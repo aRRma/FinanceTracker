@@ -111,7 +111,7 @@ for p in MD:
 
 
 # ---- L5. экраны ---------------------------------------------------------------
-SCREEN = re.compile(r"\b([ABCD]-\d{2})\b")
+SCREEN = re.compile(r"\b([ABCDE]-\d{2})\b")
 mock = ROOT / "docs/ui/mockups.html"
 proto = ROOT / "docs/ui/prototype.html"
 screens_mock = set(SCREEN.findall(read(mock))) if mock.exists() else set()
@@ -127,7 +127,7 @@ for key in sorted(screens_mock - set(SCREEN.findall(uc_text))):
     warnings.append(f"L5 экран {key} не упомянут ни в одном сценарии")
 
 if proto.exists():
-    screens_proto = set(re.findall(r'data-screen="([ABCD]-\d{2})"', read(proto)))
+    screens_proto = set(re.findall(r'data-screen="([ABCDE]-\d{2})"', read(proto)))
     absent = sorted(screens_mock - screens_proto)
     if absent:
         warnings.append(f"L5 в прототипе не размечено экранов: {len(absent)} из {len(screens_mock)} "
