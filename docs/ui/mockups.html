@@ -12,6 +12,7 @@
   --acc:#0F5C4C; --accbg:#E2EFEB;
   --pos:#2F6B2A; --neg:#963232; --negbg:#F7EAEA;
   --mono:ui-monospace,"SF Mono","Roboto Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  --onacc:#FFFFFF; --knob:#FFFFFF; --veil:rgba(22,25,28,.42);
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 [data-theme="dark"]{
@@ -20,6 +21,7 @@
   --line:#282E32;--line2:#3A4147;
   --acc:#3E9A80;--accbg:#1B342D;
   --pos:#7CBC74;--neg:#D48A8A;--negbg:#372525;
+  --onacc:#0B1310;--knob:#E7EAEC;--veil:rgba(4,6,7,.62);
 }
 
 *{box-sizing:border-box}
@@ -80,7 +82,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .fld.bad{background:var(--negbg)}
 .fld.bad .v{color:var(--neg)}
 .err{padding:0 15px 11px;background:var(--negbg);font-size:12.5px;color:var(--neg);line-height:1.45}
-.fab{position:absolute;right:15px;bottom:74px;width:52px;height:52px;border-radius:26px;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center}
+.fab{position:absolute;right:15px;bottom:74px;width:52px;height:52px;border-radius:26px;background:var(--acc);color:var(--onacc);display:flex;align-items:center;justify-content:center}
 .pad{height:66px}
 .nav{display:flex;border-top:1px solid var(--line);background:var(--card)}
 .nav a{flex:1;text-align:center;padding:9px 0 8px;color:var(--ink3);text-decoration:none}
@@ -91,15 +93,15 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .child{padding-left:44px}
 .sw2{width:38px;height:22px;border-radius:11px;background:var(--line2);position:relative;flex:none}
 .sw2.on{background:var(--acc)}
-.sw2::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:#fff}
+.sw2::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:var(--knob)}
 .sw2.on::after{left:18px}
-.btn{display:block;text-align:center;padding:11px;border-radius:9px;background:var(--acc);color:#fff;font-size:14.5px;margin:14px 15px}
+.btn{display:block;text-align:center;padding:11px;border-radius:9px;background:var(--acc);color:var(--onacc);font-size:14.5px;margin:14px 15px}
 .btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--line2)}
 .note{padding:2px 15px 12px;font-size:12px;color:var(--ink3);line-height:1.45}
 .empty{padding:44px 26px;text-align:center}
 .empty h3{font-size:17px;font-weight:500;margin:14px 0 6px}
 .empty p{font-size:13.5px;color:var(--ink2);margin:0}
-.veil{position:absolute;inset:0;background:rgba(22,25,28,.42);display:flex;align-items:flex-end;padding:16px}
+.veil{position:absolute;inset:0;background:var(--veil);display:flex;align-items:flex-end;padding:16px}
 .veil.mid{align-items:center;padding:22px}
 .dlg{background:var(--card);border-radius:14px;padding:19px;width:100%}
 .dlg h4{margin:0 0 7px;font-size:16px;font-weight:500}
@@ -107,8 +109,8 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .dlg .acts{display:flex;gap:9px}
 .dlg .acts b{flex:1;text-align:center;padding:9px;border-radius:8px;font-size:14px;font-weight:400}
 .dlg .acts .no{border:1px solid var(--line2);color:var(--ink)}
-.dlg .acts .yes{background:var(--neg);color:#fff}
-.dlg .acts .go{background:var(--acc);color:#fff}
+.dlg .acts .yes{background:var(--neg);color:var(--onacc)}
+.dlg .acts .go{background:var(--acc);color:var(--onacc)}
 .search{margin:12px 15px;padding:8px 11px;border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;gap:9px;color:var(--ink3);font-size:14px}
 .stat{display:flex;padding:12px 15px;gap:10px;border-top:1px solid var(--line)}
 .stat .b{flex:1;background:var(--sunk);border-radius:9px;padding:10px 11px}
@@ -117,13 +119,13 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .kp{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
 .kp b{background:var(--card);text-align:center;padding:13px 0;font-size:20px;font-weight:400;font-family:var(--mono)}
 .kp b.op{background:var(--sunk);color:var(--acc);font-size:18px}
-.kp b.go{background:var(--acc);color:#fff;font-size:15px;font-family:var(--sans)}
+.kp b.go{background:var(--acc);color:var(--onacc);font-size:15px;font-family:var(--sans)}
 .cal{padding:6px 10px 12px}
 .cal .wk{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11px;color:var(--ink3);padding-bottom:6px}
 .cal .gr{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
 .cal .gr i{font-style:normal;font-family:var(--mono);font-size:14px;padding:7px 0;border-radius:7px}
 .cal .gr i.off{color:var(--line2)}
-.cal .gr i.on{background:var(--acc);color:#fff}
+.cal .gr i.on{background:var(--acc);color:var(--onacc)}
 .cal .mo{display:flex;align-items:center;justify-content:space-between;padding:12px 15px 4px}
 .cal .mo b{font-size:15px;font-weight:500}
 .prog{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin:0 15px}
@@ -172,7 +174,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="wrap">
 <header class="masthead">
 <h1>Макеты экранов — итерация 2</h1>
-<p>Двадцать экранов: каркас, ввод, состояния и ошибки, справочники. Идентификаторы ссылаются на требования из REQUIREMENTS.md.</p>
+<p>Двадцать два экрана: каркас, ввод, состояния и ошибки, справочники. Идентификаторы ссылаются на требования из docs/requirements/.</p>
 <p>Изменения после первой итерации: нижняя навигация сокращена до трёх вкладок; в ленте подписью служит заметка, а не группа; добавлены экраны ввода суммы, выбора даты и разбора ошибок.</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
 </header>
