@@ -3,4 +3,4 @@ obj/
 .vs/
 *.user
 .playwright-mcp/
-*.png
+/*.png

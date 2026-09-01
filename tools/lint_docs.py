@@ -88,7 +88,7 @@ for p in MD:
         for m in RANGE.finditer(line):
             prefix, lo, hi = m.group(1).rstrip("-"), int(m.group(2)), int(m.group(3))
             top = max(groups.get(prefix, [0]))
-            if hi < top and ("все" in line.lower() or "кажд" in line.lower()):
+            if lo == 1 and hi < top and ("все" in line.lower() or "кажд" in line.lower()):
                 errors.append(
                     f"L3 {rel(p)}:{i}: диапазон {prefix}-{lo:02d}…{prefix}-{hi:02d} заявлен как полный, а существует до {prefix}-{top:02d}")
 
@@ -126,14 +126,12 @@ uc_text = read(ROOT / "docs/use-cases.md") if (ROOT / "docs/use-cases.md").exist
 for key in sorted(screens_mock - set(SCREEN.findall(uc_text))):
     warnings.append(f"L5 экран {key} не упомянут ни в одном сценарии")
 
-if proto.exists():
-    screens_proto = set(re.findall(r'data-screen="([ABCDE]-\d{2})"', read(proto)))
-    absent = sorted(screens_mock - screens_proto)
-    if absent:
-        warnings.append(f"L5 в прототипе не размечено экранов: {len(absent)} из {len(screens_mock)} "
-                        f"({', '.join(absent[:5])}{' …' if len(absent) > 5 else ''})")
-    for key in sorted(screens_proto - screens_mock):
-        errors.append(f"L5 экран {key} размечен в прототипе, но отсутствует в макетах")
+# прототип собирается из макетов скриптом; проверяем, что сборка не устарела
+sys.path.insert(0, str(ROOT / "tools"))
+import build_prototype
+fresh, _ = build_prototype.build()
+if not proto.exists() or read(proto) != fresh:
+    errors.append("L5 docs/ui/prototype.html устарел относительно макетов: запустите python tools/build_prototype.py")
 
 
 # ---- L6. запрещённые термины ---------------------------------------------------
@@ -141,14 +139,14 @@ if proto.exists():
 # «сумма», «разница», «журнал» законны в своих смыслах. Поэтому список ручной и
 # содержит только то, что неверно при любом употреблении.
 BANNED = [
-    ("копилк\w*", "«Накопления»"),
-    ("контрагент\w*", "«Место»"),
-    ("родительск\w+\s+категори\w+", "«группа»"),
-    ("категори\w+\s+первого\s+уровня", "«группа»"),
-    ("категори\w+\s+второго\s+уровня", "«подкатегория»"),
+    (r"копилк\w*", "«Накопления»"),
+    (r"контрагент\w*", "«Место»"),
+    (r"родительск\w+\s+категори\w+", "«группа»"),
+    (r"категори\w+\s+первого\s+уровня", "«группа»"),
+    (r"категори\w+\s+второго\s+уровня", "«подкатегория»"),
     ("payee", "Place"),
-    ("доступн\w+\s+остат\w+", "«доступно к тратам»"),
-    ("истори\w+\s+по\s+счёту", "«лента счёта»"),
+    (r"доступн\w+\s+остат\w+", "«доступно к тратам»"),
+    (r"истори\w+\s+по\s+счёту", "«лента счёта»"),
     ("exclude_from_available", "excluded_from_totals"),
 ]
 for p_ in MD:

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Личный трекер финансов — макеты, итерация 2</title>
+<title>Личный трекер финансов — макеты, итерация 3</title>
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -176,9 +176,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 
 <div class="wrap">
 <header class="masthead">
-<h1>Макеты экранов — итерация 2</h1>
+<h1>Макеты экранов — итерация 3</h1>
 <p>28 экранов: каркас, ввод, состояния и ошибки, справочники, отчёт. Идентификаторы ссылаются на требования из docs/requirements/.</p>
-<p>Изменения после первой итерации: нижняя навигация сокращена до трёх вкладок; в ленте подписью служит заметка, а не группа; добавлены экраны ввода суммы, выбора даты и разбора ошибок.</p>
+<p>Изменения третьей итерации: обмен между устройствами вынесен за MVP — экраны C-04 и C-05 сохранены как отложенные, значок обмена убран с главного экрана; добавлен раздел E «Отчёт» и четвёртая вкладка; подытог накоплений упразднён, признак счёта переименован в «скрыть из расчётов»; дорисованы C-07 (удаление операции) и D-06 (оформление).</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
 </header>
 
@@ -188,7 +188,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <figure class="unit">
 <figcaption class="cap"><span class="sid">A-01</span><b>Балансы</b><em>Накопления показаны группой без общей суммы: счёт, скрытый из расчётов, не попадает и в отдельный подытог. Отрицательный баланс — обычное число, без предупреждений.</em></figcaption>
 <div class="phone">
-  <div class="hd"><h2>Балансы</h2><svg class="ic act"><use href="#i-sync"/></svg><span class="num" style="font-size:12px;color:var(--ink3)">вчера</span></div>
+  <div class="hd"><h2>Балансы</h2></div>
   <div class="sec"><span class="k">Рубли</span><span class="k">Доступно</span></div>
   <div class="total"><span class="big">82 430,50 ₽</span></div>
   <div class="row tp"><svg class="ic dim"><use href="#i-cash"/></svg><div class="g"><div class="t">Наличные</div></div><span class="num">12 400,00</span></div>
@@ -237,7 +237,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <figure class="unit">
 <figcaption class="cap"><span class="sid">A-03</span><b>Лента по счёту</b><em>Подписью служит заметка, если она есть, иначе группа. Заметка — единственное, чего не вывести из названия подкатегории.</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Карта основная<span class="sub">71 920,50 ₽</span></h2><svg class="ic act"><use href="#i-note"/></svg></div>
+  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Карта основная<span class="sub">71 920,50 ₽</span></h2></div>
   <div class="date"><span>25 августа</span><span>−6 250,00</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-cart"/></svg><div class="g"><div class="t">Продукты</div><div class="s">Пятёрочка</div></div><span class="num">−1 250,00</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-swap"/></svg><div class="g"><div class="t">Копилка на отпуск</div><div class="s">Перевод</div></div><span class="num">−5 000,00</span></div>
@@ -259,13 +259,13 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-04</span><b>Ещё</b><em>Всё, что открывается реже раза в неделю. Счётчик неотправленных изменений вынесен сюда, чтобы не занимать место на главном.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-04</span><b>Ещё</b><em>Всё, что открывается реже раза в неделю: справочники, оформление, часовой пояс, сведения о версии.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Ещё</h2></div>
   <div class="row tp"><svg class="ic dim"><use href="#i-wallet"/></svg><div class="g"><div class="t">Счета</div><div class="s">5 счетов</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="row"><svg class="ic dim"><use href="#i-place"/></svg><div class="g"><div class="t">Места</div><div class="s">63 места</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
     <div class="row"><svg class="ic dim"><use href="#i-grid"/></svg><div class="g"><div class="t">Категории</div><div class="s">13 групп, 63 подкатегории</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
-  <div class="row"><svg class="ic dim"><use href="#i-sync"/></svg><div class="g"><div class="t">Синхронизация</div><div class="s">14 изменений не отправлено</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
+  <div class="row"><svg class="ic dim"><use href="#i-sun"/></svg><div class="g"><div class="t">Оформление</div><div class="s">Как в системе</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="row"><svg class="ic dim"><use href="#i-globe"/></svg><div class="g"><div class="t">Часовой пояс</div><div class="s">Europe/Moscow</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="row"><svg class="ic dim"><use href="#i-info"/></svg><div class="g"><div class="t">О программе</div><div class="s">Версия 1.0, схема 4</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="pad"></div>
@@ -444,7 +444,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <figure class="unit">
 <figcaption class="cap"><span class="sid">C-03</span><b>Счёт без операций</b><em>Начальный остаток показан отдельной строкой — иначе непонятно, откуда взялся баланс при пустой ленте.</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Карта евро<span class="sub">1 240,00 €</span></h2><svg class="ic act"><use href="#i-note"/></svg></div>
+  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Карта евро<span class="sub">1 240,00 €</span></h2></div>
   <div class="row tp"><svg class="ic dim sm"><use href="#i-cal"/></svg><div class="g"><div class="t dim">Начальный остаток</div><div class="s">1 марта 2026</div></div><span class="num dim">1 240,00</span></div>
   <div class="empty">
     <svg class="ic" style="width:32px;height:32px;color:var(--ink3);stroke-width:1.2"><use href="#i-list"/></svg>
@@ -463,7 +463,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-04</span><b>Первая выгрузка</b><em>Единственный случай, когда обмен занимает заметное время. Показан прогресс по строкам, а не бесконечный индикатор.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-04</span><b>Первая выгрузка</b><em>Отложено вместе с обменом, экран сохранён для будущего этапа. Единственный случай, когда обмен занимает заметное время. Показан прогресс по строкам, а не бесконечный индикатор.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Синхронизация</h2></div>
   <div class="sec tight"><span class="k">Отправка</span><span class="num" style="font-size:13px;color:var(--ink2)">1 240 / 2 018</span></div>
@@ -478,7 +478,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-05</span><b>Синхронизация — обычное состояние</b><em>Ошибка сформулирована как факт с последствием. Приложение не заблокировано, данные не потеряны, и это сказано прямо.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-05</span><b>Синхронизация — обычное состояние</b><em>Отложено вместе с обменом, экран сохранён для будущего этапа. Ошибка сформулирована как факт с последствием. Приложение не заблокировано, данные не потеряны, и это сказано прямо.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Синхронизация</h2></div>
   <div class="stat">
@@ -567,9 +567,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="note">Валюту нельзя изменить — по счёту есть операции</div>
   <div class="fld"><span class="k">Начальный остаток</span><span class="v"><span class="n">14 500,00</span></span></div>
   <div class="fld"><svg class="ic dim sm"><use href="#i-cal"/></svg><span class="k">Дата открытия</span><span class="v">1 января 2026</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
-  <div class="note">Дату можно сдвинуть только назад — есть операции с 3 января</div>
-  <div class="fld"><span class="k" style="flex:1">Это накопления</span><span class="sw2"></span></div>
-  <div class="note">Баланс не войдёт в подытог доступных к тратам средств</div>
+  <div class="note">Назад — свободно. Вперёд — не позже 3 января: есть операция этой датой</div>
+  <div class="fld"><span class="k" style="flex:1">Скрыть из расчётов</span><span class="sw2"></span></div>
+  <div class="note">Счёт не войдёт ни в «доступно к тратам», ни в итоги дня и отчёт. Так помечают накопления</div>
 </div>
 </figure>
 
