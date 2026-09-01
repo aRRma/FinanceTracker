@@ -16,7 +16,7 @@
 | `SYN-*` `FR-SYN-*` | [requirements/06-sync-deferred.md](requirements/06-sync-deferred.md) | **Вне MVP.** Обмен между устройствами |
 | `TECH-*` | [architecture.md](architecture.md) | Состав проектов, слои, стек, ловушки реализации |
 | `UC-*` | [use-cases.md](use-cases.md) | Сценарии использования |
-| `A-*` `B-*` `C-*` `D-*` | [ui/mockups.html](ui/mockups.html) | Экраны |
+| `A-*` `B-*` `C-*` `D-*` `E-*` | [ui/mockups.html](ui/mockups.html) | Экраны: каркас · ввод · состояния · справочники · отчёт |
 
 Аннулированные и отложенные требования оставлены на своих местах зачёркнутым заголовком. Номер не освобождается и повторно не используется никогда: ссылки на него живут в коде, коммитах и обсуждениях.
 
@@ -26,7 +26,7 @@
 |---|---|
 | Доменные типы, инварианты, фабрики | [requirements/02-domain.md](requirements/02-domain.md), [architecture.md](architecture.md) |
 | Экран или форма ввода | [requirements/03-functional.md](requirements/03-functional.md), [use-cases.md](use-cases.md), нужный экран в [ui/mockups.html](ui/mockups.html) |
-| Отчёт | `FR-RPT-*` в [requirements/03-functional.md](requirements/03-functional.md) |
+| Отчёт | `FR-RPT-*` в [requirements/03-functional.md](requirements/03-functional.md), экраны `E-01…E-04`, сценарий UC-19 |
 | Схема, миграции, индексы | [requirements/02-domain.md](requirements/02-domain.md), `NFR-01…NFR-08` в [requirements/05-quality.md](requirements/05-quality.md), `TECH-*` в [architecture.md](architecture.md) |
 | Засев категорий | [requirements/04-preset.md](requirements/04-preset.md), [preset-rationale.md](preset-rationale.md), [data/preset.json](../data/preset.json) |
 | Темы и цвета | `NFR-21…NFR-25` в [requirements/05-quality.md](requirements/05-quality.md), переключатель темы в [ui/mockups.html](ui/mockups.html) — эталон палитр |

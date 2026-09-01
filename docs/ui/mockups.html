@@ -148,6 +148,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10.5h18"/><circle cx="17" cy="14.8" r="1.1"/></symbol>
 <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M4 6h.01M4 12h.01M4 18h.01"/></symbol>
 <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></symbol>
 <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/></symbol>
 <symbol id="i-cash" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/></symbol>
 <symbol id="i-card" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="2"/><path d="M2.5 10h19"/></symbol>
@@ -174,7 +177,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="wrap">
 <header class="masthead">
 <h1>Макеты экранов — итерация 2</h1>
-<p>Двадцать два экрана: каркас, ввод, состояния и ошибки, справочники. Идентификаторы ссылаются на требования из docs/requirements/.</p>
+<p>28 экранов: каркас, ввод, состояния и ошибки, справочники, отчёт. Идентификаторы ссылаются на требования из docs/requirements/.</p>
 <p>Изменения после первой итерации: нижняя навигация сокращена до трёх вкладок; в ленте подписью служит заметка, а не группа; добавлены экраны ввода суммы, выбора даты и разбора ошибок.</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
 </header>
@@ -183,7 +186,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-01</span><b>Балансы</b><em>Три вкладки вместо четырёх: категории редактируются раз в месяц и не заслуживают четверти панели. Отрицательный баланс показан как обычное число.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-01</span><b>Балансы</b><em>Накопления показаны группой без общей суммы: счёт, скрытый из расчётов, не попадает и в отдельный подытог. Отрицательный баланс — обычное число, без предупреждений.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Балансы</h2><svg class="ic act"><use href="#i-sync"/></svg><span class="num" style="font-size:12px;color:var(--ink3)">вчера</span></div>
   <div class="sec"><span class="k">Рубли</span><span class="k">Доступно</span></div>
@@ -191,7 +194,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="row tp"><svg class="ic dim"><use href="#i-cash"/></svg><div class="g"><div class="t">Наличные</div></div><span class="num">12 400,00</span></div>
   <div class="row"><svg class="ic dim"><use href="#i-card"/></svg><div class="g"><div class="t">Карта основная</div></div><span class="num">71 920,50</span></div>
   <div class="row"><svg class="ic dim"><use href="#i-card"/></svg><div class="g"><div class="t">Карта кредитная</div></div><span class="num neg">−1 890,00</span></div>
-  <div class="sec tight" style="border-top:1px solid var(--line)"><span class="k">Накопления</span><span class="mid">250 000,00 ₽</span></div>
+  <div class="sec tight" style="border-top:1px solid var(--line)"><span class="k">Накопления</span><span class="k">скрыты из расчётов</span></div>
   <div class="row"><svg class="ic dim"><use href="#i-vault"/></svg><div class="g"><div class="t dim">Копилка на отпуск</div></div><span class="num dim">250 000,00</span></div>
   <div class="sec" style="border-top:1px solid var(--line2)"><span class="k">Евро</span><span class="k">Доступно</span></div>
   <div class="total"><span class="big">1 240,00 €</span></div>
@@ -201,6 +204,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <nav class="nav">
     <a class="on"><svg class="ic" style="display:block;margin:0 auto"><use href="#i-wallet"/></svg><span>Балансы</span></a>
     <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-list"/></svg><span>Операции</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-chart"/></svg><span>Отчёт</span></a>
     <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-more"/></svg><span>Ещё</span></a>
   </nav>
 </div>
@@ -224,6 +228,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <nav class="nav">
     <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-wallet"/></svg><span>Балансы</span></a>
     <a class="on"><svg class="ic" style="display:block;margin:0 auto"><use href="#i-list"/></svg><span>Операции</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-chart"/></svg><span>Отчёт</span></a>
     <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-more"/></svg><span>Ещё</span></a>
   </nav>
 </div>
@@ -247,6 +252,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <nav class="nav">
     <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-wallet"/></svg><span>Балансы</span></a>
     <a class="on"><svg class="ic" style="display:block;margin:0 auto"><use href="#i-list"/></svg><span>Операции</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-chart"/></svg><span>Отчёт</span></a>
     <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-more"/></svg><span>Ещё</span></a>
   </nav>
 </div>
@@ -266,6 +272,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <nav class="nav">
     <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-wallet"/></svg><span>Балансы</span></a>
     <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-list"/></svg><span>Операции</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-chart"/></svg><span>Отчёт</span></a>
     <a class="on"><svg class="ic" style="display:block;margin:0 auto"><use href="#i-more"/></svg><span>Ещё</span></a>
   </nav>
 </div>
@@ -449,6 +456,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <nav class="nav">
     <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-wallet"/></svg><span>Балансы</span></a>
     <a class="on"><svg class="ic" style="display:block;margin:0 auto"><use href="#i-list"/></svg><span>Операции</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-chart"/></svg><span>Отчёт</span></a>
     <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-more"/></svg><span>Ещё</span></a>
   </nav>
 </div>
@@ -504,12 +512,32 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <nav class="nav">
     <a class="on"><svg class="ic" style="display:block;margin:0 auto"><use href="#i-wallet"/></svg><span>Балансы</span></a>
     <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-list"/></svg><span>Операции</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-chart"/></svg><span>Отчёт</span></a>
     <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-more"/></svg><span>Ещё</span></a>
   </nav>
 </div>
 </figure>
 
 </div>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-07</span><b>Удаление операции</b><em>Подтверждение называет то, что изменится — баланс счёта. Без этого пользователь подтверждает вслепую и проверяет результат постфактум.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Операция</h2><svg class="ic act"><use href="#i-trash"/></svg></div>
+  <div class="amt"><span class="v">−1 250,00</span><span class="c">₽</span></div>
+  <div class="fld"><span class="k">Счёт</span><span class="v">Карта основная</span></div>
+  <div class="fld"><span class="k">Категория</span><span class="v">Продукты</span></div>
+  <div class="fld"><span class="k">Место</span><span class="v">Пятёрочка</span></div>
+  <div class="fld"><span class="k">Дата</span><span class="v">25 августа 2026</span></div>
+  <div class="veil">
+    <div class="dlg">
+      <h4>Удалить операцию?</h4>
+      <p>Баланс «Карта основная» станет 73 170,50 ₽. Отменить удаление будет нельзя.</p>
+      <div class="acts"><b class="no">Отмена</b><b class="yes">Удалить</b></div>
+    </div>
+  </div>
+</div>
+</figure>
 
 <div class="band"><h2>D · Справочники</h2><span>Счета и категории — редкое редактирование, но плотные правила</span></div>
 <div class="sheet">
@@ -596,7 +624,122 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </div>
 </figure>
 
+<figure class="unit">
+<figcaption class="cap"><span class="sid">D-06</span><b>Оформление</b><em>Три состояния, а не переключатель: вернуться к системной теме после ручного выбора иначе невозможно.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Оформление</h2></div>
+  <div class="sec"><span class="k">Тема</span></div>
+  <div class="row tp"><svg class="ic sm dim"><use href="#i-globe"/></svg><div class="g"><div class="t">Как в системе</div><div class="s">Следует настройке телефона</div></div><svg class="ic sm" style="color:var(--acc)"><use href="#i-check"/></svg></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-sun"/></svg><div class="g"><div class="t">Светлая</div></div></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-moon"/></svg><div class="g"><div class="t">Тёмная</div></div></div>
+  <div class="note">Настройка хранится только на этом устройстве и никуда не передаётся</div>
+  <div class="pad"></div>
 </div>
+</figure>
+
+</div>
+
+<div class="band"><h2>E · Отчёт</h2><span>Три уровня погружения: группы, подкатегории, операции</span></div>
+<div class="sheet">
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">E-01</span><b>Отчёт — группы</b><em>Первый уровень отвечает на вопрос «куда ушли деньги». Полоса под строкой даёт сравнение глазом, без чтения процентов.</em></figcaption>
+<div class="phone">
+  <div class="hd"><h2>Отчёт</h2></div>
+  <div class="seg"><b class="on">Расходы</b><b>Доходы</b></div>
+  <div class="cal" style="border-top:1px solid var(--line)"><div class="mo"><svg class="ic act"><use href="#i-prev"/></svg><b>Август 2026</b><svg class="ic act dim"><use href="#i-next"/></svg></div></div>
+  <div class="total" style="padding-top:2px"><span class="big">−84 260,00 ₽</span></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-kitchen"/></svg><div class="g"><div class="t">Еда</div></div><span class="num">−31 480,00</span><span class="tag" style="margin-left:8px">37%</span></div>
+  <div class="prog" style="margin:0 15px 9px 59px"><i style="width:37%"></i></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-car2"/></svg><div class="g"><div class="t">Транспорт</div></div><span class="num">−18 900,00</span><span class="tag" style="margin-left:8px">22%</span></div>
+  <div class="prog" style="margin:0 15px 9px 59px"><i style="width:22%"></i></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">Дом</div></div><span class="num">−14 200,00</span><span class="tag" style="margin-left:8px">17%</span></div>
+  <div class="prog" style="margin:0 15px 9px 59px"><i style="width:17%"></i></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-pill"/></svg><div class="g"><div class="t">Здоровье</div></div><span class="num">−9 340,00</span><span class="tag" style="margin-left:8px">11%</span></div>
+  <div class="prog" style="margin:0 15px 9px 59px"><i style="width:11%"></i></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-shop"/></svg><div class="g"><div class="t">Одежда</div></div><span class="num">−6 100,00</span><span class="tag" style="margin-left:8px">7%</span></div>
+  <div class="prog" style="margin:0 15px 9px 59px"><i style="width:7%"></i></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-coffee"/></svg><div class="g"><div class="t">Развлечения</div></div><span class="num">−4 240,00</span><span class="tag" style="margin-left:8px">5%</span></div>
+  <div class="prog" style="margin:0 15px 9px 59px"><i style="width:5%"></i></div>
+  <div class="note">Переводы между своими счетами в отчёт не входят: деньги не потрачены, а переложены. Счета, скрытые из расчётов, тоже не учитываются</div>
+  <div class="pad"></div>
+  <nav class="nav">
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-wallet"/></svg><span>Балансы</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-list"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic" style="display:block;margin:0 auto"><use href="#i-chart"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">E-02</span><b>Отчёт — подкатегории</b><em>Второй уровень отвечает «на что именно». Доли пересчитаны внутри группы, а не от общего расхода: иначе все числа были бы мелкими и несравнимыми между собой.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Еда<span class="sub">август 2026 · 37% расходов</span></h2></div>
+  <div class="total" style="padding-top:10px"><span class="big">−31 480,00 ₽</span></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-cart"/></svg><div class="g"><div class="t">Продукты</div></div><span class="num">−19 240,00</span><span class="tag" style="margin-left:8px">61%</span></div>
+  <div class="prog" style="margin:0 15px 9px 59px"><i style="width:61%"></i></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-kitchen"/></svg><div class="g"><div class="t">Кафе и рестораны</div></div><span class="num">−6 800,00</span><span class="tag" style="margin-left:8px">22%</span></div>
+  <div class="prog" style="margin:0 15px 9px 59px"><i style="width:22%"></i></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Доставка еды</div></div><span class="num">−3 190,00</span><span class="tag" style="margin-left:8px">10%</span></div>
+  <div class="prog" style="margin:0 15px 9px 59px"><i style="width:10%"></i></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-coffee"/></svg><div class="g"><div class="t">Кофе</div></div><span class="num">−1 750,00</span><span class="tag" style="margin-left:8px">6%</span></div>
+  <div class="prog" style="margin:0 15px 9px 59px"><i style="width:6%"></i></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-adjust"/></svg><div class="g"><div class="t">Прочее</div></div><span class="num">−500,00</span><span class="tag" style="margin-left:8px">1%</span></div>
+  <div class="prog" style="margin:0 15px 9px 59px"><i style="width:2%"></i></div>
+  <div class="pad"></div>
+  <nav class="nav">
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-wallet"/></svg><span>Балансы</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-list"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic" style="display:block;margin:0 auto"><use href="#i-chart"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">E-03</span><b>Отчёт — операции подкатегории</b><em>Третий уровень — те же строки, что и в ленте, но отобранные по подкатегории и месяцу. Отдельного представления для них не заводится.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Доставка еды<span class="sub">август 2026 · 8 операций</span></h2></div>
+  <div class="total" style="padding-top:10px"><span class="big">−3 190,00 ₽</span></div>
+  <div class="row tp"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Самокат</div><div class="s">28 августа · Карта основная</div></div><span class="num">−890,00</span></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Яндекс Еда</div><div class="s">24 августа · Карта основная</div></div><span class="num">−1 140,00</span></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Самокат</div><div class="s">19 августа · Карта основная</div></div><span class="num">−620,00</span></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Купер</div><div class="s">12 августа · Наличные</div></div><span class="num">−540,00</span></div>
+  <div class="note">Строка открывает ту же карточку операции, что и лента. Отчёт — другой разрез тех же данных, а не их копия</div>
+  <div class="pad"></div>
+  <nav class="nav">
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-wallet"/></svg><span>Балансы</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-list"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic" style="display:block;margin:0 auto"><use href="#i-chart"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">E-04</span><b>Отчёт — месяц без операций</b><em>Пустое состояние вместо списка нулей: шесть строк по нулю рублей читаются как ошибка расчёта, а не как отсутствие трат.</em></figcaption>
+<div class="phone">
+  <div class="hd"><h2>Отчёт</h2></div>
+  <div class="seg"><b class="on">Расходы</b><b>Доходы</b></div>
+  <div class="cal" style="border-top:1px solid var(--line)"><div class="mo"><svg class="ic act"><use href="#i-prev"/></svg><b>Февраль 2026</b><svg class="ic act"><use href="#i-next"/></svg></div></div>
+  <div class="empty">
+    <svg class="ic" style="width:32px;height:32px;color:var(--ink3);stroke-width:1.2"><use href="#i-chart"/></svg>
+    <h3>В этом месяце трат не было</h3>
+    <p>Выберите другой месяц стрелками вверху.</p>
+  </div>
+  <div class="pad"></div>
+  <nav class="nav">
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-wallet"/></svg><span>Балансы</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-list"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic" style="display:block;margin:0 auto"><use href="#i-chart"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic" style="display:block;margin:0 auto"><use href="#i-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+</div>
+
 </div>
 </body>
 </html>
