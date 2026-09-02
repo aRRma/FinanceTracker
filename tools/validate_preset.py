@@ -32,7 +32,7 @@ for g in p["groups"]:
             err.append(f"SEED-07: значок {s['icon']} у {s['key']} вне набора")
 
 if p["seededAtUtc"] > "2020":
-    err.append("SEED-03: метка засева должна быть заведомо давней")
+    err.append("SEED-03: метка времени стартового набора должна быть заведомо давней")
 
 print(f"групп {len(p['groups'])}, подкатегорий {len(keys)}, значков {len(icons)}")
 if err:

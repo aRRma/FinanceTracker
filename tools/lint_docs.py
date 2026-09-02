@@ -162,6 +162,7 @@ BANNED = [
     (r"\bосновн\w+\s+сч[её]т", "«счёт списания»"),
     (r"\bвтор\w+\s+сумм", "«сумма зачисления»"),
     (r"counter_(account|amount)", "target_account / target_amount"),
+    (r"\bзасе[вя]\w*", "«инициализация базы»"),
 ]
 for p_ in MD:
     if p_.name in {"CONTEXT.md", "MEMORY.md"} or "adr" in p_.parts:
