@@ -40,6 +40,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .sid{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--acc);background:var(--accbg);padding:2px 6px;border-radius:3px;margin-right:8px}
 .cap b{font-weight:500;font-size:14.5px}
 .cap em{display:block;font-style:normal;color:var(--ink2);font-size:12.5px;line-height:1.5;margin-top:4px}
+.cap .uc{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-left:8px}
 
 .phone{position:relative;width:100%;max-width:330px;background:var(--card);border:1px solid var(--line2);border-radius:22px;overflow:hidden}
 .ic{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
@@ -94,8 +95,8 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .child{padding-left:44px}
 .sw2{width:38px;height:22px;border-radius:11px;background:var(--line2);position:relative;flex:none}
 .sw2.on{background:var(--acc)}
-.sw2::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:var(--knob)}
-.sw2.on::after{left:18px}
+.sw2 i{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:var(--knob)}
+.sw2.on i{left:18px}
 .btn{display:block;text-align:center;padding:11px;border-radius:9px;background:var(--acc);color:var(--onacc);font-size:14.5px;margin:14px 15px}
 .btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--line2)}
 .note{padding:2px 15px 12px;font-size:12px;color:var(--ink3);line-height:1.45}
@@ -218,8 +219,8 @@ body{padding:0}
 </defs></svg>
 
 <div class="page">
-<h1>Анимированный прототип — итерация 3</h1>
-<p class="lede">Экраны взяты из <b>mockups.html</b> без изменений, файл собирается скриптом <b>tools/build_prototype.py</b> — править нужно макеты, а не этот файл. Кадр — Samsung Galaxy S25 Ultra: <b>480 × 1040</b> логических пикселей.</p>
+<h1>Анимированный прототип — итерация 4</h1>
+<p class="lede">Экраны взяты из <b>mockups.html</b> без изменений, файл собирается скриптом <b>tools/build_prototype.py</b> — править нужно макеты, а не этот файл. Вкладки названы по сценариям из <b>docs/use-cases.md</b>. Кадр — Samsung Galaxy S25 Ultra: <b>480 × 1040</b> логических пикселей.</p>
 
 <div class="bar" id="tabs"></div>
 <div class="bar">
@@ -240,14 +241,14 @@ body{padding:0}
 <div class="holder"><div class="frame" id="frame"><div class="dev" id="dev">
 <div class="sb"><span>21:40</span><div class="r"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
 <div class="stage" id="stage">
-<div class="scr right" data-screen="A-01" title="A-01 · Балансы">
+<div class="scr right" data-screen="A-01" title="A-01 · Посмотреть, сколько доступно">
 <div class="phone">
   <div class="hd"><h2>Балансы</h2></div>
   <div class="sec"><span class="k">Рубли</span><span class="k">Доступно</span></div>
   <div class="total"><span class="big">82 430,50 ₽</span></div>
   <div class="row tp"><svg class="ic dim"><use href="#i-cash"/></svg><div class="g"><div class="t">Наличные</div></div><span class="num">12 400,00</span></div>
   <div class="row"><svg class="ic dim"><use href="#i-card"/></svg><div class="g"><div class="t">Карта основная</div></div><span class="num">71 920,50</span></div>
-  <div class="row"><svg class="ic dim"><use href="#i-card"/></svg><div class="g"><div class="t">Карта кредитная</div></div><span class="num neg">−1 890,00</span></div>
+  <div class="row" id="a1-credit"><svg class="ic dim"><use href="#i-card"/></svg><div class="g"><div class="t">Карта кредитная</div></div><span class="num neg">−1 890,00</span></div>
   <div class="sec tight" style="border-top:1px solid var(--line)"><span class="k">Накопления</span><span class="k">скрыты из расчётов</span></div>
   <div class="row"><svg class="ic dim"><use href="#i-vault"/></svg><div class="g"><div class="t dim">Копилка на отпуск</div></div><span class="num dim">250 000,00</span></div>
   <div class="sec" style="border-top:1px solid var(--line2)"><span class="k">Евро</span><span class="k">Доступно</span></div>
@@ -264,9 +265,9 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="A-02" title="A-02 · Операции — все счета">
+<div class="scr right" data-screen="A-02" title="A-02 · Просмотреть операции по всем счетам">
 <div class="phone">
-  <div class="hd"><h2>Операции</h2><svg class="ic act"><use href="#i-search"/></svg></div>
+  <div class="hd"><h2>Операции</h2></div>
   <div class="date"><span>25 августа</span><span>−6 250,00 ₽</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-cart"/></svg><div class="g"><div class="t">Продукты</div><div class="s">Пятёрочка · Карта основная</div></div><span class="num">−1 250,00</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-swap"/></svg><div class="g"><div class="t">Копилка на отпуск</div><div class="s">Перевод · Карта основная</div></div><span class="num">−5 000,00</span></div>
@@ -287,7 +288,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="A-03" title="A-03 · Лента по счёту">
+<div class="scr right" data-screen="A-03" title="A-03 · Просмотреть ленту счёта">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Карта основная<span class="sub">71 920,50 ₽</span></h2></div>
   <div class="date"><span>25 августа</span><span>−6 250,00</span></div>
@@ -310,7 +311,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="A-04" title="A-04 · Ещё">
+<div class="scr right" data-screen="A-04" title="A-04 · Открыть справочники и настройки">
 <div class="phone">
   <div class="hd"><h2>Ещё</h2></div>
   <div class="row tp"><svg class="ic dim"><use href="#i-wallet"/></svg><div class="g"><div class="t">Счета</div><div class="s">5 счетов</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
@@ -329,13 +330,15 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="B-01" title="B-01 · Ввод суммы">
+<div class="scr right" data-screen="B-01" title="B-01 · Ввести сумму">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2></div>
   <div class="seg"><b class="on">Расход</b><b>Доход</b><b>Перевод</b></div>
   <div class="amt"><span class="expr">1250 + 340</span><span class="v">1 590,00</span><span class="c">₽</span></div>
   <div class="fld" style="border-top:none"><svg class="ic dim sm"><use href="#i-card"/></svg><span class="k">Счёт</span><span class="v">Карта основная</span></div>
   <div class="fld"><svg class="ic sm" style="color:var(--acc)"><use href="#i-grid"/></svg><span class="k">Категория</span><span class="v ask">Выбрать</span></div>
+  <div class="fld"><svg class="ic dim sm"><use href="#i-place"/></svg><span class="k">Место</span><span class="v none">Необязательно</span></div>
+  <div class="fld"><svg class="ic dim sm"><use href="#i-cal"/></svg><span class="k">Дата</span><span class="v">Сегодня</span></div>
   <div class="kp">
     <b>7</b><b>8</b><b>9</b><b class="op">÷</b>
     <b>4</b><b>5</b><b>6</b><b class="op">×</b>
@@ -346,7 +349,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="B-02" title="B-02 · Выбор счёта">
+<div class="scr right" data-screen="B-02" title="B-02 · Выбрать счёт">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Счёт списания</h2></div>
   <div class="sec tight"><span class="k">Рубли</span></div>
@@ -360,7 +363,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="B-03" title="B-03 · Выбор категории">
+<div class="scr right" data-screen="B-03" title="B-03 · Выбрать подкатегорию">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Категория расхода</h2></div>
   <div class="search"><svg class="ic sm"><use href="#i-search"/></svg><span>Поиск по названию</span></div>
@@ -379,7 +382,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="B-04" title="B-04 · Выбор даты">
+<div class="scr right" data-screen="B-04" title="B-04 · Выбрать дату">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Дата операции</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="cal">
@@ -400,21 +403,20 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="B-05" title="B-05 · Перевод в одной валюте">
+<div class="scr right" data-screen="B-05" title="B-05 · Перевести между счетами в одной валюте">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="seg"><b>Расход</b><b>Доход</b><b class="on">Перевод</b></div>
   <div class="amt"><span class="v">5 000,00</span><span class="c">₽</span></div>
   <div class="fld" style="border-top:none"><svg class="ic dim sm"><use href="#i-card"/></svg><span class="k">Откуда</span><span class="v">Карта основная</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="fld"><svg class="ic dim sm"><use href="#i-swap"/></svg><span class="k">Куда</span><span class="v">Копилка на отпуск</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
-  <div class="fld"><svg class="ic dim sm"><use href="#i-place"/></svg><span class="k">Место</span><span class="v none">Необязательно</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="fld"><svg class="ic dim sm"><use href="#i-cal"/></svg><span class="k">Дата</span><span class="v">Сегодня</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="fld"><svg class="ic dim sm"><use href="#i-note"/></svg><span class="k">Заметка</span><span class="v none">Необязательно</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="note">Перевод не попадает ни в доходы, ни в расходы</div>
 </div>
 </div>
 
-<div class="scr right" data-screen="B-06" title="B-06 · Перевод между валютами">
+<div class="scr right" data-screen="B-06" title="B-06 · Перевести между валютами">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="seg"><b>Расход</b><b>Доход</b><b class="on">Перевод</b></div>
@@ -427,7 +429,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="B-07" title="B-07 · Выбор места">
+<div class="scr right" data-screen="B-07" title="B-07 · Указать место">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Место</h2></div>
   <div class="search"><svg class="ic sm"><use href="#i-search"/></svg><span style="color:var(--ink)">пят</span><span style="width:1px;height:15px;background:var(--acc);display:inline-block"></span></div>
@@ -442,7 +444,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="C-01" title="C-01 · Дата раньше открытия счёта">
+<div class="scr right" data-screen="C-01" title="C-01 · Исправить дату раньше открытия счёта">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="seg"><b class="on">Расход</b><b>Доход</b><b>Перевод</b></div>
@@ -455,11 +457,12 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="C-02" title="C-02 · Удаление подкатегории">
+<div class="scr right" data-screen="C-02" title="C-02 · Удалить подкатегорию">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Такси</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="fld" style="border-top:none"><span class="k">Название</span><span class="v">Такси</span></div>
-  <div class="fld"><span class="k">Группа</span><span class="v">Транспорт</span></div>
+  <div class="fld"><svg class="ic dim sm"><use href="#i-car2"/></svg><span class="k">Значок</span><span class="v dim">car2</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
+  <div class="fld"><span class="k">Группа</span><span class="v">Транспорт</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="fld"><span class="k">Вид</span><span class="v dim">Расход</span><svg class="ic sm dim"><use href="#i-lock"/></svg></div>
   <div class="note">Вид наследуется от группы и не меняется</div>
   <div class="row tp" style="color:var(--neg)"><svg class="ic sm"><use href="#i-trash"/></svg><div class="g"><div class="t">Удалить подкатегорию</div></div></div>
@@ -473,7 +476,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="C-03" title="C-03 · Счёт без операций">
+<div class="scr right" data-screen="C-03" title="C-03 · Открыть счёт без операций">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Карта евро<span class="sub">1 240,00 €</span></h2></div>
   <div class="row tp"><svg class="ic dim sm"><use href="#i-cal"/></svg><div class="g"><div class="t dim">Начальный остаток</div><div class="s">1 марта 2026</div></div><span class="num dim">1 240,00</span></div>
@@ -493,7 +496,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="C-04" title="C-04 · Первая выгрузка">
+<div class="scr right" data-screen="C-04" title="C-04 · Выгрузить историю при первом обмене">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Синхронизация</h2></div>
   <div class="sec tight"><span class="k">Отправка</span><span class="num" style="font-size:13px;color:var(--ink2)">1 240 / 2 018</span></div>
@@ -507,7 +510,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="C-05" title="C-05 · Синхронизация — обычное состояние">
+<div class="scr right" data-screen="C-05" title="C-05 · Синхронизировать">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Синхронизация</h2></div>
   <div class="stat">
@@ -526,7 +529,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="C-06" title="C-06 · Первый запуск">
+<div class="scr right" data-screen="C-06" title="C-06 · Запустить приложение впервые">
 <div class="phone">
   <div class="hd"><h2>Балансы</h2></div>
   <div class="empty">
@@ -546,7 +549,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="C-07" title="C-07 · Удаление операции">
+<div class="scr right" data-screen="C-07" title="C-07 · Удалить операцию">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Операция</h2><svg class="ic act"><use href="#i-trash"/></svg></div>
   <div class="amt"><span class="v">−1 250,00</span><span class="c">₽</span></div>
@@ -564,21 +567,39 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="D-01" title="D-01 · Счета">
+<div class="scr right" data-screen="C-08" title="C-08 · Удалить место">
+<div class="phone">
+  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Пятерочка</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
+  <div class="fld" style="border-top:none"><span class="k">Название</span><span class="v">Пятерочка</span></div>
+  <div class="note">3 операции · чаще всего «Продукты». Похоже на дубль «Пятёрочки» — слить два места в одно нельзя, операции переносятся вручную</div>
+  <div class="row tp" style="color:var(--neg)"><svg class="ic sm"><use href="#i-trash"/></svg><div class="g"><div class="t">Удалить место</div></div></div>
+  <div class="veil">
+    <div class="dlg">
+      <h4>Удалить «Пятерочка»?</h4>
+      <p>3 операции останутся без места. Суммы, даты и балансы не изменятся.</p>
+      <div class="acts"><b class="no">Отмена</b><b class="yes">Удалить</b></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="scr right" data-screen="D-01" title="D-01 · Упорядочить счета">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Счета</h2><svg class="ic act on"><use href="#i-plus"/></svg></div>
   <div class="sec tight"><span class="k">Доступно к тратам</span></div>
   <div class="row tp"><svg class="ic" style="color:var(--line2)"><use href="#i-grip"/></svg><svg class="ic dim sm"><use href="#i-cash"/></svg><div class="g"><div class="t">Наличные</div><div class="s">Наличные · RUB</div></div><span class="num">12 400,00</span></div>
   <div class="row"><svg class="ic" style="color:var(--line2)"><use href="#i-grip"/></svg><svg class="ic dim sm"><use href="#i-card"/></svg><div class="g"><div class="t">Карта основная</div><div class="s">Карта · RUB</div></div><span class="num">71 920,50</span></div>
-  <div class="row"><svg class="ic" style="color:var(--line2)"><use href="#i-grip"/></svg><svg class="ic dim sm"><use href="#i-card"/></svg><div class="g"><div class="t">Карта кредитная</div><div class="s">Карта · RUB</div></div><span class="num neg">−1 890,00</span></div>
+  <div class="row" id="d1-credit"><svg class="ic" style="color:var(--line2)"><use href="#i-grip"/></svg><svg class="ic dim sm"><use href="#i-card"/></svg><div class="g"><div class="t">Карта кредитная</div><div class="s">Карта · RUB</div></div><span class="num neg">−1 890,00</span></div>
   <div class="row"><svg class="ic" style="color:var(--line2)"><use href="#i-grip"/></svg><svg class="ic dim sm"><use href="#i-card"/></svg><div class="g"><div class="t">Карта евро</div><div class="s">Карта · EUR</div></div><span class="num">1 240,00</span></div>
   <div class="sec tight" style="border-top:1px solid var(--line)"><span class="k">Накопления</span></div>
   <div class="row tp"><svg class="ic" style="color:var(--line2)"><use href="#i-grip"/></svg><svg class="ic dim sm"><use href="#i-vault"/></svg><div class="g"><div class="t">Копилка на отпуск</div><div class="s">Карта · RUB</div></div><span class="num">250 000,00</span></div>
-  <div class="note">Счета не удаляются. Неиспользуемые можно опустить вниз списка</div>
+  <div class="sec tight" style="border-top:1px solid var(--line)"><span class="k">Закрытые</span></div>
+  <div class="row tp" id="d1-closed"><svg class="ic" style="color:var(--line2)"><use href="#i-lock"/></svg><svg class="ic dim sm"><use href="#i-card"/></svg><div class="g"><div class="t dim">Карта старая</div><div class="s">Карта · RUB · закрыт</div></div><span class="num dim">0,00</span></div>
+  <div class="note">Счета не удаляются: ненужный закрывается и уходит вниз. Порядок перетаскиванием — для действующих</div>
 </div>
 </div>
 
-<div class="scr right" data-screen="D-02" title="D-02 · Счёт">
+<div class="scr right" data-screen="D-02" title="D-02 · Изменить счёт">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Карта основная</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="fld" style="border-top:none"><span class="k">Название</span><span class="v">Карта основная</span></div>
@@ -588,12 +609,14 @@ body{padding:0}
   <div class="fld"><span class="k">Начальный остаток</span><span class="v"><span class="n">14 500,00</span></span></div>
   <div class="fld"><svg class="ic dim sm"><use href="#i-cal"/></svg><span class="k">Дата открытия</span><span class="v">1 января 2026</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="note">Назад — свободно. Вперёд — не позже 3 января: есть операция этой датой</div>
-  <div class="fld"><span class="k" style="flex:1">Скрыть из расчётов</span><span class="sw2"></span></div>
+  <div class="fld"><span class="k" style="flex:1">Скрыть из расчётов</span><span class="sw2"><i></i></span></div>
   <div class="note">Счёт не войдёт ни в «доступно к тратам», ни в итоги дня и отчёт. Так помечают накопления</div>
+  <div class="fld"><span class="k" style="flex:1">Счёт закрыт</span><span class="sw2" id="d2close"><i></i></span></div>
+  <div class="note">Уйдёт с главного экрана и из выбора счёта. Операции и отчёт не изменятся. Открыть снова можно здесь же</div>
 </div>
 </div>
 
-<div class="scr right" data-screen="D-03" title="D-03 · Категории">
+<div class="scr right" data-screen="D-03" title="D-03 · Навести порядок в категориях">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Категории</h2><svg class="ic act on"><use href="#i-plus"/></svg></div>
   <div class="seg"><b class="on">Расходы</b><b>Доходы</b></div>
@@ -613,10 +636,11 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="D-04" title="D-04 · Новая группа категорий">
+<div class="scr right" data-screen="D-04" title="D-04 · Завести группу">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая группа</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="fld" style="border-top:none"><span class="k">Название</span><span class="v">Дом</span></div>
+  <div class="fld"><svg class="ic dim sm"><use href="#i-place"/></svg><span class="k">Значок</span><span class="v dim">place</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="sec tight"><span class="k">Вид</span></div>
   <div class="seg" style="padding-top:4px"><b class="on">Расход</b><b>Доход</b></div>
   <div class="note">Вид группы наследуется подкатегориями и не меняется после создания</div>
@@ -627,21 +651,22 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="D-05" title="D-05 · Справочник мест">
+<div class="scr right" data-screen="D-05" title="D-05 · Привести в порядок справочник мест">
 <div class="phone">
-  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Места</h2><svg class="ic act on"><use href="#i-plus"/></svg></div>
+  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Места</h2></div>
   <div class="search"><svg class="ic sm"><use href="#i-search"/></svg><span>Поиск по названию</span></div>
   <div class="row tp"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">Пятёрочка</div><div class="s">Продукты · чаще всего</div></div><span class="tag">142</span></div>
+  <div class="row" id="d5-dup"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">Пятерочка</div><div class="s">Продукты</div></div><span class="tag">3</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">Магнит</div><div class="s">Продукты</div></div><span class="tag">88</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">ВкусВилл</div><div class="s">Продукты</div></div><span class="tag">54</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">Озон</div><div class="s">Маркетплейсы и техника</div></div><span class="tag">37</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">Работа</div><div class="s">Зарплата</div></div><span class="tag">31</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">МТС</div><div class="s">Мобильная связь</div></div><span class="tag">28</span></div>
-  <div class="note">Подпись — категория, в которой место встречается чаще всего. Удаление места не трогает операции, ссылка просто обнуляется</div>
+  <div class="note">Подпись — категория, в которой место встречается чаще всего. Удаление места не трогает операции: они показываются без места, строки не правятся. Дубль «Пятерочка» — повод для сценария наведения порядка</div>
 </div>
 </div>
 
-<div class="scr right" data-screen="D-06" title="D-06 · Оформление">
+<div class="scr right" data-screen="D-06" title="D-06 · Выбрать тему оформления">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Оформление</h2></div>
   <div class="sec"><span class="k">Тема</span></div>
@@ -653,7 +678,23 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="E-01" title="E-01 · Отчёт — группы">
+<div class="scr right" data-screen="D-07" title="D-07 · Переименовать группу">
+<div class="phone">
+  <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Еда</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
+  <div class="fld" style="border-top:none"><span class="k">Название</span><span class="v">Еда</span></div>
+  <div class="fld"><svg class="ic dim sm"><use href="#i-kitchen"/></svg><span class="k">Значок</span><span class="v dim">kitchen</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
+  <div class="fld"><span class="k">Вид</span><span class="v dim">Расход</span><svg class="ic sm dim"><use href="#i-lock"/></svg></div>
+  <div class="note">Вид задаётся при создании и не меняется: его наследуют все подкатегории</div>
+  <div class="sec tight" style="border-top:1px solid var(--line)"><span class="k">Подкатегории</span><span class="k">6</span></div>
+  <div class="row tp"><svg class="ic sm dim"><use href="#i-cart"/></svg><div class="g"><div class="t">Продукты</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-kitchen"/></svg><div class="g"><div class="t">Кафе и рестораны</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Доставка еды</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-more"/></svg><div class="g"><div class="t dim">Прочее</div></div><svg class="ic sm dim"><use href="#i-lock"/></svg></div>
+  <div class="row" style="color:var(--acc)"><svg class="ic sm"><use href="#i-plus"/></svg><div class="g"><div class="t">Добавить подкатегорию</div></div></div>
+</div>
+</div>
+
+<div class="scr right" data-screen="E-01" title="E-01 · Разобраться, куда ушли деньги">
 <div class="phone">
   <div class="hd"><h2>Отчёт</h2></div>
   <div class="seg"><b class="on">Расходы</b><b>Доходы</b></div>
@@ -682,7 +723,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="E-02" title="E-02 · Отчёт — подкатегории">
+<div class="scr right" data-screen="E-02" title="E-02 · Разобраться, на что именно">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Еда<span class="sub">август 2026 · 37% расходов</span></h2></div>
   <div class="total" style="padding-top:10px"><span class="big">−31 480,00 ₽</span></div>
@@ -706,11 +747,11 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="E-03" title="E-03 · Отчёт — операции подкатегории">
+<div class="scr right" data-screen="E-03" title="E-03 · Найти операцию через отчёт">
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Доставка еды<span class="sub">август 2026 · 8 операций</span></h2></div>
   <div class="total" style="padding-top:10px"><span class="big">−3 190,00 ₽</span></div>
-  <div class="row tp"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Самокат</div><div class="s">28 августа · Карта основная</div></div><span class="num">−890,00</span></div>
+  <div class="row tp" id="e3-samokat"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Самокат</div><div class="s">28 августа · Карта основная</div></div><span class="num">−890,00</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Яндекс Еда</div><div class="s">24 августа · Карта основная</div></div><span class="num">−1 140,00</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Самокат</div><div class="s">19 августа · Карта основная</div></div><span class="num">−620,00</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Купер</div><div class="s">12 августа · Наличные</div></div><span class="num">−540,00</span></div>
@@ -725,7 +766,7 @@ body{padding:0}
 </div>
 </div>
 
-<div class="scr right" data-screen="E-04" title="E-04 · Отчёт — месяц без операций">
+<div class="scr right" data-screen="E-04" title="E-04 · Открыть месяц без операций">
 <div class="phone">
   <div class="hd"><h2>Отчёт</h2></div>
   <div class="seg"><b class="on">Расходы</b><b>Доходы</b></div>
@@ -748,12 +789,12 @@ body{padding:0}
 </div>
 </div></div></div>
 
-<p class="legend">Зелёный круг — касание. Счётчик считает касания по интерфейсу отдельно от набора цифр: первое зависит от раскладки экранов, второе — от суммы. С клавиатуры: <code>пробел</code> — пауза, <code>←</code> и <code>→</code> — шаг, цифры — сценарий. Клик по кадру ставит на паузу. Экранов в прототипе столько же, сколько в макетах: 28.</p>
+<p class="legend">Зелёный круг — касание. Счётчик считает касания по интерфейсу отдельно от набора цифр: первое зависит от раскладки экранов, второе — от суммы. С клавиатуры: <code>пробел</code> — пауза, <code>←</code> и <code>→</code> — шаг, цифры — первые десять сценариев. Клик по кадру ставит на паузу. Экранов в прототипе столько же, сколько в макетах: 30.</p>
 </div>
 
 <script>
-const SC=[{"n": "Завести счёт", "uc": "UC-13", "steps": [{"s": "C-06", "c": "Первый запуск: категории засеяны, счетов ещё нет", "w": 1600}, {"s": "C-06", "c": "Касание «Создать счёт»", "t": ".btn"}, {"s": "D-02", "c": "Тип и валюта заполнены умолчаниями — вводятся только название и остаток", "w": 1800, "set": {"text=Название": "", ".hd h2": "Новый счёт"}, "css": {"text=Валюту нельзя изменить — по счёту есть операции": "display:none", "text=Назад — свободно": "display:none"}}, {"s": "D-02", "c": "Ввод названия", "t": "text=Название", "set": {"text=Название": "Карта осн"}, "w": 500}, {"s": "D-02", "c": "Ввод названия", "set": {"text=Название": "Карта основная"}, "w": 700}, {"s": "D-02", "c": "Начальный остаток — поле счёта, а не операция в ленте", "t": "text=Начальный остаток", "w": 1400}, {"s": "D-02", "c": "Сохранение", "t": ".hd .act.on", "w": 700}, {"s": "A-01", "c": "Баланс равен начальному остатку — операций ещё нет", "w": 2600}]}, {"n": "Записать расход", "uc": "UC-01", "steps": [{"s": "A-01", "c": "Главный экран. Доступно к тратам — 82 430,50 ₽", "w": 1300}, {"s": "A-01", "c": "Касание кнопки добавления", "t": ".fab"}, {"s": "B-01", "c": "Форма открывается сразу с клавиатурой: вид «расход» и последний счёт подставлены", "w": 1600, "set": {".amt .v": "0", ".amt .expr": ""}}, {"s": "B-01", "c": "Ввод суммы", "k": "1", "set": {".amt .v": "1"}, "w": 260}, {"s": "B-01", "c": "Ввод суммы", "k": "2", "set": {".amt .v": "12"}, "w": 260}, {"s": "B-01", "c": "Ввод суммы", "k": "5", "set": {".amt .v": "125"}, "w": 260}, {"s": "B-01", "c": "Ввод суммы", "k": "0", "set": {".amt .v": "1 250"}, "w": 700}, {"s": "B-01", "c": "Касание поля «Категория»", "t": "text=Категория"}, {"s": "B-03", "c": "Плоский список подкатегорий под заголовками групп: один выбор вместо двух", "w": 1600}, {"s": "B-03", "c": "Касание «Продукты»", "t": "text=Продукты"}, {"s": "B-01", "c": "Категория выбрана, место необязательно — можно сохранять", "w": 1300, "set": {"text=Категория": "Продукты"}}, {"s": "B-01", "c": "Сохранение с клавиатуры", "t": ".kp b.go"}, {"s": "A-01", "c": "Расход записан: четыре касания сверх набора суммы", "w": 2800}]}, {"n": "Отложить в накопления", "uc": "UC-05", "steps": [{"s": "A-01", "c": "Накопления показаны группой без общей суммы: они скрыты из расчётов", "w": 1500}, {"s": "A-01", "c": "Касание кнопки добавления", "t": ".fab"}, {"s": "B-01", "c": "Переключение вида на «Перевод»", "t": "text=Перевод", "w": 900}, {"s": "B-05", "c": "Категория и место исчезают, появляются «Откуда» и «Куда»", "w": 1700}, {"s": "B-05", "c": "Касание «Куда»", "t": "text=Куда"}, {"s": "B-02", "c": "Выбор счёта назначения", "t": "text=Копилка на отпуск", "w": 900}, {"s": "B-05", "c": "Валюты совпадают — сумма одна", "w": 1400}, {"s": "B-05", "c": "Сохранение", "t": ".hd .act.on"}, {"s": "A-01", "c": "Доступно к тратам уменьшилось, накопления выросли. Общая сумма денег не изменилась", "w": 2800}]}, {"n": "Перевести между валютами", "uc": "UC-10", "steps": [{"s": "B-05", "c": "Перевод: счёт назначения ещё не выбран", "w": 1200}, {"s": "B-05", "c": "Касание «Куда»", "t": "text=Куда"}, {"s": "B-02", "c": "Выбор счёта в другой валюте", "t": "text=Карта евро", "w": 900}, {"s": "B-06", "c": "Появилась вторая сумма — зачисление в евро. Курс не запрашивается, только две суммы", "w": 2200}, {"s": "B-06", "c": "Сохранение", "t": ".hd .act.on"}, {"s": "A-01", "c": "Оба баланса изменились, каждый в своей валюте", "w": 2400}]}, {"n": "Исправить операцию", "uc": "UC-07", "steps": [{"s": "A-03", "c": "Лента счёта. Ошибка: кофе записан как продукты", "w": 1500}, {"s": "A-03", "c": "Касание строки", "t": "text=Продукты"}, {"s": "C-07", "c": "Карточка операции — та же форма, что при вводе", "w": 1500, "css": {".veil": "display:none"}}, {"s": "C-07", "c": "Касание поля «Категория»", "t": "text=Категория"}, {"s": "B-03", "c": "Выбор правильной подкатегории", "t": "text=Кофе", "w": 900}, {"s": "C-07", "c": "Категория заменена. Баланс не меняется — сумма та же", "w": 1500, "set": {"text=Категория": "Кофе"}, "css": {".veil": "display:none"}}, {"s": "C-07", "c": "Сохранение", "t": ".hd .act", "css": {".veil": "display:none"}}, {"s": "A-03", "c": "Строка в ленте обновилась", "w": 2200}]}, {"n": "Дата вне периода счёта", "uc": "UC-01", "steps": [{"s": "B-01", "c": "Ввод расхода", "w": 1000, "set": {".amt .v": "1 250", ".amt .expr": ""}}, {"s": "B-01", "c": "Касание поля даты", "t": "text=Дата"}, {"s": "B-04", "c": "Календарь. Будущие даты погашены", "w": 1500}, {"s": "B-04", "c": "Выбор даты раньше открытия счёта", "t": ".cal .gr i:nth-child(1)", "w": 800}, {"s": "C-01", "c": "Ошибка объясняет причину и даёт два выхода: сдвинуть дату открытия или выбрать другой счёт", "w": 3200}]}, {"n": "Удалить операцию", "uc": "UC-08", "steps": [{"s": "A-03", "c": "Лента счёта", "w": 1100}, {"s": "A-03", "c": "Касание строки", "t": "text=Продукты"}, {"s": "C-07", "c": "Карточка операции", "w": 1200, "css": {".veil": "display:none"}}, {"s": "C-07", "c": "Касание удаления", "t": ".hd .act:last-child", "css": {".veil": "display:none"}}, {"s": "C-07", "c": "Подтверждение называет, каким станет баланс. Отмены и корзины нет — это единственная защита", "w": 2600, "css": {".veil": ""}}, {"s": "C-07", "c": "Касание «Удалить»", "t": ".dlg .yes"}, {"s": "A-03", "c": "Строка исчезла, баланс пересчитан", "w": 2200}]}, {"n": "Удалить подкатегорию", "uc": "UC-12", "steps": [{"s": "A-04", "c": "Раздел «Ещё»: справочники и настройки", "w": 1200}, {"s": "A-04", "c": "Касание «Категории»", "t": "text=Категории"}, {"s": "D-03", "c": "Дерево из двух уровней. «Прочее» неудаляемо", "w": 1600}, {"s": "D-03", "c": "Касание «Такси»", "t": "text=Такси"}, {"s": "C-02", "c": "Карточка подкатегории", "w": 1200, "css": {".veil": "display:none"}}, {"s": "C-02", "c": "Касание «Удалить подкатегорию»", "t": "text=Удалить подкатегорию", "css": {".veil": "display:none"}}, {"s": "C-02", "c": "Диалог называет число операций и куда они переедут", "w": 2600, "css": {".veil": ""}}, {"s": "C-02", "c": "Касание «Удалить»", "t": ".dlg .yes"}, {"s": "D-03", "c": "Операции перенесены в «Прочее» той же группы. Балансы не изменились", "w": 2600}]}, {"n": "Куда ушли деньги", "uc": "UC-19", "steps": [{"s": "A-01", "c": "Главный экран", "w": 1000}, {"s": "A-01", "c": "Касание вкладки «Отчёт»", "t": ".nav a:nth-child(3)"}, {"s": "E-01", "c": "Расходы за месяц по группам. Доли и полосы — для сравнения глазом", "w": 2200}, {"s": "E-01", "c": "Касание «Еда»", "t": "text=Еда"}, {"s": "E-02", "c": "Подкатегории группы. Доли пересчитаны внутри группы", "w": 2200}, {"s": "E-02", "c": "Касание «Доставка еды»", "t": "text=Доставка еды"}, {"s": "E-03", "c": "Сами операции — те же строки, что в ленте, другой разрез", "w": 2400}, {"s": "E-02", "c": "Назад", "t": ".hd .act", "w": 700}, {"s": "E-01", "c": "Назад", "t": ".hd .act", "w": 700}, {"s": "E-01", "c": "Переключение месяца назад", "t": ".cal .mo .act"}, {"s": "E-04", "c": "Месяц без трат: пустое состояние, а не список нулей", "w": 2600}]}, {"n": "Оформление", "uc": "FR-SET-03", "steps": [{"s": "A-04", "c": "Раздел «Ещё»", "w": 1000}, {"s": "A-04", "c": "Касание «Оформление»", "t": "text=Оформление"}, {"s": "D-06", "c": "Три состояния: как в системе, светлая, тёмная", "w": 1600}, {"s": "D-06", "c": "Касание «Тёмная»", "t": "text=Тёмная", "theme": "dark", "w": 1800}, {"s": "D-06", "c": "Все экраны следуют теме: цвета заданы токенами, прямых значений нет", "w": 1800}, {"s": "A-04", "c": "Назад", "t": ".hd .act", "w": 1400}, {"s": "A-04", "c": "Возврат к системной теме", "theme": "", "w": 1400}]}];
-const SHEETS=["B-01", "B-05", "B-06", "C-01", "C-07", "D-02", "D-04"];
+const SC=[{"n": "Запустить приложение впервые", "uc": "UC-20", "steps": [{"s": "C-06", "c": "Первый запуск: категории засеяны, счетов нет, добавить операцию ещё нельзя", "w": 1700}, {"s": "C-06", "c": "Касание «Создать счёт»", "t": ".btn"}, {"s": "D-02", "c": "Тип и валюта заполнены умолчаниями — вводятся только название и остаток", "w": 1700, "set": {".hd h2": "Новый счёт", "text=Название": ""}, "css": {"text=Валюту нельзя изменить": "display:none", "text=Назад — свободно": "display:none"}}, {"s": "D-02", "c": "Ввод названия", "t": "text=Название", "set": {"text=Название": "Карта осн"}, "w": 450}, {"s": "D-02", "c": "Ввод названия", "set": {"text=Название": "Карта основная"}, "w": 700}, {"s": "D-02", "c": "Начальный остаток — поле счёта, а не операция в ленте", "t": "text=Начальный остаток", "w": 1400}, {"s": "D-02", "c": "Сохранение", "t": ".hd .act.on", "w": 700}, {"s": "A-01", "c": "Баланс равен начальному остатку — операций ещё нет", "w": 1800}, {"s": "A-01", "c": "Касание счёта", "t": "text=Карта основная"}, {"s": "C-03", "c": "Пустая лента: строка начального остатка объясняет, откуда взялся баланс", "w": 2000}, {"s": "C-03", "c": "Касание «Добавить операцию»", "t": ".btn"}, {"s": "B-01", "c": "Дальше — обычный ввод расхода, сценарий «Записать расход»", "w": 2200, "set": {".amt .v": "0", ".amt .expr": ""}}]}, {"n": "Записать расход", "uc": "UC-01", "steps": [{"s": "A-01", "c": "Главный экран. Доступно к тратам — 82 430,50 ₽", "w": 1300}, {"s": "A-01", "c": "Касание кнопки добавления", "t": ".fab"}, {"s": "B-01", "c": "Форма открывается сразу с клавиатурой: вид «расход», последний счёт и сегодняшняя дата подставлены", "w": 1700, "set": {".amt .v": "0", ".amt .expr": ""}}, {"s": "B-01", "c": "Ввод суммы", "k": "1", "set": {".amt .v": "1"}, "w": 260}, {"s": "B-01", "c": "Ввод суммы", "k": "2", "set": {".amt .v": "12"}, "w": 260}, {"s": "B-01", "c": "Ввод суммы", "k": "5", "set": {".amt .v": "125"}, "w": 260}, {"s": "B-01", "c": "Ввод суммы", "k": "0", "set": {".amt .v": "1 250"}, "w": 700}, {"s": "B-01", "c": "Касание поля «Категория»", "t": "text=Категория"}, {"s": "B-03", "c": "Плоский список подкатегорий под заголовками групп: один выбор вместо двух", "w": 1600}, {"s": "B-03", "c": "Касание «Продукты»", "t": "text=Продукты"}, {"s": "B-01", "c": "Категория выбрана, место необязательно — можно сохранять", "w": 1300, "set": {"text=Категория": "Продукты"}}, {"s": "B-01", "c": "Сохранение с клавиатуры", "t": ".kp b.go"}, {"s": "A-01", "c": "Расход записан: четыре касания сверх набора суммы", "w": 2800}]}, {"n": "Записать вчерашнюю покупку", "uc": "UC-24", "steps": [{"s": "A-01", "c": "Вспомнил про вчерашнюю покупку", "w": 1100}, {"s": "A-01", "c": "Касание кнопки добавления", "t": ".fab"}, {"s": "B-01", "c": "Сумма", "set": {".amt .v": "0", ".amt .expr": ""}, "w": 500}, {"s": "B-01", "c": "Ввод суммы", "k": "8", "set": {".amt .v": "8"}, "w": 260}, {"s": "B-01", "c": "Ввод суммы", "k": "9", "set": {".amt .v": "89"}, "w": 260}, {"s": "B-01", "c": "Ввод суммы", "k": "0", "set": {".amt .v": "890"}, "w": 600}, {"s": "B-01", "c": "Касание поля «Дата»", "t": "text=Дата"}, {"s": "B-04", "c": "Календарь. «Вчера» — одним касанием, без листания", "w": 1400}, {"s": "B-04", "c": "Касание «Вчера»", "t": "text=Вчера"}, {"s": "B-01", "c": "Дата подставлена", "w": 1000, "set": {"text=Дата": "Вчера"}}, {"s": "B-01", "c": "Касание поля «Место»", "t": "text=Место"}, {"s": "B-07", "c": "Подсказки по первым буквам, по частоте использования", "w": 1500}, {"s": "B-07", "c": "Касание «Пятёрочка»", "t": "text=Пятёрочка"}, {"s": "B-01", "c": "Место подставлено", "w": 900, "set": {"text=Место": "Пятёрочка"}}, {"s": "B-01", "c": "Касание поля «Категория»", "t": "text=Категория"}, {"s": "B-03", "c": "Касание «Продукты»", "t": "text=Продукты", "w": 800}, {"s": "B-01", "c": "Всё заполнено", "w": 1000, "set": {"text=Категория": "Продукты"}}, {"s": "B-01", "c": "Сохранение", "t": ".kp b.go"}, {"s": "A-03", "c": "Операция встала во вчерашний день ленты", "w": 2600}]}, {"n": "Перевести деньги между счетами", "uc": "UC-04", "steps": [{"s": "A-01", "c": "Кредитка в минусе на 1 890 ₽ — погашаем с основной карты", "w": 1600}, {"s": "A-01", "c": "Касание кнопки добавления", "t": ".fab"}, {"s": "B-01", "c": "Переключение вида на «Перевод»", "t": "text=Перевод", "w": 900, "set": {".amt .v": "0", ".amt .expr": ""}}, {"s": "B-05", "c": "Категория и место исчезают, появляются «Откуда» и «Куда»", "w": 1700, "set": {"text=Куда": "Выбрать", ".amt .v": "1 890,00"}}, {"s": "B-05", "c": "Касание «Куда»", "t": "text=Куда"}, {"s": "B-02", "c": "Выбор счёта назначения", "t": "text=Карта кредитная", "w": 900}, {"s": "B-05", "c": "Валюты совпадают — сумма одна", "w": 1400, "set": {"text=Куда": "Карта кредитная"}}, {"s": "B-05", "c": "Сохранение", "t": ".hd .act.on"}, {"s": "A-01", "c": "Долг по кредитке закрыт: баланс вырос от −1 890 до нуля", "w": 2800, "set": {"#a1-credit .num": "0,00"}, "css": {"#a1-credit .num": "color:var(--ink)"}}]}, {"n": "Отложить в накопления", "uc": "UC-05", "steps": [{"s": "A-01", "c": "Накопления показаны группой без общей суммы: они скрыты из расчётов", "w": 1500}, {"s": "A-01", "c": "Касание кнопки добавления", "t": ".fab"}, {"s": "B-01", "c": "Переключение вида на «Перевод»", "t": "text=Перевод", "w": 900}, {"s": "B-05", "c": "Категория и место исчезают, появляются «Откуда» и «Куда»", "w": 1700}, {"s": "B-05", "c": "Касание «Куда»", "t": "text=Куда"}, {"s": "B-02", "c": "Выбор счёта назначения", "t": "text=Копилка на отпуск", "w": 900}, {"s": "B-05", "c": "Валюты совпадают — сумма одна", "w": 1400}, {"s": "B-05", "c": "Сохранение", "t": ".hd .act.on"}, {"s": "A-01", "c": "Доступно к тратам уменьшилось, накопления выросли. Общая сумма денег не изменилась", "w": 2800}]}, {"n": "Перевести между валютами", "uc": "UC-10", "steps": [{"s": "B-05", "c": "Перевод: счёт назначения ещё не выбран", "w": 1200}, {"s": "B-05", "c": "Касание «Куда»", "t": "text=Куда"}, {"s": "B-02", "c": "Выбор счёта в другой валюте", "t": "text=Карта евро", "w": 900}, {"s": "B-06", "c": "Появилась вторая сумма — зачисление в евро. Курс не запрашивается, только две суммы", "w": 2200}, {"s": "B-06", "c": "Сохранение", "t": ".hd .act.on"}, {"s": "A-01", "c": "Оба баланса изменились, каждый в своей валюте", "w": 2400}]}, {"n": "Просмотреть ленту счёта", "uc": "UC-06", "steps": [{"s": "A-01", "c": "Главный экран", "w": 1000}, {"s": "A-01", "c": "Касание счёта", "t": "text=Карта основная"}, {"s": "A-03", "c": "Лента одного счёта: по дням, с итогом дня. Подпись — заметка или группа", "w": 2200}, {"s": "A-03", "c": "Назад", "t": ".hd .act", "w": 600}, {"s": "A-01", "c": "Касание вкладки «Операции»", "t": ".nav a:nth-child(2)"}, {"s": "A-02", "c": "Все счета вперемешку, счёт подписан у каждой строки. Перевод — одной строкой, со стороны источника", "w": 2600}, {"s": "A-02", "c": "Касание вкладки «Балансы»", "t": ".nav a:nth-child(1)"}, {"s": "A-01", "c": "Касание счёта без операций", "t": "text=Карта евро"}, {"s": "C-03", "c": "Пустая лента: строка начального остатка и приглашение добавить операцию", "w": 2400}]}, {"n": "Исправить ошибочную операцию", "uc": "UC-07", "steps": [{"s": "A-03", "c": "Лента счёта. Ошибка: кофе записан как продукты", "w": 1500}, {"s": "A-03", "c": "Касание строки", "t": "text=Продукты"}, {"s": "C-07", "c": "Карточка операции — та же форма, что при вводе", "w": 1500, "css": {".veil": "display:none"}}, {"s": "C-07", "c": "Касание поля «Категория»", "t": "text=Категория"}, {"s": "B-03", "c": "Выбор правильной подкатегории", "t": "text=Кофе", "w": 900}, {"s": "C-07", "c": "Категория заменена. Баланс не меняется — сумма та же", "w": 1500, "set": {"text=Категория": "Кофе"}, "css": {".veil": "display:none"}}, {"s": "C-07", "c": "Сохранение", "t": ".hd .act", "css": {".veil": "display:none"}}, {"s": "A-03", "c": "Строка в ленте обновилась", "w": 2200}]}, {"n": "Найти операцию через отчёт", "uc": "UC-07", "steps": [{"s": "A-01", "c": "Поиска нет, но помнишь категорию и месяц — отчёт приводит к операции", "w": 1800}, {"s": "A-01", "c": "Касание вкладки «Отчёт»", "t": ".nav a:nth-child(3)"}, {"s": "E-01", "c": "Касание «Еда»", "t": "text=Еда", "w": 900}, {"s": "E-02", "c": "Касание «Доставка еды»", "t": "text=Доставка еды", "w": 900}, {"s": "E-03", "c": "Вот она: «Самокат» 28 августа записан как доставка, а это были продукты", "w": 2000}, {"s": "E-03", "c": "Касание строки", "t": "text=Самокат"}, {"s": "C-07", "c": "Та же карточка операции, что открывается из ленты", "w": 1500, "css": {".veil": "display:none"}, "set": {".amt .v": "−890,00", "text=Категория": "Доставка еды", "text=Место": "Самокат", "text=Дата": "28 августа 2026"}}, {"s": "C-07", "c": "Касание поля «Категория»", "t": "text=Категория"}, {"s": "B-03", "c": "Выбор «Продукты»", "t": "text=Продукты", "w": 800}, {"s": "C-07", "c": "Категория заменена", "w": 1200, "set": {"text=Категория": "Продукты"}, "css": {".veil": "display:none"}}, {"s": "C-07", "c": "Сохранение", "t": ".hd .act", "css": {".veil": "display:none"}}, {"s": "E-03", "c": "Операция ушла из «Доставки еды», суммы отчёта пересчитаны", "w": 2600, "css": {"#e3-samokat": "display:none"}, "set": {".total .big": "−2 300,00 ₽", ".hd .sub": "август 2026 · 7 операций"}}]}, {"n": "Оформить возврат покупки", "uc": "UC-22", "steps": [{"s": "A-03", "c": "Вернул часть покупки в аптеке, 600 ₽ пришли обратно на карту", "w": 1800}, {"s": "A-03", "c": "Касание строки", "t": "text=Аптека"}, {"s": "C-07", "c": "Карточка операции. Возврат оформляется правкой исходного расхода", "w": 1700, "css": {".veil": "display:none"}, "set": {".amt .v": "−1 890,00", "text=Категория": "Аптека", "text=Место": "Ригла", "text=Дата": "22 августа 2026"}}, {"s": "C-07", "c": "Касание суммы", "t": ".amt"}, {"s": "B-01", "c": "Сумму можно не пересчитывать в уме: выражение прямо в поле", "w": 2000, "set": {".hd h2": "Операция", ".amt .expr": "1890 − 600", ".amt .v": "1 290,00", "text=Категория": "Аптека", "text=Место": "Ригла", "text=Дата": "22 августа"}}, {"s": "B-01", "c": "Сохранение", "t": ".kp b.go"}, {"s": "A-03", "c": "Расход уменьшен, баланс вырос на 600 ₽. Вернули всё — операцию удаляют", "w": 2800, "set": {"text=Аптека": "−1 290,00", "text=22 августа": "−1 335,00"}}]}, {"n": "Записать расход: дата раньше открытия счёта", "uc": "UC-01", "steps": [{"s": "B-01", "c": "Ввод расхода", "w": 1000, "set": {".amt .v": "1 250", ".amt .expr": ""}}, {"s": "B-01", "c": "Касание поля даты", "t": "text=Дата"}, {"s": "B-04", "c": "Календарь. Будущие даты погашены", "w": 1500}, {"s": "B-04", "c": "Выбор даты раньше открытия счёта", "t": ".cal .gr i:nth-child(1)", "w": 800}, {"s": "C-01", "c": "Ошибка объясняет причину и даёт два выхода: сдвинуть дату открытия или выбрать другой счёт", "w": 3200}]}, {"n": "Удалить операцию", "uc": "UC-08", "steps": [{"s": "A-03", "c": "Лента счёта", "w": 1100}, {"s": "A-03", "c": "Касание строки", "t": "text=Продукты"}, {"s": "C-07", "c": "Карточка операции", "w": 1200, "css": {".veil": "display:none"}}, {"s": "C-07", "c": "Касание удаления", "t": ".hd .act:last-child", "css": {".veil": "display:none"}}, {"s": "C-07", "c": "Подтверждение называет, каким станет баланс. Отмены и корзины нет — это единственная защита", "w": 2600, "css": {".veil": ""}}, {"s": "C-07", "c": "Касание «Удалить»", "t": ".dlg .yes"}, {"s": "A-03", "c": "Строка исчезла, баланс пересчитан", "w": 2200}]}, {"n": "Завести подкатегорию", "uc": "UC-11", "steps": [{"s": "A-04", "c": "Раздел «Ещё»", "w": 1000}, {"s": "A-04", "c": "Касание «Категории»", "t": "text=Категории"}, {"s": "D-03", "c": "Касание группы «Еда»", "t": "text=Еда", "w": 900}, {"s": "D-07", "c": "Карточка группы: подкатегории и кнопка добавления", "w": 1500}, {"s": "D-07", "c": "Касание «Добавить подкатегорию»", "t": "text=Добавить подкатегорию"}, {"s": "C-02", "c": "Вид и значок унаследованы от группы, вводится только название", "w": 1600, "css": {".veil": "display:none", ".row.tp": "display:none"}, "set": {".hd h2": "Новая подкатегория", "text=Название": "", "text=Группа": "Еда", "text=Значок": "kitchen"}}, {"s": "C-02", "c": "Ввод названия", "t": "text=Название", "set": {"text=Название": "Пек"}, "w": 450}, {"s": "C-02", "c": "Ввод названия", "set": {"text=Название": "Пекарня"}, "w": 700}, {"s": "C-02", "c": "Сохранение", "t": ".hd .act.on"}, {"s": "D-07", "c": "Подкатегория появилась в группе", "w": 2000, "set": {"text=Подкатегории": "7"}}]}, {"n": "Завести группу", "uc": "UC-11", "steps": [{"s": "A-04", "c": "Раздел «Ещё»", "w": 900}, {"s": "A-04", "c": "Касание «Категории»", "t": "text=Категории"}, {"s": "D-03", "c": "Касание «+» в шапке", "t": ".hd .act.on", "w": 700}, {"s": "D-04", "c": "Вид задаётся здесь и наследуется подкатегориями", "w": 1500, "set": {"text=Название": ""}}, {"s": "D-04", "c": "Ввод названия", "t": "text=Название", "set": {"text=Название": "Дом"}, "w": 900}, {"s": "D-04", "c": "«Прочее» будет создано автоматически — сказано до нажатия", "w": 1600}, {"s": "D-04", "c": "Сохранение", "t": ".hd .act.on"}, {"s": "D-03", "c": "Группа появилась в дереве", "w": 2000}]}, {"n": "Навести порядок в категориях", "uc": "UC-23", "steps": [{"s": "A-04", "c": "Раздел «Ещё»", "w": 900}, {"s": "A-04", "c": "Касание «Категории»", "t": "text=Категории"}, {"s": "D-03", "c": "Касание подкатегории «Такси»", "t": "text=Такси", "w": 800}, {"s": "C-02", "c": "Карточка подкатегории: имя, значок, группа", "w": 1400, "css": {".veil": "display:none"}}, {"s": "C-02", "c": "Переименование", "t": "text=Название", "set": {"text=Название": "Такси и каршеринг"}, "w": 1100}, {"s": "C-02", "c": "Перенос в другую группу того же вида — список групп", "t": "text=Группа", "set": {"text=Группа": "Автомобиль"}, "w": 1400}, {"s": "C-02", "c": "Сохранение", "t": ".hd .act.on"}, {"s": "D-03", "c": "Подкатегория переехала под «Автомобиль». Операции не тронуты", "w": 1800, "set": {"text=Такси": "Такси и каршеринг"}}, {"s": "D-03", "c": "Касание группы «Еда»", "t": "text=Еда"}, {"s": "D-07", "c": "Карточка группы: имя и значок правятся, вид заперт", "w": 1400}, {"s": "D-07", "c": "Переименование", "t": "text=Название", "set": {"text=Название": "Еда и кафе", ".hd h2": "Еда и кафе"}, "w": 1100}, {"s": "D-07", "c": "Сохранение", "t": ".hd .act.on"}, {"s": "D-03", "c": "Группа переименована, подкатегории на месте", "w": 2000, "set": {"text=Еда": "Еда и кафе"}}]}, {"n": "Удалить подкатегорию", "uc": "UC-12", "steps": [{"s": "A-04", "c": "Раздел «Ещё»: справочники и настройки", "w": 1200}, {"s": "A-04", "c": "Касание «Категории»", "t": "text=Категории"}, {"s": "D-03", "c": "Дерево из двух уровней. «Прочее» неудаляемо", "w": 1600}, {"s": "D-03", "c": "Касание «Такси»", "t": "text=Такси"}, {"s": "C-02", "c": "Карточка подкатегории", "w": 1200, "css": {".veil": "display:none"}}, {"s": "C-02", "c": "Касание «Удалить подкатегорию»", "t": "text=Удалить подкатегорию", "css": {".veil": "display:none"}}, {"s": "C-02", "c": "Диалог называет число операций и куда они переедут", "w": 2600, "css": {".veil": ""}}, {"s": "C-02", "c": "Касание «Удалить»", "t": ".dlg .yes"}, {"s": "D-03", "c": "Операции перенесены в «Прочее» той же группы. Балансы не изменились", "w": 2600}]}, {"n": "Завести счёт", "uc": "UC-13", "steps": [{"s": "A-04", "c": "Раздел «Ещё»", "w": 900}, {"s": "A-04", "c": "Касание «Счета»", "t": "text=Счета"}, {"s": "D-01", "c": "Справочник счетов. Действующие, накопления, закрытые", "w": 1500}, {"s": "D-01", "c": "Касание «+» в шапке", "t": ".hd .act.on"}, {"s": "D-02", "c": "Тип и валюта — умолчания; вводятся название и остаток", "w": 1500, "set": {".hd h2": "Новый счёт", "text=Название": ""}, "css": {"text=Валюту нельзя изменить": "display:none", "text=Назад — свободно": "display:none"}}, {"s": "D-02", "c": "Ввод названия", "t": "text=Название", "set": {"text=Название": "Вклад"}, "w": 900}, {"s": "D-02", "c": "Сохранение", "t": ".hd .act.on"}, {"s": "D-01", "c": "Счёт появился в списке", "w": 2000}]}, {"n": "Изменить счёт", "uc": "UC-14", "steps": [{"s": "A-04", "c": "Раздел «Ещё»", "w": 900}, {"s": "A-04", "c": "Касание «Счета»", "t": "text=Счета"}, {"s": "D-01", "c": "Касание счёта", "t": "text=Карта основная", "w": 800}, {"s": "D-02", "c": "Валюта заперта: по счёту есть операции. Каждое ограничение объяснено рядом с полем", "w": 2200}, {"s": "D-02", "c": "Касание «Скрыть из расчётов»", "t": "text=Скрыть из расчётов", "css": {".sw2:not(#d2close)": "background:var(--acc)", ".sw2:not(#d2close) i": "left:18px"}, "w": 1400}, {"s": "D-02", "c": "Сохранение", "t": ".hd .act.on"}, {"s": "D-01", "c": "Счёт переехал в накопления, операции не изменились", "w": 2000}]}, {"n": "Закрыть ненужный счёт", "uc": "UC-21", "steps": [{"s": "A-01", "c": "Кредитка погашена и закрыта в банке. Баланс 0, но счёт торчит на главном экране", "w": 2000, "set": {"#a1-credit .num": "0,00"}, "css": {"#a1-credit .num": "color:var(--ink)"}}, {"s": "A-01", "c": "Касание вкладки «Ещё»", "t": ".nav a:nth-child(4)"}, {"s": "A-04", "c": "Касание «Счета»", "t": "text=Счета", "w": 700}, {"s": "D-01", "c": "Касание «Карта кредитная»", "t": "text=Карта кредитная", "w": 800}, {"s": "D-02", "c": "Карточка счёта", "w": 1200, "set": {".hd h2": "Карта кредитная", "text=Название": "Карта кредитная", "text=Начальный остаток": "0,00"}}, {"s": "D-02", "c": "Касание «Счёт закрыт». Подсказка называет последствия и что это обратимо", "t": "text=Счёт закрыт", "css": {"#d2close": "background:var(--acc)", "#d2close i": "left:18px"}, "w": 2000}, {"s": "D-02", "c": "Сохранение", "t": ".hd .act.on"}, {"s": "D-01", "c": "Счёт ушёл в раздел «Закрытые». Операции и отчёт не изменились", "w": 2200, "css": {"#d1-credit": "display:none"}, "set": {"#d1-closed .t": "Карта кредитная"}}, {"s": "D-01", "c": "Назад", "t": ".hd .act", "w": 600}, {"s": "A-04", "c": "Касание вкладки «Балансы»", "t": ".nav a:nth-child(1)"}, {"s": "A-01", "c": "На главном экране закрытого счёта больше нет. В выборе счёта при вводе — тоже", "w": 2800, "css": {"#a1-credit": "display:none"}}]}, {"n": "Привести в порядок справочник мест", "uc": "UC-18", "steps": [{"s": "A-04", "c": "Раздел «Ещё»", "w": 900}, {"s": "A-04", "c": "Касание «Места»", "t": "text=Места"}, {"s": "D-05", "c": "Список по частоте. «Пятерочка» с тремя операциями — дубль «Пятёрочки»", "w": 2000}, {"s": "D-05", "c": "Касание дубля", "t": "text=Пятерочка"}, {"s": "C-08", "c": "Карточка места: число операций и категория. Слить два места нельзя — операции переносятся вручную", "w": 2200, "css": {".veil": "display:none"}}, {"s": "C-08", "c": "Касание «Удалить место»", "t": "text=Удалить место", "css": {".veil": "display:none"}}, {"s": "C-08", "c": "Диалог называет, сколько операций останется без места. Строки не правятся", "w": 2400, "css": {".veil": ""}}, {"s": "C-08", "c": "Касание «Удалить»", "t": ".dlg .yes"}, {"s": "D-05", "c": "Дубль исчез", "w": 1400, "css": {"#d5-dup": "display:none"}}, {"s": "D-05", "c": "Касание «МТС»", "t": "text=МТС"}, {"s": "C-08", "c": "Карточка места", "w": 1000, "css": {".veil": "display:none"}, "set": {".hd h2": "МТС", "text=Название": "МТС"}}, {"s": "C-08", "c": "Переименование правит все операции разом", "t": "text=Название", "set": {"text=Название": "МТС · связь"}, "w": 1200}, {"s": "C-08", "c": "Сохранение", "t": ".hd .act.on"}, {"s": "D-05", "c": "Имя изменилось во всех операциях, править их по одной не нужно", "w": 2400, "set": {"text=МТС": "МТС · связь"}}]}, {"n": "Упорядочить счета", "uc": "UC-15", "steps": [{"s": "A-04", "c": "Раздел «Ещё»", "w": 900}, {"s": "A-04", "c": "Касание «Счета»", "t": "text=Счета"}, {"s": "D-01", "c": "Порядок задаётся перетаскиванием за рукоятку слева. Он же — порядок на главном экране", "w": 2200}, {"s": "D-01", "c": "Захват «Наличные»", "t": "text=Наличные", "w": 900}, {"s": "D-01", "c": "Перетаскивание под «Карта основная»", "t": "text=Карта основная", "w": 1200, "set": {"text=Наличные": "Карта основная", "text=Карта основная": "Наличные"}}, {"s": "D-01", "c": "Закрытые счета не перетаскиваются: порядок нужен только действующим", "w": 2400}]}, {"n": "Разобраться, куда ушли деньги", "uc": "UC-19", "steps": [{"s": "A-01", "c": "Главный экран", "w": 1000}, {"s": "A-01", "c": "Касание вкладки «Отчёт»", "t": ".nav a:nth-child(3)"}, {"s": "E-01", "c": "Расходы за месяц по группам. Доли и полосы — для сравнения глазом", "w": 2200}, {"s": "E-01", "c": "Касание «Еда»", "t": "text=Еда"}, {"s": "E-02", "c": "Подкатегории группы. Доли пересчитаны внутри группы", "w": 2200}, {"s": "E-02", "c": "Касание «Доставка еды»", "t": "text=Доставка еды"}, {"s": "E-03", "c": "Сами операции — те же строки, что в ленте, другой разрез", "w": 2400}, {"s": "E-03", "c": "Назад", "t": ".hd .act", "w": 600}, {"s": "E-02", "c": "Назад", "t": ".hd .act", "w": 600}, {"s": "E-01", "c": "Переключение месяца назад", "t": ".cal .mo .act"}, {"s": "E-04", "c": "Месяц без трат: пустое состояние, а не список нулей", "w": 2600}]}, {"n": "Выбрать тему оформления", "uc": "UC-20", "steps": [{"s": "A-04", "c": "Раздел «Ещё»", "w": 1000}, {"s": "A-04", "c": "Касание «Оформление»", "t": "text=Оформление"}, {"s": "D-06", "c": "Три состояния: как в системе, светлая, тёмная", "w": 1600}, {"s": "D-06", "c": "Касание «Тёмная»", "t": "text=Тёмная", "theme": "dark", "w": 1800}, {"s": "D-06", "c": "Все экраны следуют теме: цвета заданы токенами, прямых значений нет", "w": 1800}, {"s": "D-06", "c": "Назад", "t": ".hd .act", "w": 800}, {"s": "A-04", "c": "Раздел «Ещё» в тёмной теме", "w": 1400}, {"s": "A-04", "c": "Возврат к системной теме", "theme": "", "w": 1400}]}];
+const SHEETS=["B-01", "B-05", "B-06", "C-01", "C-07", "D-02", "D-04", "D-07"];
 const stage=document.getElementById('stage'), snapshot=stage.innerHTML;
 const cap=document.getElementById('captxt'), stepno=document.getElementById('stepno');
 const trackbar=document.getElementById('trackbar'), mUi=document.getElementById('m-ui'), mKey=document.getElementById('m-key');
@@ -777,11 +818,20 @@ function find(root,spec){
     root.querySelectorAll('*').forEach(el=>{
       if(el.children.length>3) return;
       const own=(el.textContent||'').trim();
-      if(own===t||own.startsWith(t)){ if(!best||el.textContent.length<best.textContent.length) best=el; }
+      if(own===t||own.startsWith(t)){ if(!best||el.textContent.length<=best.textContent.length) best=el; }
     });
     return best;
   }
   return root.querySelector(spec);
+}
+// куда писать текст: подпись поля → его значение, заголовок строки с суммой → сумма,
+// дата в шапке дня → итог дня; иначе — сам элемент
+function valueOf(el){
+  if(el.classList.contains('k')||el.classList.contains('t')){
+    const box=el.closest('.fld,.row'); const v=box&&box.querySelector('.v,.num'); if(v) return v;
+  }
+  if(el.parentElement&&el.parentElement.classList.contains('date')&&el.nextElementSibling) return el.nextElementSibling;
+  return el;
 }
 function counters(){mUi.textContent=uiTaps;mKey.textContent=keyTaps}
 function ripple(el){
@@ -795,14 +845,16 @@ function ripple(el){
 function apply(st){
   if(st.s&&st.s!==shown) show(st.s);
   const root=scr(st.s||shown); if(!root) return;
-  if(st.t){ uiTaps++; ripple(find(root,st.t)); }
+  if(st.t){ uiTaps++; const el=find(root,st.t); if(!el) console.warn('нет цели', st.s, st.t); ripple(el); }
   if(st.k){ keyTaps++; ripple([...root.querySelectorAll('.kp b')].find(b=>b.textContent.trim()===st.k)); }
   if(st.set) for(const [sel,txt] of Object.entries(st.set)){
-    let el=find(root,sel); if(!el) continue;
-    if(el.classList.contains('k')){ const box=el.closest('.fld,.row'); el=(box&&box.querySelector('.v,.num'))||el; }
-    el.textContent=txt; el.classList.remove('ask','none');
+    const el=find(root,sel); if(!el){ console.warn('нет элемента', st.s, sel); continue; }
+    const v=valueOf(el); v.textContent=txt; v.classList.remove('ask','none');
   }
-  if(st.css) for(const [sel,style] of Object.entries(st.css)){ const el=find(root,sel); if(el) el.style.cssText=style; }
+  if(st.css) for(const [sel,style] of Object.entries(st.css)){
+    const list=sel.startsWith('text=')?[find(root,sel)]:[...root.querySelectorAll(sel)];
+    list.forEach(el=>{ if(el) el.style.cssText=style; });
+  }
   if('theme' in st) document.documentElement.dataset.theme=st.theme;
   counters();
 }
