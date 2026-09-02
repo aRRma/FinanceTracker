@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Личный трекер финансов — макеты, итерация 3</title>
+<title>Личный трекер финансов — макеты, итерация 4</title>
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -39,6 +39,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .sid{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--acc);background:var(--accbg);padding:2px 6px;border-radius:3px;margin-right:8px}
 .cap b{font-weight:500;font-size:14.5px}
 .cap em{display:block;font-style:normal;color:var(--ink2);font-size:12.5px;line-height:1.5;margin-top:4px}
+.cap .uc{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-left:8px}
 
 .phone{position:relative;width:100%;max-width:330px;background:var(--card);border:1px solid var(--line2);border-radius:22px;overflow:hidden}
 .ic{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
@@ -93,8 +94,8 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .child{padding-left:44px}
 .sw2{width:38px;height:22px;border-radius:11px;background:var(--line2);position:relative;flex:none}
 .sw2.on{background:var(--acc)}
-.sw2::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:var(--knob)}
-.sw2.on::after{left:18px}
+.sw2 i{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:var(--knob)}
+.sw2.on i{left:18px}
 .btn{display:block;text-align:center;padding:11px;border-radius:9px;background:var(--acc);color:var(--onacc);font-size:14.5px;margin:14px 15px}
 .btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--line2)}
 .note{padding:2px 15px 12px;font-size:12px;color:var(--ink3);line-height:1.45}
@@ -176,8 +177,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 
 <div class="wrap">
 <header class="masthead">
-<h1>Макеты экранов — итерация 3</h1>
-<p>28 экранов: каркас, ввод, состояния и ошибки, справочники, отчёт. Идентификаторы ссылаются на требования из docs/requirements/.</p>
+<h1>Макеты экранов — итерация 4</h1>
+<p>30 экранов: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
+<p>Изменения четвёртой итерации: экраны названы по действию пользователя и связаны со сценариями; добавлены C-08 (удалить место) и D-07 (переименовать группу); у счёта появился признак «закрыт», в справочнике счетов — раздел закрытых; с формы перевода убрано место, с общей ленты — поиск, из справочника мест — создание; на форме ввода видны место и дата.</p>
 <p>Изменения третьей итерации: обмен между устройствами вынесен за MVP — экраны C-04 и C-05 сохранены как отложенные, значок обмена убран с главного экрана; добавлен раздел E «Отчёт» и четвёртая вкладка; подытог накоплений упразднён, признак счёта переименован в «скрыть из расчётов»; дорисованы C-07 (удаление операции) и D-06 (оформление).</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
 </header>
@@ -186,14 +188,14 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-01</span><b>Балансы</b><em>Накопления показаны группой без общей суммы: счёт, скрытый из расчётов, не попадает и в отдельный подытог. Отрицательный баланс — обычное число, без предупреждений.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-01</span><b>Посмотреть, сколько доступно</b><span class="uc">UC-02</span><em>Накопления показаны группой без общей суммы: счёт, скрытый из расчётов, не попадает и в отдельный подытог. Отрицательный баланс — обычное число, без предупреждений.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Балансы</h2></div>
   <div class="sec"><span class="k">Рубли</span><span class="k">Доступно</span></div>
   <div class="total"><span class="big">82 430,50 ₽</span></div>
   <div class="row tp"><svg class="ic dim"><use href="#i-cash"/></svg><div class="g"><div class="t">Наличные</div></div><span class="num">12 400,00</span></div>
   <div class="row"><svg class="ic dim"><use href="#i-card"/></svg><div class="g"><div class="t">Карта основная</div></div><span class="num">71 920,50</span></div>
-  <div class="row"><svg class="ic dim"><use href="#i-card"/></svg><div class="g"><div class="t">Карта кредитная</div></div><span class="num neg">−1 890,00</span></div>
+  <div class="row" id="a1-credit"><svg class="ic dim"><use href="#i-card"/></svg><div class="g"><div class="t">Карта кредитная</div></div><span class="num neg">−1 890,00</span></div>
   <div class="sec tight" style="border-top:1px solid var(--line)"><span class="k">Накопления</span><span class="k">скрыты из расчётов</span></div>
   <div class="row"><svg class="ic dim"><use href="#i-vault"/></svg><div class="g"><div class="t dim">Копилка на отпуск</div></div><span class="num dim">250 000,00</span></div>
   <div class="sec" style="border-top:1px solid var(--line2)"><span class="k">Евро</span><span class="k">Доступно</span></div>
@@ -211,9 +213,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-02</span><b>Операции — все счета</b><em>Общая лента. Счёт указан справа мелким, потому что при просмотре всех операций он перестаёт быть очевидным из контекста.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-02</span><b>Просмотреть операции по всем счетам</b><span class="uc">UC-06</span><em>Общая лента. Счёт указан справа мелким, потому что при просмотре всех операций он перестаёт быть очевидным из контекста.</em></figcaption>
 <div class="phone">
-  <div class="hd"><h2>Операции</h2><svg class="ic act"><use href="#i-search"/></svg></div>
+  <div class="hd"><h2>Операции</h2></div>
   <div class="date"><span>25 августа</span><span>−6 250,00 ₽</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-cart"/></svg><div class="g"><div class="t">Продукты</div><div class="s">Пятёрочка · Карта основная</div></div><span class="num">−1 250,00</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-swap"/></svg><div class="g"><div class="t">Копилка на отпуск</div><div class="s">Перевод · Карта основная</div></div><span class="num">−5 000,00</span></div>
@@ -235,7 +237,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-03</span><b>Лента по счёту</b><em>Подписью служит заметка, если она есть, иначе группа. Заметка — единственное, чего не вывести из названия подкатегории.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-03</span><b>Просмотреть ленту счёта</b><span class="uc">UC-06</span><em>Подписью служит заметка, если она есть, иначе группа. Заметка — единственное, чего не вывести из названия подкатегории.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Карта основная<span class="sub">71 920,50 ₽</span></h2></div>
   <div class="date"><span>25 августа</span><span>−6 250,00</span></div>
@@ -259,7 +261,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-04</span><b>Ещё</b><em>Всё, что открывается реже раза в неделю: справочники, оформление, часовой пояс, сведения о версии.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-04</span><b>Открыть справочники и настройки</b><span class="uc">UC-11 UC-13 UC-18 UC-20</span><em>Всё, что открывается реже раза в неделю: справочники, оформление, часовой пояс, сведения о версии.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Ещё</h2></div>
   <div class="row tp"><svg class="ic dim"><use href="#i-wallet"/></svg><div class="g"><div class="t">Счета</div><div class="s">5 счетов</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
@@ -284,13 +286,15 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-01</span><b>Ввод суммы</b><em>Клавиатура открыта сразу — сумму меняют всегда. Арифметика прямо в поле: строка выражения над результатом снимает нужду считать в уме при разделе счёта.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-01</span><b>Ввести сумму</b><span class="uc">UC-01</span><em>Клавиатура открыта сразу — сумму меняют всегда. Арифметика прямо в поле: строка выражения над результатом снимает нужду считать в уме при разделе счёта.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2></div>
   <div class="seg"><b class="on">Расход</b><b>Доход</b><b>Перевод</b></div>
   <div class="amt"><span class="expr">1250 + 340</span><span class="v">1 590,00</span><span class="c">₽</span></div>
   <div class="fld" style="border-top:none"><svg class="ic dim sm"><use href="#i-card"/></svg><span class="k">Счёт</span><span class="v">Карта основная</span></div>
   <div class="fld"><svg class="ic sm" style="color:var(--acc)"><use href="#i-grid"/></svg><span class="k">Категория</span><span class="v ask">Выбрать</span></div>
+  <div class="fld"><svg class="ic dim sm"><use href="#i-place"/></svg><span class="k">Место</span><span class="v none">Необязательно</span></div>
+  <div class="fld"><svg class="ic dim sm"><use href="#i-cal"/></svg><span class="k">Дата</span><span class="v">Сегодня</span></div>
   <div class="kp">
     <b>7</b><b>8</b><b>9</b><b class="op">÷</b>
     <b>4</b><b>5</b><b>6</b><b class="op">×</b>
@@ -302,7 +306,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-02</span><b>Выбор счёта</b><em>Балансы показаны прямо в списке: выбирая счёт для расхода, вы обычно и хотите знать, хватит ли на нём денег.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-02</span><b>Выбрать счёт</b><span class="uc">UC-01 UC-04</span><em>Балансы показаны прямо в списке: выбирая счёт для расхода, вы обычно и хотите знать, хватит ли на нём денег.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Счёт списания</h2></div>
   <div class="sec tight"><span class="k">Рубли</span></div>
@@ -317,7 +321,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-03</span><b>Выбор категории</b><em>Родитель — заголовок группы, а не строка. Выбрать первый уровень физически невозможно, поэтому инвариант не нуждается в проверке.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-03</span><b>Выбрать подкатегорию</b><span class="uc">UC-01</span><em>Родитель — заголовок группы, а не строка. Выбрать первый уровень физически невозможно, поэтому инвариант не нуждается в проверке.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Категория расхода</h2></div>
   <div class="search"><svg class="ic sm"><use href="#i-search"/></svg><span>Поиск по названию</span></div>
@@ -337,7 +341,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-04</span><b>Выбор даты</b><em>Будущие дни и дни раньше открытия счёта погашены. Ограничение видно до попытки его нарушить, а не после.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-04</span><b>Выбрать дату</b><span class="uc">UC-24 UC-01</span><em>Будущие дни и дни раньше открытия счёта погашены. Ограничение видно до попытки его нарушить, а не после.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Дата операции</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="cal">
@@ -359,14 +363,13 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-05</span><b>Перевод в одной валюте</b><em>Сумма одна. Второе поле не появляется, потому что при совпадающих валютах суммы обязаны быть равны.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-05</span><b>Перевести между счетами в одной валюте</b><span class="uc">UC-04 UC-05</span><em>Сумма одна. Второе поле не появляется, потому что при совпадающих валютах суммы обязаны быть равны.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="seg"><b>Расход</b><b>Доход</b><b class="on">Перевод</b></div>
   <div class="amt"><span class="v">5 000,00</span><span class="c">₽</span></div>
   <div class="fld" style="border-top:none"><svg class="ic dim sm"><use href="#i-card"/></svg><span class="k">Откуда</span><span class="v">Карта основная</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="fld"><svg class="ic dim sm"><use href="#i-swap"/></svg><span class="k">Куда</span><span class="v">Копилка на отпуск</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
-  <div class="fld"><svg class="ic dim sm"><use href="#i-place"/></svg><span class="k">Место</span><span class="v none">Необязательно</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="fld"><svg class="ic dim sm"><use href="#i-cal"/></svg><span class="k">Дата</span><span class="v">Сегодня</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="fld"><svg class="ic dim sm"><use href="#i-note"/></svg><span class="k">Заметка</span><span class="v none">Необязательно</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="note">Перевод не попадает ни в доходы, ни в расходы</div>
@@ -374,7 +377,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-06</span><b>Перевод между валютами</b><em>Обе суммы вводятся вручную: курса в приложении нет. Разница между ними и есть фактический курс сделки.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-06</span><b>Перевести между валютами</b><span class="uc">UC-10</span><em>Обе суммы вводятся вручную: курса в приложении нет. Разница между ними и есть фактический курс сделки.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="seg"><b>Расход</b><b>Доход</b><b class="on">Перевод</b></div>
@@ -388,7 +391,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-07</span><b>Выбор места</b><em>Подстановка по первым буквам. Если совпадения нет, место создаётся прямо отсюда — без похода в справочник.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-07</span><b>Указать место</b><span class="uc">UC-01 UC-24</span><em>Подстановка по первым буквам. Если совпадения нет, место создаётся прямо отсюда — без похода в справочник.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Место</h2></div>
   <div class="search"><svg class="ic sm"><use href="#i-search"/></svg><span style="color:var(--ink)">пят</span><span style="width:1px;height:15px;background:var(--acc);display:inline-block"></span></div>
@@ -409,7 +412,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-01</span><b>Дата раньше открытия счёта</b><em>Ошибка объясняет причину и предлагает оба выхода. Сохранение остаётся доступным до нажатия, а не гасится заранее.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-01</span><b>Исправить дату раньше открытия счёта</b><span class="uc">UC-01</span><em>Ошибка объясняет причину и предлагает оба выхода. Сохранение остаётся доступным до нажатия, а не гасится заранее.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="seg"><b class="on">Расход</b><b>Доход</b><b>Перевод</b></div>
@@ -423,11 +426,12 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-02</span><b>Удаление подкатегории</b><em>Диалог называет число затронутых операций и куда они переедут. Пользователь узнаёт последствие до действия, а не обнаруживает после.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-02</span><b>Удалить подкатегорию</b><span class="uc">UC-12 UC-23</span><em>Диалог называет число затронутых операций и куда они переедут. Пользователь узнаёт последствие до действия, а не обнаруживает после.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Такси</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="fld" style="border-top:none"><span class="k">Название</span><span class="v">Такси</span></div>
-  <div class="fld"><span class="k">Группа</span><span class="v">Транспорт</span></div>
+  <div class="fld"><svg class="ic dim sm"><use href="#i-car2"/></svg><span class="k">Значок</span><span class="v dim">car2</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
+  <div class="fld"><span class="k">Группа</span><span class="v">Транспорт</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="fld"><span class="k">Вид</span><span class="v dim">Расход</span><svg class="ic sm dim"><use href="#i-lock"/></svg></div>
   <div class="note">Вид наследуется от группы и не меняется</div>
   <div class="row tp" style="color:var(--neg)"><svg class="ic sm"><use href="#i-trash"/></svg><div class="g"><div class="t">Удалить подкатегорию</div></div></div>
@@ -442,7 +446,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-03</span><b>Счёт без операций</b><em>Начальный остаток показан отдельной строкой — иначе непонятно, откуда взялся баланс при пустой ленте.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-03</span><b>Открыть счёт без операций</b><span class="uc">UC-06 UC-20</span><em>Начальный остаток показан отдельной строкой — иначе непонятно, откуда взялся баланс при пустой ленте.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Карта евро<span class="sub">1 240,00 €</span></h2></div>
   <div class="row tp"><svg class="ic dim sm"><use href="#i-cal"/></svg><div class="g"><div class="t dim">Начальный остаток</div><div class="s">1 марта 2026</div></div><span class="num dim">1 240,00</span></div>
@@ -463,7 +467,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-04</span><b>Первая выгрузка</b><em>Отложено вместе с обменом, экран сохранён для будущего этапа. Единственный случай, когда обмен занимает заметное время. Показан прогресс по строкам, а не бесконечный индикатор.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-04</span><b>Выгрузить историю при первом обмене</b><span class="uc">UC-16</span><em>Отложено вместе с обменом, экран сохранён для будущего этапа. Единственный случай, когда обмен занимает заметное время. Показан прогресс по строкам, а не бесконечный индикатор.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Синхронизация</h2></div>
   <div class="sec tight"><span class="k">Отправка</span><span class="num" style="font-size:13px;color:var(--ink2)">1 240 / 2 018</span></div>
@@ -478,7 +482,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-05</span><b>Синхронизация — обычное состояние</b><em>Отложено вместе с обменом, экран сохранён для будущего этапа. Ошибка сформулирована как факт с последствием. Приложение не заблокировано, данные не потеряны, и это сказано прямо.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-05</span><b>Синхронизировать</b><span class="uc">UC-16 UC-17</span><em>Отложено вместе с обменом, экран сохранён для будущего этапа. Ошибка сформулирована как факт с последствием. Приложение не заблокировано, данные не потеряны, и это сказано прямо.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Синхронизация</h2></div>
   <div class="stat">
@@ -498,7 +502,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-06</span><b>Первый запуск</b><em>Категории уже засеяны, счетов нет. Экран зовёт к единственному осмысленному действию и снимает вопрос про категории.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-06</span><b>Запустить приложение впервые</b><span class="uc">UC-20</span><em>Категории уже засеяны, счетов нет. Экран зовёт к единственному осмысленному действию и снимает вопрос про категории.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Балансы</h2></div>
   <div class="empty">
@@ -521,7 +525,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </div>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-07</span><b>Удаление операции</b><em>Подтверждение называет то, что изменится — баланс счёта. Без этого пользователь подтверждает вслепую и проверяет результат постфактум.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-07</span><b>Удалить операцию</b><span class="uc">UC-08 UC-07</span><em>Подтверждение называет то, что изменится — баланс счёта. Без этого пользователь подтверждает вслепую и проверяет результат постфактум.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Операция</h2><svg class="ic act"><use href="#i-trash"/></svg></div>
   <div class="amt"><span class="v">−1 250,00</span><span class="c">₽</span></div>
@@ -539,26 +543,45 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </div>
 </figure>
 
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-08</span><b>Удалить место</b><span class="uc">UC-18</span><em>Карточка места и подтверждение удаления. Диалог называет число операций, которые останутся без места: строки не правятся, ссылка просто перестаёт разрешаться.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Пятерочка</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
+  <div class="fld" style="border-top:none"><span class="k">Название</span><span class="v">Пятерочка</span></div>
+  <div class="note">3 операции · чаще всего «Продукты». Похоже на дубль «Пятёрочки» — слить два места в одно нельзя, операции переносятся вручную</div>
+  <div class="row tp" style="color:var(--neg)"><svg class="ic sm"><use href="#i-trash"/></svg><div class="g"><div class="t">Удалить место</div></div></div>
+  <div class="veil">
+    <div class="dlg">
+      <h4>Удалить «Пятерочка»?</h4>
+      <p>3 операции останутся без места. Суммы, даты и балансы не изменятся.</p>
+      <div class="acts"><b class="no">Отмена</b><b class="yes">Удалить</b></div>
+    </div>
+  </div>
+</div>
+</figure>
+
 <div class="band"><h2>D · Справочники</h2><span>Счета и категории — редкое редактирование, но плотные правила</span></div>
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-01</span><b>Счета</b><em>Порядок задаётся перетаскиванием. Раздел накоплений появляется от флага счёта, а не от его типа.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-01</span><b>Упорядочить счета</b><span class="uc">UC-15 UC-13 UC-21</span><em>Порядок задаётся перетаскиванием. Раздел накоплений появляется от флага счёта, а не от его типа.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Счета</h2><svg class="ic act on"><use href="#i-plus"/></svg></div>
   <div class="sec tight"><span class="k">Доступно к тратам</span></div>
   <div class="row tp"><svg class="ic" style="color:var(--line2)"><use href="#i-grip"/></svg><svg class="ic dim sm"><use href="#i-cash"/></svg><div class="g"><div class="t">Наличные</div><div class="s">Наличные · RUB</div></div><span class="num">12 400,00</span></div>
   <div class="row"><svg class="ic" style="color:var(--line2)"><use href="#i-grip"/></svg><svg class="ic dim sm"><use href="#i-card"/></svg><div class="g"><div class="t">Карта основная</div><div class="s">Карта · RUB</div></div><span class="num">71 920,50</span></div>
-  <div class="row"><svg class="ic" style="color:var(--line2)"><use href="#i-grip"/></svg><svg class="ic dim sm"><use href="#i-card"/></svg><div class="g"><div class="t">Карта кредитная</div><div class="s">Карта · RUB</div></div><span class="num neg">−1 890,00</span></div>
+  <div class="row" id="d1-credit"><svg class="ic" style="color:var(--line2)"><use href="#i-grip"/></svg><svg class="ic dim sm"><use href="#i-card"/></svg><div class="g"><div class="t">Карта кредитная</div><div class="s">Карта · RUB</div></div><span class="num neg">−1 890,00</span></div>
   <div class="row"><svg class="ic" style="color:var(--line2)"><use href="#i-grip"/></svg><svg class="ic dim sm"><use href="#i-card"/></svg><div class="g"><div class="t">Карта евро</div><div class="s">Карта · EUR</div></div><span class="num">1 240,00</span></div>
   <div class="sec tight" style="border-top:1px solid var(--line)"><span class="k">Накопления</span></div>
   <div class="row tp"><svg class="ic" style="color:var(--line2)"><use href="#i-grip"/></svg><svg class="ic dim sm"><use href="#i-vault"/></svg><div class="g"><div class="t">Копилка на отпуск</div><div class="s">Карта · RUB</div></div><span class="num">250 000,00</span></div>
-  <div class="note">Счета не удаляются. Неиспользуемые можно опустить вниз списка</div>
+  <div class="sec tight" style="border-top:1px solid var(--line)"><span class="k">Закрытые</span></div>
+  <div class="row tp" id="d1-closed"><svg class="ic" style="color:var(--line2)"><use href="#i-lock"/></svg><svg class="ic dim sm"><use href="#i-card"/></svg><div class="g"><div class="t dim">Карта старая</div><div class="s">Карта · RUB · закрыт</div></div><span class="num dim">0,00</span></div>
+  <div class="note">Счета не удаляются: ненужный закрывается и уходит вниз. Порядок перетаскиванием — для действующих</div>
 </div>
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-02</span><b>Счёт</b><em>Валюта заперта: по счёту есть операции. Каждое ограничение объяснено рядом с полем, а не всплывает при сохранении.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-02</span><b>Изменить счёт</b><span class="uc">UC-14 UC-13 UC-21</span><em>Валюта заперта: по счёту есть операции. Каждое ограничение объяснено рядом с полем, а не всплывает при сохранении.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Карта основная</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="fld" style="border-top:none"><span class="k">Название</span><span class="v">Карта основная</span></div>
@@ -568,13 +591,15 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="fld"><span class="k">Начальный остаток</span><span class="v"><span class="n">14 500,00</span></span></div>
   <div class="fld"><svg class="ic dim sm"><use href="#i-cal"/></svg><span class="k">Дата открытия</span><span class="v">1 января 2026</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="note">Назад — свободно. Вперёд — не позже 3 января: есть операция этой датой</div>
-  <div class="fld"><span class="k" style="flex:1">Скрыть из расчётов</span><span class="sw2"></span></div>
+  <div class="fld"><span class="k" style="flex:1">Скрыть из расчётов</span><span class="sw2"><i></i></span></div>
   <div class="note">Счёт не войдёт ни в «доступно к тратам», ни в итоги дня и отчёт. Так помечают накопления</div>
+  <div class="fld"><span class="k" style="flex:1">Счёт закрыт</span><span class="sw2" id="d2close"><i></i></span></div>
+  <div class="note">Уйдёт с главного экрана и из выбора счёта. Операции и отчёт не изменятся. Открыть снова можно здесь же</div>
 </div>
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-03</span><b>Категории</b><em>Дерево ровно в два уровня. «Прочее» помечено как несносимое: именно туда переезжают операции удалённых подкатегорий.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-03</span><b>Навести порядок в категориях</b><span class="uc">UC-23 UC-11 UC-12</span><em>Дерево ровно в два уровня. «Прочее» помечено как несносимое: именно туда переезжают операции удалённых подкатегорий.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Категории</h2><svg class="ic act on"><use href="#i-plus"/></svg></div>
   <div class="seg"><b class="on">Расходы</b><b>Доходы</b></div>
@@ -595,10 +620,11 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-04</span><b>Новая группа категорий</b><em>Вид задаётся здесь и наследуется всеми подкатегориями. «Прочее» создаётся автоматически — об этом сказано до нажатия, а не после.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-04</span><b>Завести группу</b><span class="uc">UC-11</span><em>Вид задаётся здесь и наследуется всеми подкатегориями. «Прочее» создаётся автоматически — об этом сказано до нажатия, а не после.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая группа</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="fld" style="border-top:none"><span class="k">Название</span><span class="v">Дом</span></div>
+  <div class="fld"><svg class="ic dim sm"><use href="#i-place"/></svg><span class="k">Значок</span><span class="v dim">place</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
   <div class="sec tight"><span class="k">Вид</span></div>
   <div class="seg" style="padding-top:4px"><b class="on">Расход</b><b>Доход</b></div>
   <div class="note">Вид группы наследуется подкатегориями и не меняется после создания</div>
@@ -610,22 +636,23 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-05</span><b>Справочник мест</b><em>Пуст при первом запуске, наполняется сам. Переименование правит все операции разом — ради этого справочник и нужен вместо свободной строки.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-05</span><b>Привести в порядок справочник мест</b><span class="uc">UC-18</span><em>Пуст при первом запуске, наполняется сам. Переименование правит все операции разом — ради этого справочник и нужен вместо свободной строки.</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Места</h2><svg class="ic act on"><use href="#i-plus"/></svg></div>
+  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Места</h2></div>
   <div class="search"><svg class="ic sm"><use href="#i-search"/></svg><span>Поиск по названию</span></div>
   <div class="row tp"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">Пятёрочка</div><div class="s">Продукты · чаще всего</div></div><span class="tag">142</span></div>
+  <div class="row" id="d5-dup"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">Пятерочка</div><div class="s">Продукты</div></div><span class="tag">3</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">Магнит</div><div class="s">Продукты</div></div><span class="tag">88</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">ВкусВилл</div><div class="s">Продукты</div></div><span class="tag">54</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">Озон</div><div class="s">Маркетплейсы и техника</div></div><span class="tag">37</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">Мультифактор</div><div class="s">Зарплата</div></div><span class="tag">31</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-place"/></svg><div class="g"><div class="t">МТС</div><div class="s">Мобильная связь</div></div><span class="tag">28</span></div>
-  <div class="note">Подпись — категория, в которой место встречается чаще всего. Удаление места не трогает операции, ссылка просто обнуляется</div>
+  <div class="note">Подпись — категория, в которой место встречается чаще всего. Удаление места не трогает операции: они показываются без места, строки не правятся. Дубль «Пятерочка» — повод для сценария наведения порядка</div>
 </div>
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-06</span><b>Оформление</b><em>Три состояния, а не переключатель: вернуться к системной теме после ручного выбора иначе невозможно.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-06</span><b>Выбрать тему оформления</b><span class="uc">UC-20</span><em>Три состояния, а не переключатель: вернуться к системной теме после ручного выбора иначе невозможно.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Оформление</h2></div>
   <div class="sec"><span class="k">Тема</span></div>
@@ -637,13 +664,30 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </div>
 </figure>
 
+<figure class="unit">
+<figcaption class="cap"><span class="sid">D-07</span><b>Переименовать группу</b><span class="uc">UC-23</span><em>Карточка группы: имя и значок правятся, вид заперт — он наследуется подкатегориями. Отсюда же добавляют подкатегорию.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Еда</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
+  <div class="fld" style="border-top:none"><span class="k">Название</span><span class="v">Еда</span></div>
+  <div class="fld"><svg class="ic dim sm"><use href="#i-kitchen"/></svg><span class="k">Значок</span><span class="v dim">kitchen</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
+  <div class="fld"><span class="k">Вид</span><span class="v dim">Расход</span><svg class="ic sm dim"><use href="#i-lock"/></svg></div>
+  <div class="note">Вид задаётся при создании и не меняется: его наследуют все подкатегории</div>
+  <div class="sec tight" style="border-top:1px solid var(--line)"><span class="k">Подкатегории</span><span class="k">6</span></div>
+  <div class="row tp"><svg class="ic sm dim"><use href="#i-cart"/></svg><div class="g"><div class="t">Продукты</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-kitchen"/></svg><div class="g"><div class="t">Кафе и рестораны</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Доставка еды</div></div><svg class="ic sm dim"><use href="#i-next"/></svg></div>
+  <div class="row"><svg class="ic sm dim"><use href="#i-more"/></svg><div class="g"><div class="t dim">Прочее</div></div><svg class="ic sm dim"><use href="#i-lock"/></svg></div>
+  <div class="row" style="color:var(--acc)"><svg class="ic sm"><use href="#i-plus"/></svg><div class="g"><div class="t">Добавить подкатегорию</div></div></div>
+</div>
+</figure>
+
 </div>
 
 <div class="band"><h2>E · Отчёт</h2><span>Три уровня погружения: группы, подкатегории, операции</span></div>
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">E-01</span><b>Отчёт — группы</b><em>Первый уровень отвечает на вопрос «куда ушли деньги». Полоса под строкой даёт сравнение глазом, без чтения процентов.</em></figcaption>
+<figcaption class="cap"><span class="sid">E-01</span><b>Разобраться, куда ушли деньги</b><span class="uc">UC-19</span><em>Первый уровень отвечает на вопрос «куда ушли деньги». Полоса под строкой даёт сравнение глазом, без чтения процентов.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Отчёт</h2></div>
   <div class="seg"><b class="on">Расходы</b><b>Доходы</b></div>
@@ -673,7 +717,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">E-02</span><b>Отчёт — подкатегории</b><em>Второй уровень отвечает «на что именно». Доли пересчитаны внутри группы, а не от общего расхода: иначе все числа были бы мелкими и несравнимыми между собой.</em></figcaption>
+<figcaption class="cap"><span class="sid">E-02</span><b>Разобраться, на что именно</b><span class="uc">UC-19</span><em>Второй уровень отвечает «на что именно». Доли пересчитаны внутри группы, а не от общего расхода: иначе все числа были бы мелкими и несравнимыми между собой.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Еда<span class="sub">август 2026 · 37% расходов</span></h2></div>
   <div class="total" style="padding-top:10px"><span class="big">−31 480,00 ₽</span></div>
@@ -698,11 +742,11 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">E-03</span><b>Отчёт — операции подкатегории</b><em>Третий уровень — те же строки, что и в ленте, но отобранные по подкатегории и месяцу. Отдельного представления для них не заводится.</em></figcaption>
+<figcaption class="cap"><span class="sid">E-03</span><b>Найти операцию через отчёт</b><span class="uc">UC-19 UC-07</span><em>Третий уровень — те же строки, что и в ленте, но отобранные по подкатегории и месяцу. Отдельного представления для них не заводится.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Доставка еды<span class="sub">август 2026 · 8 операций</span></h2></div>
   <div class="total" style="padding-top:10px"><span class="big">−3 190,00 ₽</span></div>
-  <div class="row tp"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Самокат</div><div class="s">28 августа · Карта основная</div></div><span class="num">−890,00</span></div>
+  <div class="row tp" id="e3-samokat"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Самокат</div><div class="s">28 августа · Карта основная</div></div><span class="num">−890,00</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Яндекс Еда</div><div class="s">24 августа · Карта основная</div></div><span class="num">−1 140,00</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Самокат</div><div class="s">19 августа · Карта основная</div></div><span class="num">−620,00</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-truck"/></svg><div class="g"><div class="t">Купер</div><div class="s">12 августа · Наличные</div></div><span class="num">−540,00</span></div>
@@ -718,7 +762,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">E-04</span><b>Отчёт — месяц без операций</b><em>Пустое состояние вместо списка нулей: шесть строк по нулю рублей читаются как ошибка расчёта, а не как отсутствие трат.</em></figcaption>
+<figcaption class="cap"><span class="sid">E-04</span><b>Открыть месяц без операций</b><span class="uc">UC-19</span><em>Пустое состояние вместо списка нулей: шесть строк по нулю рублей читаются как ошибка расчёта, а не как отсутствие трат.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Отчёт</h2></div>
   <div class="seg"><b class="on">Расходы</b><b>Доходы</b></div>

@@ -148,6 +148,7 @@ BANNED = [
     (r"доступн\w+\s+остат\w+", "«доступно к тратам»"),
     (r"истори\w+\s+по\s+счёту", "«лента счёта»"),
     ("exclude_from_available", "excluded_from_totals"),
+    (r"архивн\w+\s+сч[её]т\w*", "«закрытый счёт»"),
 ]
 for p_ in MD:
     if p_.name in {"CONTEXT.md", "MEMORY.md"} or "adr" in p_.parts:
