@@ -11,7 +11,7 @@
 | `SYS-*` | [requirements/01-scope.md](requirements/01-scope.md) | Границы MVP, платформа, объёмы, валюты |
 | `INV-*` | [requirements/02-domain.md](requirements/02-domain.md) | Сущности, поля и правила, которые обязаны соблюдаться всегда |
 | `FR-ACC-*` `FR-CAT-*` `FR-TRX-*` `FR-PAY-*` `FR-BAL-*` `FR-LED-*` `FR-RPT-*` `FR-SET-*` | [requirements/03-functional.md](requirements/03-functional.md) | Что приложение умеет делать |
-| `SEED-*` | [requirements/04-preset.md](requirements/04-preset.md) | Засев стартовых категорий |
+| `SEED-*` | [requirements/04-preset.md](requirements/04-preset.md) | Инициализация базы: стартовые категории |
 | `NFR-*` | [requirements/05-quality.md](requirements/05-quality.md) | Производительность, надёжность, время, оформление |
 | `SYN-*` `FR-SYN-*` | [requirements/06-sync-deferred.md](requirements/06-sync-deferred.md) | **Вне MVP.** Обмен между устройствами |
 | `TECH-*` | [architecture.md](architecture.md) | Состав проектов, слои, стек, ловушки реализации |
@@ -28,7 +28,7 @@
 | Экран или форма ввода | [requirements/03-functional.md](requirements/03-functional.md), [use-cases.md](use-cases.md), нужный экран в [ui/mockups.html](ui/mockups.html) |
 | Отчёт | `FR-RPT-*` в [requirements/03-functional.md](requirements/03-functional.md), экраны `E-01…E-04`, сценарий UC-19 |
 | Схема, миграции, индексы | [requirements/02-domain.md](requirements/02-domain.md), `NFR-01…NFR-08` в [requirements/05-quality.md](requirements/05-quality.md), `TECH-*` в [architecture.md](architecture.md) |
-| Засев категорий | [requirements/04-preset.md](requirements/04-preset.md), [preset-rationale.md](preset-rationale.md), [data/preset.json](../data/preset.json) |
+| Инициализация базы | [requirements/04-preset.md](requirements/04-preset.md), [preset-rationale.md](preset-rationale.md), [data/preset.json](../data/preset.json) |
 | Темы и цвета | `NFR-21…NFR-25` в [requirements/05-quality.md](requirements/05-quality.md), переключатель темы в [ui/mockups.html](ui/mockups.html) — эталон палитр |
 | Как назвать новое понятие | [../CONTEXT.md](../CONTEXT.md) — сначала словарь, потом код |
 
@@ -36,7 +36,7 @@
 
 - [decisions.md](decisions.md) — что сознательно не делается, чем рискуем, что ещё не решено
 - [adr/](adr/) — решения, которые дорого пересматривать, с обоснованием и отвергнутыми вариантами. Требование говорит «что», ADR — «почему»:
-  - ADR-0001 справочник мест назван `Place`, отраслевое имя отвергнуто · ADR-0002 идентификаторы UUIDv7 с клиента, в SQLite текстом · ADR-0003 поля обмена и мягкое удаление до появления обмена · ADR-0004 деньги `decimal` с валютой в типе, суммы по валютам не существует · ADR-0005 два уровня категорий, место вместо третьего · ADR-0006 детерминированные ключи стартового набора и давняя метка засева · ADR-0007 MVP на одном устройстве, сервер без доменной логики · ADR-0008 слайсы по функциям вне MAUI, без посредника и репозиториев · ADR-0009 календарные даты без времени · ADR-0010 начальный остаток — поле счёта
+  - ADR-0001 справочник мест назван `Place`, отраслевое имя отвергнуто · ADR-0002 идентификаторы UUIDv7 с клиента, в SQLite текстом · ADR-0003 поля обмена и мягкое удаление до появления обмена · ADR-0004 деньги `decimal` с валютой в типе, суммы по валютам не существует · ADR-0005 два уровня категорий, место вместо третьего · ADR-0006 детерминированные ключи стартового набора и давняя метка времени · ADR-0007 MVP на одном устройстве, сервер без доменной логики · ADR-0008 слайсы по функциям вне MAUI, без посредника и репозиториев · ADR-0009 календарные даты без времени · ADR-0010 начальный остаток — поле счёта
 - [preset-rationale.md](preset-rationale.md) — почему стартовый набор категорий именно такой. Обоснование, не спецификация
 - [ui/prototype.html](ui/prototype.html) — интерактивный прототип, динамика сценариев. Собирается из макетов скриптом `tools/build_prototype.py`, руками не правится
 - [../PLAN.md](../PLAN.md) — этапы и чеклисты
