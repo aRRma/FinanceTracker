@@ -155,6 +155,13 @@ BANNED = [
     (r"истори\w+\s+по\s+счёту", "«лента счёта»"),
     ("exclude_from_available", "excluded_from_totals"),
     (r"архивн\w+\s+сч[её]т\w*", "«закрытый счёт»"),
+    (r"\bпресет\w*", "«стартовый набор»"),
+    (r"\bсним(ок|ка|ку|ком|ке)\s+базы", "«резервная копия»"),
+    (r"\bсрез\w*\s+по\s+функци", "«слайс»"),
+    (r"сч[её]т\w*[\s-]+(назначени\w*|источник\w*)", "«счёт зачисления» / «счёт списания»"),
+    (r"\bосновн\w+\s+сч[её]т", "«счёт списания»"),
+    (r"\bвтор\w+\s+сумм", "«сумма зачисления»"),
+    (r"counter_(account|amount)", "target_account / target_amount"),
 ]
 for p_ in MD:
     if p_.name in {"CONTEXT.md", "MEMORY.md"} or "adr" in p_.parts:
@@ -233,7 +240,7 @@ for key in sorted(k for k in defined if k.startswith("FR-")):
 
 # ---- вывод --------------------------------------------------------------------
 print(f"файлов: {len(MD)} md, {len(HTML)} html · идентификаторов: {len(defined)} · "
-      f"экранов: {n_screens} · пресет: {n_groups}/{n_subs}, значков {n_icons}")
+      f"экранов: {n_screens} · стартовый набор: {n_groups}/{n_subs}, значков {n_icons}")
 
 for w in warnings:
     print("  ПРЕДУПРЕЖДЕНИЕ: " + w)
