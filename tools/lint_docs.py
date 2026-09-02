@@ -29,7 +29,7 @@ def lines(p):
 
 
 # идентификатор требования: INV-08, FR-PAY-02, SYN-14, NFR-25, SEED-03, SYS-01, TECH-02, UC-11
-ID = re.compile(r"\b(INV|SYN|SEED|NFR|SYS|TECH|UC|FR-(?:ACC|CAT|TRX|PAY|BAL|LED|RPT|SYN|SET))-(\d{2})\b")
+ID = re.compile(r"\b(?:(INV|SYN|SEED|NFR|SYS|TECH|UC|FR-(?:ACC|CAT|TRX|PAY|BAL|LED|RPT|SYN|SET))-(\d{2})|ADR-\d{4})\b")
 # определение: строка таблицы, начинающаяся идентификатором, возможно зачёркнутым
 DEFN = re.compile(r"^\|\s*~?~?((?:INV|SYN|SEED|NFR|SYS|TECH|FR-(?:ACC|CAT|TRX|PAY|BAL|LED|RPT|SYN|SET))-\d{2})~?~?\s*\|")
 UC_DEFN = re.compile(r"^## (UC-\d{2})\b")
@@ -53,9 +53,15 @@ for p in DEFN_FILES:
             else:
                 defined[key] = f"{rel(p)}:{i}"
 
-# префикс должен жить ровно в одном файле
+# ADR определяются именами файлов docs/adr/NNNN-*.md — по одному на файл
+for f in sorted((ROOT / "docs/adr").glob("[0-9][0-9][0-9][0-9]-*.md")):
+    defined[f"ADR-{f.name[:4]}"] = rel(f)
+
+# префикс должен жить ровно в одном файле (кроме ADR: там файл на решение)
 by_prefix = {}
 for key, loc in defined.items():
+    if key.startswith("ADR-"):
+        continue
     by_prefix.setdefault(key.rsplit("-", 1)[0], set()).add(loc.split(":")[0])
 for prefix, files in sorted(by_prefix.items()):
     if len(files) > 1:

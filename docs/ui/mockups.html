@@ -41,7 +41,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .cap em{display:block;font-style:normal;color:var(--ink2);font-size:12.5px;line-height:1.5;margin-top:4px}
 .cap .uc{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-left:8px}
 
-.phone{position:relative;width:100%;max-width:330px;background:var(--card);border:1px solid var(--line2);border-radius:22px;overflow:hidden}
+.phone{position:relative;width:330px;height:690px;background:var(--card);border:1px solid var(--line2);border-radius:22px;overflow:hidden}
+/* все экраны одного размера: 330×690 — экран Samsung Galaxy S25 Ultra (480×1040 dp) под строкой состояния в масштабе 330/480; лишнее обрезается, как на устройстве */
+.nav,.kp{position:absolute;left:0;right:0;bottom:0}
 .ic{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .ic.sm{width:17px;height:17px}
 .ic.lg{width:24px;height:24px}
@@ -179,6 +181,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <header class="masthead">
 <h1>Макеты экранов — итерация 4</h1>
 <p>30 экранов: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
+<p>Все экраны одного размера — 330 × 690: экран Samsung Galaxy S25 Ultra (480 × 1040 логических пикселей) под строкой состояния, уменьшенный в 480/330 раза. Нижняя панель и клавиатура прижаты к низу, содержимое длиннее экрана обрезается, как на устройстве.</p>
 <p>Изменения четвёртой итерации: экраны названы по действию пользователя и связаны со сценариями; добавлены C-08 (удалить место) и D-07 (переименовать группу); у счёта появился признак «закрыт», в справочнике счетов — раздел закрытых; с формы перевода убрано место, с общей ленты — поиск, из справочника мест — создание; на форме ввода видны место и дата.</p>
 <p>Изменения третьей итерации: обмен между устройствами вынесен за MVP — экраны C-04 и C-05 сохранены как отложенные, значок обмена убран с главного экрана; добавлен раздел E «Отчёт» и четвёртая вкладка; подытог накоплений упразднён, признак счёта переименован в «скрыть из расчётов»; дорисованы C-07 (удаление операции) и D-06 (оформление).</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
@@ -615,7 +618,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="row" style="padding-left:52px"><svg class="ic sm dim"><use href="#i-car2"/></svg><div class="g"><div class="t">Такси</div></div></div>
     <div class="row" style="padding-left:52px"><svg class="ic sm dim"><use href="#i-train2"/></svg><div class="g"><div class="t">Общественный транспорт</div></div></div>
     <div class="row" style="padding-left:52px"><svg class="ic sm dim"><use href="#i-more"/></svg><div class="g"><div class="t dim">Прочее</div></div></div>
-  <div class="note">Дерево ровно в два уровня. «Прочее» не удаляется — туда переезжают операции удалённых подкатегорий</div>
 </div>
 </figure>
 
@@ -691,7 +693,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="phone">
   <div class="hd"><h2>Отчёт</h2></div>
   <div class="seg"><b class="on">Расходы</b><b>Доходы</b></div>
-  <div class="cal" style="border-top:1px solid var(--line)"><div class="mo"><svg class="ic act"><use href="#i-prev"/></svg><b>Август 2026</b><svg class="ic act dim"><use href="#i-next"/></svg></div></div>
+  <div class="cal" style="border-top:1px solid var(--line);padding-bottom:4px"><div class="mo"><svg class="ic act"><use href="#i-prev"/></svg><b>Август 2026</b><svg class="ic act dim"><use href="#i-next"/></svg></div></div>
   <div class="total" style="padding-top:2px"><span class="big">−84 260,00 ₽</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-kitchen"/></svg><div class="g"><div class="t">Еда</div></div><span class="num">−31 480,00</span><span class="tag" style="margin-left:8px">37%</span></div>
   <div class="prog" style="margin:0 15px 9px 59px"><i style="width:37%"></i></div>
