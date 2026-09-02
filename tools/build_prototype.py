@@ -341,8 +341,8 @@ body{padding:0}
 .track i{display:block;height:100%;background:var(--acc);width:0;transition:width .25s}
 .meter{background:var(--card);border:1px solid var(--line2);border-radius:8px;padding:6px 12px;font-size:13px;color:var(--ink2);font-family:var(--mono)}
 .meter b{color:var(--acc);font-weight:500}
-.holder{width:480px;margin:0 auto;height:calc(1040px * var(--z));transition:height .2s}
-.frame{width:480px;height:1040px;transform:scale(var(--z));transform-origin:top center;transition:transform .2s;background:var(--frame);border-radius:46px;padding:9px;position:relative;cursor:pointer}
+.holder{width:498px;margin:0 auto;height:calc(1058px * var(--z));transition:height .2s}
+.frame{width:498px;height:1058px;transform:scale(var(--z));transform-origin:top center;transition:transform .2s;background:var(--frame);border-radius:46px;padding:9px;position:relative;cursor:pointer}
 .dev{position:relative;width:100%;height:100%;background:var(--card);border-radius:38px;overflow:hidden;display:flex;flex-direction:column}
 .dev.nofx *{transition:none!important;animation:none!important}
 .sb{height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-size:13.5px;font-family:var(--mono);color:var(--ink);flex:none}
@@ -352,10 +352,7 @@ body{padding:0}
 .scr{position:absolute;inset:0;background:var(--card);transition:transform .34s cubic-bezier(.3,.7,.3,1);will-change:transform;zoom:1.4545}
 .scr.right{transform:translateX(100%)}
 .scr.down{transform:translateY(100%)}
-.scr .phone{width:330px;max-width:none;height:690px;border:none;border-radius:0;display:flex;flex-direction:column}
-.scr .pad{display:none}
-.scr .nav{margin-top:auto}
-.scr .kp{margin-top:auto}
+.scr .phone{border:none;border-radius:0}
 .scr .veil{z-index:2}
 .rip{position:absolute;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:32px;background:var(--ripple);pointer-events:none;opacity:0;z-index:5}
 .rip.go{animation:rp .55s ease-out}
@@ -370,7 +367,7 @@ __SPRITE__
 
 <div class="page">
 <h1>Анимированный прототип — итерация 4</h1>
-<p class="lede">Экраны взяты из <b>mockups.html</b> без изменений, файл собирается скриптом <b>tools/build_prototype.py</b> — править нужно макеты, а не этот файл. Вкладки названы по сценариям из <b>docs/use-cases.md</b>. Кадр — Samsung Galaxy S25 Ultra: <b>480 × 1040</b> логических пикселей.</p>
+<p class="lede">Экраны взяты из <b>mockups.html</b> без изменений, файл собирается скриптом <b>tools/build_prototype.py</b> — править нужно макеты, а не этот файл. Вкладки названы по сценариям из <b>docs/use-cases.md</b>. Экран — Samsung Galaxy S25 Ultra: <b>480 × 1040</b> логических пикселей; макеты нарисованы в масштабе 330 × 690 и увеличены в 480/330 раза.</p>
 
 <div class="bar" id="tabs"></div>
 <div class="bar">

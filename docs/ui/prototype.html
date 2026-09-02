@@ -42,7 +42,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .cap em{display:block;font-style:normal;color:var(--ink2);font-size:12.5px;line-height:1.5;margin-top:4px}
 .cap .uc{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-left:8px}
 
-.phone{position:relative;width:100%;max-width:330px;background:var(--card);border:1px solid var(--line2);border-radius:22px;overflow:hidden}
+.phone{position:relative;width:330px;height:690px;background:var(--card);border:1px solid var(--line2);border-radius:22px;overflow:hidden}
+/* все экраны одного размера: 330×690 — экран Samsung Galaxy S25 Ultra (480×1040 dp) под строкой состояния в масштабе 330/480; лишнее обрезается, как на устройстве */
+.nav,.kp{position:absolute;left:0;right:0;bottom:0}
 .ic{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .ic.sm{width:17px;height:17px}
 .ic.lg{width:24px;height:24px}
@@ -153,8 +155,8 @@ body{padding:0}
 .track i{display:block;height:100%;background:var(--acc);width:0;transition:width .25s}
 .meter{background:var(--card);border:1px solid var(--line2);border-radius:8px;padding:6px 12px;font-size:13px;color:var(--ink2);font-family:var(--mono)}
 .meter b{color:var(--acc);font-weight:500}
-.holder{width:480px;margin:0 auto;height:calc(1040px * var(--z));transition:height .2s}
-.frame{width:480px;height:1040px;transform:scale(var(--z));transform-origin:top center;transition:transform .2s;background:var(--frame);border-radius:46px;padding:9px;position:relative;cursor:pointer}
+.holder{width:498px;margin:0 auto;height:calc(1058px * var(--z));transition:height .2s}
+.frame{width:498px;height:1058px;transform:scale(var(--z));transform-origin:top center;transition:transform .2s;background:var(--frame);border-radius:46px;padding:9px;position:relative;cursor:pointer}
 .dev{position:relative;width:100%;height:100%;background:var(--card);border-radius:38px;overflow:hidden;display:flex;flex-direction:column}
 .dev.nofx *{transition:none!important;animation:none!important}
 .sb{height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-size:13.5px;font-family:var(--mono);color:var(--ink);flex:none}
@@ -164,10 +166,7 @@ body{padding:0}
 .scr{position:absolute;inset:0;background:var(--card);transition:transform .34s cubic-bezier(.3,.7,.3,1);will-change:transform;zoom:1.4545}
 .scr.right{transform:translateX(100%)}
 .scr.down{transform:translateY(100%)}
-.scr .phone{width:330px;max-width:none;height:690px;border:none;border-radius:0;display:flex;flex-direction:column}
-.scr .pad{display:none}
-.scr .nav{margin-top:auto}
-.scr .kp{margin-top:auto}
+.scr .phone{border:none;border-radius:0}
 .scr .veil{z-index:2}
 .rip{position:absolute;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:32px;background:var(--ripple);pointer-events:none;opacity:0;z-index:5}
 .rip.go{animation:rp .55s ease-out}
@@ -220,7 +219,7 @@ body{padding:0}
 
 <div class="page">
 <h1>Анимированный прототип — итерация 4</h1>
-<p class="lede">Экраны взяты из <b>mockups.html</b> без изменений, файл собирается скриптом <b>tools/build_prototype.py</b> — править нужно макеты, а не этот файл. Вкладки названы по сценариям из <b>docs/use-cases.md</b>. Кадр — Samsung Galaxy S25 Ultra: <b>480 × 1040</b> логических пикселей.</p>
+<p class="lede">Экраны взяты из <b>mockups.html</b> без изменений, файл собирается скриптом <b>tools/build_prototype.py</b> — править нужно макеты, а не этот файл. Вкладки названы по сценариям из <b>docs/use-cases.md</b>. Экран — Samsung Galaxy S25 Ultra: <b>480 × 1040</b> логических пикселей; макеты нарисованы в масштабе 330 × 690 и увеличены в 480/330 раза.</p>
 
 <div class="bar" id="tabs"></div>
 <div class="bar">
@@ -632,7 +631,6 @@ body{padding:0}
     <div class="row" style="padding-left:52px"><svg class="ic sm dim"><use href="#i-car2"/></svg><div class="g"><div class="t">Такси</div></div></div>
     <div class="row" style="padding-left:52px"><svg class="ic sm dim"><use href="#i-train2"/></svg><div class="g"><div class="t">Общественный транспорт</div></div></div>
     <div class="row" style="padding-left:52px"><svg class="ic sm dim"><use href="#i-more"/></svg><div class="g"><div class="t dim">Прочее</div></div></div>
-  <div class="note">Дерево ровно в два уровня. «Прочее» не удаляется — туда переезжают операции удалённых подкатегорий</div>
 </div>
 </div>
 
@@ -698,7 +696,7 @@ body{padding:0}
 <div class="phone">
   <div class="hd"><h2>Отчёт</h2></div>
   <div class="seg"><b class="on">Расходы</b><b>Доходы</b></div>
-  <div class="cal" style="border-top:1px solid var(--line)"><div class="mo"><svg class="ic act"><use href="#i-prev"/></svg><b>Август 2026</b><svg class="ic act dim"><use href="#i-next"/></svg></div></div>
+  <div class="cal" style="border-top:1px solid var(--line);padding-bottom:4px"><div class="mo"><svg class="ic act"><use href="#i-prev"/></svg><b>Август 2026</b><svg class="ic act dim"><use href="#i-next"/></svg></div></div>
   <div class="total" style="padding-top:2px"><span class="big">−84 260,00 ₽</span></div>
   <div class="row"><svg class="ic sm dim"><use href="#i-kitchen"/></svg><div class="g"><div class="t">Еда</div></div><span class="num">−31 480,00</span><span class="tag" style="margin-left:8px">37%</span></div>
   <div class="prog" style="margin:0 15px 9px 59px"><i style="width:37%"></i></div>
