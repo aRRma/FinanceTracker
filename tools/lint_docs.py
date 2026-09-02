@@ -178,12 +178,13 @@ if len(icons) != len(set(icons)):
     dupes = {i for i in icons if icons.count(i) > 1}
     errors.append(f"L10 data/icons.json: дубли ключей {sorted(dupes)}")
 
+# число не должно быть хвостом идентификатора вроде ADR-0002 или UC-19
 CHECKS = [
-    (re.compile(r"(\d+)\s+групп"), n_groups, "групп"),
-    (re.compile(r"(\d+)\s+подкатегори"), n_subs, "подкатегорий"),
-    (re.compile(r"(\d+)\s+значк"), n_icons, "значков"),
-    (re.compile(r"(\d+)\s+ключ"), n_icons, "ключей значков"),
-    (re.compile(r"(\d+)\s+экран"), n_screens, "экранов"),
+    (re.compile(r"(?<![-\d])(\d+)\s+групп"), n_groups, "групп"),
+    (re.compile(r"(?<![-\d])(\d+)\s+подкатегори"), n_subs, "подкатегорий"),
+    (re.compile(r"(?<![-\d])(\d+)\s+значк"), n_icons, "значков"),
+    (re.compile(r"(?<![-\d])(\d+)\s+ключ"), n_icons, "ключей значков"),
+    (re.compile(r"(?<![-\d])(\d+)\s+экран"), n_screens, "экранов"),
 ]
 WORDS = {"двадцать": 20, "двадцать два": 22, "двадцать две": 22, "тринадцать": 13}
 
