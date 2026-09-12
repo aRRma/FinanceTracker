@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+	<application android:allowBackup="true" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true"></application>
+	<!-- Разрешений на сеть нет намеренно: к сети приложение не обращается (SYS-04),
+	     а обмен с сервером отложен целиком. Шаблон MAUI заводит INTERNET и
+	     ACCESS_NETWORK_STATE сам — при обновлении шаблона их надо убирать снова -->
+</manifest>
