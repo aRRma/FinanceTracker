@@ -1,0 +1,20 @@
+<Project>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Предупреждение, замеченное поздно, стоит дороже сломанной сборки -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <!-- Публичные члены обязаны быть прокомментированы: без файла документации
+       CS1591 не выдаётся, и забытый комментарий проходит молча. Тестов и
+       страниц MAUI правило не касается — там публичность техническая. -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Finance.Domain' Or '$(MSBuildProjectName)' == 'Finance.Application'">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>

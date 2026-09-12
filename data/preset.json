@@ -9,42 +9,48 @@
       "name": "Еда",
       "kind": "expense",
       "icon": "tools-kitchen-2",
+      "role": "normal",
       "subcategories": [
         {
           "key": "food.groceries",
           "name": "Продукты",
           "icon": "shopping-cart",
+          "role": "normal",
           "id": "ebcd116b-f74f-5cc4-90d0-1027795b5b72"
         },
         {
           "key": "food.restaurant",
           "name": "Кафе и рестораны",
           "icon": "tools-kitchen-2",
+          "role": "normal",
           "id": "464060df-2961-5991-8c75-5791a01bc274"
         },
         {
           "key": "food.delivery",
           "name": "Доставка еды",
           "icon": "truck-delivery",
+          "role": "normal",
           "id": "ae042297-f675-5b1a-998f-923459475ad8"
         },
         {
           "key": "food.lunch",
           "name": "Бизнес-ланч",
           "icon": "soup",
+          "role": "normal",
           "id": "1e4ac6b8-d2ad-582e-8954-7f1a25fa5b80"
         },
         {
           "key": "food.coffee",
           "name": "Кофе",
           "icon": "coffee",
+          "role": "normal",
           "id": "5ea1bc19-053f-56a7-895b-094647ee78ef"
         },
         {
           "key": "food.other",
           "name": "Прочее",
           "icon": "dots",
-          "protected": true,
+          "role": "other",
           "id": "366b0059-d44f-5171-ad96-1b07165b4428"
         }
       ],
@@ -55,30 +61,34 @@
       "name": "Жильё",
       "kind": "expense",
       "icon": "home",
+      "role": "normal",
       "subcategories": [
         {
           "key": "home.rent",
           "name": "Аренда",
           "icon": "key",
+          "role": "normal",
           "id": "f3f3fd6d-af82-5b3c-8827-0f32bcd9f808"
         },
         {
           "key": "home.mortgage",
           "name": "Ипотека",
           "icon": "building-bank",
+          "role": "normal",
           "id": "eeb99b84-1409-5d04-8cea-f02a736c05cc"
         },
         {
           "key": "home.utilities",
           "name": "Коммунальные услуги",
           "icon": "bolt",
+          "role": "normal",
           "id": "0587819a-6f57-52d1-8bbb-e2489cd54a6b"
         },
         {
           "key": "home.other",
           "name": "Прочее",
           "icon": "dots",
-          "protected": true,
+          "role": "other",
           "id": "6ac8550b-6747-5667-bf8d-247d7175e742"
         }
       ],
@@ -89,42 +99,48 @@
       "name": "Покупки",
       "kind": "expense",
       "icon": "shopping-bag",
+      "role": "normal",
       "subcategories": [
         {
           "key": "shopping.marketplace",
           "name": "Маркетплейсы и техника",
           "icon": "device-laptop",
+          "role": "normal",
           "id": "3f6e625e-b7fb-5104-84c3-8f7d3e66a9b3"
         },
         {
           "key": "shopping.gifts",
           "name": "Подарки и цветы",
           "icon": "gift",
+          "role": "normal",
           "id": "88443a27-e1de-58e5-8cf6-7a0fbe7b866e"
         },
         {
           "key": "shopping.clothes",
           "name": "Одежда и обувь",
           "icon": "shirt",
+          "role": "normal",
           "id": "a15ec119-cc6c-5462-9007-467366426638"
         },
         {
           "key": "shopping.pharmacy",
           "name": "Аптека",
           "icon": "pill",
+          "role": "normal",
           "id": "c1c5320e-3b57-55b6-b40b-66056a638798"
         },
         {
           "key": "shopping.home_goods",
           "name": "Дом",
           "icon": "sofa",
+          "role": "normal",
           "id": "7da71347-8f8d-5627-8d1f-3a9695cec51b"
         },
         {
           "key": "shopping.other",
           "name": "Прочее",
           "icon": "dots",
-          "protected": true,
+          "role": "other",
           "id": "c13e340e-fe93-507a-acc1-e167925cbbef"
         }
       ],
@@ -135,42 +151,48 @@
       "name": "Дети",
       "kind": "expense",
       "icon": "baby-carriage",
+      "role": "normal",
       "subcategories": [
         {
           "key": "kids.classes",
           "name": "Кружки и секции",
           "icon": "ball-football",
+          "role": "normal",
           "id": "c58937f3-945a-56bb-8bca-66a95aa49543"
         },
         {
           "key": "kids.goods",
           "name": "Детские товары",
           "icon": "teddy-bear",
+          "role": "normal",
           "id": "175d2442-c544-5307-81ef-4ef7ff1b3b70"
         },
         {
           "key": "kids.playground",
           "name": "Игровые и развлечения",
           "icon": "building-carousel",
+          "role": "normal",
           "id": "a1a85b4e-b528-5a8d-8032-ba1028451a15"
         },
         {
           "key": "kids.allowance",
           "name": "Карманные и на счёт",
           "icon": "wallet",
+          "role": "normal",
           "id": "3c199f90-cb1b-5ced-811b-dc3247404aa0"
         },
         {
           "key": "kids.kindergarten",
           "name": "Садик",
           "icon": "school",
+          "role": "normal",
           "id": "2bbbbb36-8d36-55ab-8391-0c05725e9b35"
         },
         {
           "key": "kids.other",
           "name": "Прочее",
           "icon": "dots",
-          "protected": true,
+          "role": "other",
           "id": "d739f1d5-279c-534f-b41e-a602ae772683"
         }
       ],
@@ -181,30 +203,34 @@
       "name": "Транспорт",
       "kind": "expense",
       "icon": "train",
+      "role": "normal",
       "subcategories": [
         {
           "key": "transport.travel",
           "name": "Самолёт и поезд",
           "icon": "plane",
+          "role": "normal",
           "id": "92cebeeb-ea33-55ff-bdf7-60a90ef01c19"
         },
         {
           "key": "transport.taxi",
           "name": "Такси",
           "icon": "car",
+          "role": "normal",
           "id": "7e7acbd7-47e6-5edd-8a9f-b918fe1fa452"
         },
         {
           "key": "transport.public",
           "name": "Общественный транспорт",
           "icon": "train",
+          "role": "normal",
           "id": "a91fce50-80e1-546d-b840-6860b5a83ca2"
         },
         {
           "key": "transport.other",
           "name": "Прочее",
           "icon": "dots",
-          "protected": true,
+          "role": "other",
           "id": "e6d79c95-3d24-5f7b-9a7b-ad4e8306ce2b"
         }
       ],
@@ -215,36 +241,41 @@
       "name": "Автомобиль",
       "kind": "expense",
       "icon": "steering-wheel",
+      "role": "normal",
       "subcategories": [
         {
           "key": "car.fuel",
           "name": "Топливо",
           "icon": "gas-station",
+          "role": "normal",
           "id": "c19d2150-ee20-520d-99c3-3a837a398116"
         },
         {
           "key": "car.service",
           "name": "Обслуживание и ремонт",
           "icon": "tool",
+          "role": "normal",
           "id": "c414ee6a-edac-5203-a2e9-49dfe3f8b614"
         },
         {
           "key": "car.insurance",
           "name": "Страховка и налоги",
           "icon": "shield-check",
+          "role": "normal",
           "id": "c7d3c308-f2e2-5e34-ab7c-e8fe8fde497a"
         },
         {
           "key": "car.parking",
           "name": "Парковка",
           "icon": "parking",
+          "role": "normal",
           "id": "369669be-241a-594f-a369-bd478602b8f0"
         },
         {
           "key": "car.other",
           "name": "Прочее",
           "icon": "dots",
-          "protected": true,
+          "role": "other",
           "id": "fbd22f7e-99d1-533f-b082-e089449a5021"
         }
       ],
@@ -255,36 +286,41 @@
       "name": "Здоровье",
       "kind": "expense",
       "icon": "stethoscope",
+      "role": "normal",
       "subcategories": [
         {
           "key": "health.doctor",
           "name": "Врачи",
           "icon": "stethoscope",
+          "role": "normal",
           "id": "9399b97e-6ae6-508a-b9f2-565376a0570a"
         },
         {
           "key": "health.dentist",
           "name": "Стоматология",
           "icon": "dental",
+          "role": "normal",
           "id": "736b3961-c2ca-58e0-8ec4-ec550b0f7b3d"
         },
         {
           "key": "health.barber",
           "name": "Стрижка",
           "icon": "scissors",
+          "role": "normal",
           "id": "38e51986-9abd-54f6-bcec-d2a166633a1e"
         },
         {
           "key": "health.tests",
           "name": "Анализы",
           "icon": "test-pipe",
+          "role": "normal",
           "id": "202e2c99-0550-5952-af5f-954308d776a1"
         },
         {
           "key": "health.other",
           "name": "Прочее",
           "icon": "dots",
-          "protected": true,
+          "role": "other",
           "id": "125cc16c-9649-54d6-afff-5af9a3950dc8"
         }
       ],
@@ -295,54 +331,62 @@
       "name": "Отдых",
       "kind": "expense",
       "icon": "mood-happy",
+      "role": "normal",
       "subcategories": [
         {
           "key": "leisure.vacation",
           "name": "Отпуск и поездки",
           "icon": "beach",
+          "role": "normal",
           "id": "b95c7982-b207-5d59-8ff4-8727a5a977d0"
         },
         {
           "key": "leisure.events",
           "name": "Концерты и матчи",
           "icon": "ticket",
+          "role": "normal",
           "id": "b52990d4-ad65-55e0-a573-c5c76b073e79"
         },
         {
           "key": "leisure.charity",
           "name": "Благотворительность",
           "icon": "heart-handshake",
+          "role": "normal",
           "id": "4b9761a6-3724-5e1a-944d-b21bb79cc126"
         },
         {
           "key": "leisure.sport",
           "name": "Бассейн и спорт",
           "icon": "barbell",
+          "role": "normal",
           "id": "68e4bf63-4adc-508f-ba3a-5aeebab8827e"
         },
         {
           "key": "leisure.photo",
           "name": "Фотосессии",
           "icon": "camera",
+          "role": "normal",
           "id": "11c0943c-df4a-5502-b93a-05dbbaf66127"
         },
         {
           "key": "leisure.spa",
           "name": "Массаж и спа",
           "icon": "massage",
+          "role": "normal",
           "id": "6bc1167d-ee15-57f3-8589-c339580018c8"
         },
         {
           "key": "leisure.cinema",
           "name": "Кино, театр, музеи",
           "icon": "movie",
+          "role": "normal",
           "id": "a672e8a1-086a-5001-a421-953be4ee080a"
         },
         {
           "key": "leisure.other",
           "name": "Прочее",
           "icon": "dots",
-          "protected": true,
+          "role": "other",
           "id": "c1ab9da7-682f-5734-be0d-44d5b0dc9a0c"
         }
       ],
@@ -353,30 +397,34 @@
       "name": "Связь и подписки",
       "kind": "expense",
       "icon": "wifi",
+      "role": "normal",
       "subcategories": [
         {
           "key": "digital.mobile",
           "name": "Мобильная связь",
           "icon": "device-mobile",
+          "role": "normal",
           "id": "baad9b78-6683-5d29-a27b-fbbd8103445e"
         },
         {
           "key": "digital.subscriptions",
           "name": "Подписки и приложения",
           "icon": "cloud",
+          "role": "normal",
           "id": "a10f100a-709b-58ca-9ba4-034b6699f5bf"
         },
         {
           "key": "digital.internet",
           "name": "Интернет",
           "icon": "wifi",
+          "role": "normal",
           "id": "b3574472-20fb-567b-b1c5-dd9b562c25fb"
         },
         {
           "key": "digital.other",
           "name": "Прочее",
           "icon": "dots",
-          "protected": true,
+          "role": "other",
           "id": "910c02b7-ee62-5bc9-ad45-7b8b11b9a9a8"
         }
       ],
@@ -387,42 +435,48 @@
       "name": "Финансы",
       "kind": "expense",
       "icon": "coins",
+      "role": "normal",
       "subcategories": [
         {
           "key": "finance.family",
           "name": "Переводы близким",
           "icon": "users",
+          "role": "normal",
           "id": "5004b2be-6e83-5263-9b0f-d0e9da0e79ed"
         },
         {
           "key": "finance.interest",
           "name": "Проценты по займам",
           "icon": "percentage",
+          "role": "normal",
           "id": "845e5297-7e2f-5562-8245-01090ee365a5"
         },
         {
           "key": "finance.fees",
           "name": "Комиссии банка",
           "icon": "receipt",
+          "role": "normal",
           "id": "c4f5332f-39e8-5d50-985a-7d76c70c9956"
         },
         {
           "key": "finance.insurance",
           "name": "Страхование",
           "icon": "shield",
+          "role": "normal",
           "id": "72d1ff45-ca95-503f-b041-3e95ccdc2d1a"
         },
         {
           "key": "finance.taxes",
           "name": "Налоги и штрафы",
           "icon": "receipt-tax",
+          "role": "normal",
           "id": "e88af86f-ba97-5c32-bada-b857b89209c6"
         },
         {
           "key": "finance.other",
           "name": "Прочее",
           "icon": "dots",
-          "protected": true,
+          "role": "other",
           "id": "e9e6fb5d-a915-59d2-9aeb-3af194b6c108"
         }
       ],
@@ -433,48 +487,55 @@
       "name": "Доход",
       "kind": "income",
       "icon": "cash",
+      "role": "normal",
       "subcategories": [
         {
           "key": "income.salary",
           "name": "Зарплата",
           "icon": "cash",
+          "role": "normal",
           "id": "10bb615c-9e65-5847-9a61-8d40ed2a72bd"
         },
         {
           "key": "income.family",
           "name": "Поступления от близких",
           "icon": "users",
+          "role": "normal",
           "id": "8068a39b-61e1-58fb-8195-a64943160ce3"
         },
         {
           "key": "income.gifts",
           "name": "Подарки",
           "icon": "gift",
+          "role": "normal",
           "id": "0237fbd0-86eb-55fa-932c-d16d0ecf718e"
         },
         {
           "key": "income.refunds",
           "name": "Возвраты и вычеты",
           "icon": "arrow-back-up",
+          "role": "normal",
           "id": "d1ae0518-3f05-57f7-bed3-7be96c37e12c"
         },
         {
           "key": "income.interest",
           "name": "Проценты и дивиденды",
           "icon": "trending-up",
+          "role": "normal",
           "id": "0326d841-7336-50fe-80e5-a385595b1de8"
         },
         {
           "key": "income.sale",
           "name": "Продажа вещей",
           "icon": "tag",
+          "role": "normal",
           "id": "e8bec7b5-3e93-5dee-9c92-a95de9f4dcb3"
         },
         {
           "key": "income.other",
           "name": "Прочее",
           "icon": "dots",
-          "protected": true,
+          "role": "other",
           "id": "d07b1ebb-1de0-5e13-a6ac-c065633d9829"
         }
       ],
@@ -485,12 +546,13 @@
       "name": "Служебное",
       "kind": "expense",
       "icon": "adjustments",
+      "role": "service",
       "subcategories": [
         {
           "key": "service_exp.adjust",
           "name": "Разница",
           "icon": "adjustments",
-          "protected": true,
+          "role": "service",
           "excludeFromReports": true,
           "id": "465b3b2e-3ba0-5a2f-a8c0-5e669a51c457"
         }
@@ -502,12 +564,13 @@
       "name": "Служебное",
       "kind": "income",
       "icon": "adjustments",
+      "role": "service",
       "subcategories": [
         {
           "key": "service_inc.adjust",
           "name": "Разница",
           "icon": "adjustments",
-          "protected": true,
+          "role": "service",
           "excludeFromReports": true,
           "id": "5d9d12cd-2f80-5707-90c6-bbe38398ab3b"
         }
