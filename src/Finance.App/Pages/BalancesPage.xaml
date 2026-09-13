@@ -19,6 +19,9 @@
         <DataTemplate x:Key="AccountTileTemplate" x:DataType="balances:AccountTile">
             <Grid Padding="14,12" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto"
                   MinimumHeightRequest="{StaticResource TouchTarget}">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnAccountTapped" />
+                </Grid.GestureRecognizers>
                 <Label Grid.Column="0" Grid.Row="0" Text="{Binding Name}" />
                 <Label Grid.Column="0" Grid.Row="1" Text="{Binding Kind}"
                        Style="{StaticResource SecondaryLabel}" />
@@ -71,6 +74,10 @@
                    HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
             <Button Text="Создать счёт" Clicked="OnCreateAccount" />
         </VerticalStackLayout>
+
+        <!-- Пока счетов нет, записывать операцию некуда — кнопки нет -->
+        <Button Text="+" Clicked="OnAddTransaction" IsVisible="{Binding HasAccounts}"
+                Style="{StaticResource FloatingButton}" />
     </Grid>
 
 </pages:DataPage>

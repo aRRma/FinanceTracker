@@ -38,6 +38,7 @@ public sealed class AccountsQuery : IAccountsQuery
                 row.Type,
                 row.Currency,
                 row.OpeningBalance,
+                row.OpenedOn,
                 row.ExcludedFromTotals,
                 row.IsClosed,
                 row.SortOrder
@@ -64,6 +65,8 @@ public sealed class AccountsQuery : IAccountsQuery
                 // Restore, а не Create: число уже прошло проверку при вводе,
                 // а баланс ещё и не обязан укладываться в предел суммы операции
                 Balance = Money.Restore(balance, account.Currency),
+                OpeningBalance = Money.Restore(account.OpeningBalance, account.Currency),
+                OpenedOn = account.OpenedOn,
                 ExcludedFromTotals = account.ExcludedFromTotals,
                 IsClosed = account.IsClosed,
                 SortOrder = account.SortOrder

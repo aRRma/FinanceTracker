@@ -111,6 +111,22 @@
         <Setter Property="Padding" Value="20,0" />
     </Style>
 
+    <!-- Плавающая кнопка добавления операции: правый нижний угол, поверх списка -->
+    <Style x:Key="FloatingButton" TargetType="Button">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+        <Setter Property="TextColor"
+                Value="{AppThemeBinding Light={StaticResource OnAccentLight}, Dark={StaticResource OnAccentDark}}" />
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="WidthRequest" Value="56" />
+        <Setter Property="HeightRequest" Value="56" />
+        <Setter Property="CornerRadius" Value="28" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="20" />
+        <Setter Property="HorizontalOptions" Value="End" />
+        <Setter Property="VerticalOptions" Value="End" />
+    </Style>
+
     <!-- Второстепенное действие: «Отмена», «Прервать» -->
     <Style x:Key="GhostButton" TargetType="Button">
         <Setter Property="BackgroundColor" Value="Transparent" />

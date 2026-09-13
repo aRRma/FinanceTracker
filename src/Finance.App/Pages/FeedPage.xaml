@@ -1,13 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<ContentPage
+<!--
+    Экран A-02: общая лента по всем счетам. Счёт подписан у каждой строки:
+    при просмотре всех операций он перестаёт быть очевидным из контекста.
+    Итог дня — в рублях по счетам без «скрыть из расчётов».
+-->
+<pages:DataPage
     x:Class="Finance.App.Pages.FeedPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:feed="clr-namespace:Finance.Application.Features.Feed;assembly=Finance.Application"
+    x:DataType="feed:FeedViewModel"
     Title="Операции">
 
-    <VerticalStackLayout Padding="32" Spacing="12" VerticalOptions="Center" HorizontalOptions="Center">
-        <Label Text="Операций пока нет" HorizontalTextAlignment="Center" Style="{StaticResource TotalLabel}" />
-        <Label Text="Записать первую можно кнопкой «плюс» на главном экране." HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
-    </VerticalStackLayout>
+    <Grid>
+        <controls:FeedList IsVisible="{Binding HasItems}" />
 
-</ContentPage>
+        <VerticalStackLayout IsVisible="{Binding IsEmpty}" Padding="32" Spacing="12"
+                             VerticalOptions="Center" HorizontalOptions="Center">
+            <Label Text="Операций пока нет" HorizontalTextAlignment="Center"
+                   Style="{StaticResource TotalLabel}" />
+            <Label Text="Первая запись появится здесь сразу после сохранения."
+                   HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
+        </VerticalStackLayout>
+
+        <Button Text="+" Clicked="OnAdd" Style="{StaticResource FloatingButton}" />
+    </Grid>
+
+</pages:DataPage>

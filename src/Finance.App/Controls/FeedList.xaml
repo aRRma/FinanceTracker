@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Список ленты: дни с шапками, строки, дочитывание страниц у конца прокрутки.
+    Общий для вкладки операций (A-02) и ленты счёта (A-03): разметка строки
+    одна, а разница — в подписи — уже собрана моделью.
+-->
+<ContentView
+    x:Class="Finance.App.Controls.FeedList"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:feed="clr-namespace:Finance.Application.Features.Feed;assembly=Finance.Application"
+    x:DataType="feed:FeedViewModel">
+
+    <CollectionView
+        ItemsSource="{Binding Days}"
+        IsGrouped="True"
+        SelectionMode="None"
+        RemainingItemsThreshold="10"
+        RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
+
+        <CollectionView.GroupHeaderTemplate>
+            <DataTemplate x:DataType="feed:FeedDay">
+                <Grid Padding="16,16,16,6" ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
+                    <Label Grid.Column="1" Text="{Binding Total}" Style="{StaticResource SectionLabel}" />
+                </Grid>
+            </DataTemplate>
+        </CollectionView.GroupHeaderTemplate>
+
+        <CollectionView.ItemTemplate>
+            <DataTemplate x:DataType="feed:FeedRowItem">
+                <Grid Padding="16,10" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto"
+                      MinimumHeightRequest="{StaticResource TouchTarget}">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnRowTapped" />
+                    </Grid.GestureRecognizers>
+
+                    <Label Grid.Column="0" Grid.Row="0" Text="{Binding Title}" />
+                    <Label Grid.Column="0" Grid.Row="1" Text="{Binding Caption}"
+                           Style="{StaticResource SecondaryLabel}" />
+                    <Label Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Amount}"
+                           VerticalOptions="Center">
+                        <Label.Triggers>
+                            <!-- Доход и зачисление — смысловым цветом, расход — обычным текстом -->
+                            <DataTrigger TargetType="Label" Binding="{Binding IsPositive}" Value="True">
+                                <Setter Property="Style" Value="{StaticResource PositiveLabel}" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </Grid>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+
+        <CollectionView.Footer>
+            <!-- Место под плавающую кнопку: последняя строка не должна прятаться за ней -->
+            <BoxView HeightRequest="88" Color="Transparent" />
+        </CollectionView.Footer>
+    </CollectionView>
+
+</ContentView>
