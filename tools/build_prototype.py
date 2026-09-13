@@ -7,10 +7,16 @@
 
 Запуск:   python tools/build_prototype.py          # пересобрать
 Проверка: python tools/build_prototype.py --check  # упасть, если prototype.html устарел
+
+В собранный файл проставляются отпечатки источников. По ним свежесть сборки
+проверяет Finance.Docs.Tests: вызывать Python из тестов нельзя, а расходиться
+макетам и прототипу нельзя тем более.
 """
-import json, pathlib, re, sys
+import hashlib, json, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+CRLF, LF = chr(13) + chr(10), chr(10)
+
 SRC = ROOT / "docs/ui/mockups.html"
 DST = ROOT / "docs/ui/prototype.html"
 
@@ -319,6 +325,7 @@ TEMPLATE = r"""<!doctype html>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Личный трекер финансов — прототип</title>
 <!-- СГЕНЕРИРОВАНО из mockups.html скриптом tools/build_prototype.py. Руками не править. -->
+__FINGERPRINT__
 <style>
 __MOCKUP_CSS__
 
@@ -515,6 +522,17 @@ start(0);
 """
 
 
+def fingerprint(path):
+    """Отпечаток источника сборки.
+
+    Переводы строк приводятся к одному виду, а метка порядка байтов отбрасывается:
+    иначе отпечаток зависел бы от настроек checkout, и у второго разработчика
+    сборка считалась бы устаревшей на ровном месте.
+    """
+    text = path.read_text(encoding="utf-8-sig").replace(CRLF, LF)
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 def build():
     src = SRC.read_text(encoding="utf-8")
     css = re.search(r"<style>(.*?)</style>", src, re.S).group(1).strip()
@@ -538,7 +556,13 @@ def build():
                         print(f"  предупреждение: «{sc['n']}» шаг «{st['c']}»: на {st['s']} нет текста «{lit}»")
             for spec, val in (st.get("set") or {}).items():
                 dynamic.add((st["s"], val))
+    # Отпечаток берётся и со сборщика: сценарии и шаблон живут в нём, значит
+    # его правка меняет прототип так же, как правка макетов
+    stamp = (f"<!-- отпечатки источников: mockups.html={fingerprint(SRC)} "
+             f"build_prototype.py={fingerprint(pathlib.Path(__file__))} -->")
+
     out = (TEMPLATE
+           .replace("__FINGERPRINT__", stamp)
            .replace("__MOCKUP_CSS__", css)
            .replace("__SPRITE__", sprite)
            .replace("__SCREENS__", "\n\n".join(screens))
