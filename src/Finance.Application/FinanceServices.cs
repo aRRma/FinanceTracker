@@ -3,6 +3,8 @@ using Finance.Application.Features.Accounts.Catalog;
 using Finance.Application.Features.Balances;
 using Finance.Application.Features.Categories.Card;
 using Finance.Application.Features.Categories.Catalog;
+using Finance.Application.Features.Places.Card;
+using Finance.Application.Features.Places.Catalog;
 using Finance.Application.Features.Feed;
 using Finance.Application.Features.More;
 using Finance.Application.Features.Transactions.Card;
@@ -70,6 +72,9 @@ public static class FinanceServices
     private static void AddFeatures(IServiceCollection services)
     {
         services.AddSingleton<IAccountsQuery, AccountsQuery>();
+        services.AddSingleton<IPlacesQuery, PlacesQuery>();
+        services.AddSingleton<IRenamePlaceHandler, RenamePlaceHandler>();
+        services.AddSingleton<IDeletePlaceHandler, DeletePlaceHandler>();
         services.AddSingleton<ICategoriesQuery, CategoriesQuery>();
         services.AddSingleton<ISaveCategoryHandler, SaveCategoryHandler>();
         services.AddSingleton<ICategoryDeletionQuery, CategoryDeletionQuery>();
@@ -90,6 +95,8 @@ public static class FinanceServices
         services.AddTransient<AccountViewModel>();
         services.AddTransient<FeedViewModel>();
         services.AddTransient<TransactionViewModel>();
+        services.AddTransient<PlacesViewModel>();
+        services.AddTransient<PlaceViewModel>();
         services.AddTransient<CategoriesViewModel>();
         services.AddTransient<GroupViewModel>();
         services.AddTransient<SubcategoryViewModel>();

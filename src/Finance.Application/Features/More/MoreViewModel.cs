@@ -12,25 +12,37 @@ namespace Finance.Application.Features.More;
 public sealed partial class MoreViewModel : ScreenViewModel
 {
     private readonly IAccountsQuery _accounts;
+    private readonly IPlacesQuery _places;
     private readonly ICategoriesQuery _categories;
 
     /// <summary>Создаёт модель представления раздела «Ещё».</summary>
     /// <param name="accounts">Список счетов.</param>
+    /// <param name="places">Справочник мест.</param>
     /// <param name="categories">Список категорий.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
-    public MoreViewModel(IAccountsQuery accounts, ICategoriesQuery categories, IChangeNotifier changes)
+    public MoreViewModel(
+        IAccountsQuery accounts,
+        IPlacesQuery places,
+        ICategoriesQuery categories,
+        IChangeNotifier changes)
         : base(changes)
     {
         ArgumentNullException.ThrowIfNull(accounts);
+        ArgumentNullException.ThrowIfNull(places);
         ArgumentNullException.ThrowIfNull(categories);
 
         _accounts = accounts;
+        _places = places;
         _categories = categories;
     }
 
     /// <summary>Сколько заведено счетов.</summary>
     [ObservableProperty]
     public partial string AccountsCaption { get; private set; } = string.Empty;
+
+    /// <summary>Сколько накопилось мест.</summary>
+    [ObservableProperty]
+    public partial string PlacesCaption { get; private set; } = string.Empty;
 
     /// <summary>Сколько заведено групп и подкатегорий.</summary>
     [ObservableProperty]
@@ -44,9 +56,11 @@ public sealed partial class MoreViewModel : ScreenViewModel
         // ConfigureAwait(false) здесь недопустим: следом меняются привязанные
         // свойства, а их правка вне потока интерфейса роняет разметку
         IReadOnlyList<AccountListItem> accounts = await _accounts.ReadAsync(cancellationToken);
+        IReadOnlyList<PlaceListItem> places = await _places.ReadAsync(cancellationToken);
         IReadOnlyList<CategoryListItem> categories = await _categories.ReadAsync(cancellationToken);
 
         AccountsCaption = Plural.Of(accounts.Count, "счёт", "счёта", "счетов");
+        PlacesCaption = Plural.Of(places.Count, "место", "места", "мест");
 
         int groups = categories.Count(static category => category.IsGroup);
 
@@ -56,7 +70,8 @@ public sealed partial class MoreViewModel : ScreenViewModel
     }
 
     /// <inheritdoc />
-    protected override DataChange Watched => DataChange.Accounts | DataChange.Categories;
+    protected override DataChange Watched =>
+        DataChange.Accounts | DataChange.Places | DataChange.Categories;
 
     /// <inheritdoc />
     protected override void Reload() => LoadCommand.Execute(null);
