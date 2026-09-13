@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран D-02: карточка счёта. Заведение и правка одной формой. Валюта заперта,
+    если по счёту уже была операция, — рядом стоит пояснение почему, иначе
+    заблокированное поле выглядит поломкой.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.AccountPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:card="clr-namespace:Finance.Application.Features.Accounts.Card;assembly=Finance.Application"
+    x:DataType="card:AccountViewModel"
+    Title="{Binding Title}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12" Spacing="16">
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="14,10" Spacing="10">
+                    <Label Text="Название" Style="{StaticResource CaptionLabel}" />
+                    <Entry Text="{Binding Name}" Placeholder="Карта основная" />
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Label Text="Тип" Style="{StaticResource CaptionLabel}" />
+                    <Picker ItemsSource="{Binding TypeNames}" SelectedIndex="{Binding TypeIndex}" />
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Label Text="Валюта" Style="{StaticResource CaptionLabel}" />
+                    <Picker ItemsSource="{Binding CurrencyNames}" SelectedIndex="{Binding CurrencyIndex}"
+                            IsEnabled="{Binding CurrencyEditable}" />
+                    <Label Text="Валюта не меняется: по счёту уже есть операции"
+                           Style="{StaticResource CaptionLabel}" IsVisible="{Binding CurrencyLocked}" />
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Label Text="Начальный остаток" Style="{StaticResource CaptionLabel}" />
+                    <Entry Text="{Binding OpeningBalance}" Keyboard="Numeric" />
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Label Text="Дата открытия" Style="{StaticResource CaptionLabel}" />
+                    <DatePicker Date="{Binding OpenedOnDate}" MaximumDate="{Binding LatestOpeningDate}" />
+                    <Label Text="{Binding OpenedOnHint}" Style="{StaticResource CaptionLabel}"
+                           IsVisible="{Binding HasOpenedOnHint}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="14,10" Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Label Grid.Column="0" Text="Скрыть из расчётов" VerticalOptions="Center" />
+                        <Switch Grid.Column="1" IsToggled="{Binding ExcludedFromTotals}" />
+                    </Grid>
+                    <Label Text="Счёт не входит ни в «доступно к тратам», ни в итоги дня, ни в отчёт"
+                           Style="{StaticResource CaptionLabel}" />
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Label Grid.Column="0" Text="Счёт закрыт" VerticalOptions="Center" />
+                        <Switch Grid.Column="1" IsToggled="{Binding IsClosed}" />
+                    </Grid>
+                    <Label Text="Закрытый счёт не показывается на главном экране и не предлагается в выборе. Лента и отчёт не меняются"
+                           Style="{StaticResource CaptionLabel}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource Card}" IsVisible="{Binding HasError}">
+                <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
+            </Border>
+
+            <Button Text="Сохранить" Clicked="OnSave" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</pages:DataPage>

@@ -1,14 +1,14 @@
-﻿namespace Finance.App;
+namespace Finance.App;
 
-public partial class App : Application
+/// <summary>Приложение: ресурсы темы и корневое окно.</summary>
+public partial class App : ControlsApplication
 {
-	public App()
-	{
-		InitializeComponent();
-	}
+    /// <summary>Создаёт приложение.</summary>
+    public App()
+    {
+        InitializeComponent();
+    }
 
-	protected override Window CreateWindow(IActivationState? activationState)
-	{
-		return new Window(new AppShell());
-	}
+    /// <inheritdoc />
+    protected override Window CreateWindow(IActivationState? activationState) => new(new AppShell());
 }

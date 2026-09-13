@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран A-01: сколько доступно к тратам. Счета сгруппированы по валютам,
+    в каждой валюте один подытог. Пока счетов нет — приглашение завести первый
+    (экран C-06), и добавить операцию нельзя: записывать её некуда.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.BalancesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:balances="clr-namespace:Finance.Application.Features.Balances;assembly=Finance.Application"
+    x:DataType="balances:BalancesViewModel"
+    Title="Балансы">
+
+    <ContentPage.Resources>
+        <!-- Один шаблон на тратимые счета и на накопления: строка у них одинаковая,
+             разное только то, входит ли счёт в подытог -->
+        <DataTemplate x:Key="AccountTileTemplate" x:DataType="balances:AccountTile">
+            <Grid Padding="14,12" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto"
+                  MinimumHeightRequest="{StaticResource TouchTarget}">
+                <Label Grid.Column="0" Grid.Row="0" Text="{Binding Name}" />
+                <Label Grid.Column="0" Grid.Row="1" Text="{Binding Kind}"
+                       Style="{StaticResource SecondaryLabel}" />
+                <Label Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Balance}"
+                       VerticalOptions="Center" />
+            </Grid>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <Grid>
+        <ScrollView IsVisible="{Binding HasAccounts}">
+            <VerticalStackLayout Padding="16,12,16,88" Spacing="20"
+                                 BindableLayout.ItemsSource="{Binding Sections}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="balances:CurrencySection">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
+
+                            <Label Text="Доступно" Style="{StaticResource CaptionLabel}" />
+                            <Label Text="{Binding Available}" Style="{StaticResource TotalLabel}" />
+
+                            <Border Style="{StaticResource Card}">
+                                <VerticalStackLayout
+                                    BindableLayout.ItemsSource="{Binding Spendable}"
+                                    BindableLayout.ItemTemplate="{StaticResource AccountTileTemplate}" />
+                            </Border>
+
+                            <Label Text="Накопления" Style="{StaticResource SectionLabel}"
+                                   IsVisible="{Binding HasSavings}" />
+                            <Label Text="Скрыты из расчётов" Style="{StaticResource CaptionLabel}"
+                                   IsVisible="{Binding HasSavings}" />
+
+                            <Border Style="{StaticResource Card}" IsVisible="{Binding HasSavings}">
+                                <VerticalStackLayout
+                                    BindableLayout.ItemsSource="{Binding Savings}"
+                                    BindableLayout.ItemTemplate="{StaticResource AccountTileTemplate}" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Первый запуск: счетов нет, и единственное осмысленное действие — завести счёт -->
+        <VerticalStackLayout IsVisible="{Binding IsEmpty}" Padding="32" Spacing="12"
+                             VerticalOptions="Center" HorizontalOptions="Center">
+            <Label Text="Заведите первый счёт" HorizontalTextAlignment="Center"
+                   Style="{StaticResource TotalLabel}" />
+            <Label Text="Категории уже созданы — останется записать первую операцию."
+                   HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
+            <Button Text="Создать счёт" Clicked="OnCreateAccount" />
+        </VerticalStackLayout>
+    </Grid>
+
+</pages:DataPage>

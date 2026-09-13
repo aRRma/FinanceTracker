@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран A-04: справочники и настройки. Вкладка «Ещё» — единственный вход
+    во всё, что не балансы, операции и отчёт.
+-->
+<ContentPage
+    x:Class="Finance.App.Pages.MorePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Ещё">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12" Spacing="16">
+
+            <Label Text="Справочники" Style="{StaticResource SectionLabel}" />
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout>
+                    <Grid Padding="14,12" MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnAccounts" />
+                        </Grid.GestureRecognizers>
+                        <Label Text="Счета" VerticalOptions="Center" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

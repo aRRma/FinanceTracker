@@ -1,11 +1,34 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Nullable, ImplicitUsings и режим предупреждений — в Directory.Build.props -->
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Finance.Domain\Finance.Domain.csproj" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
+
+    <!-- Только для `dotnet ef`: в приложение уезжать этому пакету незачем -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Строки таблиц внутренние: наружу они не нужны, а тестам нужны -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="Finance.Application.Tests" />
+  </ItemGroup>
+
+  <!-- Стартовый набор и значки едут внутри сборки: инициализация базы идёт
+       без обращения к сети и без файлов рядом с приложением (SEED-01, NFR-21) -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\data\preset.json" LogicalName="Finance.Application.preset.json" />
+    <EmbeddedResource Include="..\..\data\icons.json" LogicalName="Finance.Application.icons.json" />
+  </ItemGroup>
 
 </Project>

@@ -1,0 +1,218 @@
+using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Finance.Application.Infrastructure;
+using Finance.Domain;
+
+namespace Finance.Application.Features.Accounts.Card;
+
+/// <summary>
+/// Карточка счёта: заведение и правка одним экраном. Запреты показываются сразу —
+/// валюта заперта операциями, дата открытия дальше первой операции не двигается, —
+/// потому что узнать о них при сохранении поздно: пользователь уже всё ввёл.
+/// </summary>
+public sealed partial class AccountViewModel : ObservableObject
+{
+    private readonly IAccountCardQuery _query;
+    private readonly ISaveAccountHandler _handler;
+    private readonly IClock _clock;
+
+    /// <summary>Создаёт модель представления карточки счёта.</summary>
+    /// <param name="query">Чтение счёта для правки.</param>
+    /// <param name="handler">Сохранение счёта.</param>
+    /// <param name="clock">Часы: «сегодня» пользователя.</param>
+    public AccountViewModel(IAccountCardQuery query, ISaveAccountHandler handler, IClock clock)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(clock);
+
+        _query = query;
+        _handler = handler;
+        _clock = clock;
+
+        OpenedOn = clock.Today;
+    }
+
+    /// <summary>Ключ правимого счёта. Пусто — заводится новый.</summary>
+    public Guid? Key { get; private set; }
+
+    /// <summary>Наименование счёта.</summary>
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
+
+    /// <summary>Наличные или карта.</summary>
+    [ObservableProperty]
+    public partial AccountType Type { get; set; } = AccountType.Card;
+
+    /// <summary>Валюта счёта.</summary>
+    [ObservableProperty]
+    public partial Currency Currency { get; set; } = Currency.RUB;
+
+    private static readonly AccountType[] TypeOrder = [AccountType.Card, AccountType.Cash];
+
+    private static readonly Currency[] CurrencyOrder = [Currency.RUB, Currency.USD, Currency.EUR];
+
+    /// <summary>Подписи типов счёта для списка выбора.</summary>
+    public static IReadOnlyList<string> TypeNames { get; } = ["Карта", "Наличные"];
+
+    /// <summary>Подписи валют для списка выбора.</summary>
+    public static IReadOnlyList<string> CurrencyNames { get; } = ["Рубль ₽", "Доллар $", "Евро €"];
+
+    /// <summary>Выбранный тип счёта — номером в списке: список показывает подписи, а не имена членов.</summary>
+    public int TypeIndex
+    {
+        get => Array.IndexOf(TypeOrder, Type);
+        set => Type = TypeOrder[Math.Clamp(value, 0, TypeOrder.Length - 1)];
+    }
+
+    /// <summary>Выбранная валюта — номером в списке.</summary>
+    public int CurrencyIndex
+    {
+        get => Array.IndexOf(CurrencyOrder, Currency);
+        set => Currency = CurrencyOrder[Math.Clamp(value, 0, CurrencyOrder.Length - 1)];
+    }
+
+    /// <summary>Валюту менять можно: операций по счёту ещё не было.</summary>
+    public bool CurrencyEditable => !CurrencyLocked;
+
+    /// <summary>Дата открытия в том виде, в каком её принимает календарь.</summary>
+    public DateTime OpenedOnDate
+    {
+        get => OpenedOn.ToDateTime(TimeOnly.MinValue);
+        set => OpenedOn = DateOnly.FromDateTime(value);
+    }
+
+    /// <summary>Позднее сегодняшнего дня календарь не пускает: операций в будущем нет.</summary>
+    public DateTime LatestOpeningDate => _clock.Today.ToDateTime(TimeOnly.MinValue);
+
+    /// <summary>Пояснение, почему дату открытия дальше не сдвинуть.</summary>
+    public string? OpenedOnHint => EarliestTransactionOn is { } earliest
+        ? $"Не позже {earliest:dd.MM.yyyy} — этим днём есть операция"
+        : null;
+
+    /// <summary>Пояснение к дате открытия есть — его стоит показать.</summary>
+    public bool HasOpenedOnHint => OpenedOnHint is not null;
+
+    /// <summary>Правило нарушено — сообщение показывается рядом с формой.</summary>
+    public bool HasError => !string.IsNullOrEmpty(Error);
+
+    /// <summary>Начальный остаток, как он набран в поле.</summary>
+    [ObservableProperty]
+    public partial string OpeningBalance { get; set; } = "0";
+
+    /// <summary>Дата открытия.</summary>
+    [ObservableProperty]
+    public partial DateOnly OpenedOn { get; set; }
+
+    /// <summary>«Скрыть из расчётов».</summary>
+    [ObservableProperty]
+    public partial bool ExcludedFromTotals { get; set; }
+
+    /// <summary>«Счёт закрыт».</summary>
+    [ObservableProperty]
+    public partial bool IsClosed { get; set; }
+
+    /// <summary>Валюту менять нельзя: по счёту уже была операция.</summary>
+    [ObservableProperty]
+    public partial bool CurrencyLocked { get; private set; }
+
+    /// <summary>Дальше этой даты открытие не сдвигается — раньше неё есть операция.</summary>
+    [ObservableProperty]
+    public partial DateOnly? EarliestTransactionOn { get; private set; }
+
+    /// <summary>Текст нарушенного правила. Пусто — сохранять можно.</summary>
+    [ObservableProperty]
+    public partial string? Error { get; private set; }
+
+    /// <summary>Заголовок экрана.</summary>
+    public string Title => Key is null ? "Новый счёт" : "Счёт";
+
+    /// <summary>Загружает счёт для правки. Пустой ключ оставляет форму пустой.</summary>
+    /// <param name="key">Ключ счёта или <c>null</c> для нового.</param>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    [RelayCommand]
+    public async Task LoadAsync(Guid? key, CancellationToken cancellationToken = default)
+    {
+        if (key is not { } existing)
+        {
+            return;
+        }
+
+        // ConfigureAwait(false) здесь недопустим: следом меняются привязанные
+        // свойства, а их правка вне потока интерфейса роняет разметку
+        AccountCard? card = await _query.ReadAsync(existing, cancellationToken);
+
+        if (card is null)
+        {
+            return;
+        }
+
+        Key = card.Key;
+        Name = card.Name;
+        Type = card.Type;
+        Currency = card.Currency;
+        OpeningBalance = card.OpeningBalance.ToString(CultureInfo.InvariantCulture);
+        OpenedOn = card.OpenedOn;
+        ExcludedFromTotals = card.ExcludedFromTotals;
+        IsClosed = card.IsClosed;
+        CurrencyLocked = card.CurrencyLocked;
+        EarliestTransactionOn = card.EarliestTransactionOn;
+
+        OnPropertyChanged(nameof(Title));
+        OnPropertyChanged(nameof(TypeIndex));
+        OnPropertyChanged(nameof(CurrencyIndex));
+        OnPropertyChanged(nameof(CurrencyEditable));
+        OnPropertyChanged(nameof(OpenedOnDate));
+        OnPropertyChanged(nameof(OpenedOnHint));
+        OnPropertyChanged(nameof(HasOpenedOnHint));
+    }
+
+    /// <summary>
+    /// Сохраняет счёт. Нарушенное доменное правило показывается текстом рядом
+    /// с формой: это ввод пользователя, а не сбой, и падать приложению не за что.
+    /// </summary>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    /// <returns><c>true</c>, если счёт сохранён и экран можно закрыть.</returns>
+    [RelayCommand]
+    public async Task<bool> SaveAsync(CancellationToken cancellationToken = default)
+    {
+        Error = null;
+        OnPropertyChanged(nameof(HasError));
+
+        if (!AmountExpression.TryEvaluate(OpeningBalance, out decimal openingBalance))
+        {
+            Error = "Начальный остаток введён не полностью";
+            OnPropertyChanged(nameof(HasError));
+
+            return false;
+        }
+
+        try
+        {
+            await _handler
+                .HandleAsync(
+                    new SaveAccountCommand
+                    {
+                        Key = Key,
+                        Name = Name,
+                        Type = Type,
+                        Currency = Currency,
+                        OpeningBalance = openingBalance,
+                        OpenedOn = OpenedOn,
+                        ExcludedFromTotals = ExcludedFromTotals,
+                        IsClosed = IsClosed
+                    },
+                    cancellationToken);
+
+            return true;
+        }
+        catch (DomainException error)
+        {
+            Error = error.Message;
+            OnPropertyChanged(nameof(HasError));
+
+            return false;
+        }
+    }
+}
