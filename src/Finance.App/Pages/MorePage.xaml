@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
     Экран A-04: справочники и настройки. Вкладка «Ещё» — единственный вход
-    во всё, что не балансы, операции и отчёт.
+    во всё, что не балансы, операции и отчёт. Подписи считают содержимое:
+    по ним видно, что справочник не пуст, ещё до захода в него.
 -->
-<ContentPage
+<pages:DataPage
     x:Class="Finance.App.Pages.MorePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:more="clr-namespace:Finance.Application.Features.More;assembly=Finance.Application"
+    x:DataType="more:MoreViewModel"
     Title="Ещё">
 
     <ScrollView>
@@ -15,11 +19,28 @@
             <Label Text="Справочники" Style="{StaticResource SectionLabel}" />
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout>
-                    <Grid Padding="14,12" MinimumHeightRequest="{StaticResource TouchTarget}">
+                    <Grid Padding="14,12" RowDefinitions="Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnAccounts" />
                         </Grid.GestureRecognizers>
-                        <Label Text="Счета" VerticalOptions="Center" />
+
+                        <Label Grid.Row="0" Text="Счета" VerticalOptions="Center" />
+                        <Label Grid.Row="1" Text="{Binding AccountsCaption}"
+                               Style="{StaticResource SecondaryLabel}" />
+                    </Grid>
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Grid Padding="14,12" RowDefinitions="Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCategories" />
+                        </Grid.GestureRecognizers>
+
+                        <Label Grid.Row="0" Text="Категории" VerticalOptions="Center" />
+                        <Label Grid.Row="1" Text="{Binding CategoriesCaption}"
+                               Style="{StaticResource SecondaryLabel}" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>
@@ -27,4 +48,4 @@
         </VerticalStackLayout>
     </ScrollView>
 
-</ContentPage>
+</pages:DataPage>

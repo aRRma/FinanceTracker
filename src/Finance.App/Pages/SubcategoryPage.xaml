@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран C-02: карточка подкатегории. Группа выбирается списком — смена группы
+    и есть перенос. Вид показан, но заперт: он наследуется от группы. Удаление
+    спрашивает подтверждение и называет, сколько операций переедет и куда.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.SubcategoryPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:card="clr-namespace:Finance.Application.Features.Categories.Card;assembly=Finance.Application"
+    x:DataType="card:SubcategoryViewModel"
+    Title="{Binding Title}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12" Spacing="16">
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="14,10" Spacing="10">
+                    <Label Text="Название" Style="{StaticResource CaptionLabel}" />
+                    <Entry Text="{Binding Name}" Placeholder="Продукты" />
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Icon.ToggleCommand}" />
+                        </Grid.GestureRecognizers>
+
+                        <Label Grid.Column="0" Text="Значок" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{Binding Icon.Selected}" VerticalOptions="Center"
+                               Style="{StaticResource SecondaryLabel}" />
+                    </Grid>
+
+                    <CollectionView ItemsSource="{Binding Icon.Keys}" IsVisible="{Binding Icon.IsOpen}"
+                                    SelectionMode="None" HeightRequest="220">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical" Span="3" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Label Text="{Binding .}" Padding="8" Style="{StaticResource SecondaryLabel}"
+                                       MinimumHeightRequest="{StaticResource TouchTarget}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnIconTapped" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Label Text="Группа" Style="{StaticResource CaptionLabel}" />
+                    <!-- Только группы того же вида: перенос в чужой вид перевернул бы
+                         знак у всей истории подкатегории -->
+                    <Picker ItemsSource="{Binding Groups}"
+                            ItemDisplayBinding="{Binding Name, x:DataType=card:CategoryGroupOption}"
+                            SelectedItem="{Binding Group}" Title="Выбрать группу" />
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Label Text="Вид" Style="{StaticResource CaptionLabel}" />
+                    <Label Text="{Binding KindCaption}" />
+                    <Label Text="Вид наследуется от группы и не меняется"
+                           Style="{StaticResource CaptionLabel}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource Card}" IsVisible="{Binding HasError}">
+                <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
+            </Border>
+
+            <Button Text="Сохранить" Clicked="OnSave" />
+
+            <Button Text="Удалить подкатегорию" Clicked="OnDelete" IsVisible="{Binding CanDelete}"
+                    Style="{StaticResource DangerButton}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</pages:DataPage>

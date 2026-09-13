@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран D-03: справочник категорий. Расходы и доходы порознь: вместе список
+    вдвое длиннее, а ищут в нём всегда что-то одно. «Прочее» и служебные видны,
+    но не открываются — их не переносят и не удаляют.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.CategoriesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:catalog="clr-namespace:Finance.Application.Features.Categories.Catalog;assembly=Finance.Application"
+    xmlns:domain="clr-namespace:Finance.Domain;assembly=Finance.Domain"
+    x:DataType="catalog:CategoriesViewModel"
+    Title="Категории">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="+" Clicked="OnCreateGroup" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <HorizontalStackLayout Grid.Row="0" Padding="16,12" Spacing="8" HorizontalOptions="Center"
+                               RadioButtonGroup.GroupName="categoryKind"
+                               RadioButtonGroup.SelectedValue="{Binding Kind}">
+            <RadioButton Content="Расходы" Value="{x:Static domain:CategoryKind.Expense}" />
+            <RadioButton Content="Доходы" Value="{x:Static domain:CategoryKind.Income}" />
+        </HorizontalStackLayout>
+
+        <Label Grid.Row="1" Padding="16,24" IsVisible="{Binding IsEmpty}"
+               Text="Групп этого вида пока нет. Заведите первую кнопкой «+» — подкатегория «Прочее» создастся сама."
+               Style="{StaticResource SecondaryLabel}" />
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Groups}" IsGrouped="True" SelectionMode="None">
+
+            <CollectionView.GroupHeaderTemplate>
+                <DataTemplate x:DataType="catalog:CategoryGroupItem">
+                    <Grid Padding="16,16,16,6" ColumnDefinitions="*,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnGroupTapped" />
+                        </Grid.GestureRecognizers>
+
+                        <Label Grid.Column="0" Text="{Binding Name}" Style="{StaticResource SectionLabel}" />
+                        <Label Grid.Column="1" Text="{Binding SubcategoryCount}" Style="{StaticResource SectionLabel}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.GroupHeaderTemplate>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="catalog:CategoryRowItem">
+                    <!-- Отступ слева отделяет второй уровень от первого: дерево здесь
+                         показано отступом, а не рамками -->
+                    <Grid Padding="52,10,16,10" MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnSubcategoryTapped" />
+                        </Grid.GestureRecognizers>
+
+                        <Label Text="{Binding Name}">
+                            <Label.Triggers>
+                                <!-- Приёмник и служебная приглушены: они не открываются -->
+                                <DataTrigger TargetType="Label" Binding="{Binding IsProtected}" Value="True">
+                                    <Setter Property="TextColor"
+                                            Value="{AppThemeBinding Light={StaticResource Ink3Light}, Dark={StaticResource Ink3Dark}}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </Grid>
+
+</pages:DataPage>

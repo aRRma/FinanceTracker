@@ -15,6 +15,18 @@ public static class Routes
     /// <summary>Карточка счёта: заведение и правка.</summary>
     public const string Account = "accounts/account";
 
+    /// <summary>Справочник категорий.</summary>
+    public const string Categories = "categories";
+
+    /// <summary>Карточка группы: заведение и правка. Параметр <c>key</c> — ключ группы.</summary>
+    public const string Group = "categories/group";
+
+    /// <summary>
+    /// Карточка подкатегории. Параметр <c>key</c> — ключ правимой подкатегории,
+    /// <c>group</c> — группа, в которой заводится новая.
+    /// </summary>
+    public const string Subcategory = "categories/subcategory";
+
     /// <summary>Лента одного счёта. Параметр <c>key</c> — ключ счёта.</summary>
     public const string AccountFeed = "feed/account";
 
@@ -29,6 +41,9 @@ public static class Routes
     {
         Routing.RegisterRoute(Accounts, typeof(AccountsPage));
         Routing.RegisterRoute(Account, typeof(AccountPage));
+        Routing.RegisterRoute(Categories, typeof(CategoriesPage));
+        Routing.RegisterRoute(Group, typeof(GroupPage));
+        Routing.RegisterRoute(Subcategory, typeof(SubcategoryPage));
         Routing.RegisterRoute(AccountFeed, typeof(AccountFeedPage));
         Routing.RegisterRoute(Transaction, typeof(TransactionPage));
     }
