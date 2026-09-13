@@ -10,6 +10,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:card="clr-namespace:Finance.Application.Features.Categories.Card;assembly=Finance.Application"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
     x:DataType="card:SubcategoryViewModel"
     Title="{Binding Title}">
 
@@ -29,23 +30,22 @@
                         </Grid.GestureRecognizers>
 
                         <Label Grid.Column="0" Text="Значок" VerticalOptions="Center" />
-                        <Label Grid.Column="1" Text="{Binding Icon.Selected}" VerticalOptions="Center"
-                               Style="{StaticResource SecondaryLabel}" />
+                        <controls:Icon Grid.Column="1" Key="{Binding Icon.Selected}" Style="{StaticResource AccentIcon}" />
                     </Grid>
 
                     <CollectionView ItemsSource="{Binding Icon.Keys}" IsVisible="{Binding Icon.IsOpen}"
                                     SelectionMode="None" HeightRequest="220">
                         <CollectionView.ItemsLayout>
-                            <GridItemsLayout Orientation="Vertical" Span="3" />
+                            <GridItemsLayout Orientation="Vertical" Span="6" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="x:String">
-                                <Label Text="{Binding .}" Padding="8" Style="{StaticResource SecondaryLabel}"
-                                       MinimumHeightRequest="{StaticResource TouchTarget}">
-                                    <Label.GestureRecognizers>
+                                <Grid MinimumHeightRequest="{StaticResource TouchTarget}">
+                                    <Grid.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnIconTapped" />
-                                    </Label.GestureRecognizers>
-                                </Label>
+                                    </Grid.GestureRecognizers>
+                                    <controls:Icon Key="{Binding .}" HorizontalOptions="Center" />
+                                </Grid>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>

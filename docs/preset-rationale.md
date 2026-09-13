@@ -78,7 +78,7 @@
 | Ключ | Название | Значок | Основание |
 |---|---|---|---|
 | `kids.classes` | Кружки и секции | `ball-football` | 220 000 ₽ · новая статья с 2024 · логопед, плавание, английский |
-| `kids.goods` | Детские товары | `teddy-bear` | 171 164 ₽ · 6 из 6 |
+| `kids.goods` | Детские товары | `horse-toy` | 171 164 ₽ · 6 из 6 |
 | `kids.playground` | Игровые и развлечения | `building-carousel` | 170 966 ₽ · 5 из 6 · спад в 2026 |
 | `kids.allowance` | Карманные и на счёт | `wallet` | 91 000 ₽ · 5 из 6 |
 | `kids.kindergarten` | Садик | `school` | 69 636 ₽ · 5 из 6 |
@@ -187,7 +187,7 @@
 **Дом** `home` `home-2` `sofa` `key` `building-bank` `bolt` `bulb` `wash-machine` `tool` `plant-2`
 **Транспорт** `train` `car` `steering-wheel` `plane` `bus` `bike` `scooter` `gas-station` `parking` `road`
 **Покупки** `shopping-bag` `device-laptop` `shirt` `shoe` `gift` `flower` `device-mobile` `basket`
-**Дети** `baby-carriage` `teddy-bear` `school` `ball-football` `building-carousel` `pencil`
+**Дети** `baby-carriage` `horse-toy` `school` `ball-football` `building-carousel` `pencil`
 **Здоровье** `stethoscope` `dental` `pill` `test-pipe` `scissors` `massage` `barbell` `mood-happy`
 **Отдых** `beach` `ticket` `movie` `camera` `music` `book` `heart-handshake` `confetti` `paw`
 **Финансы** `coins` `cash` `wallet` `receipt` `receipt-tax` `percentage` `shield` `shield-check` `users` `trending-up` `tag` `arrow-back-up` `building-bank`

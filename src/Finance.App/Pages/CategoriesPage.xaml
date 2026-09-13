@@ -11,6 +11,7 @@
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:catalog="clr-namespace:Finance.Application.Features.Categories.Catalog;assembly=Finance.Application"
     xmlns:domain="clr-namespace:Finance.Domain;assembly=Finance.Domain"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
     x:DataType="catalog:CategoriesViewModel"
     Title="Категории">
 
@@ -35,14 +36,17 @@
 
             <CollectionView.GroupHeaderTemplate>
                 <DataTemplate x:DataType="catalog:CategoryGroupItem">
-                    <Grid Padding="16,16,16,6" ColumnDefinitions="*,Auto"
+                    <Grid Padding="16,16,16,6" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"
                           MinimumHeightRequest="{StaticResource TouchTarget}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnGroupTapped" />
                         </Grid.GestureRecognizers>
 
-                        <Label Grid.Column="0" Text="{Binding Name}" Style="{StaticResource SectionLabel}" />
-                        <Label Grid.Column="1" Text="{Binding SubcategoryCount}" Style="{StaticResource SectionLabel}" />
+                        <controls:Icon Grid.Column="0" Key="{Binding Icon}" />
+                        <Label Grid.Column="1" Text="{Binding Name}" Style="{StaticResource SectionLabel}"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="2" Text="{Binding SubcategoryCount}" Style="{StaticResource SectionLabel}"
+                               VerticalOptions="Center" />
                     </Grid>
                 </DataTemplate>
             </CollectionView.GroupHeaderTemplate>
@@ -51,12 +55,14 @@
                 <DataTemplate x:DataType="catalog:CategoryRowItem">
                     <!-- Отступ слева отделяет второй уровень от первого: дерево здесь
                          показано отступом, а не рамками -->
-                    <Grid Padding="52,10,16,10" MinimumHeightRequest="{StaticResource TouchTarget}">
+                    <Grid Padding="52,10,16,10" ColumnDefinitions="Auto,*" ColumnSpacing="12"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnSubcategoryTapped" />
                         </Grid.GestureRecognizers>
 
-                        <Label Text="{Binding Name}">
+                        <controls:Icon Grid.Column="0" Key="{Binding Icon}" />
+                        <Label Grid.Column="1" Text="{Binding Name}" VerticalOptions="Center">
                             <Label.Triggers>
                                 <!-- Приёмник и служебная приглушены: они не открываются -->
                                 <DataTrigger TargetType="Label" Binding="{Binding IsProtected}" Value="True">

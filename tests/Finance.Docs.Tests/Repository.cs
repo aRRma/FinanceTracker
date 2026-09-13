@@ -14,6 +14,8 @@ internal static class Repository
 
     public static string Icons => Path.Combine(Root, "data", "icons.json");
 
+    public static string IconPaths => Path.Combine(Root, "data", "icon-paths.json");
+
     private static string FindRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);
