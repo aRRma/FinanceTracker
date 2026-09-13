@@ -14,6 +14,10 @@ public sealed class IconCatalog
 {
     private const string ResourceName = "Finance.Application.icons.json";
 
+    // Набор неизменяем, поэтому один на процесс: его просят и контейнер, и отрисовка
+    // значков в приложении, а разбирать ресурс дважды ради одной строки незачем
+    private static readonly Lazy<IconCatalog> Shared = new(Parse);
+
     private readonly FrozenSet<string> _keys;
 
     private IconCatalog(string fallback, FrozenSet<string> keys)
@@ -28,8 +32,10 @@ public sealed class IconCatalog
     /// <summary>Все ключи набора в порядке файла — так они и показываются при выборе.</summary>
     public IReadOnlyList<string> Keys { get; private init; } = [];
 
-    /// <summary>Читает набор значков, вшитый в сборку.</summary>
-    public static IconCatalog Embedded()
+    /// <summary>Набор значков, вшитый в сборку. Читается при первом обращении, дальше общий.</summary>
+    public static IconCatalog Embedded() => Shared.Value;
+
+    private static IconCatalog Parse()
     {
         using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(ResourceName)
                               ?? throw new InvalidOperationException($"Ресурс {ResourceName} не вшит в сборку");

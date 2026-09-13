@@ -6,10 +6,25 @@
 -->
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:Finance.App.Controls">
 
     <!-- Зона касания: меньше 48 dp попасть пальцем не получается (NFR-25) -->
     <x:Double x:Key="TouchTarget">48</x:Double>
+
+    <!-- Значок рядом с текстом: тем же тоном, что вторичная подпись -->
+    <Style TargetType="controls:Icon">
+        <Setter Property="Stroke"
+                Value="{AppThemeBinding Light={StaticResource Ink2Light}, Dark={StaticResource Ink2Dark}}" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
+
+    <!-- Выбранный значок: цветом действия, чтобы отличался в сетке выбора -->
+    <Style x:Key="AccentIcon" TargetType="controls:Icon">
+        <Setter Property="Stroke"
+                Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
 
     <Style TargetType="Page" ApplyToDerivedTypes="True">
         <Setter Property="BackgroundColor"
