@@ -29,7 +29,7 @@
 
 ## Организация прикладного слоя
 
-Код режется по функциям, а не по техническим слоям: `Features/Transactions/Add`, `Features/Transactions/Edit`, `Features/Accounts/Reorder`, `Features/Balances`, `Features/Sync`. Слайс содержит команду, обработчик, модель представления и страницу.
+Код режется по функциям, а не по техническим слоям: `Features/Transactions/Card`, `Features/Accounts/Card`, `Features/Accounts/Catalog`, `Features/Balances`, `Features/Feed`, `Features/Sync`. Слайс содержит команду, обработчик, запросы и модель представления; страница живёт в `Finance.App`. Запись и правка одной сущности — один слайс `Card`: экран у них один, а отличает их только заполненный ключ.
 
 Слайсы не ссылаются друг на друга. Запрос, потребовавшийся второму слайсу, переносится в общую инфраструктуру.
 

@@ -20,6 +20,12 @@ public sealed record AccountListItem
     /// <summary>Баланс на текущий момент: начальный остаток плюс все операции.</summary>
     public required Money Balance { get; init; }
 
+    /// <summary>Начальный остаток — строка ленты счёта, пока операций нет.</summary>
+    public required Money OpeningBalance { get; init; }
+
+    /// <summary>Дата открытия — подпись начального остатка и нижняя граница даты операции.</summary>
+    public required DateOnly OpenedOn { get; init; }
+
     /// <summary>«Скрыть из расчётов»: счёт не входит в «доступно к тратам» и в итоги дня.</summary>
     public required bool ExcludedFromTotals { get; init; }
 

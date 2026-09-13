@@ -49,6 +49,7 @@ public sealed class FinanceDbContext : DbContext
 
         configurationBuilder.Properties<Guid>().HaveConversion<GuidToTextConverter>();
         configurationBuilder.Properties<decimal>().HaveConversion<MinorUnitsConverter>();
+        configurationBuilder.Properties<DateTimeOffset>().HaveConversion<UtcMomentConverter>();
 
         // Перечисления хранятся именем, а не номером: дамп базы читается глазами,
         // а перестановка членов перечисления не переименовывает молча все записи

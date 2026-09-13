@@ -46,8 +46,13 @@ internal static class AccountTransactions
             .MinAsync(cancellationToken);
     }
 
-    /// <summary>Операции по счёту списания и по счёту зачисления одним потоком: EF переводит это в <c>UNION ALL</c>.</summary>
-    private static IQueryable<TransactionRow> BothSides(IQueryable<TransactionRow> transactions, Guid accountKey) =>
+    /// <summary>
+    /// Операции по счёту списания и по счёту зачисления одним потоком: EF переводит
+    /// это в <c>UNION ALL</c>. Единственный разрешённый способ спросить «операции счёта».
+    /// </summary>
+    /// <param name="transactions">Откуда читать — с фильтром удалённых или без него.</param>
+    /// <param name="accountKey">Ключ счёта.</param>
+    public static IQueryable<TransactionRow> BothSides(IQueryable<TransactionRow> transactions, Guid accountKey) =>
         transactions
             .Where(row => row.SourceAccountKey == accountKey)
             .Concat(transactions.Where(row => row.TargetAccountKey == accountKey));

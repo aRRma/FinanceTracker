@@ -1,6 +1,8 @@
 using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Accounts.Catalog;
 using Finance.Application.Features.Balances;
+using Finance.Application.Features.Feed;
+using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
@@ -68,11 +70,18 @@ public static class FinanceServices
         services.AddSingleton<IReorderAccountsHandler, ReorderAccountsHandler>();
         services.AddSingleton<IAccountCardQuery, AccountCardQuery>();
         services.AddSingleton<ISaveAccountHandler, SaveAccountHandler>();
+        services.AddSingleton<IFeedQuery, FeedQuery>();
+        services.AddSingleton<ITransactionFormQuery, TransactionFormQuery>();
+        services.AddSingleton<ITransactionCardQuery, TransactionCardQuery>();
+        services.AddSingleton<ISaveTransactionHandler, SaveTransactionHandler>();
+        services.AddSingleton<IDeleteTransactionHandler, DeleteTransactionHandler>();
 
         // Модель представления живёт ровно столько, сколько экран: общая на всё
         // приложение держала бы в памяти списки закрытых экранов
         services.AddTransient<BalancesViewModel>();
         services.AddTransient<AccountsViewModel>();
         services.AddTransient<AccountViewModel>();
+        services.AddTransient<FeedViewModel>();
+        services.AddTransient<TransactionViewModel>();
     }
 }

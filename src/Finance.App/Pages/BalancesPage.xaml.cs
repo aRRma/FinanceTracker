@@ -27,4 +27,15 @@ public partial class BalancesPage : DataPage
 
     private async void OnCreateAccount(object? sender, EventArgs e) =>
         await Shell.Current.GoToAsync(Routes.Account);
+
+    private async void OnAddTransaction(object? sender, EventArgs e) =>
+        await Shell.Current.GoToAsync(Routes.Transaction);
+
+    private async void OnAccountTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is BindableObject { BindingContext: AccountTile account })
+        {
+            await Shell.Current.GoToAsync($"{Routes.AccountFeed}?key={account.Key}");
+        }
+    }
 }

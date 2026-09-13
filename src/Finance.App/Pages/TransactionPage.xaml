@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экраны B-01, B-05, B-06: форма операции — запись и правка одной формой;
+    C-01 — та же форма с нарушенным правилом; C-07 — удаление с подтверждением.
+    Форма перестраивается по виду: у перевода второй счёт вместо категории и места,
+    вторая сумма — только при разных валютах счетов.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.TransactionPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:card="clr-namespace:Finance.Application.Features.Transactions.Card;assembly=Finance.Application"
+    xmlns:domain="clr-namespace:Finance.Domain;assembly=Finance.Domain"
+    x:DataType="card:TransactionViewModel"
+    Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Удалить" Clicked="OnDelete" />
+    </ContentPage.ToolbarItems>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12" Spacing="16">
+
+            <!-- Вид операции. По умолчанию расход — он записывается чаще всего -->
+            <HorizontalStackLayout Spacing="8" HorizontalOptions="Center"
+                                   RadioButtonGroup.GroupName="kind"
+                                   RadioButtonGroup.SelectedValue="{Binding Kind}">
+                <RadioButton Content="Расход" Value="{x:Static domain:TransactionKind.Expense}" />
+                <RadioButton Content="Доход" Value="{x:Static domain:TransactionKind.Income}" />
+                <RadioButton Content="Перевод" Value="{x:Static domain:TransactionKind.Transfer}" />
+            </HorizontalStackLayout>
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="14,10" Spacing="10">
+                    <Label Text="Сумма" Style="{StaticResource CaptionLabel}" />
+                    <!-- Арифметика прямо в поле: результат показан рядом, сохраняется он -->
+                    <Entry Text="{Binding Amount}" Placeholder="1250 + 340" Keyboard="Numeric" />
+                    <Label Text="{Binding AmountPreview}" Style="{StaticResource TotalLabel}" />
+
+                    <VerticalStackLayout Spacing="10" IsVisible="{Binding NeedsTargetAmount}">
+                        <BoxView Style="{StaticResource Divider}" />
+                        <Label Text="Зачисление" Style="{StaticResource CaptionLabel}" />
+                        <Entry Text="{Binding TargetAmount}" Keyboard="Numeric" />
+                        <Label Text="{Binding TargetAmountPreview}" Style="{StaticResource TotalLabel}" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="14,10" Spacing="10">
+                    <Label Text="{Binding SourceLabel}" Style="{StaticResource CaptionLabel}" />
+                    <Picker ItemsSource="{Binding Accounts}" ItemDisplayBinding="{Binding Label, x:DataType=card:AccountOption}"
+                            SelectedItem="{Binding SourceAccount}" Title="Выбрать счёт" />
+
+                    <VerticalStackLayout Spacing="10" IsVisible="{Binding IsTransfer}">
+                        <BoxView Style="{StaticResource Divider}" />
+                        <Label Text="Куда" Style="{StaticResource CaptionLabel}" />
+                        <Picker ItemsSource="{Binding Accounts}" ItemDisplayBinding="{Binding Label, x:DataType=card:AccountOption}"
+                                SelectedItem="{Binding TargetAccount}" Title="Выбрать счёт" />
+                        <Label Text="Перевод не попадает ни в доходы, ни в расходы"
+                               Style="{StaticResource CaptionLabel}" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="10" IsVisible="{Binding IsNotTransfer}">
+                        <BoxView Style="{StaticResource Divider}" />
+                        <Label Text="Категория" Style="{StaticResource CaptionLabel}" />
+                        <Picker ItemsSource="{Binding Categories}" ItemDisplayBinding="{Binding Label, x:DataType=card:CategoryOption}"
+                                SelectedItem="{Binding Category}" Title="Выбрать" />
+
+                        <BoxView Style="{StaticResource Divider}" />
+                        <Label Text="Место" Style="{StaticResource CaptionLabel}" />
+                        <Entry Text="{Binding PlaceName}" Placeholder="Необязательно" />
+                        <!-- Подстановка по набранному: совпадения от частых к редким; новое место заведётся при сохранении -->
+                        <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding PlaceSuggestions}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="card:PlaceOption">
+                                    <Button Text="{Binding Name}" Clicked="OnPlacePicked"
+                                            Style="{StaticResource GhostButton}" />
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="14,10" Spacing="10">
+                    <Label Text="Дата" Style="{StaticResource CaptionLabel}" />
+                    <!-- Будущие дни и дни раньше открытия счёта календарь не предлагает -->
+                    <DatePicker Date="{Binding OccurredOnDate}"
+                                MinimumDate="{Binding EarliestDate}"
+                                MaximumDate="{Binding LatestDate}" />
+                    <HorizontalStackLayout Spacing="8">
+                        <Button Text="Сегодня" Command="{Binding SetTodayCommand}" Style="{StaticResource GhostButton}" />
+                        <Button Text="Вчера" Command="{Binding SetYesterdayCommand}" Style="{StaticResource GhostButton}" />
+                    </HorizontalStackLayout>
+
+                    <BoxView Style="{StaticResource Divider}" />
+                    <Label Text="Заметка" Style="{StaticResource CaptionLabel}" />
+                    <Entry Text="{Binding Note}" Placeholder="Необязательно" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource Card}" IsVisible="{Binding HasError}">
+                <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
+            </Border>
+
+            <Button Text="Сохранить" Clicked="OnSave" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</pages:DataPage>

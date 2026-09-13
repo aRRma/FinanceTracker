@@ -3,15 +3,16 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экран A-02: общая лента операций по всем счетам.</summary>
-public partial class FeedPage : DataPage
+/// <summary>Экран A-03: лента одного счёта.</summary>
+[QueryProperty(nameof(Key), "key")]
+public partial class AccountFeedPage : DataPage
 {
     private readonly FeedViewModel _model;
 
     /// <summary>Создаёт экран.</summary>
     /// <param name="model">Модель представления ленты.</param>
     /// <param name="startup">Подготовка приложения.</param>
-    public FeedPage(FeedViewModel model, FinanceStartup startup)
+    public AccountFeedPage(FeedViewModel model, FinanceStartup startup)
         : base(startup)
     {
         ArgumentNullException.ThrowIfNull(model);
@@ -22,9 +23,13 @@ public partial class FeedPage : DataPage
         BindingContext = model;
     }
 
+    /// <summary>Ключ счёта из маршрута. Строкой, а не <see cref="Guid"/>: в маршруте он и есть строка.</summary>
+    public string? Key { get; set; }
+
     /// <inheritdoc />
-    protected override Task LoadAsync() => _model.LoadAsync(accountKey: null);
+    protected override Task LoadAsync() =>
+        Guid.TryParse(Key, out Guid key) ? _model.LoadAsync(key) : Task.CompletedTask;
 
     private async void OnAdd(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync(Routes.Transaction);
+        await Shell.Current.GoToAsync($"{Routes.Transaction}?account={Key}");
 }

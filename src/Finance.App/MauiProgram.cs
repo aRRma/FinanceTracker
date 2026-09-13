@@ -51,5 +51,7 @@ public static class MauiProgram
         services.AddTransient<MorePage>();
         services.AddTransient<AccountsPage>();
         services.AddTransient<AccountPage>();
+        services.AddTransient<AccountFeedPage>();
+        services.AddTransient<TransactionPage>();
     }
 }
