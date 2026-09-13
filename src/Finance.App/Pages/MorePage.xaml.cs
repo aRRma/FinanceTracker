@@ -28,6 +28,9 @@ public partial class MorePage : DataPage
     private async void OnAccounts(object? sender, TappedEventArgs e) =>
         await Shell.Current.GoToAsync(Routes.Accounts);
 
+    private async void OnPlaces(object? sender, TappedEventArgs e) =>
+        await Shell.Current.GoToAsync(Routes.Places);
+
     private async void OnCategories(object? sender, TappedEventArgs e) =>
         await Shell.Current.GoToAsync(Routes.Categories);
 }

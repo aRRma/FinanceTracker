@@ -15,6 +15,12 @@ public static class Routes
     /// <summary>Карточка счёта: заведение и правка.</summary>
     public const string Account = "accounts/account";
 
+    /// <summary>Справочник мест.</summary>
+    public const string Places = "places";
+
+    /// <summary>Карточка места: переименование и удаление. Параметр <c>key</c> — ключ места.</summary>
+    public const string Place = "places/place";
+
     /// <summary>Справочник категорий.</summary>
     public const string Categories = "categories";
 
@@ -41,6 +47,8 @@ public static class Routes
     {
         Routing.RegisterRoute(Accounts, typeof(AccountsPage));
         Routing.RegisterRoute(Account, typeof(AccountPage));
+        Routing.RegisterRoute(Places, typeof(PlacesPage));
+        Routing.RegisterRoute(Place, typeof(PlacePage));
         Routing.RegisterRoute(Categories, typeof(CategoriesPage));
         Routing.RegisterRoute(Group, typeof(GroupPage));
         Routing.RegisterRoute(Subcategory, typeof(SubcategoryPage));
