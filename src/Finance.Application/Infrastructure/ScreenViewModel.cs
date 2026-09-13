@@ -28,7 +28,15 @@ public abstract class ScreenViewModel : ObservableObject, IScreenModel
     protected abstract void Reload();
 
     /// <inheritdoc />
-    public void Activate() => _changes.Changed += OnChanged;
+    public void Activate()
+    {
+        // Сначала снятие, потом подписка: на Android появление экрана приходит
+        // и без предшествующего ухода — после возврата приложения из фона, —
+        // и голое += копило бы вторую и третью подписку, а с ними лишние
+        // перечитывания экрана на каждое изменение
+        _changes.Changed -= OnChanged;
+        _changes.Changed += OnChanged;
+    }
 
     /// <inheritdoc />
     public void Deactivate() => _changes.Changed -= OnChanged;

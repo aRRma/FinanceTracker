@@ -344,7 +344,7 @@ public sealed partial class TransactionViewModel : ObservableObject
     /// <param name="cancellationToken">Признак отмены.</param>
     public async Task<string> DeletePromptAsync(CancellationToken cancellationToken = default)
     {
-        if (Key is null || SourceAccount is not { } source)
+        if (Key is null)
         {
             return "Отменить удаление будет нельзя.";
         }
@@ -369,7 +369,12 @@ public sealed partial class TransactionViewModel : ObservableObject
             decimal delta = card.Kind is TransactionKind.Income ? -card.Amount : card.Amount;
             Money after = Money.Restore(current.Amount + delta, current.Currency);
 
-            consequences.Add($"Баланс «{source.Name}» станет {after.Display}.");
+            // Название берётся у записанного счёта, а не у выбранного в форме:
+            // счёт в поле могли уже сменить, а удаляется операция как записана,
+            // и подпись разошлась бы с числом рядом с ней
+            string name = accounts.First(account => account.Key == card.SourceAccountKey).Name;
+
+            consequences.Add($"Баланс «{name}» станет {after.Display}.");
         }
 
         if (card.TargetAccountKey is { } targetKey && card.TargetAmount is { } targetAmount

@@ -26,6 +26,10 @@ public sealed partial class FeedViewModel : ScreenViewModel
 
     private int _loaded;
 
+    // Номер перечитывания: по нему дочитанная страница узнаёт, что лента
+    // за время запроса была перечитана заново и её строки уже не к месту
+    private int _generation;
+
     /// <summary>Создаёт модель представления ленты.</summary>
     /// <param name="feed">Чтение ленты.</param>
     /// <param name="accounts">Счета с балансами — для шапки ленты счёта.</param>
@@ -92,6 +96,8 @@ public sealed partial class FeedViewModel : ScreenViewModel
         AccountKey = accountKey;
         OnPropertyChanged(nameof(IsAccountFeed));
 
+        int generation = ++_generation;
+
         IsBusy = true;
 
         try
@@ -104,6 +110,11 @@ public sealed partial class FeedViewModel : ScreenViewModel
             }
 
             FeedPage page = await _feed.ReadAsync(accountKey, skip: 0, PageSize, cancellationToken);
+
+            if (generation != _generation)
+            {
+                return;
+            }
 
             Days.Clear();
             _loaded = 0;
@@ -128,11 +139,21 @@ public sealed partial class FeedViewModel : ScreenViewModel
             return;
         }
 
+        int generation = _generation;
+
         IsBusy = true;
 
         try
         {
             FeedPage page = await _feed.ReadAsync(AccountKey, _loaded, PageSize, cancellationToken);
+
+            // Пока страница читалась, лента могла быть перечитана с начала:
+            // её строки уже показаны, и дописывать их значило бы показать
+            // те же операции дважды
+            if (generation != _generation)
+            {
+                return;
+            }
 
             Append(page);
         }
