@@ -55,37 +55,27 @@ public sealed class FinanceStartup
     {
         lock (_gate)
         {
+            // Запоминается только удавшаяся подготовка. Запомни мы упавшую —
+            // приложение не поднялось бы до переустановки: повторная попытка
+            // возвращала бы ту же неудачу, даже когда мешало разовое
+            // обстоятельство вроде нехватки места. Сброс делается здесь, а не
+            // внутри задачи: с SQLite весь путь бывает синхронным, и сброс
+            // изнутри отработал бы раньше, чем задача попала в поле
+            if (_prepared is { IsCompleted: true, IsCompletedSuccessfully: false })
+            {
+                _prepared = null;
+            }
+
             return _prepared ??= RunOnceAsync(cancellationToken);
         }
     }
 
-    /// <summary>
-    /// Запоминается только удавшаяся подготовка. Запомни мы упавшую — приложение
-    /// не поднялось бы до переустановки: повторная попытка возвращала бы ту же
-    /// неудачу, даже когда мешало разовое обстоятельство вроде нехватки места.
-    /// </summary>
+    /// <summary>Один прогон подготовки: файл базы, стартовый набор, часовой пояс.</summary>
     private async Task RunOnceAsync(CancellationToken cancellationToken)
     {
-        bool prepared = false;
-
-        try
-        {
-            await _bootstrapper.InitializeAsync(cancellationToken).ConfigureAwait(false);
-            await _initializer.InitializeAsync(cancellationToken).ConfigureAwait(false);
-            await ApplyTimeZoneAsync(cancellationToken).ConfigureAwait(false);
-
-            prepared = true;
-        }
-        finally
-        {
-            if (!prepared)
-            {
-                lock (_gate)
-                {
-                    _prepared = null;
-                }
-            }
-        }
+        await _bootstrapper.InitializeAsync(cancellationToken).ConfigureAwait(false);
+        await _initializer.InitializeAsync(cancellationToken).ConfigureAwait(false);
+        await ApplyTimeZoneAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>

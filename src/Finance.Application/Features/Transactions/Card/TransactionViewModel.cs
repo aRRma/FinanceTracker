@@ -228,6 +228,10 @@ public sealed partial class TransactionViewModel : ObservableObject
 
         FillAccounts(card);
 
+        // Список категорий наполняется здесь, а не только сменой вида: у новой
+        // операции вид уже расход, смены не происходит, и выбор остался бы пустым
+        FillCategories();
+
         if (card is not null)
         {
             Kind = card.Kind;
