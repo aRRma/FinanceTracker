@@ -1,6 +1,7 @@
 using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Accounts.Catalog;
 using Finance.Application.Features.Balances;
+using Finance.Application.Features.Categories.Card;
 using Finance.Application.Features.Feed;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
@@ -67,6 +68,10 @@ public static class FinanceServices
     private static void AddFeatures(IServiceCollection services)
     {
         services.AddSingleton<IAccountsQuery, AccountsQuery>();
+        services.AddSingleton<ICategoriesQuery, CategoriesQuery>();
+        services.AddSingleton<ISaveCategoryHandler, SaveCategoryHandler>();
+        services.AddSingleton<ICategoryDeletionQuery, CategoryDeletionQuery>();
+        services.AddSingleton<IDeleteSubcategoryHandler, DeleteSubcategoryHandler>();
         services.AddSingleton<IReorderAccountsHandler, ReorderAccountsHandler>();
         services.AddSingleton<IAccountCardQuery, AccountCardQuery>();
         services.AddSingleton<ISaveAccountHandler, SaveAccountHandler>();
