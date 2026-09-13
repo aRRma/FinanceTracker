@@ -2,7 +2,9 @@ using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Accounts.Catalog;
 using Finance.Application.Features.Balances;
 using Finance.Application.Features.Categories.Card;
+using Finance.Application.Features.Categories.Catalog;
 using Finance.Application.Features.Feed;
+using Finance.Application.Features.More;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Initialization;
@@ -88,5 +90,9 @@ public static class FinanceServices
         services.AddTransient<AccountViewModel>();
         services.AddTransient<FeedViewModel>();
         services.AddTransient<TransactionViewModel>();
+        services.AddTransient<CategoriesViewModel>();
+        services.AddTransient<GroupViewModel>();
+        services.AddTransient<SubcategoryViewModel>();
+        services.AddTransient<MoreViewModel>();
     }
 }
