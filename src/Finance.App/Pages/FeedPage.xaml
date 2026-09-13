@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="Finance.App.Pages.FeedPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Операции">
+
+    <VerticalStackLayout Padding="32" Spacing="12" VerticalOptions="Center" HorizontalOptions="Center">
+        <Label Text="Операций пока нет" HorizontalTextAlignment="Center" Style="{StaticResource TotalLabel}" />
+        <Label Text="Записать первую можно кнопкой «плюс» на главном экране." HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
+    </VerticalStackLayout>
+
+</ContentPage>

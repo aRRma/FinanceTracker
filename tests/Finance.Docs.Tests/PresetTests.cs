@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Finance.Application.Infrastructure.Initialization;
 using Finance.Domain;
 
 namespace Finance.Docs.Tests;
@@ -13,7 +14,8 @@ public sealed class PresetTests
     // Разбор отложен намеренно: в инициализаторе поля сбой пришёл бы как
     // TypeInitializationException во всех тестах разом, а настоящая причина
     // оказалась бы двумя уровнями глубже. Через Lazy падает исходное исключение
-    private static readonly Lazy<Preset> Loaded = new(Preset.Load);
+    private static readonly Lazy<Preset> Loaded = new(
+        static () => Preset.Parse(File.ReadAllText(Repository.Preset)));
 
     private static readonly Lazy<IReadOnlySet<string>> LoadedIcons = new(LoadIcons);
 
@@ -49,6 +51,24 @@ public sealed class PresetTests
             .ToArray();
 
         Assert.Empty(broken);
+    }
+
+    /// <summary>
+    /// Вшитый в приложение набор — тот же файл, что лежит в репозитории. Отвались
+    /// ссылка на него в проекте, приложение молча засеяло бы старый набор,
+    /// а проверки здесь прошли бы по файлу и ничего не заметили.
+    /// </summary>
+    [Fact]
+    public void Вшитый_в_приложение_набор_совпадает_с_файлом()
+    {
+        Preset embedded = Preset.Embedded();
+
+        Assert.Equal(Set.PresetVersion, embedded.PresetVersion);
+        Assert.Equal(Set.Namespace, embedded.Namespace);
+        Assert.Equal(Set.SeededAtUtc, embedded.SeededAtUtc);
+        Assert.Equal(
+            Set.All().Select(category => category.Id),
+            embedded.All().Select(category => category.Id));
     }
 
     /// <summary>Значки берутся только из набора, зашитого в приложение.</summary>

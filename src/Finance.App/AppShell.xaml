@@ -1,14 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Четыре вкладки каркаса (экраны A-01…A-04). Пятой не будет: всё остальное —
+    справочники и настройки — живёт за вкладкой «Ещё».
+-->
 <Shell
     x:Class="Finance.App.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:Finance.App"
-    Title="Finance.App">
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    FlyoutBehavior="Disabled">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar>
+        <ShellContent
+            Title="Балансы"
+            ContentTemplate="{DataTemplate pages:BalancesPage}"
+            Route="balances" />
+
+        <ShellContent
+            Title="Операции"
+            ContentTemplate="{DataTemplate pages:FeedPage}"
+            Route="feed" />
+
+        <ShellContent
+            Title="Отчёт"
+            ContentTemplate="{DataTemplate pages:ReportPage}"
+            Route="report" />
+
+        <ShellContent
+            Title="Ещё"
+            ContentTemplate="{DataTemplate pages:MorePage}"
+            Route="more" />
+    </TabBar>
 
 </Shell>

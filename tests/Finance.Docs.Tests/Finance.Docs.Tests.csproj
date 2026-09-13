@@ -18,6 +18,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Finance.Domain\Finance.Domain.csproj" />
+
+    <!-- Разбор стартового набора берётся оттуда же, откуда его берёт инициализация
+         базы: две реализации одного разбора разошлись бы, а файл правится необратимо -->
+    <ProjectReference Include="..\..\src\Finance.Application\Finance.Application.csproj" />
   </ItemGroup>
 
 </Project>
