@@ -7,6 +7,7 @@ using Finance.Application.Features.Places.Card;
 using Finance.Application.Features.Places.Catalog;
 using Finance.Application.Features.Feed;
 using Finance.Application.Features.More;
+using Finance.Application.Features.Report;
 using Finance.Application.Features.Settings.About;
 using Finance.Application.Features.Settings.Appearance;
 using Finance.Application.Features.Settings.TimeZones;
@@ -104,6 +105,7 @@ public static class FinanceServices
         services.AddSingleton<ITransactionCardQuery, TransactionCardQuery>();
         services.AddSingleton<ISaveTransactionHandler, SaveTransactionHandler>();
         services.AddSingleton<IDeleteTransactionHandler, DeleteTransactionHandler>();
+        services.AddSingleton<IReportQuery, ReportQuery>();
 
         // Модель представления живёт ровно столько, сколько экран: общая на всё
         // приложение держала бы в памяти списки закрытых экранов
@@ -118,6 +120,7 @@ public static class FinanceServices
         services.AddTransient<GroupViewModel>();
         services.AddTransient<SubcategoryViewModel>();
         services.AddTransient<MoreViewModel>();
+        services.AddTransient<ReportViewModel>();
         services.AddTransient<AppearanceViewModel>();
         services.AddTransient<TimeZoneViewModel>();
         services.AddTransient<AboutViewModel>();

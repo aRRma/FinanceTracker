@@ -1,13 +1,84 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<ContentPage
+<!--
+    Экраны E-01 и E-04: отчёт за месяц по группам. Полоса под строкой даёт
+    сравнение глазом, без чтения процентов. Пустое состояние вместо списка нулей:
+    строки по нулю рублей читаются как ошибка расчёта, а не как отсутствие трат.
+-->
+<pages:DataPage
     x:Class="Finance.App.Pages.ReportPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:report="clr-namespace:Finance.Application.Features.Report;assembly=Finance.Application"
+    xmlns:domain="clr-namespace:Finance.Domain;assembly=Finance.Domain"
+    x:DataType="report:ReportViewModel"
     Title="Отчёт">
 
-    <VerticalStackLayout Padding="32" Spacing="12" VerticalOptions="Center" HorizontalOptions="Center">
-        <Label Text="В этом месяце трат не было" HorizontalTextAlignment="Center" Style="{StaticResource TotalLabel}" />
-        <Label Text="Переключите месяц стрелками или запишите первую операцию." HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
-    </VerticalStackLayout>
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
 
-</ContentPage>
+        <HorizontalStackLayout Grid.Row="0" Padding="16,12,16,4" Spacing="8" HorizontalOptions="Center"
+                               RadioButtonGroup.GroupName="reportKind"
+                               RadioButtonGroup.SelectedValue="{Binding Kind}">
+            <RadioButton Content="Расходы" Value="{x:Static domain:CategoryKind.Expense}" />
+            <RadioButton Content="Доходы" Value="{x:Static domain:CategoryKind.Income}" />
+        </HorizontalStackLayout>
+
+        <Grid Grid.Row="1" Padding="8,0" ColumnDefinitions="Auto,*,Auto">
+            <Button Grid.Column="0" Text="‹" FontSize="28" Command="{Binding PreviousMonthCommand}"
+                    Style="{StaticResource GhostButton}" />
+            <Label Grid.Column="1" Text="{Binding MonthTitle}" HorizontalTextAlignment="Center"
+                   VerticalOptions="Center" FontFamily="OpenSansSemibold" />
+            <Button Grid.Column="2" Text="›" FontSize="28" Command="{Binding NextMonthCommand}"
+                    Style="{StaticResource GhostButton}">
+                <Button.Triggers>
+                    <!-- На текущем месяце стрелка гаснет: операций в будущем не бывает -->
+                    <Trigger TargetType="Button" Property="IsEnabled" Value="False">
+                        <Setter Property="TextColor"
+                                Value="{AppThemeBinding Light={StaticResource LineLight}, Dark={StaticResource LineDark}}" />
+                    </Trigger>
+                </Button.Triggers>
+            </Button>
+        </Grid>
+
+        <Label Grid.Row="2" Padding="16,4,16,8" Text="{Binding Total}" HorizontalTextAlignment="End"
+               IsVisible="{Binding HasItems}" Style="{StaticResource TotalLabel}" />
+
+        <VerticalStackLayout Grid.Row="3" IsVisible="{Binding IsEmpty}" Padding="32" Spacing="12"
+                             VerticalOptions="Center" HorizontalOptions="Center">
+            <Label Text="{Binding EmptyTitle}" HorizontalTextAlignment="Center"
+                   Style="{StaticResource TotalLabel}" />
+            <Label Text="Выберите другой месяц стрелками вверху."
+                   HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="3" ItemsSource="{Binding Rows}" IsVisible="{Binding HasItems}"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="report:ReportRowItem">
+                    <Grid Padding="16,10,16,6" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12"
+                          RowDefinitions="Auto,Auto" RowSpacing="6"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <controls:Icon Grid.Column="0" Grid.Row="0" Key="{Binding Icon}" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="{Binding Name}" VerticalOptions="Center" />
+                        <Label Grid.Column="2" Grid.Row="0" Text="{Binding Amount}" VerticalOptions="Center" />
+                        <Label Grid.Column="3" Grid.Row="0" Text="{Binding Share}" VerticalOptions="Center"
+                               MinimumWidthRequest="40" HorizontalTextAlignment="End"
+                               Style="{StaticResource SecondaryLabel}" />
+                        <ProgressBar Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3"
+                                     Progress="{Binding Fraction}" HeightRequest="4"
+                                     ProgressColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.Footer>
+                <Label Padding="16,12,16,24"
+                       Text="Переводы между своими счетами в отчёт не входят: деньги не потрачены, а переложены. Счета, скрытые из расчётов, тоже не учитываются."
+                       Style="{StaticResource CaptionLabel}" />
+            </CollectionView.Footer>
+        </CollectionView>
+
+    </Grid>
+
+</pages:DataPage>

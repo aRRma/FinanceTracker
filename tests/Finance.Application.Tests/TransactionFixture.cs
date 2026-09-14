@@ -1,4 +1,6 @@
 using Finance.Application.Features.Accounts.Card;
+using Finance.Application.Features.Categories.Card;
+using Finance.Application.Features.Report;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
@@ -82,24 +84,59 @@ internal sealed class TransactionFixture : IAsyncDisposable
     public Task<Guid> SaveAsync(SaveTransactionCommand command) =>
         Database.Resolve<ISaveTransactionHandler>().HandleAsync(command);
 
-    public SaveTransactionCommand Expense(Guid account, decimal amount, DateOnly? on = null, string? place = null) =>
+    /// <summary>
+    /// Месяц, заведомо прошедший целиком. Границы месяца нельзя проверять на текущем:
+    /// дата операции в будущем запрещена доменом, и последнее число первого числа не записать.
+    /// </summary>
+    public DateOnly PreviousMonth => new DateOnly(Today.Year, Today.Month, 1).AddMonths(-1);
+
+    public Task<Guid> GroupAsync(string name, CategoryKind kind) =>
+        Database.Resolve<ISaveCategoryHandler>().HandleAsync(new SaveCategoryCommand
+        {
+            Name = name,
+            Icon = "cash",
+            Kind = kind
+        });
+
+    public Task<Guid> SubcategoryAsync(Guid group, string name) =>
+        Database.Resolve<ISaveCategoryHandler>().HandleAsync(new SaveCategoryCommand
+        {
+            ParentKey = group,
+            Name = name,
+            Icon = "cash"
+        });
+
+    /// <summary>
+    /// Ставит категории признак «вне отчётов» прямо в базе: команды для него нет,
+    /// а в стартовом наборе он стоит только у служебных подкатегорий.
+    /// </summary>
+    public async Task ExcludeFromReportsAsync(Guid category)
+    {
+        await using FinanceDbContext context = await Database.Contexts.CreateDbContextAsync();
+
+        await context.Categories
+            .Where(row => row.Key == category)
+            .ExecuteUpdateAsync(set => set.SetProperty(row => row.ExcludeFromReports, true));
+    }
+
+    public SaveTransactionCommand Expense(Guid account, decimal amount, DateOnly? on = null, string? place = null, Guid? category = null) =>
         new()
         {
             Kind = TransactionKind.Expense,
             SourceAccountKey = account,
             Amount = amount,
-            CategoryKey = ExpenseCategory,
+            CategoryKey = category ?? ExpenseCategory,
             PlaceName = place,
             OccurredOn = on ?? Today
         };
 
-    public SaveTransactionCommand Income(Guid account, decimal amount, DateOnly? on = null) =>
+    public SaveTransactionCommand Income(Guid account, decimal amount, DateOnly? on = null, Guid? category = null) =>
         new()
         {
             Kind = TransactionKind.Income,
             SourceAccountKey = account,
             Amount = amount,
-            CategoryKey = IncomeCategory,
+            CategoryKey = category ?? IncomeCategory,
             OccurredOn = on ?? Today
         };
 
@@ -123,6 +160,10 @@ internal sealed class TransactionFixture : IAsyncDisposable
 
     public Task<FeedPage> FeedAsync(Guid? account = null, int skip = 0, int take = 50) =>
         Database.Resolve<IFeedQuery>().ReadAsync(account, skip, take);
+
+    /// <summary>Первый уровень отчёта за месяц; пусто — за текущий.</summary>
+    public Task<IReadOnlyList<ReportTotal>> ReportAsync(ReportMonth? month = null) =>
+        Database.Resolve<IReportQuery>().ReadGroupsAsync(month ?? ReportMonth.Of(Today));
 
     public ValueTask DisposeAsync() => Database.DisposeAsync();
 
