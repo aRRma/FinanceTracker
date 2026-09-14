@@ -121,6 +121,7 @@ public static class FinanceServices
         services.AddTransient<SubcategoryViewModel>();
         services.AddTransient<MoreViewModel>();
         services.AddTransient<ReportViewModel>();
+        services.AddTransient<ReportGroupViewModel>();
         services.AddTransient<AppearanceViewModel>();
         services.AddTransient<TimeZoneViewModel>();
         services.AddTransient<AboutViewModel>();

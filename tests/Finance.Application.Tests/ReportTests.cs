@@ -299,6 +299,56 @@ public sealed partial class ReportTests
         Assert.Equal(1, report.Reads);
     }
 
+    /// <summary>Подкатегории чужой группы в список не попадают; сумма уровня равна строке группы с первого уровня.</summary>
+    [Fact]
+    public async Task Второй_уровень_показывает_подкатегории_своей_группы()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 10_000m);
+        Guid food = await given.GroupAsync("Питание", CategoryKind.Expense);
+        Guid grocery = await given.SubcategoryAsync(food, "Продукты");
+        Guid cafe = await given.SubcategoryAsync(food, "Кафе");
+
+        await given.SaveAsync(given.Expense(card, 300m, category: grocery));
+        await given.SaveAsync(given.Expense(card, 700m, category: cafe));
+        await given.SaveAsync(given.Expense(card, 999m));
+
+        IReadOnlyList<ReportTotal> rows = await given.Database.Resolve<IReportQuery>()
+            .ReadSubcategoriesAsync(food, ReportMonth.Of(given.Today));
+        ReportTotal group = (await given.ReportAsync()).Single(item => item.Key == food);
+
+        Assert.Equal(["Кафе", "Продукты"], rows.Select(row => row.Name));
+        Assert.Equal(group.Total, rows.Aggregate(Money.Zero(Currency.RUB), (sum, row) => sum + row.Total));
+    }
+
+    /// <summary>Доля подкатегории — от суммы группы, а не от месяца; шапка несёт долю группы в месяце.</summary>
+    [Fact]
+    public async Task Доли_подкатегорий_считаются_внутри_группы()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 10_000m);
+        Guid food = await given.GroupAsync("Питание", CategoryKind.Expense);
+        Guid grocery = await given.SubcategoryAsync(food, "Продукты");
+        Guid cafe = await given.SubcategoryAsync(food, "Кафе");
+
+        // Питание — 40% месяца; внутри неё кафе — 75%, продукты — 25%
+        await given.SaveAsync(given.Expense(card, 100m, category: grocery));
+        await given.SaveAsync(given.Expense(card, 300m, category: cafe));
+        await given.SaveAsync(given.Expense(card, 600m));
+
+        ReportGroupViewModel model = new(given.Database.Resolve<IReportQuery>(), given.Database.Resolve<IChangeNotifier>());
+
+        await model.LoadAsync(food, ReportMonth.Of(given.Today));
+
+        Assert.Equal("Питание", model.Name);
+        Assert.Equal(["75%", "25%"], model.Rows.Select(row => row.Share));
+        Assert.EndsWith("· 40% расходов", model.Caption, StringComparison.Ordinal);
+        Assert.Equal(Money.Restore(-400m, Currency.RUB).DisplaySigned, model.Total);
+        Assert.False(model.IsEmpty);
+    }
+
     /// <summary>Сложение, уехавшее в память, на маленьких данных ничем себя не выдаст — сверяется сам SQL.</summary>
     [Fact]
     public async Task Суммы_месяца_считает_база()
@@ -376,6 +426,13 @@ public sealed partial class ReportTests
             Reads++;
 
             return inner.ReadGroupsAsync(month, cancellationToken);
+        }
+
+        public Task<IReadOnlyList<ReportTotal>> ReadSubcategoriesAsync(Guid groupKey, ReportMonth month, CancellationToken cancellationToken = default)
+        {
+            Reads++;
+
+            return inner.ReadSubcategoriesAsync(groupKey, month, cancellationToken);
         }
     }
 }

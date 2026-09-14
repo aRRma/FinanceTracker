@@ -40,6 +40,45 @@ public sealed class ReportQuery : IReportQuery
         return ToTotals(buckets);
     }
 
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ReportTotal>> ReadSubcategoriesAsync(
+        Guid groupKey,
+        ReportMonth month,
+        CancellationToken cancellationToken = default)
+    {
+        await using FinanceDbContext context = await _contexts
+            .CreateDbContextAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        List<Bucket> buckets = await Subcategories(context, groupKey, month)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return ToTotals(buckets);
+    }
+
+    /// <summary>
+    /// Суммы по подкатегориям одной группы за месяц. Соединение с группой остаётся:
+    /// у подкатегории нет своего вида, и нужен флаг «вне отчётов» самой группы.
+    /// </summary>
+    internal static IQueryable<Bucket> Subcategories(FinanceDbContext context, Guid groupKey, ReportMonth month) =>
+        from row in Counted(context, month)
+        join category in context.Categories.AsNoTracking() on row.CategoryKey equals category.Key
+        join parent in context.Categories.AsNoTracking() on category.ParentKey equals parent.Key
+        where category.ParentKey == groupKey
+              && !category.ExcludeFromReports
+              && !parent.ExcludeFromReports
+        group row.Amount by new { category.Key, category.Name, category.Icon, parent.Kind } into bucket
+        orderby bucket.Sum() descending
+        select new Bucket
+        {
+            Key = bucket.Key.Key,
+            Name = bucket.Key.Name,
+            Icon = bucket.Key.Icon,
+            Kind = bucket.Key.Kind,
+            Total = bucket.Sum()
+        };
+
     /// <summary>
     /// Суммы по группам за месяц. Открыт тестам, чтобы сверить SQL и план запроса:
     /// сложение, уехавшее из базы в память, тестом на числа не отличить.
