@@ -1,0 +1,144 @@
+using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Finance.Application.Infrastructure;
+using Finance.Domain;
+
+namespace Finance.Application.Features.Report;
+
+/// <summary>
+/// Второй уровень отчёта: подкатегории одной группы за месяц. Доли пересчитаны
+/// внутри группы, а не от итога месяца: иначе все числа были бы мелкими
+/// и несравнимыми между собой.
+/// </summary>
+public sealed partial class ReportGroupViewModel : ScreenViewModel
+{
+    private readonly IReportQuery _report;
+
+    private Guid _groupKey;
+
+    /// <summary>Создаёт модель представления группы отчёта.</summary>
+    /// <param name="report">Суммы отчёта.</param>
+    /// <param name="changes">Оповещение об изменении данных.</param>
+    public ReportGroupViewModel(IReportQuery report, IChangeNotifier changes)
+        : base(changes)
+    {
+        ArgumentNullException.ThrowIfNull(report);
+
+        _report = report;
+    }
+
+    /// <summary>Подкатегории группы, по убыванию суммы.</summary>
+    public ObservableCollection<ReportRowItem> Rows { get; } = [];
+
+    /// <summary>Месяц отчёта — приходит параметром перехода, здесь не переключается.</summary>
+    public ReportMonth Month { get; private set; }
+
+    /// <summary>Название группы — заголовок экрана.</summary>
+    [ObservableProperty]
+    public partial string Name { get; private set; } = string.Empty;
+
+    /// <summary>Подпись под заголовком: «август 2026 · 37% расходов».</summary>
+    [ObservableProperty]
+    public partial string Caption { get; private set; } = string.Empty;
+
+    /// <summary>Сумма группы за месяц со знаком.</summary>
+    [ObservableProperty]
+    public partial string Total { get; private set; } = string.Empty;
+
+    /// <summary>Группа за месяц пуста: операции переехали или удалены после перехода сюда.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasItems))]
+    public partial bool IsEmpty { get; private set; }
+
+    /// <summary>Идёт чтение.</summary>
+    [ObservableProperty]
+    public partial bool IsBusy { get; private set; }
+
+    /// <summary>Есть что показать: список и итог видны.</summary>
+    public bool HasItems => !IsEmpty;
+
+    /// <summary>
+    /// Читает группу за месяц. Первый уровень читается ради шапки: название, вид
+    /// и доля группы в месяце. Протащить долю параметром перехода нельзя — после
+    /// правки операции на третьем уровне она осталась бы прежней, а числа под ней изменились.
+    /// </summary>
+    /// <param name="groupKey">Ключ группы.</param>
+    /// <param name="month">Месяц отчёта.</param>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    public async Task LoadAsync(Guid groupKey, ReportMonth month, CancellationToken cancellationToken = default)
+    {
+        _groupKey = groupKey;
+        Month = month;
+        IsBusy = true;
+
+        try
+        {
+            // ConfigureAwait(false) здесь недопустим: дальше наполняются
+            // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
+            IReadOnlyList<ReportTotal> groups = await _report.ReadGroupsAsync(month, cancellationToken);
+            IReadOnlyList<ReportTotal> rows = await _report.ReadSubcategoriesAsync(groupKey, month, cancellationToken);
+
+            Rebuild(groups, rows);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private void Rebuild(IReadOnlyList<ReportTotal> groups, IReadOnlyList<ReportTotal> rows)
+    {
+        Rows.Clear();
+
+        ReportTotal? self = null;
+        Money monthTotal = Money.Zero(Currency.RUB);
+
+        foreach (ReportTotal group in groups)
+        {
+            if (group.Key == _groupKey)
+            {
+                self = group;
+            }
+        }
+
+        // Итог месяца — по виду этой группы: доля расходной группы в доходах бессмысленна
+        if (self is not null)
+        {
+            foreach (ReportTotal group in groups)
+            {
+                if (group.Kind == self.Kind)
+                {
+                    monthTotal += group.Total;
+                }
+            }
+        }
+
+        IsEmpty = self is null || rows.Count is 0;
+
+        if (self is null)
+        {
+            Caption = Month.Caption;
+            Total = string.Empty;
+            return;
+        }
+
+        foreach (ReportTotal row in rows)
+        {
+            Rows.Add(ReportRowItem.From(row, self.Total));
+        }
+
+        ReportRowItem share = ReportRowItem.From(self, monthTotal);
+        string ofWhat = self.Kind is CategoryKind.Expense ? "расходов" : "доходов";
+
+        Name = self.Name;
+        Caption = $"{Month.Caption} · {share.Share} {ofWhat}";
+        Total = share.Amount;
+    }
+
+    /// <inheritdoc />
+    protected override DataChange Watched =>
+        DataChange.Transactions | DataChange.Categories | DataChange.Accounts;
+
+    /// <inheritdoc />
+    protected override Task ReloadAsync() => LoadAsync(_groupKey, Month);
+}

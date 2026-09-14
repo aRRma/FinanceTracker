@@ -46,6 +46,16 @@ public static class Routes
     /// </summary>
     public const string Transaction = "transactions/transaction";
 
+    /// <summary>
+    /// Второй уровень отчёта: подкатегории группы. Параметры <c>key</c> — ключ группы,
+    /// <c>month</c> — месяц в виде «2026-08». Первый сегмент — не имя вкладки «report»
+    /// намеренно, по той же причине, что и у ленты счёта.
+    /// </summary>
+    public const string ReportGroup = "reports/group";
+
+    /// <summary>Третий уровень отчёта: операции подкатегории. Параметры те же, <c>key</c> — ключ подкатегории.</summary>
+    public const string ReportSubcategory = "reports/subcategory";
+
     /// <summary>Выбор темы оформления.</summary>
     public const string Appearance = "settings/appearance";
 
@@ -67,6 +77,7 @@ public static class Routes
         Routing.RegisterRoute(Subcategory, typeof(SubcategoryPage));
         Routing.RegisterRoute(AccountFeed, typeof(AccountFeedPage));
         Routing.RegisterRoute(Transaction, typeof(TransactionPage));
+        Routing.RegisterRoute(ReportGroup, typeof(ReportGroupPage));
         Routing.RegisterRoute(Appearance, typeof(AppearancePage));
         Routing.RegisterRoute(TimeZone, typeof(TimeZonePage));
         Routing.RegisterRoute(About, typeof(AboutPage));

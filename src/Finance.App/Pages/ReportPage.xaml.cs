@@ -24,4 +24,12 @@ public partial class ReportPage : DataPage
 
     /// <inheritdoc />
     protected override Task LoadAsync() => _model.LoadAsync();
+
+    private void OnRowTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is BindableObject { BindingContext: ReportRowItem row })
+        {
+            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.ReportGroup}?key={row.Key}&month={_model.Month}"));
+        }
+    }
 }
