@@ -69,8 +69,17 @@ public sealed partial class TimeZoneViewModel : ScreenViewModel
 
         // Список зон читается у системы один раз на заход: он не меняется, пока
         // приложение живёт, а перебор шестисот зон на каждую набранную букву
-        // сделал бы поиск заметно медленным
-        _all = [.. TimeZoneInfo.GetSystemTimeZones()];
+        // сделал бы поиск заметно медленным.
+        // Порядок задаётся заново: система сортирует по зимнему смещению, а на
+        // экране стоит действующее, и на летнем времени список выглядел бы вразнобой
+        DateTimeOffset now = _clock.NowUtc;
+
+        _all =
+        [
+            .. TimeZoneInfo.GetSystemTimeZones()
+                .OrderBy(zone => zone.GetUtcOffset(now))
+                .ThenBy(zone => zone.Id, StringComparer.Ordinal)
+        ];
 
         Rebuild();
     }

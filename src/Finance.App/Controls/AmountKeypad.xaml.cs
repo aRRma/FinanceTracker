@@ -20,6 +20,10 @@ public partial class AmountKeypad : ContentView
     public static readonly BindableProperty CanSaveProperty =
         BindableProperty.Create(nameof(CanSave), typeof(bool), typeof(AmountKeypad), defaultValue: false);
 
+    /// <summary>Клавиши на виду. Прячутся отдельно от клавиши сохранения.</summary>
+    public static readonly BindableProperty AreKeysVisibleProperty =
+        BindableProperty.Create(nameof(AreKeysVisible), typeof(bool), typeof(AmountKeypad), defaultValue: true);
+
     /// <summary>Создаёт клавиатуру.</summary>
     public AmountKeypad()
     {
@@ -51,6 +55,16 @@ public partial class AmountKeypad : ContentView
     {
         get => (bool)GetValue(CanSaveProperty);
         set => SetValue(CanSaveProperty, value);
+    }
+
+    /// <summary>
+    /// Клавиши на виду. Скрывается только сетка клавиш: спрятать контрол целиком
+    /// значило бы унести с экрана и сохранение — записанную операцию нечем было бы закончить.
+    /// </summary>
+    public bool AreKeysVisible
+    {
+        get => (bool)GetValue(AreKeysVisibleProperty);
+        set => SetValue(AreKeysVisibleProperty, value);
     }
 
     /// <summary>

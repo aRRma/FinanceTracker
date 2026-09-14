@@ -23,7 +23,7 @@
 
     <Grid RowDefinitions="*,Auto">
 
-        <ScrollView Grid.Row="0">
+        <ScrollView Grid.Row="0" x:Name="Form">
             <VerticalStackLayout Padding="16,12" Spacing="16">
 
                 <!-- Вид операции. По умолчанию расход — он записывается чаще всего -->
@@ -82,7 +82,7 @@
                         <VerticalStackLayout Spacing="10" IsVisible="{Binding IsTransfer}">
                             <BoxView Style="{StaticResource Divider}" />
                             <Label Text="Куда" Style="{StaticResource CaptionLabel}" />
-                            <Picker ItemsSource="{Binding Accounts}" ItemDisplayBinding="{Binding Label, x:DataType=card:AccountOption}"
+                            <Picker ItemsSource="{Binding TargetAccounts}" ItemDisplayBinding="{Binding Label, x:DataType=card:AccountOption}"
                                     SelectedItem="{Binding TargetAccount}" Title="Выбрать счёт" />
                             <Label Text="Перевод не попадает ни в доходы, ни в расходы"
                                    Style="{StaticResource CaptionLabel}" />
@@ -131,14 +131,14 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Style="{StaticResource Card}" IsVisible="{Binding HasError}">
+                <Border x:Name="ErrorCard" Style="{StaticResource Card}" IsVisible="{Binding HasError}">
                     <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
                 </Border>
 
             </VerticalStackLayout>
         </ScrollView>
 
-        <controls:AmountKeypad Grid.Row="1" IsVisible="{Binding IsKeypadVisible}"
+        <controls:AmountKeypad Grid.Row="1" AreKeysVisible="{Binding AreKeysVisible}"
                                KeyCommand="{Binding PressKeyCommand}"
                                BackspaceCommand="{Binding BackspaceCommand}"
                                CanSave="{Binding CanSave}"

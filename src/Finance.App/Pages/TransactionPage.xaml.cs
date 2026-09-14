@@ -46,19 +46,56 @@ public partial class TransactionPage : DataPage
     }
 
     /// <summary>
-    /// Буквенная клавиатура системы и клавиатура суммы на экран вместе не влезают,
-    /// поэтому на время набора места и заметки вторая уходит.
+    /// Буквенная клавиатура системы и клавиши суммы на экран вместе не влезают,
+    /// поэтому на время набора места и заметки клавиши уходят. Клавиша сохранения
+    /// остаётся: снятие фокуса с поля зависит от системной клавиатуры, а закончить
+    /// операцию пользователь должен мочь всегда.
     /// </summary>
-    private void OnTextFocused(object? sender, FocusEventArgs e) => _model.IsKeypadVisible = false;
+    private void OnTextFocused(object? sender, FocusEventArgs e) => _model.AreKeysVisible = false;
 
-    private void OnTextUnfocused(object? sender, FocusEventArgs e) => _model.IsKeypadVisible = true;
+    private void OnTextUnfocused(object? sender, FocusEventArgs e) => _model.AreKeysVisible = true;
 
     private async void OnSave(object? sender, EventArgs e)
     {
         if (await _model.SaveAsync())
         {
             await Shell.Current.GoToAsync("..");
+
+            return;
         }
+
+        // Нарушенное правило стоит последним в форме и с нижней части экрана не
+        // видно: без подвода к нему нажатие выглядит так, будто ничего не произошло
+        if (_model.HasError)
+        {
+            ScrollToError();
+        }
+    }
+
+    /// <summary>
+    /// Подводит форму к нарушенному правилу. Карточка правила до этого была скрыта,
+    /// и до конца разметки её положение ещё нулевое — прокрутка по нему увела бы
+    /// экран в начало формы. Поэтому уже измеренную двигаем сразу, а только что
+    /// показанную — по первому же измерению.
+    /// </summary>
+    private void ScrollToError()
+    {
+        if (ErrorCard.Height > 0)
+        {
+            _ = Form.ScrollToAsync(ErrorCard, ScrollToPosition.End, animated: true);
+
+            return;
+        }
+
+        ErrorCard.SizeChanged -= OnErrorMeasured;
+        ErrorCard.SizeChanged += OnErrorMeasured;
+    }
+
+    private void OnErrorMeasured(object? sender, EventArgs e)
+    {
+        ErrorCard.SizeChanged -= OnErrorMeasured;
+
+        _ = Form.ScrollToAsync(ErrorCard, ScrollToPosition.End, animated: true);
     }
 
     /// <summary>

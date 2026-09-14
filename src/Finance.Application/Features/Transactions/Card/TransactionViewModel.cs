@@ -126,11 +126,12 @@ public sealed partial class TransactionViewModel : ObservableObject
     public partial AmountField ActiveAmount { get; private set; } = AmountField.Source;
 
     /// <summary>
-    /// Клавиатура суммы на виду. Прячется, пока набирают место или заметку:
-    /// там нужна буквенная клавиатура системы, и две сразу на экран не помещаются.
+    /// Клавиши суммы на виду. Прячутся, пока набирают место или заметку: там нужна
+    /// буквенная клавиатура системы, и две сразу на экран не помещаются. Клавиша
+    /// сохранения этим не управляется — она на виду всегда.
     /// </summary>
     [ObservableProperty]
-    public partial bool IsKeypadVisible { get; set; } = true;
+    public partial bool AreKeysVisible { get; set; } = true;
 
     /// <summary>Набирается сумма списания — её поле подсвечено.</summary>
     public bool IsSourceAmountActive => ActiveAmount is AmountField.Source;
@@ -163,6 +164,13 @@ public sealed partial class TransactionViewModel : ObservableObject
 
     /// <summary>Счета, которые форма предлагает: открытые и те, что уже в этой операции.</summary>
     public ObservableCollection<AccountOption> Accounts { get; } = [];
+
+    /// <summary>
+    /// Счета зачисления перевода: те же, кроме счёта списания. Отдельный список,
+    /// а не общий: перевод на себя запрещён доменом, и предлагать его в выборе —
+    /// значит рассказывать о запрете уже после нажатия «Сохранить».
+    /// </summary>
+    public ObservableCollection<AccountOption> TargetAccounts { get; } = [];
 
     /// <summary>Подкатегории вида операции.</summary>
     public ObservableCollection<CategoryOption> Categories { get; } = [];
@@ -479,7 +487,7 @@ public sealed partial class TransactionViewModel : ObservableObject
     public void ActivateSourceAmount()
     {
         ActiveAmount = AmountField.Source;
-        IsKeypadVisible = true;
+        AreKeysVisible = true;
     }
 
     /// <summary>Переводит клавиатуру на сумму зачисления.</summary>
@@ -494,7 +502,7 @@ public sealed partial class TransactionViewModel : ObservableObject
         }
 
         ActiveAmount = AmountField.Target;
-        IsKeypadVisible = true;
+        AreKeysVisible = true;
     }
 
     /// <summary>Правит то поле суммы, которое набирается сейчас.</summary>
@@ -569,6 +577,36 @@ public sealed partial class TransactionViewModel : ObservableObject
                 Accounts.Add(account);
             }
         }
+
+        FillTargetAccounts();
+    }
+
+    /// <summary>Счета зачисления: всё, кроме выбранного счёта списания.</summary>
+    private void FillTargetAccounts()
+    {
+        TargetAccounts.Clear();
+
+        foreach (AccountOption account in Accounts)
+        {
+            if (SourceAccount is not { } source || account.Key != source.Key)
+            {
+                TargetAccounts.Add(account);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Смена счёта списания перестраивает список зачисления: счёт, ставший счётом
+    /// списания, обязан уйти из выбора, а если он там уже стоял — сброситься.
+    /// </summary>
+    partial void OnSourceAccountChanged(AccountOption? value)
+    {
+        if (value is { } source && TargetAccount is { } target && target.Key == source.Key)
+        {
+            TargetAccount = null;
+        }
+
+        FillTargetAccounts();
     }
 
     /// <summary>Подкатегории вида операции. У перевода список пуст — категории у него нет.</summary>
