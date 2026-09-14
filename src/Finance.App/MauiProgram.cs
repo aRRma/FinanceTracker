@@ -70,6 +70,7 @@ public static class MauiProgram
         services.AddTransient<FeedPage>();
         services.AddTransient<ReportPage>();
         services.AddTransient<ReportGroupPage>();
+        services.AddTransient<ReportSubcategoryPage>();
         services.AddTransient<MorePage>();
         services.AddTransient<AccountsPage>();
         services.AddTransient<AccountPage>();

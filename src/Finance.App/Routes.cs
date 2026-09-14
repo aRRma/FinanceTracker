@@ -78,6 +78,7 @@ public static class Routes
         Routing.RegisterRoute(AccountFeed, typeof(AccountFeedPage));
         Routing.RegisterRoute(Transaction, typeof(TransactionPage));
         Routing.RegisterRoute(ReportGroup, typeof(ReportGroupPage));
+        Routing.RegisterRoute(ReportSubcategory, typeof(ReportSubcategoryPage));
         Routing.RegisterRoute(Appearance, typeof(AppearancePage));
         Routing.RegisterRoute(TimeZone, typeof(TimeZonePage));
         Routing.RegisterRoute(About, typeof(AboutPage));

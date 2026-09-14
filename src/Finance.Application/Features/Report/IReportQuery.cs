@@ -20,4 +20,13 @@ public interface IReportQuery
     /// <param name="month">Месяц отчёта.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     Task<IReadOnlyList<ReportTotal>> ReadSubcategoriesAsync(Guid groupKey, ReportMonth month, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Третий уровень: операции подкатегории за месяц, от новых к старым, плоским
+    /// списком. Без страниц: месяц одной подкатегории — десятки строк, не тысячи.
+    /// </summary>
+    /// <param name="subcategoryKey">Ключ подкатегории.</param>
+    /// <param name="month">Месяц отчёта.</param>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    Task<IReadOnlyList<ReportTransaction>> ReadTransactionsAsync(Guid subcategoryKey, ReportMonth month, CancellationToken cancellationToken = default);
 }
