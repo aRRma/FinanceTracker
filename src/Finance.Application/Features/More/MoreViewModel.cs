@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
@@ -104,5 +104,5 @@ public sealed partial class MoreViewModel : ScreenViewModel
         DataChange.Accounts | DataChange.Places | DataChange.Categories | DataChange.Settings;
 
     /// <inheritdoc />
-    protected override void Reload() => LoadCommand.Execute(null);
+    protected override Task ReloadAsync() => LoadAsync();
 }

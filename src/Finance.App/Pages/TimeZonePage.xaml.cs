@@ -25,13 +25,16 @@ public partial class TimeZonePage : DataPage
     /// <inheritdoc />
     protected override Task LoadAsync() => _model.LoadAsync();
 
-    private async void OnZoneTapped(object? sender, TappedEventArgs e)
+    private void OnZoneTapped(object? sender, TappedEventArgs e)
     {
-        if (sender is not BindableObject { BindingContext: TimeZoneOption option })
+        if (sender is BindableObject { BindingContext: TimeZoneOption option })
         {
-            return;
+            Guarded.Run(() => SelectAsync(option));
         }
+    }
 
+    private async Task SelectAsync(TimeZoneOption option)
+    {
         try
         {
             await _model.SelectAsync(option);

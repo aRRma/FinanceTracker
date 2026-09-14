@@ -19,7 +19,8 @@ public sealed class AmountInputTests
         Assert.Equal(expected, AmountInput.Append(expression, key));
 
     /// <summary>
-    /// Предел суммы — двенадцать разрядов до запятой и две копейки после (INV-24).
+    /// Предел суммы — двенадцать разрядов до запятой и две копейки после,
+    /// тот же, что у <c>Invariant.AmountWithinLimit</c>.
     /// Лишний разряд клавиатура не принимает: набрать и получить отказ при
     /// сохранении хуже, чем не набрать.
     /// </summary>

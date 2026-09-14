@@ -1,8 +1,10 @@
+using System.Text;
 using Finance.Application.Features.Feed;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Domain;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Tests;
@@ -230,6 +232,54 @@ public sealed class FeedTests
 
         Assert.Contains("UNION ALL", sql, StringComparison.Ordinal);
         Assert.DoesNotContain("\"source_account_key\" = @", sql.Split("UNION ALL")[1], StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Общая лента идёт по индексу, а не полным проходом с сортировкой в памяти базы.
+    /// У индексов ленты счёта ведущая колонка — сам счёт, и сортировку по всем счетам
+    /// они не обслуживают: без отдельного индекса главный список операций перебирает
+    /// всю таблицу на каждую страницу. Сверяется план запроса — по составу колонок
+    /// этого не видно.
+    /// </summary>
+    [Fact]
+    public async Task Общая_лента_сортируется_по_индексу()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+        await using FinanceDbContext context = await given.Database.Contexts.CreateDbContextAsync();
+
+        string plan = await ExplainAsync(given, FeedQuery.Compose(context, accountKey: null).Take(50));
+
+        Assert.Contains("ix_transactions_feed", plan, StringComparison.Ordinal);
+        Assert.DoesNotContain("TEMP B-TREE", plan, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// План запроса от самой SQLite. Параметры запроса подставлять незачем: план
+    /// от их значений не зависит, а строки <c>.param set</c> впереди SQL — команды
+    /// оболочки, и база на них спотыкается.
+    /// </summary>
+    private static async Task<string> ExplainAsync<T>(TransactionFixture given, IQueryable<T> query)
+    {
+        string sql = string.Join(
+            '\n',
+            query.ToQueryString().Split('\n').SkipWhile(line => line.StartsWith('.') || line.Trim().Length is 0));
+
+        await using SqliteConnection connection = new(given.Database.Location.ConnectionString);
+        await connection.OpenAsync();
+
+        await using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = $"EXPLAIN QUERY PLAN {sql}";
+
+        StringBuilder plan = new();
+
+        await using SqliteDataReader reader = await command.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            plan.AppendLine(reader.GetString(reader.GetOrdinal("detail")));
+        }
+
+        return plan.ToString();
     }
 
     /// <summary>Урезает страницу до заданного размера: модель просит полсотни, а тесту нужно две.</summary>

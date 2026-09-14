@@ -30,7 +30,9 @@ public partial class PlacePage : DataPage
     protected override Task LoadAsync() =>
         Guid.TryParse(Key, out Guid key) ? _model.LoadAsync(key) : Task.CompletedTask;
 
-    private async void OnSave(object? sender, EventArgs e)
+    private void OnSave(object? sender, EventArgs e) => Guarded.Run(SaveAsync);
+
+    private async Task SaveAsync()
     {
         if (await _model.SaveAsync())
         {
@@ -38,9 +40,11 @@ public partial class PlacePage : DataPage
         }
     }
 
+    private void OnDelete(object? sender, EventArgs e) => Guarded.Run(DeleteAsync);
+
     // Подтверждение называет число операций, которые останутся без места:
     // отменить удаление нельзя, а по числу видно, то ли это место
-    private async void OnDelete(object? sender, EventArgs e)
+    private async Task DeleteAsync()
     {
         if (!await DisplayAlertAsync(_model.DeleteTitle, _model.DeletePrompt, "Удалить", "Отмена"))
         {

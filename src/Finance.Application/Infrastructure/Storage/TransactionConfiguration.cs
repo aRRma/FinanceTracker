@@ -9,7 +9,9 @@ namespace Finance.Application.Infrastructure.Storage;
 /// Таблица операций и индексы под ленту. Индексов по счёту два — по счёту списания
 /// и по счёту зачисления, — потому что лента счёта собирается объединением двух
 /// выборок: условие <c>source = ? OR target = ?</c> индекс не берёт и при пятидесяти
-/// тысячах операций превращается в полный проход.
+/// тысячах операций превращается в полный проход. Третий, без ключа счёта, нужен
+/// общей ленте: у тех двух ведущая колонка — счёт, и сортировку по всем счетам
+/// они не обслуживают.
 /// </summary>
 internal sealed class TransactionConfiguration : IEntityTypeConfiguration<TransactionRow>
 {
@@ -41,6 +43,15 @@ internal sealed class TransactionConfiguration : IEntityTypeConfiguration<Transa
             .IsDescending(false, true, true, true)
             .HasFilter(NotDeleted)
             .HasDatabaseName("ix_transactions_target_feed");
+
+        // Под общую ленту: у индексов выше ведущая колонка — ключ счёта, и сортировку
+        // ленты по всем счетам они не обслуживают. Без него главный список операций
+        // идёт полным проходом с сортировкой во временном дереве. Он же берётся
+        // на итоги дней общей ленты — там та же группировка по дате операции
+        builder.HasIndex(row => new { row.OccurredOn, row.CreatedAtUtc, row.Key })
+            .IsDescending(true, true, true)
+            .HasFilter(NotDeleted)
+            .HasDatabaseName("ix_transactions_feed");
 
         // Под отчёт: суммы за месяц по подкатегории
         builder.HasIndex(row => new { row.CategoryKey, row.OccurredOn })

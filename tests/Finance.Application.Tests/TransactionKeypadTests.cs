@@ -33,7 +33,7 @@ public sealed class TransactionKeypadTests
 
     /// <summary>
     /// Пустая и нулевая сумма сохранение не включают: кнопка гаснет, а не
-    /// отказывает после нажатия (INV-02).
+    /// отказывает после нажатия нарушением <c>Invariant.AmountIsPositive</c>.
     /// </summary>
     [Fact]
     public async Task Нулевая_сумма_не_включает_сохранение()

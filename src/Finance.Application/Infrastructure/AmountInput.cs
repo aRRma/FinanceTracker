@@ -1,4 +1,4 @@
-using System.Buffers;
+﻿using System.Buffers;
 
 namespace Finance.Application.Infrastructure;
 
@@ -20,8 +20,9 @@ public static class AmountInput
     /// <summary>Разделитель дробной части. На клавиатуре он один — запятая.</summary>
     public const char Separator = ',';
 
-    // Предел суммы — 999 999 999 999,99 (INV-24). Клавиатура не принимает лишние
-    // разряды вместо того, чтобы дать набрать и отказать при сохранении
+    // Предел суммы — 999 999 999 999,99, тот же, что у Invariant.AmountWithinLimit.
+    // Клавиатура не принимает лишние разряды вместо того, чтобы дать набрать
+    // и отказать при сохранении
     private const int IntegerDigitLimit = 12;
     private const int FractionDigitLimit = 2;
 

@@ -11,6 +11,13 @@ namespace Finance.Application.Infrastructure;
 /// </remarks>
 public interface IScreenModel
 {
+    /// <summary>
+    /// Перечитать экран не удалось. Модель об этом сказать некому: перечитывание
+    /// начинается не с действия пользователя, а с чужого изменения данных,
+    /// и без этого события экран молча остался бы устаревшим.
+    /// </summary>
+    event Action<Exception>? ReloadFailed;
+
     /// <summary>Экран появился: подписаться на изменения.</summary>
     void Activate();
 

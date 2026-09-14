@@ -25,15 +25,36 @@ public abstract class DataPage : ContentPage
     protected abstract Task LoadAsync();
 
     /// <inheritdoc />
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
 
         // Подписка на изменения живёт только пока экран на виду: оповещение
         // одно на приложение, и подписка от создания модели копилась бы
         // с каждым заходом на экран
-        (BindingContext as IScreenModel)?.Activate();
+        if (BindingContext is IScreenModel screen)
+        {
+            screen.ReloadFailed -= OnReloadFailed;
+            screen.ReloadFailed += OnReloadFailed;
+            screen.Activate();
+        }
 
+        Guarded.Run(PrepareAndLoadAsync);
+    }
+
+    /// <summary>
+    /// Перечитать экран по чужой правке не удалось. Сказать об этом обязательно:
+    /// пользователь ничего не нажимал и принял бы устаревшие числа за нынешние.
+    /// </summary>
+    private void OnReloadFailed(Exception error) =>
+        Guarded.Run(() => DisplayAlertAsync("Данные не обновились", error.Message, "Закрыть"));
+
+    /// <summary>
+    /// Подготовка базы и первое чтение. Общий перехват живёт в <see cref="Guarded"/>;
+    /// здесь остаётся только неудачная миграция — у неё свой ответ.
+    /// </summary>
+    private async Task PrepareAndLoadAsync()
+    {
         try
         {
             // ConfigureAwait здесь не ставится намеренно: продолжение обязано
@@ -47,13 +68,6 @@ public abstract class DataPage : ContentPage
             // что экран просто пуст, нельзя: данные целы, а приложение — нет
             await DisplayAlertAsync("База не обновилась", error.Message, "Закрыть");
         }
-        catch (Exception error) when (error is not OperationCanceledException)
-        {
-            // Метод async void: невыловленный сбой чтения здесь не всплывает
-            // к вызывающему, а роняет процесс. Показать сообщение — единственное,
-            // что тут можно сделать, и это лучше молчаливого закрытия приложения
-            await DisplayAlertAsync("Не удалось прочитать данные", error.Message, "Закрыть");
-        }
     }
 
     /// <inheritdoc />
@@ -61,6 +75,10 @@ public abstract class DataPage : ContentPage
     {
         base.OnDisappearing();
 
-        (BindingContext as IScreenModel)?.Deactivate();
+        if (BindingContext is IScreenModel screen)
+        {
+            screen.Deactivate();
+            screen.ReloadFailed -= OnReloadFailed;
+        }
     }
 }

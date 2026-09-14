@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -158,5 +158,5 @@ public sealed partial class TimeZoneViewModel : ScreenViewModel
     protected override DataChange Watched => DataChange.Settings;
 
     /// <inheritdoc />
-    protected override void Reload() => LoadCommand.Execute(null);
+    protected override Task ReloadAsync() => LoadAsync();
 }

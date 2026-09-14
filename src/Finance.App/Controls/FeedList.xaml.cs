@@ -11,11 +11,11 @@ public partial class FeedList : ContentView
         InitializeComponent();
     }
 
-    private async void OnRowTapped(object? sender, TappedEventArgs e)
+    private void OnRowTapped(object? sender, TappedEventArgs e)
     {
         if (sender is BindableObject { BindingContext: FeedRowItem row })
         {
-            await Shell.Current.GoToAsync($"{Routes.Transaction}?key={row.Key}");
+            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Transaction}?key={row.Key}"));
         }
     }
 }
