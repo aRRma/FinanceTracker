@@ -1,0 +1,210 @@
+using Finance.Application.Features.Settings.Appearance;
+using Finance.Application.Features.Settings.TimeZones;
+using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.Queries;
+using Finance.Application.Infrastructure.Settings;
+
+namespace Finance.Application.Tests;
+
+/// <summary>
+/// Настройки устройства: тема оформления и часовой пояс. Обе меняют не данные,
+/// а то, как приложение их показывает и что считает сегодняшним днём.
+/// </summary>
+public sealed class SettingsTests
+{
+    // Две зоны по краям шкалы: между ними двадцать пять часов, поэтому
+    // календарная дата в них не совпадает никогда — тест не зависит от того,
+    // когда его запустили
+    private const string FarEast = "Pacific/Kiritimati";
+    private const string FarWest = "Pacific/Midway";
+
+    /// <summary>Выбранная тема и сохраняется, и доходит до платформы: экран перекрашивается сразу.</summary>
+    [Fact]
+    public async Task Выбранная_тема_сохраняется_и_применяется()
+    {
+        Theme? applied = null;
+
+        await using TestDatabase database = await TestDatabase.CreateAsync(theme => applied = theme);
+
+        await database.Resolve<IChangeThemeHandler>().HandleAsync(Theme.Dark);
+
+        SettingsSummary summary = await database.Resolve<ISettingsSummaryQuery>().ReadAsync();
+
+        Assert.Equal(Theme.Dark, applied);
+        Assert.Equal(Theme.Dark, summary.Theme);
+    }
+
+    /// <summary>
+    /// Сохранённая тема применяется при запуске. Без этого выбор действовал бы
+    /// до закрытия приложения и молча пропадал.
+    /// </summary>
+    [Fact]
+    public async Task Сохранённая_тема_применяется_при_запуске()
+    {
+        Theme? applied = null;
+
+        await using TestDatabase database = await TestDatabase.CreateAsync(theme => applied = theme);
+
+        await database.Resolve<ILocalSettings>().SetAsync(SettingName.Theme, Theme.Light.Stored);
+        await database.Resolve<FinanceStartup>().PrepareAsync();
+
+        Assert.Equal(Theme.Light, applied);
+    }
+
+    /// <summary>
+    /// Незнакомая запись настройки — системная тема. Отказ запуститься из-за
+    /// испорченной строки оформления был бы несоразмерен.
+    /// </summary>
+    [Fact]
+    public void Незнакомая_запись_темы_читается_как_системная() =>
+        Assert.Equal(Theme.System, Theme.Parse("сиреневая"));
+
+    /// <summary>Выбранный пояс меняет «сегодня» — именно ради этого настройка и заведена.</summary>
+    [Fact]
+    public async Task Выбранный_пояс_меняет_сегодняшнюю_дату()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        IChangeTimeZoneHandler change = database.Resolve<IChangeTimeZoneHandler>();
+        IClock clock = database.Resolve<IClock>();
+
+        await change.HandleAsync(FarEast);
+        DateOnly east = clock.Today;
+
+        await change.HandleAsync(FarWest);
+        DateOnly west = clock.Today;
+
+        Assert.NotEqual(east, west);
+    }
+
+    /// <summary>
+    /// Возврат к системному поясу стирает настройку, а не записывает слово
+    /// «системный»: записанное слово не переехало бы вместе с пользователем.
+    /// </summary>
+    [Fact]
+    public async Task Возврат_к_системному_поясу_стирает_настройку()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        IChangeTimeZoneHandler change = database.Resolve<IChangeTimeZoneHandler>();
+        ILocalSettings settings = database.Resolve<ILocalSettings>();
+
+        await change.HandleAsync(FarEast);
+        Assert.Equal(FarEast, await settings.GetAsync(SettingName.TimeZoneId));
+
+        await change.HandleAsync(id: null);
+
+        Assert.Null(await settings.GetAsync(SettingName.TimeZoneId));
+        Assert.Equal(TimeZoneInfo.Local.Id, database.Resolve<IClock>().TimeZone.Id);
+    }
+
+    /// <summary>
+    /// Незнакомая зона отвергается до записи. Записанная, она молча откатилась бы
+    /// на системную при следующем запуске, а пользователь считал бы выбор сохранённым.
+    /// </summary>
+    [Fact]
+    public async Task Незнакомая_зона_отвергается_и_не_записывается()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        IChangeTimeZoneHandler change = database.Resolve<IChangeTimeZoneHandler>();
+
+        await change.HandleAsync(FarEast);
+
+        await Assert.ThrowsAsync<TimeZoneNotFoundException>(
+            () => change.HandleAsync("Europe/Атлантида"));
+
+        Assert.Equal(FarEast, await database.Resolve<ILocalSettings>().GetAsync(SettingName.TimeZoneId));
+    }
+
+    /// <summary>Убирать нечего — не ошибка: настройка уже в том состоянии, которого от неё хотят.</summary>
+    [Fact]
+    public async Task Удаление_незаданной_настройки_проходит_молча()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        await database.Resolve<ILocalSettings>().RemoveAsync(SettingName.TimeZoneId);
+
+        Assert.Null(await database.Resolve<ILocalSettings>().GetAsync(SettingName.TimeZoneId));
+    }
+
+    /// <summary>
+    /// «О программе» называет версию и номер схемы. Номер берётся у самой базы:
+    /// по нему сверяют, накатилась ли миграция после обновления приложения.
+    /// </summary>
+    [Fact]
+    public async Task Сводка_называет_версию_и_номер_схемы()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync(applicationVersion: "1.0");
+
+        SettingsSummary summary = await database.Resolve<ISettingsSummaryQuery>().ReadAsync();
+
+        Assert.Equal("1.0", summary.Version);
+        Assert.True(summary.Schema > 0);
+        Assert.True(summary.TimeZoneFromSystem);
+    }
+
+    /// <summary>Экран оформления показывает три состояния, и выбранное отмечено ровно одно.</summary>
+    [Fact]
+    public async Task Экран_оформления_показывает_три_состояния()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        AppearanceViewModel model = new(
+            database.Resolve<ISettingsSummaryQuery>(),
+            database.Resolve<IChangeThemeHandler>(),
+            database.Resolve<IChangeNotifier>());
+
+        await model.LoadAsync();
+
+        Assert.Equal(3, model.Options.Count);
+        Assert.Single(model.Options, option => option.IsSelected);
+        Assert.Equal(Theme.System, model.Current);
+
+        await model.SelectAsync(Theme.Dark);
+
+        Assert.Equal(Theme.Dark, model.Current);
+        Assert.Single(model.Options, option => option is { IsSelected: true, Theme: Theme.Dark });
+    }
+
+    /// <summary>
+    /// Список зон отбирается по набранным буквам, а первой строкой всегда стоит
+    /// возврат к системному поясу — иначе после ручного выбора вернуться нечем.
+    /// </summary>
+    [Fact]
+    public async Task Список_зон_отбирается_по_буквам()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        TimeZoneViewModel model = new(
+            database.Resolve<ISettingsSummaryQuery>(),
+            database.Resolve<IChangeTimeZoneHandler>(),
+            database.Resolve<IClock>(),
+            database.Resolve<IChangeNotifier>());
+
+        await model.LoadAsync();
+
+        Assert.True(model.Zones.Count > 1);
+        Assert.Null(model.Zones[0].Id);
+        Assert.True(model.Zones[0].IsSelected);
+
+        // Зона берётся из самого списка, а не пишется в тесте: идентификаторы
+        // зон задаёт система, и на рабочей машине они не такие, как на устройстве
+        string some = model.Zones[1].Id!;
+
+        model.Filter = some;
+
+        Assert.Equal(some, model.Zones[1].Id);
+        Assert.All(model.Zones.Skip(1), zone => Assert.Contains(some, zone.Id!, StringComparison.Ordinal));
+
+        await model.SelectAsync(model.Zones[1]);
+
+        Assert.False(model.IsFromSystem);
+        Assert.False(model.Zones[0].IsSelected);
+        Assert.True(model.Zones[1].IsSelected);
+
+        model.Filter = "Атлантида";
+
+        Assert.True(model.IsFilteredOut);
+    }
+}

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран D-09: «О программе». Версия приложения и номер схемы базы — по ним
+    сверяют, накатилась ли миграция после обновления. Здесь же лицензия набора
+    значков: он поставляется в составе приложения.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.AboutPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:about="clr-namespace:Finance.Application.Features.Settings.About;assembly=Finance.Application"
+    x:DataType="about:AboutViewModel"
+    Title="О программе">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12" Spacing="16">
+
+            <Label Text="Личный трекер финансов" Style="{StaticResource TotalLabel}" />
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout>
+                    <Grid Padding="14,12" ColumnDefinitions="*,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Label Grid.Column="0" Text="Версия" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{Binding Version}" VerticalOptions="Center"
+                               Style="{StaticResource SecondaryLabel}" />
+                    </Grid>
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Grid Padding="14,12" ColumnDefinitions="*,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Label Grid.Column="0" Text="Схема базы" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{Binding Schema}" VerticalOptions="Center"
+                               Style="{StaticResource SecondaryLabel}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="Данные хранятся на этом устройстве и никуда не передаются."
+                   Style="{StaticResource SecondaryLabel}" />
+
+            <Label Text="Значки — Tabler Icons, лицензия MIT."
+                   Style="{StaticResource SecondaryLabel}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</pages:DataPage>

@@ -33,4 +33,13 @@ public partial class MorePage : DataPage
 
     private async void OnCategories(object? sender, TappedEventArgs e) =>
         await Shell.Current.GoToAsync(Routes.Categories);
+
+    private async void OnAppearance(object? sender, TappedEventArgs e) =>
+        await Shell.Current.GoToAsync(Routes.Appearance);
+
+    private async void OnTimeZone(object? sender, TappedEventArgs e) =>
+        await Shell.Current.GoToAsync(Routes.TimeZone);
+
+    private async void OnAbout(object? sender, TappedEventArgs e) =>
+        await Shell.Current.GoToAsync(Routes.About);
 }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран D-06: выбор темы. Три состояния, а не переключатель: вернуться
+    к системной теме после ручного выбора иначе невозможно. Выбранное
+    применяется сразу — подтверждением служит сам перекрасившийся экран.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.AppearancePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:appearance="clr-namespace:Finance.Application.Features.Settings.Appearance;assembly=Finance.Application"
+    x:DataType="appearance:AppearanceViewModel"
+    Title="Оформление">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12" Spacing="16">
+
+            <Label Text="Тема" Style="{StaticResource SectionLabel}" />
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Options}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="appearance:ThemeOption">
+                            <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
+                                  MinimumHeightRequest="{StaticResource TouchTarget}">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnThemeTapped" />
+                                </Grid.GestureRecognizers>
+
+                                <controls:Icon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Margin="0,0,12,0"
+                                               Key="{Binding Icon}" />
+
+                                <Label Grid.Column="1" Grid.Row="0" Text="{Binding Caption}" />
+                                <Label Grid.Column="1" Grid.Row="1" Text="{Binding Hint}"
+                                       IsVisible="{Binding HasHint}"
+                                       Style="{StaticResource SecondaryLabel}" />
+
+                                <controls:Icon Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Key="check"
+                                               IsVisible="{Binding IsSelected}"
+                                               Style="{StaticResource AccentIcon}" />
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="Настройка хранится только на этом устройстве и никуда не передаётся"
+                   Style="{StaticResource SecondaryLabel}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</pages:DataPage>

@@ -7,6 +7,9 @@ using Finance.Application.Features.Places.Card;
 using Finance.Application.Features.Places.Catalog;
 using Finance.Application.Features.Feed;
 using Finance.Application.Features.More;
+using Finance.Application.Features.Settings.About;
+using Finance.Application.Features.Settings.Appearance;
+using Finance.Application.Features.Settings.TimeZones;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Initialization;
@@ -33,10 +36,19 @@ public static class FinanceServices
     /// а экраны по их итогу правят привязанные коллекции — платформа обязана
     /// вернуть это в свой поток. Пусто — оповещение приходит на месте, так работают тесты.
     /// </param>
+    /// <param name="applyTheme">
+    /// Как платформа переключает оформление. Прикладной слой знает только выбранную
+    /// тему; что такое тёмное оформление окна, знает MAUI. Пусто — применять нечем.
+    /// </param>
+    /// <param name="applicationVersion">
+    /// Версия приложения из манифеста для экрана «О программе». Её знает только платформа.
+    /// </param>
     public static IServiceCollection AddFinance(
         this IServiceCollection services,
         string databasePath,
-        Action<Action>? dispatchToInterface = null)
+        Action<Action>? dispatchToInterface = null,
+        Action<Theme>? applyTheme = null,
+        string? applicationVersion = null)
     {
         ArgumentNullException.ThrowIfNull(services);
 
@@ -44,6 +56,8 @@ public static class FinanceServices
 
         services.AddSingleton(location);
         services.AddSingleton(IconCatalog.Embedded());
+        services.AddSingleton(new AboutInfo(applicationVersion));
+        services.AddSingleton(new ThemeApplier(applyTheme, dispatchToInterface));
 
         // Часы регистрируются одним объектом под двумя именами: настройки меняют
         // зону через SystemClock, а читают время все остальные через IClock
@@ -72,6 +86,9 @@ public static class FinanceServices
     private static void AddFeatures(IServiceCollection services)
     {
         services.AddSingleton<IAccountsQuery, AccountsQuery>();
+        services.AddSingleton<ISettingsSummaryQuery, SettingsSummaryQuery>();
+        services.AddSingleton<IChangeThemeHandler, ChangeThemeHandler>();
+        services.AddSingleton<IChangeTimeZoneHandler, ChangeTimeZoneHandler>();
         services.AddSingleton<IPlacesQuery, PlacesQuery>();
         services.AddSingleton<IRenamePlaceHandler, RenamePlaceHandler>();
         services.AddSingleton<IDeletePlaceHandler, DeletePlaceHandler>();
@@ -101,5 +118,8 @@ public static class FinanceServices
         services.AddTransient<GroupViewModel>();
         services.AddTransient<SubcategoryViewModel>();
         services.AddTransient<MoreViewModel>();
+        services.AddTransient<AppearanceViewModel>();
+        services.AddTransient<TimeZoneViewModel>();
+        services.AddTransient<AboutViewModel>();
     }
 }

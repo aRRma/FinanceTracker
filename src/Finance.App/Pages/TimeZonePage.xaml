@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран D-08: часовой пояс. Зон в системе сотни, поэтому список отбирается
+    по набранным буквам. Первой строкой — возврат к системному поясу: после
+    ручного выбора вернуться к нему иначе нечем.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.TimeZonePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:zones="clr-namespace:Finance.Application.Features.Settings.TimeZones;assembly=Finance.Application"
+    x:DataType="zones:TimeZoneViewModel"
+    Title="Часовой пояс">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <SearchBar Grid.Row="0" Text="{Binding Filter}" Placeholder="Поиск по названию зоны" />
+
+        <Label Grid.Row="1" Padding="16,8"
+               Text="Пояс решает, какой день считается сегодняшним. Сами операции он не меняет."
+               Style="{StaticResource SecondaryLabel}" />
+
+        <Label Grid.Row="2" Padding="16,24" IsVisible="{Binding IsFilteredOut}"
+               Text="Ни одна зона не подходит под набранные буквы."
+               Style="{StaticResource SecondaryLabel}" />
+
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Zones}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="zones:TimeZoneOption">
+                    <Grid Padding="16,10" ColumnDefinitions="*,Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnZoneTapped" />
+                        </Grid.GestureRecognizers>
+
+                        <Label Grid.Column="0" Text="{Binding Caption}" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Margin="8,0" Text="{Binding Offset}" VerticalOptions="Center"
+                               Style="{StaticResource SecondaryLabel}" />
+                        <controls:Icon Grid.Column="2" Key="check" IsVisible="{Binding IsSelected}"
+                                       Style="{StaticResource AccentIcon}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+
+</pages:DataPage>
