@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран E-03: операции подкатегории за месяц. Те же строки, что в ленте,
+    но отобранные по подкатегории и месяцу, без шапок дней. Строка открывает
+    ту же карточку операции: отчёт — другой разрез тех же данных, а не их копия.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.ReportSubcategoryPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:report="clr-namespace:Finance.Application.Features.Report;assembly=Finance.Application"
+    x:DataType="report:ReportSubcategoryViewModel"
+    Title="{Binding Name}">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <Label Grid.Row="0" Padding="16,12,16,0" Text="{Binding Caption}"
+               Style="{StaticResource SecondaryLabel}" />
+
+        <Label Grid.Row="1" Padding="16,4,16,8" Text="{Binding Total}" HorizontalTextAlignment="End"
+               IsVisible="{Binding HasItems}" Style="{StaticResource TotalLabel}" />
+
+        <VerticalStackLayout Grid.Row="2" IsVisible="{Binding IsEmpty}" Padding="32" Spacing="12"
+                             VerticalOptions="Center" HorizontalOptions="Center">
+            <Label Text="В этом месяце операций нет" HorizontalTextAlignment="Center"
+                   Style="{StaticResource TotalLabel}" />
+            <Label Text="Они переехали или удалены. Вернитесь к отчёту."
+                   HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Rows}" IsVisible="{Binding HasItems}"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="report:ReportTransactionItem">
+                    <Grid Padding="16,10" ColumnDefinitions="*,Auto" ColumnSpacing="12" RowDefinitions="Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRowTapped" />
+                        </Grid.GestureRecognizers>
+
+                        <Label Grid.Column="0" Grid.Row="0" Text="{Binding Title}" />
+                        <Label Grid.Column="0" Grid.Row="1" Text="{Binding Caption}"
+                               Style="{StaticResource SecondaryLabel}" />
+                        <Label Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Amount}"
+                               VerticalOptions="Center">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsPositive}" Value="True">
+                                    <Setter Property="Style" Value="{StaticResource PositiveLabel}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.Footer>
+                <Label Padding="16,12,16,24"
+                       Text="Строка открывает ту же карточку операции, что и лента."
+                       Style="{StaticResource CaptionLabel}" />
+            </CollectionView.Footer>
+        </CollectionView>
+
+    </Grid>
+
+</pages:DataPage>

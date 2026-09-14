@@ -57,6 +57,65 @@ public sealed class ReportQuery : IReportQuery
         return ToTotals(buckets);
     }
 
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ReportTransaction>> ReadTransactionsAsync(
+        Guid subcategoryKey,
+        ReportMonth month,
+        CancellationToken cancellationToken = default)
+    {
+        await using FinanceDbContext context = await _contexts
+            .CreateDbContextAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        List<Line> lines = await Transactions(context, subcategoryKey, month)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        List<ReportTransaction> items = new(lines.Count);
+
+        foreach (Line line in lines)
+        {
+            // Знак приписывается здесь: в базе суммы всегда положительны
+            decimal signed = line.Kind is TransactionKind.Income ? line.Amount : -line.Amount;
+
+            items.Add(new ReportTransaction
+            {
+                Key = line.Key,
+                OccurredOn = line.OccurredOn,
+                Amount = Money.Restore(signed, Currency.RUB),
+                AccountName = line.AccountName,
+                Place = line.Place,
+                Note = line.Note
+            });
+        }
+
+        return items;
+    }
+
+    /// <summary>
+    /// Операции подкатегории за месяц. Порядок тот же, что в ленте: дата, момент
+    /// записи, ключ — иначе две операции одного дня менялись бы местами между заходами.
+    /// Соединение с местом левое: место могло быть удалено из справочника,
+    /// и такая операция показывается как операция без места. Открыт тестам — сверяется план.
+    /// </summary>
+    internal static IQueryable<Line> Transactions(FinanceDbContext context, Guid subcategoryKey, ReportMonth month) =>
+        from row in Counted(context, month)
+        where row.CategoryKey == subcategoryKey
+        join account in context.Accounts.AsNoTracking() on row.SourceAccountKey equals account.Key
+        join place in context.Places.AsNoTracking() on row.PlaceKey equals place.Key into places
+        from place in places.DefaultIfEmpty()
+        orderby row.OccurredOn descending, row.CreatedAtUtc descending, row.Key descending
+        select new Line
+        {
+            Key = row.Key,
+            Kind = row.Kind,
+            OccurredOn = row.OccurredOn,
+            Amount = row.Amount,
+            AccountName = account.Name,
+            Place = place != null ? place.Name : null,
+            Note = row.Note
+        };
+
     /// <summary>
     /// Суммы по подкатегориям одной группы за месяц. Соединение с группой остаётся:
     /// у подкатегории нет своего вида, и нужен флаг «вне отчётов» самой группы.
@@ -141,6 +200,24 @@ public sealed class ReportQuery : IReportQuery
         }
 
         return totals;
+    }
+
+    /// <summary>Что база отдаёт на операцию третьего уровня.</summary>
+    internal sealed class Line
+    {
+        public required Guid Key { get; init; }
+
+        public required TransactionKind Kind { get; init; }
+
+        public required DateOnly OccurredOn { get; init; }
+
+        public required decimal Amount { get; init; }
+
+        public required string AccountName { get; init; }
+
+        public string? Place { get; init; }
+
+        public string? Note { get; init; }
     }
 
     /// <summary>Что база отдаёт на строку уровня. Сумма — голый <c>decimal</c>: <c>Money</c> в SQL не собрать.</summary>

@@ -349,6 +349,76 @@ public sealed partial class ReportTests
         Assert.False(model.IsEmpty);
     }
 
+    /// <summary>Строки не сгруппированы по дням; порядок — дата, момент записи, ключ; валютная операция отсутствует.</summary>
+    [Fact]
+    public async Task Третий_уровень_идёт_плоским_списком_от_новых_к_старым()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 10_000m);
+        Guid euro = await given.AccountAsync("Карта евро", 1_000m, Currency.EUR);
+        DateOnly today = given.Today;
+
+        Guid old = await given.SaveAsync(given.Expense(card, 1m, on: today.AddDays(-2), place: "Самокат"));
+        Guid first = await given.SaveAsync(given.Expense(card, 2m, on: today));
+        Guid second = await given.SaveAsync(given.Expense(card, 3m, on: today));
+        await given.SaveAsync(given.Expense(euro, 4m, on: today));
+
+        IReadOnlyList<ReportTransaction> items = await given.Database.Resolve<IReportQuery>()
+            .ReadTransactionsAsync(given.ExpenseCategory, ReportMonth.Of(today));
+
+        Assert.Equal([second, first, old], items.Select(item => item.Key));
+        Assert.Equal("Самокат", items[^1].Place);
+        Assert.Equal(Money.Restore(-1m, Currency.RUB), items[^1].Amount);
+        Assert.Equal("Карта", items[^1].AccountName);
+    }
+
+    /// <summary>Шапка несёт склонённое число операций и итог со знаком; строка — ключ операции для карточки.</summary>
+    [Fact]
+    public async Task Шапка_третьего_уровня_считает_операции_и_сумму()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 10_000m);
+
+        Guid saved = await given.SaveAsync(given.Expense(card, 890m, place: "Самокат"));
+        await given.SaveAsync(given.Expense(card, 1_140m));
+
+        ReportSubcategoryViewModel model = new(
+            given.Database.Resolve<IReportQuery>(),
+            given.Database.Resolve<ICategoriesQuery>(),
+            given.Database.Resolve<IChangeNotifier>());
+
+        await model.LoadAsync(given.ExpenseCategory, ReportMonth.Of(given.Today));
+
+        Assert.False(string.IsNullOrEmpty(model.Name));
+        Assert.EndsWith("· 2 операции", model.Caption, StringComparison.Ordinal);
+        Assert.Equal(Money.Restore(-2_030m, Currency.RUB).DisplaySigned, model.Total);
+        Assert.Equal(2, model.Rows.Count);
+
+        ReportTransactionItem row = model.Rows.Single(item => item.Key == saved);
+
+        Assert.Equal("Самокат", row.Title);
+        Assert.EndsWith("· Карта", row.Caption, StringComparison.Ordinal);
+
+        // Без места заголовком идёт сама подкатегория
+        Assert.Equal(model.Name, model.Rows.Single(item => item.Key != saved).Title);
+    }
+
+    /// <summary>Третий уровень идёт по индексу подкатегории — тому, что заведён под отчёт.</summary>
+    [Fact]
+    public async Task Операции_подкатегории_идут_по_своему_индексу()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+        await using FinanceDbContext context = await given.Database.Contexts.CreateDbContextAsync();
+
+        string plan = await QueryPlan.ExplainAsync(
+            given.Database,
+            ReportQuery.Transactions(context, given.ExpenseCategory, ReportMonth.Of(given.Today)));
+
+        Assert.Contains("ix_transactions_category_occurred_on", plan, StringComparison.Ordinal);
+    }
+
     /// <summary>Сложение, уехавшее в память, на маленьких данных ничем себя не выдаст — сверяется сам SQL.</summary>
     [Fact]
     public async Task Суммы_месяца_считает_база()
@@ -433,6 +503,13 @@ public sealed partial class ReportTests
             Reads++;
 
             return inner.ReadSubcategoriesAsync(groupKey, month, cancellationToken);
+        }
+
+        public Task<IReadOnlyList<ReportTransaction>> ReadTransactionsAsync(Guid subcategoryKey, ReportMonth month, CancellationToken cancellationToken = default)
+        {
+            Reads++;
+
+            return inner.ReadTransactionsAsync(subcategoryKey, month, cancellationToken);
         }
     }
 }
