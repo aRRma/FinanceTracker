@@ -33,8 +33,12 @@ public static class Routes
     /// </summary>
     public const string Subcategory = "categories/subcategory";
 
-    /// <summary>Лента одного счёта. Параметр <c>key</c> — ключ счёта.</summary>
-    public const string AccountFeed = "feed/account";
+    /// <summary>
+    /// Лента одного счёта. Параметр <c>key</c> — ключ счёта.
+    /// Первый сегмент не совпадает с маршрутом вкладки намеренно: Shell принял бы
+    /// такой переход за переход на саму вкладку и бросил бы исключение.
+    /// </summary>
+    public const string AccountFeed = "accounts/feed";
 
     /// <summary>
     /// Форма операции: запись и правка. Параметр <c>key</c> — ключ правимой операции,

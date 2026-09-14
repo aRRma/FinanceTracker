@@ -54,10 +54,14 @@ public sealed partial class AccountViewModel : ObservableObject
     private static readonly Currency[] CurrencyOrder = [Currency.RUB, Currency.USD, Currency.EUR];
 
     /// <summary>Подписи типов счёта для списка выбора.</summary>
-    public static IReadOnlyList<string> TypeNames { get; } = ["Карта", "Наличные"];
+    public IReadOnlyList<string> TypeNames => TypeCaptions;
+
+    private static readonly string[] TypeCaptions = ["Карта", "Наличные"];
 
     /// <summary>Подписи валют для списка выбора.</summary>
-    public static IReadOnlyList<string> CurrencyNames { get; } = ["Рубль ₽", "Доллар $", "Евро €"];
+    public IReadOnlyList<string> CurrencyNames => CurrencyCaptions;
+
+    private static readonly string[] CurrencyCaptions = ["Рубль ₽", "Доллар $", "Евро €"];
 
     /// <summary>Выбранный тип счёта — номером в списке: список показывает подписи, а не имена членов.</summary>
     public int TypeIndex

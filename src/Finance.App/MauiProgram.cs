@@ -1,8 +1,10 @@
+using Finance.App.Controls;
 using Finance.App.Pages;
 using Finance.Application;
 using Finance.Application.Infrastructure.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Handlers;
 
 namespace Finance.App;
 
@@ -19,6 +21,9 @@ public static class MauiProgram
 
         builder
             .UseMauiApp<App>()
+            // Фигуру своего типа MAUI не находит: обработчики фигур записаны
+            // поимённо, и без этой строки любой экран со значком падает при открытии
+            .ConfigureMauiHandlers(handlers => handlers.AddHandler<Icon, ShapeViewHandler>())
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
