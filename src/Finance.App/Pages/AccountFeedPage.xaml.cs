@@ -30,6 +30,6 @@ public partial class AccountFeedPage : DataPage
     protected override Task LoadAsync() =>
         Guid.TryParse(Key, out Guid key) ? _model.LoadAsync(key) : Task.CompletedTask;
 
-    private async void OnAdd(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync($"{Routes.Transaction}?account={Key}");
+    private void OnAdd(object? sender, EventArgs e) =>
+        Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Transaction}?account={Key}"));
 }

@@ -25,11 +25,11 @@ public partial class AppearancePage : DataPage
     /// <inheritdoc />
     protected override Task LoadAsync() => _model.LoadAsync();
 
-    private async void OnThemeTapped(object? sender, TappedEventArgs e)
+    private void OnThemeTapped(object? sender, TappedEventArgs e)
     {
         if (sender is BindableObject { BindingContext: ThemeOption option })
         {
-            await _model.SelectAsync(option.Theme);
+            Guarded.Run(() => _model.SelectAsync(option.Theme));
         }
     }
 }

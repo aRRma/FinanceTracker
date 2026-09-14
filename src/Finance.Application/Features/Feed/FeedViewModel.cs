@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -213,5 +213,5 @@ public sealed partial class FeedViewModel : ScreenViewModel
         DataChange.Transactions | DataChange.Accounts | DataChange.Categories | DataChange.Places;
 
     /// <inheritdoc />
-    protected override void Reload() => _ = LoadAsync(AccountKey);
+    protected override Task ReloadAsync() => LoadAsync(AccountKey);
 }

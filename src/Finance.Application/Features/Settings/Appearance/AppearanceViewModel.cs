@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
@@ -94,5 +94,5 @@ public sealed partial class AppearanceViewModel : ScreenViewModel
     protected override DataChange Watched => DataChange.Settings;
 
     /// <inheritdoc />
-    protected override void Reload() => LoadCommand.Execute(null);
+    protected override Task ReloadAsync() => LoadAsync();
 }

@@ -21,11 +21,14 @@ public abstract class ScreenViewModel : ObservableObject, IScreenModel
         _changes = changes;
     }
 
+    /// <inheritdoc />
+    public event Action<Exception>? ReloadFailed;
+
     /// <summary>Какие изменения устаревают этот экран.</summary>
     protected abstract DataChange Watched { get; }
 
     /// <summary>Перечитывает экран после изменения.</summary>
-    protected abstract void Reload();
+    protected abstract Task ReloadAsync();
 
     /// <inheritdoc />
     public void Activate()
@@ -41,11 +44,29 @@ public abstract class ScreenViewModel : ObservableObject, IScreenModel
     /// <inheritdoc />
     public void Deactivate() => _changes.Changed -= OnChanged;
 
-    private void OnChanged(DataChange change)
+    /// <summary>
+    /// Метод async void: подписчик события иначе не бывает. Перехват поэтому
+    /// обязателен — без него сбой чтения не всплыл бы к вызывающему, а уронил
+    /// бы процесс, и приложение закрылось бы на чужой правке данных.
+    /// </summary>
+    private async void OnChanged(DataChange change)
     {
-        if ((change & Watched) is not DataChange.None)
+        if ((change & Watched) is DataChange.None)
         {
-            Reload();
+            return;
+        }
+
+        try
+        {
+            // ConfigureAwait(false) здесь недопустим: перечитывание наполняет
+            // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
+            await ReloadAsync();
+        }
+        catch (Exception error) when (error is not OperationCanceledException)
+        {
+            // Молча оставить устаревший экран нельзя: пользователь увидел бы
+            // прежние числа и принял бы их за нынешние
+            ReloadFailed?.Invoke(error);
         }
     }
 }

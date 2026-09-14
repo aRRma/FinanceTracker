@@ -55,7 +55,9 @@ public partial class TransactionPage : DataPage
 
     private void OnTextUnfocused(object? sender, FocusEventArgs e) => _model.AreKeysVisible = true;
 
-    private async void OnSave(object? sender, EventArgs e)
+    private void OnSave(object? sender, EventArgs e) => Guarded.Run(SaveAsync);
+
+    private async Task SaveAsync()
     {
         if (await _model.SaveAsync())
         {
@@ -98,11 +100,13 @@ public partial class TransactionPage : DataPage
         _ = Form.ScrollToAsync(ErrorCard, ScrollToPosition.End, animated: true);
     }
 
+    private void OnDelete(object? sender, EventArgs e) => Guarded.Run(DeleteAsync);
+
     /// <summary>
     /// Подтверждение обязательно: отмены и корзины нет, и диалог — единственная
     /// защита. Он называет последствие — каким станет баланс.
     /// </summary>
-    private async void OnDelete(object? sender, EventArgs e)
+    private async Task DeleteAsync()
     {
         string consequence = await _model.DeletePromptAsync();
 

@@ -26,11 +26,11 @@ public partial class PlacesPage : DataPage
     /// <inheritdoc />
     protected override Task LoadAsync() => _model.LoadAsync();
 
-    private async void OnPlaceTapped(object? sender, TappedEventArgs e)
+    private void OnPlaceTapped(object? sender, TappedEventArgs e)
     {
         if (sender is BindableObject { BindingContext: PlaceListItem place })
         {
-            await Shell.Current.GoToAsync($"{Routes.Place}?key={place.Key}");
+            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Place}?key={place.Key}"));
         }
     }
 }

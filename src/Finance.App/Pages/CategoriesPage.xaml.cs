@@ -25,24 +25,24 @@ public partial class CategoriesPage : DataPage
     /// <inheritdoc />
     protected override Task LoadAsync() => _model.LoadAsync();
 
-    private async void OnCreateGroup(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync(Routes.Group);
+    private void OnCreateGroup(object? sender, EventArgs e) =>
+        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Group));
 
-    private async void OnGroupTapped(object? sender, TappedEventArgs e)
+    private void OnGroupTapped(object? sender, TappedEventArgs e)
     {
         if (sender is BindableObject { BindingContext: CategoryGroupItem group })
         {
-            await Shell.Current.GoToAsync($"{Routes.Group}?key={group.Key}");
+            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Group}?key={group.Key}"));
         }
     }
 
     // «Прочее» и служебная не открываются: переносить и удалять их нельзя,
     // а карточка без единого доступного действия сбивает с толку
-    private async void OnSubcategoryTapped(object? sender, TappedEventArgs e)
+    private void OnSubcategoryTapped(object? sender, TappedEventArgs e)
     {
         if (sender is BindableObject { BindingContext: CategoryRowItem { IsEditable: true } subcategory })
         {
-            await Shell.Current.GoToAsync($"{Routes.Subcategory}?key={subcategory.Key}");
+            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Subcategory}?key={subcategory.Key}"));
         }
     }
 }

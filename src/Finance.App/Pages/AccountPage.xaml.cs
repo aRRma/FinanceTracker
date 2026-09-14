@@ -33,7 +33,9 @@ public partial class AccountPage : DataPage
     protected override Task LoadAsync() =>
         _model.LoadAsync(Guid.TryParse(Key, out Guid key) ? key : null);
 
-    private async void OnSave(object? sender, EventArgs e)
+    private void OnSave(object? sender, EventArgs e) => Guarded.Run(SaveAsync);
+
+    private async Task SaveAsync()
     {
         if (await _model.SaveAsync())
         {

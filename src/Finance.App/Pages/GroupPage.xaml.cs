@@ -42,23 +42,25 @@ public partial class GroupPage : DataPage
         }
     }
 
-    private async void OnSubcategoryTapped(object? sender, TappedEventArgs e)
+    private void OnSubcategoryTapped(object? sender, TappedEventArgs e)
     {
         if (sender is BindableObject { BindingContext: CategoryRowItem { IsEditable: true } subcategory })
         {
-            await Shell.Current.GoToAsync($"{Routes.Subcategory}?key={subcategory.Key}");
+            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Subcategory}?key={subcategory.Key}"));
         }
     }
 
-    private async void OnAddSubcategory(object? sender, EventArgs e)
+    private void OnAddSubcategory(object? sender, EventArgs e)
     {
         if (_model.Key is { } group)
         {
-            await Shell.Current.GoToAsync($"{Routes.Subcategory}?group={group}");
+            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Subcategory}?group={group}"));
         }
     }
 
-    private async void OnSave(object? sender, EventArgs e)
+    private void OnSave(object? sender, EventArgs e) => Guarded.Run(SaveAsync);
+
+    private async Task SaveAsync()
     {
         if (await _model.SaveAsync())
         {

@@ -1,4 +1,4 @@
-using Finance.Application.Features.More;
+﻿using Finance.Application.Features.More;
 using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
@@ -25,21 +25,21 @@ public partial class MorePage : DataPage
     /// <inheritdoc />
     protected override Task LoadAsync() => _model.LoadAsync();
 
-    private async void OnAccounts(object? sender, TappedEventArgs e) =>
-        await Shell.Current.GoToAsync(Routes.Accounts);
+    private void OnAccounts(object? sender, TappedEventArgs e) =>
+        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Accounts));
 
-    private async void OnPlaces(object? sender, TappedEventArgs e) =>
-        await Shell.Current.GoToAsync(Routes.Places);
+    private void OnPlaces(object? sender, TappedEventArgs e) =>
+        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Places));
 
-    private async void OnCategories(object? sender, TappedEventArgs e) =>
-        await Shell.Current.GoToAsync(Routes.Categories);
+    private void OnCategories(object? sender, TappedEventArgs e) =>
+        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Categories));
 
-    private async void OnAppearance(object? sender, TappedEventArgs e) =>
-        await Shell.Current.GoToAsync(Routes.Appearance);
+    private void OnAppearance(object? sender, TappedEventArgs e) =>
+        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Appearance));
 
-    private async void OnTimeZone(object? sender, TappedEventArgs e) =>
-        await Shell.Current.GoToAsync(Routes.TimeZone);
+    private void OnTimeZone(object? sender, TappedEventArgs e) =>
+        Guarded.Run(() => Shell.Current.GoToAsync(Routes.TimeZone));
 
-    private async void OnAbout(object? sender, TappedEventArgs e) =>
-        await Shell.Current.GoToAsync(Routes.About);
+    private void OnAbout(object? sender, TappedEventArgs e) =>
+        Guarded.Run(() => Shell.Current.GoToAsync(Routes.About));
 }

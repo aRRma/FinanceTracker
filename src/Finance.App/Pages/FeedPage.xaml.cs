@@ -25,6 +25,6 @@ public partial class FeedPage : DataPage
     /// <inheritdoc />
     protected override Task LoadAsync() => _model.LoadAsync(accountKey: null);
 
-    private async void OnAdd(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync(Routes.Transaction);
+    private void OnAdd(object? sender, EventArgs e) =>
+        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Transaction));
 }

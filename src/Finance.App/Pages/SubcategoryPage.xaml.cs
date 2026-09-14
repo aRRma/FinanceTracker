@@ -44,7 +44,9 @@ public partial class SubcategoryPage : DataPage
         }
     }
 
-    private async void OnSave(object? sender, EventArgs e)
+    private void OnSave(object? sender, EventArgs e) => Guarded.Run(SaveAsync);
+
+    private async Task SaveAsync()
     {
         if (await _model.SaveAsync())
         {
@@ -52,9 +54,11 @@ public partial class SubcategoryPage : DataPage
         }
     }
 
+    private void OnDelete(object? sender, EventArgs e) => Guarded.Run(DeleteAsync);
+
     // Подтверждение называет число операций и приёмник: переезд необратим,
     // и подтверждать его вслепую нельзя
-    private async void OnDelete(object? sender, EventArgs e)
+    private async Task DeleteAsync()
     {
         string prompt = await _model.DeletePromptAsync();
 
