@@ -45,6 +45,14 @@ public partial class TransactionPage : DataPage
         }
     }
 
+    /// <summary>
+    /// Буквенная клавиатура системы и клавиатура суммы на экран вместе не влезают,
+    /// поэтому на время набора места и заметки вторая уходит.
+    /// </summary>
+    private void OnTextFocused(object? sender, FocusEventArgs e) => _model.IsKeypadVisible = false;
+
+    private void OnTextUnfocused(object? sender, FocusEventArgs e) => _model.IsKeypadVisible = true;
+
     private async void OnSave(object? sender, EventArgs e)
     {
         if (await _model.SaveAsync())

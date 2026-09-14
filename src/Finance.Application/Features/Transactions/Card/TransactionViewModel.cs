@@ -21,6 +21,10 @@ public sealed partial class TransactionViewModel : ObservableObject
     private static readonly TransactionKind[] KindOrder =
         [TransactionKind.Expense, TransactionKind.Income, TransactionKind.Transfer];
 
+    // Клавиатура набирает запятую, и сумма правимой операции обязана
+    // выглядеть так же: точка в поле появилась бы там, где её нечем стереть и нечем набрать
+    private static readonly NumberFormatInfo CommaSeparator = new() { NumberDecimalSeparator = "," };
+
     private readonly ITransactionFormQuery _form;
     private readonly ITransactionCardQuery _card;
     private readonly ISaveTransactionHandler _save;
@@ -82,6 +86,7 @@ public sealed partial class TransactionViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(IsTransfer))]
     [NotifyPropertyChangedFor(nameof(IsNotTransfer))]
     [NotifyPropertyChangedFor(nameof(SourceLabel))]
+    [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial TransactionKind Kind { get; set; } = TransactionKind.Expense;
 
     /// <summary>Вид номером в переключателе.</summary>
@@ -103,18 +108,58 @@ public sealed partial class TransactionViewModel : ObservableObject
     /// <summary>Сумма, как набрана: выражение из четырёх действий или число.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(AmountPreview))]
+    [NotifyPropertyChangedFor(nameof(AmountDisplay))]
+    [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial string Amount { get; set; } = string.Empty;
 
     /// <summary>Сумма зачисления — у перевода между валютами.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TargetAmountPreview))]
+    [NotifyPropertyChangedFor(nameof(TargetAmountDisplay))]
+    [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial string TargetAmount { get; set; } = string.Empty;
+
+    /// <summary>Какое поле суммы набирается: клавиатура в форме одна на оба.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSourceAmountActive))]
+    [NotifyPropertyChangedFor(nameof(IsTargetAmountActive))]
+    public partial AmountField ActiveAmount { get; private set; } = AmountField.Source;
+
+    /// <summary>
+    /// Клавиатура суммы на виду. Прячется, пока набирают место или заметку:
+    /// там нужна буквенная клавиатура системы, и две сразу на экран не помещаются.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsKeypadVisible { get; set; } = true;
+
+    /// <summary>Набирается сумма списания — её поле подсвечено.</summary>
+    public bool IsSourceAmountActive => ActiveAmount is AmountField.Source;
+
+    /// <summary>Набирается сумма зачисления.</summary>
+    public bool IsTargetAmountActive => ActiveAmount is AmountField.Target;
+
+    /// <summary>Набранное выражение для показа. Пустое поле показывает ноль, а не пустоту.</summary>
+    public string AmountDisplay => Amount.Length is 0 ? "0" : Amount;
+
+    /// <summary>Набранная сумма зачисления для показа.</summary>
+    public string TargetAmountDisplay => TargetAmount.Length is 0 ? "0" : TargetAmount;
 
     /// <summary>Вычисленный итог выражения в валюте счёта списания. Пусто — выражение не закончено.</summary>
     public string AmountPreview => Preview(Amount, SourceAccount?.Currency);
 
     /// <summary>Вычисленный итог суммы зачисления в валюте счёта зачисления.</summary>
     public string TargetAmountPreview => Preview(TargetAmount, TargetAccount?.Currency);
+
+    /// <summary>
+    /// Сохранять есть что: счёт выбран и суммы набраны до конца. Кнопка сохранения
+    /// на клавиатуре гаснет, а не отказывает после нажатия.
+    /// </summary>
+    public bool CanSave =>
+        SourceAccount is not null
+        && AmountExpression.TryEvaluate(Amount, out decimal amount)
+        && amount > 0m
+        && (!NeedsTargetAmount
+            || (AmountExpression.TryEvaluate(TargetAmount, out decimal target) && target > 0m));
 
     /// <summary>Счета, которые форма предлагает: открытые и те, что уже в этой операции.</summary>
     public ObservableCollection<AccountOption> Accounts { get; } = [];
@@ -130,6 +175,7 @@ public sealed partial class TransactionViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(AmountPreview))]
     [NotifyPropertyChangedFor(nameof(NeedsTargetAmount))]
     [NotifyPropertyChangedFor(nameof(EarliestDate))]
+    [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial AccountOption? SourceAccount { get; set; }
 
     /// <summary>Счёт зачисления — у перевода.</summary>
@@ -137,6 +183,7 @@ public sealed partial class TransactionViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(TargetAmountPreview))]
     [NotifyPropertyChangedFor(nameof(NeedsTargetAmount))]
     [NotifyPropertyChangedFor(nameof(EarliestDate))]
+    [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial AccountOption? TargetAccount { get; set; }
 
     /// <summary>Подкатегория — у дохода и расхода.</summary>
@@ -237,8 +284,8 @@ public sealed partial class TransactionViewModel : ObservableObject
             Kind = card.Kind;
             SourceAccount = Find(card.SourceAccountKey);
             TargetAccount = card.TargetAccountKey is { } target ? Find(target) : null;
-            Amount = card.Amount.ToString(CultureInfo.InvariantCulture);
-            TargetAmount = card.TargetAmount?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+            Amount = card.Amount.ToString(CommaSeparator);
+            TargetAmount = card.TargetAmount?.ToString(CommaSeparator) ?? string.Empty;
             Category = Categories.FirstOrDefault(option => option.Key == card.CategoryKey);
             PlaceName = card.PlaceName ?? string.Empty;
             OccurredOn = card.OccurredOn;
@@ -407,6 +454,62 @@ public sealed partial class TransactionViewModel : ObservableObject
         return true;
     }
 
+    /// <summary>Нажата клавиша суммы: цифра, запятая или знак действия.</summary>
+    /// <param name="key">Знак на клавише.</param>
+    /// <exception cref="ArgumentException">Клавиша названа не одним знаком.</exception>
+    [RelayCommand]
+    public void PressKey(string key)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(key);
+
+        if (key.Length is not 1)
+        {
+            throw new ArgumentException("Клавиша суммы называется одним знаком", nameof(key));
+        }
+
+        Edit(expression => AmountInput.Append(expression, key[0]));
+    }
+
+    /// <summary>Стирает последний набранный знак.</summary>
+    [RelayCommand]
+    public void Backspace() => Edit(AmountInput.Backspace);
+
+    /// <summary>Переводит клавиатуру на сумму списания.</summary>
+    [RelayCommand]
+    public void ActivateSourceAmount()
+    {
+        ActiveAmount = AmountField.Source;
+        IsKeypadVisible = true;
+    }
+
+    /// <summary>Переводит клавиатуру на сумму зачисления.</summary>
+    [RelayCommand]
+    public void ActivateTargetAmount()
+    {
+        // Поля зачисления может не быть на экране: перевод между счетами одной
+        // валюты его не показывает, и уводить туда набор не во что
+        if (!NeedsTargetAmount)
+        {
+            return;
+        }
+
+        ActiveAmount = AmountField.Target;
+        IsKeypadVisible = true;
+    }
+
+    /// <summary>Правит то поле суммы, которое набирается сейчас.</summary>
+    private void Edit(Func<string, string> change)
+    {
+        if (ActiveAmount is AmountField.Target && NeedsTargetAmount)
+        {
+            TargetAmount = change(TargetAmount);
+        }
+        else
+        {
+            Amount = change(Amount);
+        }
+    }
+
     /// <summary>Быстрый выбор: сегодня.</summary>
     [RelayCommand]
     public void SetToday() => OccurredOn = _clock.Today;
@@ -442,6 +545,7 @@ public sealed partial class TransactionViewModel : ObservableObject
         {
             TargetAccount = null;
             TargetAmount = string.Empty;
+            ActiveAmount = AmountField.Source;
         }
 
         OnPropertyChanged(nameof(NeedsTargetAmount));
