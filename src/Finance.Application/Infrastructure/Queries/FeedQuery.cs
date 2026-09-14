@@ -158,8 +158,7 @@ public sealed class FeedQuery : IFeedQuery
             .AsNoTracking()
             .Where(row => row.OccurredOn >= earliest && row.OccurredOn <= latest)
             .Join(
-                context.Accounts.AsNoTracking()
-                    .Where(account => account.Currency == Currency.RUB && !account.ExcludedFromTotals),
+                CountedAccounts.Of(context),
                 row => row.SourceAccountKey,
                 account => account.Key,
                 (row, account) => new { row.OccurredOn, row.Kind, row.Amount })
