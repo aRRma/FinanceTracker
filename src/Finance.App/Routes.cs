@@ -42,6 +42,15 @@ public static class Routes
     /// </summary>
     public const string Transaction = "transactions/transaction";
 
+    /// <summary>Выбор темы оформления.</summary>
+    public const string Appearance = "settings/appearance";
+
+    /// <summary>Выбор часового пояса.</summary>
+    public const string TimeZone = "settings/time-zone";
+
+    /// <summary>Версия приложения и номер схемы базы.</summary>
+    public const string About = "settings/about";
+
     /// <summary>Регистрирует маршруты в каркасе навигации.</summary>
     public static void Register()
     {
@@ -54,5 +63,8 @@ public static class Routes
         Routing.RegisterRoute(Subcategory, typeof(SubcategoryPage));
         Routing.RegisterRoute(AccountFeed, typeof(AccountFeedPage));
         Routing.RegisterRoute(Transaction, typeof(TransactionPage));
+        Routing.RegisterRoute(Appearance, typeof(AppearancePage));
+        Routing.RegisterRoute(TimeZone, typeof(TimeZonePage));
+        Routing.RegisterRoute(About, typeof(AboutPage));
     }
 }

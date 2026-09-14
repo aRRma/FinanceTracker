@@ -9,6 +9,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:more="clr-namespace:Finance.Application.Features.More;assembly=Finance.Application"
     x:DataType="more:MoreViewModel"
     Title="Ещё">
@@ -53,6 +54,51 @@
 
                         <Label Grid.Row="0" Text="Категории" VerticalOptions="Center" />
                         <Label Grid.Row="1" Text="{Binding CategoriesCaption}"
+                               Style="{StaticResource SecondaryLabel}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="Настройки" Style="{StaticResource SectionLabel}" />
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout>
+                    <Grid Padding="14,12" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnAppearance" />
+                        </Grid.GestureRecognizers>
+
+                        <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="sun" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="Оформление" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding ThemeCaption}"
+                               Style="{StaticResource SecondaryLabel}" />
+                    </Grid>
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Grid Padding="14,12" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnTimeZone" />
+                        </Grid.GestureRecognizers>
+
+                        <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="world" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="Часовой пояс" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding TimeZoneCaption}"
+                               Style="{StaticResource SecondaryLabel}" />
+                    </Grid>
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Grid Padding="14,12" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnAbout" />
+                        </Grid.GestureRecognizers>
+
+                        <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="info-circle" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="О программе" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding AboutCaption}"
                                Style="{StaticResource SecondaryLabel}" />
                     </Grid>
                 </VerticalStackLayout>

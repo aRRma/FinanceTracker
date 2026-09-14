@@ -15,6 +15,7 @@ public sealed class FinanceStartup
     private readonly DatabaseInitializer _initializer;
     private readonly ILocalSettings _settings;
     private readonly SystemClock _clock;
+    private readonly ThemeApplier _theme;
 
     // Замок, а не голое поле: вкладок четыре, и две могут спросить подготовку
     // одновременно — второй запуск вставил бы стартовый набор поверх первого
@@ -27,21 +28,25 @@ public sealed class FinanceStartup
     /// <param name="initializer">Запись стартового набора при первом запуске.</param>
     /// <param name="settings">Локальные настройки устройства.</param>
     /// <param name="clock">Часы приложения: им задаётся часовой пояс пользователя.</param>
+    /// <param name="theme">Применение выбранной темы оформления.</param>
     public FinanceStartup(
         DatabaseBootstrapper bootstrapper,
         DatabaseInitializer initializer,
         ILocalSettings settings,
-        SystemClock clock)
+        SystemClock clock,
+        ThemeApplier theme)
     {
         ArgumentNullException.ThrowIfNull(bootstrapper);
         ArgumentNullException.ThrowIfNull(initializer);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(clock);
+        ArgumentNullException.ThrowIfNull(theme);
 
         _bootstrapper = bootstrapper;
         _initializer = initializer;
         _settings = settings;
         _clock = clock;
+        _theme = theme;
     }
 
     /// <summary>
@@ -70,12 +75,13 @@ public sealed class FinanceStartup
         }
     }
 
-    /// <summary>Один прогон подготовки: файл базы, стартовый набор, часовой пояс.</summary>
+    /// <summary>Один прогон подготовки: файл базы, стартовый набор, пояс и тема.</summary>
     private async Task RunOnceAsync(CancellationToken cancellationToken)
     {
         await _bootstrapper.InitializeAsync(cancellationToken).ConfigureAwait(false);
         await _initializer.InitializeAsync(cancellationToken).ConfigureAwait(false);
         await ApplyTimeZoneAsync(cancellationToken).ConfigureAwait(false);
+        await ApplyThemeAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -93,5 +99,19 @@ public sealed class FinanceStartup
         {
             _clock.TimeZone = zone;
         }
+    }
+
+    /// <summary>
+    /// Ставит сохранённую тему. Незаданная настройка — системная тема, и
+    /// применить её всё равно надо: платформа помнит выбор прошлого запуска сама,
+    /// и без явного сброса возврат к системной теме не подействовал бы.
+    /// </summary>
+    private async Task ApplyThemeAsync(CancellationToken cancellationToken)
+    {
+        string? saved = await _settings
+            .GetAsync(SettingName.Theme, cancellationToken)
+            .ConfigureAwait(false);
+
+        _theme.Apply(Theme.Parse(saved));
     }
 }

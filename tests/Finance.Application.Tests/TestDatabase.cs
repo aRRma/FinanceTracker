@@ -1,3 +1,4 @@
+using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,13 +29,17 @@ internal sealed class TestDatabase : IAsyncDisposable
     public T Resolve<T>() where T : notnull => _services.GetRequiredService<T>();
 
     /// <summary>Создаёт пустую базу с накатанной схемой.</summary>
-    public static async Task<TestDatabase> CreateAsync()
+    /// <param name="applyTheme">Чем подменяется переключение оформления: платформы в тестах нет.</param>
+    /// <param name="applicationVersion">Версия приложения для экрана «О программе».</param>
+    public static async Task<TestDatabase> CreateAsync(
+        Action<Theme>? applyTheme = null,
+        string? applicationVersion = null)
     {
         string folder = Path.Combine(Path.GetTempPath(), "finance-tests", Guid.CreateVersion7().ToString("N"));
         Directory.CreateDirectory(folder);
 
         ServiceProvider services = new ServiceCollection()
-            .AddFinance(Path.Combine(folder, "finance.db"))
+            .AddFinance(Path.Combine(folder, "finance.db"), applyTheme: applyTheme, applicationVersion: applicationVersion)
             .BuildServiceProvider();
 
         TestDatabase database = new(folder, services);

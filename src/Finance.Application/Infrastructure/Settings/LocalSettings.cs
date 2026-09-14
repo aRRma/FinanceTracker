@@ -60,4 +60,31 @@ public sealed class LocalSettings : ILocalSettings
 
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
+
+    /// <inheritdoc />
+    public async Task RemoveAsync(string name, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+        await using FinanceDbContext context = await _contexts
+            .CreateDbContextAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        SettingRow? row = await context.Settings
+            .FirstOrDefaultAsync(existing => existing.Name == name, cancellationToken)
+            .ConfigureAwait(false);
+
+        // Настройки нет — значит она уже в том состоянии, которого от неё хотят:
+        // отсутствие записи и есть «как в системе»
+        if (row is null)
+        {
+            return;
+        }
+
+        // Физическое удаление, а не мягкое: настройки живут только на этом
+        // устройстве и обмену не подлежат — узнавать об их удалении некому
+        context.Settings.Remove(row);
+
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
 }

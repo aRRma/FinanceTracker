@@ -1,5 +1,6 @@
 using Finance.App.Pages;
 using Finance.Application;
+using Finance.Application.Infrastructure.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -28,7 +29,9 @@ public static class MauiProgram
         // и тестируется без неё и получает путь готовым
         builder.Services.AddFinance(
             Path.Combine(FileSystem.AppDataDirectory, DatabaseFileName),
-            dispatchToInterface: MainThread.BeginInvokeOnMainThread);
+            dispatchToInterface: MainThread.BeginInvokeOnMainThread,
+            applyTheme: ApplyTheme,
+            applicationVersion: AppInfo.Current.VersionString);
 
         AddPages(builder.Services);
 
@@ -38,6 +41,19 @@ public static class MauiProgram
 
         return builder.Build();
     }
+
+    /// <summary>
+    /// Переключает оформление окна. Системная тема ставится явным «не задано»:
+    /// MAUI помнит выбор прошлого запуска, и без сброса возврат к системной
+    /// теме не подействовал бы.
+    /// </summary>
+    private static void ApplyTheme(Theme theme) =>
+        ControlsApplication.Current?.UserAppTheme = theme switch
+        {
+            Theme.Light => AppTheme.Light,
+            Theme.Dark => AppTheme.Dark,
+            _ => AppTheme.Unspecified
+        };
 
     /// <summary>
     /// Страницы берутся из контейнера: иначе модель представления пришлось бы
@@ -58,5 +74,8 @@ public static class MauiProgram
         services.AddTransient<GroupPage>();
         services.AddTransient<SubcategoryPage>();
         services.AddTransient<TransactionPage>();
+        services.AddTransient<AppearancePage>();
+        services.AddTransient<TimeZonePage>();
+        services.AddTransient<AboutPage>();
     }
 }

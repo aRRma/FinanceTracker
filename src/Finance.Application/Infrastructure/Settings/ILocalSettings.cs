@@ -17,4 +17,13 @@ public interface ILocalSettings
     /// <param name="value">Новое значение.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     Task SetAsync(string name, string value, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Убирает настройку. Возврат к системному значению — это именно отсутствие
+    /// записи, а не записанное слово «системный»: система со временем меняется,
+    /// и настройка обязана меняться вместе с ней.
+    /// </summary>
+    /// <param name="name">Имя из <see cref="SettingName"/>.</param>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    Task RemoveAsync(string name, CancellationToken cancellationToken = default);
 }
