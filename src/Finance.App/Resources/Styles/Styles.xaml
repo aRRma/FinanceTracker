@@ -157,6 +157,53 @@
                 Value="{AppThemeBinding Light={StaticResource OnAccentLight}, Dark={StaticResource OnAccentDark}}" />
     </Style>
 
+    <!-- Клавиша суммы. Фон карточки, разделители — просветы сетки цветом линии -->
+    <Style x:Key="KeypadKey" TargetType="Button">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}" />
+        <Setter Property="TextColor"
+                Value="{AppThemeBinding Light={StaticResource InkLight}, Dark={StaticResource InkDark}}" />
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="HeightRequest" Value="54" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <!-- Знак действия: тот же размер клавиши, тон вторичной подписи -->
+    <Style x:Key="KeypadOperator" TargetType="Button" BasedOn="{StaticResource KeypadKey}">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource SunkLight}, Dark={StaticResource SunkDark}}" />
+        <Setter Property="TextColor"
+                Value="{AppThemeBinding Light={StaticResource Ink2Light}, Dark={StaticResource Ink2Dark}}" />
+    </Style>
+
+    <!-- Клавиша со значком вместо подписи: стирание -->
+    <Style x:Key="KeypadCell" TargetType="Border">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="HeightRequest" Value="54" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <!-- Сохранение прямо на клавиатуре: рука уже здесь -->
+    <Style x:Key="KeypadGo" TargetType="Button">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+        <Setter Property="TextColor"
+                Value="{AppThemeBinding Light={StaticResource OnAccentLight}, Dark={StaticResource OnAccentDark}}" />
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="HeightRequest" Value="54" />
+    </Style>
+
+    <!-- Поле суммы: набранное выражение, под ним итог. Набираемое сейчас
+         обводится цветом действия — обводку ставит триггер на самой странице -->
+    <Style x:Key="AmountField" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Setter Property="Padding" Value="14,10" />
+    </Style>
+
     <Style TargetType="Entry">
         <Setter Property="TextColor"
                 Value="{AppThemeBinding Light={StaticResource InkLight}, Dark={StaticResource InkDark}}" />
