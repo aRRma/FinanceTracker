@@ -29,4 +29,13 @@ public interface IReportQuery
     /// <param name="month">Месяц отчёта.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     Task<IReadOnlyList<ReportTransaction>> ReadTransactionsAsync(Guid subcategoryKey, ReportMonth month, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Есть ли за месяц операции, не попавшие в суммы: по счетам в чужой валюте или
+    /// скрытым из расчётов. Пустому отчёту это объясняет, почему он пуст, когда
+    /// операции в ленте видны.
+    /// </summary>
+    /// <param name="month">Месяц отчёта.</param>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    Task<bool> HasUncountedAsync(ReportMonth month, CancellationToken cancellationToken = default);
 }

@@ -1,5 +1,6 @@
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
+using Finance.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Features.Accounts.Card;
@@ -55,6 +56,16 @@ public sealed class AccountCardQuery : IAccountCardQuery
             .EarliestOnAsync(context, key, cancellationToken)
             .ConfigureAwait(false);
 
+        // Движения читаются по всем счетам разом: отдельного запроса на один счёт
+        // нет, а сводка по всем — два запроса по индексам, не полный проход
+        Dictionary<Guid, decimal> movements = await AccountBalances
+            .ReadMovementsAsync(context, cancellationToken)
+            .ConfigureAwait(false);
+
+        Money balance = Money.Restore(
+            account.OpeningBalance + movements.GetValueOrDefault(key),
+            account.Currency);
+
         return new AccountCard
         {
             Key = account.Key,
@@ -65,6 +76,7 @@ public sealed class AccountCardQuery : IAccountCardQuery
             OpenedOn = account.OpenedOn,
             ExcludedFromTotals = account.ExcludedFromTotals,
             IsClosed = account.IsClosed,
+            Balance = balance,
             CurrencyLocked = hasEverHadTransactions,
             EarliestTransactionOn = earliest
         };

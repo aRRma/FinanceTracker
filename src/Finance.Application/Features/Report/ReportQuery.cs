@@ -92,6 +92,31 @@ public sealed class ReportQuery : IReportQuery
         return items;
     }
 
+    /// <inheritdoc />
+    public async Task<bool> HasUncountedAsync(ReportMonth month, CancellationToken cancellationToken = default)
+    {
+        await using FinanceDbContext context = await _contexts
+            .CreateDbContextAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        DateOnly first = month.First;
+        DateOnly last = month.Last;
+
+        // Левое соединение с учитываемыми счетами: операция без пары — как раз та,
+        // что в суммы не вошла
+        return await (
+                from row in context.Transactions.AsNoTracking()
+                where row.Kind != TransactionKind.Transfer
+                      && row.OccurredOn >= first
+                      && row.OccurredOn <= last
+                join account in CountedAccounts.Of(context) on row.SourceAccountKey equals account.Key into counted
+                from account in counted.DefaultIfEmpty()
+                where account == null
+                select row.Key)
+            .AnyAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     /// <summary>
     /// Операции подкатегории за месяц. Порядок тот же, что в ленте: дата, момент
     /// записи, ключ — иначе две операции одного дня менялись бы местами между заходами.

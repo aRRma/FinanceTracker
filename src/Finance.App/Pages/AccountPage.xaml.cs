@@ -38,8 +38,18 @@ public partial class AccountPage : DataPage
 
     private void OnSave(object? sender, EventArgs e) => Guarded.Run(SaveAsync);
 
+    /// <summary>
+    /// Закрытие счёта с деньгами подтверждается отдельно: домен его не запрещает,
+    /// а остаток молча уходит из «доступно к тратам».
+    /// </summary>
     private async Task SaveAsync()
     {
+        if (_model.ClosingWarning is { } warning
+            && !await DisplayAlertAsync("Закрыть счёт?", warning, "Закрыть", "Отмена"))
+        {
+            return;
+        }
+
         if (await _model.SaveAsync())
         {
             await Shell.Current.GoToAsync("..");

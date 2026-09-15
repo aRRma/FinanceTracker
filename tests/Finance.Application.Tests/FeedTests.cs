@@ -57,8 +57,10 @@ public sealed class FeedTests
     }
 
     /// <summary>
-    /// Итог дня общей ленты — в рублях, без скрытых из расчётов счетов и чужих валют;
-    /// перевод входит как расход счёта списания. Строки при этом видны все.
+    /// Итог дня общей ленты — в рублях, без скрытых из расчётов счетов и чужих валют.
+    /// Перевод входит как расход, только если деньги ушли из учитываемых счетов:
+    /// на скрытый счёт или в валюту. Перевод между двумя учитываемыми счетами
+    /// итог не меняет. Строки при этом видны все.
     /// </summary>
     [Fact]
     public async Task Итог_дня_общей_ленты_считается_по_правилам()
@@ -66,19 +68,22 @@ public sealed class FeedTests
         await using TransactionFixture given = await TransactionFixture.CreateAsync();
 
         Guid card = await given.AccountAsync("Карта", 10_000m);
+        Guid cash = await given.AccountAsync("Наличные");
         Guid savings = await given.AccountAsync("Копилка", excluded: true);
         Guid euro = await given.AccountAsync("Карта евро", 100m, Currency.EUR);
 
         await given.SaveAsync(given.Expense(card, 1_250m));
         await given.SaveAsync(given.Income(card, 90_000m));
         await given.SaveAsync(given.Transfer(card, savings, 5_000m));
+        await given.SaveAsync(given.Transfer(card, cash, 3_000m));
+        await given.SaveAsync(given.Transfer(card, euro, 2_000m, targetAmount: 20m));
         await given.SaveAsync(given.Expense(savings, 700m));
         await given.SaveAsync(given.Expense(euro, 48m));
 
         FeedPage page = await given.FeedAsync();
 
-        Assert.Equal(5, page.Items.Count);
-        Assert.Equal(Money.Restore(83_750m, Currency.RUB), page.DayTotals[given.Today]);
+        Assert.Equal(7, page.Items.Count);
+        Assert.Equal(Money.Restore(81_750m, Currency.RUB), page.DayTotals[given.Today]);
     }
 
     /// <summary>Итог дня ленты счёта — в его валюте, обе стороны переводов.</summary>

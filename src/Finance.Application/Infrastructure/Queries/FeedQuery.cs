@@ -144,9 +144,12 @@ public sealed class FeedQuery : IFeedQuery
     }
 
     /// <summary>
-    /// Итог дня общей ленты: в рублях, по счетам без «скрыть из расчётов», перевод —
-    /// как расход счёта списания. Строки по счетам в других валютах в ленте видны,
-    /// а в итог не входят: общей суммы по валютам не существует.
+    /// Итог дня общей ленты: в рублях, по счетам без «скрыть из расчётов». Строки
+    /// по счетам в других валютах в ленте видны, а в итог не входят: общей суммы
+    /// по валютам не существует. Перевод входит как расход счёта списания, только
+    /// если деньги ушли из учитываемых счетов — в валюту или на скрытый счёт.
+    /// Перевод между двумя учитываемыми счетами итог не меняет: деньги остались
+    /// в тех же суммах, просто на другом счёте.
     /// </summary>
     private static async Task<Dictionary<DateOnly, Money>> LedgerDayTotalsAsync(
         FinanceDbContext context,
@@ -154,20 +157,21 @@ public sealed class FeedQuery : IFeedQuery
         DateOnly latest,
         CancellationToken cancellationToken)
     {
-        var totals = await context.Transactions
-            .AsNoTracking()
-            .Where(row => row.OccurredOn >= earliest && row.OccurredOn <= latest)
-            .Join(
-                CountedAccounts.Of(context),
-                row => row.SourceAccountKey,
-                account => account.Key,
-                (row, account) => new { row.OccurredOn, row.Kind, row.Amount })
-            .GroupBy(row => row.OccurredOn)
-            .Select(group => new
-            {
-                Day = group.Key,
-                Total = group.Sum(row => row.Kind == TransactionKind.Income ? row.Amount : -row.Amount)
-            })
+        var totals = await (
+                from row in context.Transactions.AsNoTracking()
+                where row.OccurredOn >= earliest && row.OccurredOn <= latest
+                join source in CountedAccounts.Of(context) on row.SourceAccountKey equals source.Key
+                join target in CountedAccounts.Of(context) on row.TargetAccountKey equals target.Key into targets
+                from target in targets.DefaultIfEmpty()
+                group new { row.Kind, row.Amount, TargetCounted = target != null } by row.OccurredOn into bucket
+                select new
+                {
+                    Day = bucket.Key,
+                    Total = bucket.Sum(item =>
+                        item.Kind == TransactionKind.Income ? item.Amount
+                        : item.Kind == TransactionKind.Transfer && item.TargetCounted ? 0m
+                        : -item.Amount)
+                })
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
