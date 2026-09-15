@@ -22,41 +22,50 @@
             <Label Text="Справочники" Style="{StaticResource SectionLabel}" />
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout>
-                    <Grid Padding="14,12" RowDefinitions="Auto,Auto"
+                    <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
                           MinimumHeightRequest="{StaticResource TouchTarget}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnAccounts" />
                         </Grid.GestureRecognizers>
 
-                        <Label Grid.Row="0" Text="Счета" VerticalOptions="Center" />
-                        <Label Grid.Row="1" Text="{Binding AccountsCaption}"
+                        <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="wallet" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="Счета" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding AccountsCaption}"
                                Style="{StaticResource SecondaryLabel}" />
+                        <controls:Icon Grid.Column="2" Grid.RowSpan="2" Key="chevron-right"
+                                       Style="{StaticResource MutedIcon}" />
                     </Grid>
 
                     <BoxView Style="{StaticResource Divider}" />
 
-                    <Grid Padding="14,12" RowDefinitions="Auto,Auto"
+                    <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
                           MinimumHeightRequest="{StaticResource TouchTarget}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnPlaces" />
                         </Grid.GestureRecognizers>
 
-                        <Label Grid.Row="0" Text="Места" VerticalOptions="Center" />
-                        <Label Grid.Row="1" Text="{Binding PlacesCaption}"
+                        <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="map-pin" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="Места" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding PlacesCaption}"
                                Style="{StaticResource SecondaryLabel}" />
+                        <controls:Icon Grid.Column="2" Grid.RowSpan="2" Key="chevron-right"
+                                       Style="{StaticResource MutedIcon}" />
                     </Grid>
 
                     <BoxView Style="{StaticResource Divider}" />
 
-                    <Grid Padding="14,12" RowDefinitions="Auto,Auto"
+                    <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
                           MinimumHeightRequest="{StaticResource TouchTarget}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnCategories" />
                         </Grid.GestureRecognizers>
 
-                        <Label Grid.Row="0" Text="Категории" VerticalOptions="Center" />
-                        <Label Grid.Row="1" Text="{Binding CategoriesCaption}"
+                        <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="tag" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="Категории" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding CategoriesCaption}"
                                Style="{StaticResource SecondaryLabel}" />
+                        <controls:Icon Grid.Column="2" Grid.RowSpan="2" Key="chevron-right"
+                                       Style="{StaticResource MutedIcon}" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>
@@ -64,7 +73,7 @@
             <Label Text="Настройки" Style="{StaticResource SectionLabel}" />
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout>
-                    <Grid Padding="14,12" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto"
+                    <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
                           MinimumHeightRequest="{StaticResource TouchTarget}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnAppearance" />
@@ -74,11 +83,13 @@
                         <Label Grid.Column="1" Grid.Row="0" Text="Оформление" VerticalOptions="Center" />
                         <Label Grid.Column="1" Grid.Row="1" Text="{Binding ThemeCaption}"
                                Style="{StaticResource SecondaryLabel}" />
+                        <controls:Icon Grid.Column="2" Grid.RowSpan="2" Key="chevron-right"
+                                       Style="{StaticResource MutedIcon}" />
                     </Grid>
 
                     <BoxView Style="{StaticResource Divider}" />
 
-                    <Grid Padding="14,12" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto"
+                    <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
                           MinimumHeightRequest="{StaticResource TouchTarget}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnTimeZone" />
@@ -88,11 +99,13 @@
                         <Label Grid.Column="1" Grid.Row="0" Text="Часовой пояс" VerticalOptions="Center" />
                         <Label Grid.Column="1" Grid.Row="1" Text="{Binding TimeZoneCaption}"
                                Style="{StaticResource SecondaryLabel}" />
+                        <controls:Icon Grid.Column="2" Grid.RowSpan="2" Key="chevron-right"
+                                       Style="{StaticResource MutedIcon}" />
                     </Grid>
 
                     <BoxView Style="{StaticResource Divider}" />
 
-                    <Grid Padding="14,12" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto"
+                    <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
                           MinimumHeightRequest="{StaticResource TouchTarget}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnAbout" />
@@ -102,6 +115,8 @@
                         <Label Grid.Column="1" Grid.Row="0" Text="О программе" VerticalOptions="Center" />
                         <Label Grid.Column="1" Grid.Row="1" Text="{Binding AboutCaption}"
                                Style="{StaticResource SecondaryLabel}" />
+                        <controls:Icon Grid.Column="2" Grid.RowSpan="2" Key="chevron-right"
+                                       Style="{StaticResource MutedIcon}" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>

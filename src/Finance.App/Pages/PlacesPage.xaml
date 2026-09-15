@@ -10,6 +10,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:catalog="clr-namespace:Finance.Application.Features.Places.Catalog;assembly=Finance.Application"
     xmlns:queries="clr-namespace:Finance.Application.Infrastructure.Queries;assembly=Finance.Application"
     x:DataType="catalog:PlacesViewModel"
@@ -25,19 +26,25 @@
             <CollectionView ItemsSource="{Binding Places}" SelectionMode="None">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="queries:PlaceListItem">
-                        <Grid Padding="16,10" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto"
+                        <Grid Padding="16,10" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"
+                              RowDefinitions="Auto,Auto"
                               MinimumHeightRequest="{StaticResource TouchTarget}">
                             <Grid.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnPlaceTapped" />
                             </Grid.GestureRecognizers>
 
-                            <Label Grid.Column="0" Grid.Row="0" Text="{Binding Name}" />
-                            <Label Grid.Column="0" Grid.Row="1" Text="{Binding TopCategoryName}"
+                            <controls:Icon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Key="map-pin" />
+
+                            <Label Grid.Column="1" Grid.Row="0" Text="{Binding Name}" />
+                            <Label Grid.Column="1" Grid.Row="1" Text="{Binding TopCategoryName}"
                                    IsVisible="{Binding HasTopCategory}"
                                    Style="{StaticResource SecondaryLabel}" />
-                            <Label Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
-                                   Text="{Binding TransactionCount}" VerticalOptions="Center"
-                                   Style="{StaticResource SecondaryLabel}" />
+
+                            <!-- Счётчик плашкой: число рядом с названием того же
+                                 начертания читалось бы как часть подписи -->
+                            <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Style="{StaticResource Badge}">
+                                <Label Text="{Binding TransactionCount}" Style="{StaticResource CaptionLabel}" />
+                            </Border>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

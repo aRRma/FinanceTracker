@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Ярлыки долгого нажатия на значке приложения: запись операции нужного вида
+    мимо главного экрана. Самый частый сценарий — расход — этим сокращается
+    на два касания.
+
+    Порядок в меню обратный порядку в файле: система показывает список снизу
+    вверх, и расход стоит последним, чтобы оказаться ближе всего к пальцу.
+
+    Вид передаётся строкой в дополнении к намерению, а не своим действием
+    на каждый вид: разбирает его один обработчик, и добавление вида не потребует
+    ни нового действия, ни правки манифеста.
+-->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:shortcutId="transfer"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_transfer"
+        android:shortcutShortLabel="@string/shortcut_transfer_short"
+        android:shortcutLongLabel="@string/shortcut_transfer_long">
+        <intent
+            android:action="ru.finance.tracker.action.ADD_TRANSACTION"
+            android:targetPackage="ru.finance.tracker"
+            android:targetClass="ru.finance.tracker.MainActivity">
+            <extra android:name="kind" android:value="Transfer" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="income"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_income"
+        android:shortcutShortLabel="@string/shortcut_income_short"
+        android:shortcutLongLabel="@string/shortcut_income_long">
+        <intent
+            android:action="ru.finance.tracker.action.ADD_TRANSACTION"
+            android:targetPackage="ru.finance.tracker"
+            android:targetClass="ru.finance.tracker.MainActivity">
+            <extra android:name="kind" android:value="Income" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="expense"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_expense"
+        android:shortcutShortLabel="@string/shortcut_expense_short"
+        android:shortcutLongLabel="@string/shortcut_expense_long">
+        <intent
+            android:action="ru.finance.tracker.action.ADD_TRANSACTION"
+            android:targetPackage="ru.finance.tracker"
+            android:targetClass="ru.finance.tracker.MainActivity">
+            <extra android:name="kind" android:value="Expense" />
+        </intent>
+    </shortcut>
+
+</shortcuts>

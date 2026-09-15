@@ -30,6 +30,16 @@
         <Setter Property="VerticalOptions" Value="Center" />
     </Style>
 
+    <!--
+        Знак навигации и запрета: шеврон, замок, ручка перетаскивания. Тише
+        значка строки намеренно — он подсказка, а не содержание строки.
+    -->
+    <Style x:Key="MutedIcon" TargetType="controls:Icon">
+        <Setter Property="Stroke"
+                Value="{AppThemeBinding Light={StaticResource Ink3Light}, Dark={StaticResource Ink3Dark}}" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
+
     <Style TargetType="Page" ApplyToDerivedTypes="True">
         <Setter Property="BackgroundColor"
                 Value="{AppThemeBinding Light={StaticResource PaperLight}, Dark={StaticResource PaperDark}}" />
@@ -132,6 +142,20 @@
         <Setter Property="HeightRequest" Value="1" />
         <Setter Property="Color"
                 Value="{AppThemeBinding Light={StaticResource LineLight}, Dark={StaticResource LineDark}}" />
+    </Style>
+
+    <!--
+        Плашка-счётчик: число операций у места, число подкатегорий у группы.
+        Отдельным фоном, а не серым текстом: число рядом с суммой того же
+        размера читается как ещё одна сумма.
+    -->
+    <Style x:Key="Badge" TargetType="Border">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource SunkLight}, Dark={StaticResource SunkDark}}" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 9" />
+        <Setter Property="Padding" Value="8,2" />
+        <Setter Property="VerticalOptions" Value="Center" />
     </Style>
 
     <Style TargetType="Button">
@@ -284,6 +308,132 @@
         <Setter Property="BackgroundColor"
                 Value="{AppThemeBinding Light={StaticResource SunkLight}, Dark={StaticResource SunkDark}}" />
     </Style>
+
+    <!--
+        Вид операции и вид категории выбираются сегментами во всю ширину, как в
+        макетах. Встроенный шаблон MAUI рисует кружок на плашке со своим фоном,
+        мимо токенов темы: она остаётся белой и в тёмной теме. Шаблон общий —
+        радиокнопок другого вида в приложении нет.
+    -->
+    <ControlTemplate x:Key="SegmentTemplate">
+        <Border x:Name="Plate" BackgroundColor="Transparent" StrokeThickness="0"
+                StrokeShape="RoundRectangle 8" Padding="0,8"
+                MinimumHeightRequest="{StaticResource TouchTarget}">
+            <Label x:Name="Caption" Text="{TemplateBinding Content}"
+                   HorizontalTextAlignment="Center" VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource Ink2Light}, Dark={StaticResource Ink2Dark}}" />
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CheckedStates">
+                        <VisualState x:Name="Checked">
+                            <VisualState.Setters>
+                                <Setter TargetName="Plate" Property="Border.BackgroundColor"
+                                        Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}" />
+                                <!-- В тёмной теме подпись основным текстом, а не цветом
+                                     действия: акцент на своём фоне даёт контраст 3,9
+                                     при пороге 4,5 (ContrastTests). Выбранный сегмент
+                                     и так виден плашкой -->
+                                <Setter TargetName="Caption" Property="Label.TextColor"
+                                        Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource InkDark}}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Unchecked" />
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </VisualStateManager.VisualStateGroups>
+        </Border>
+    </ControlTemplate>
+
+    <Style TargetType="RadioButton">
+        <Setter Property="ControlTemplate" Value="{StaticResource SegmentTemplate}" />
+        <Setter Property="HorizontalOptions" Value="Fill" />
+    </Style>
+
+    <!--
+        Вид операции подписан своим цветом и своим знаком: три одинаково серых
+        слова читаются как подпись, а не как выбор, и расход от дохода глазом
+        не отличить. Шаблонов три, а не один с параметрами: цвет плашки живёт
+        в сеттере состояния, а тот принимает только готовое значение.
+    -->
+    <ControlTemplate x:Key="ExpenseSegmentTemplate">
+        <Border x:Name="Plate" BackgroundColor="Transparent" StrokeThickness="0"
+                StrokeShape="RoundRectangle 8" Padding="0,8"
+                MinimumHeightRequest="{StaticResource TouchTarget}">
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                <controls:Icon Key="arrow-down-left"
+                               Stroke="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+                <Label x:Name="Caption" Text="{TemplateBinding Content}" VerticalOptions="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+            </HorizontalStackLayout>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CheckedStates">
+                        <VisualState x:Name="Checked">
+                            <VisualState.Setters>
+                                <Setter TargetName="Plate" Property="Border.BackgroundColor"
+                                        Value="{AppThemeBinding Light={StaticResource NegativeBackgroundLight}, Dark={StaticResource NegativeBackgroundDark}}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Unchecked" />
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </VisualStateManager.VisualStateGroups>
+        </Border>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="IncomeSegmentTemplate">
+        <Border x:Name="Plate" BackgroundColor="Transparent" StrokeThickness="0"
+                StrokeShape="RoundRectangle 8" Padding="0,8"
+                MinimumHeightRequest="{StaticResource TouchTarget}">
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                <controls:Icon Key="arrow-up-right"
+                               Stroke="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
+                <Label x:Name="Caption" Text="{TemplateBinding Content}" VerticalOptions="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
+            </HorizontalStackLayout>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CheckedStates">
+                        <VisualState x:Name="Checked">
+                            <VisualState.Setters>
+                                <Setter TargetName="Plate" Property="Border.BackgroundColor"
+                                        Value="{AppThemeBinding Light={StaticResource PositiveBackgroundLight}, Dark={StaticResource PositiveBackgroundDark}}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Unchecked" />
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </VisualStateManager.VisualStateGroups>
+        </Border>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="TransferSegmentTemplate">
+        <Border x:Name="Plate" BackgroundColor="Transparent" StrokeThickness="0"
+                StrokeShape="RoundRectangle 8" Padding="0,8"
+                MinimumHeightRequest="{StaticResource TouchTarget}">
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                <controls:Icon Key="swap"
+                               Stroke="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                <Label x:Name="Caption" Text="{TemplateBinding Content}" VerticalOptions="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+            </HorizontalStackLayout>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CheckedStates">
+                        <VisualState x:Name="Checked">
+                            <VisualState.Setters>
+                                <Setter TargetName="Plate" Property="Border.BackgroundColor"
+                                        Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}" />
+                                <Setter TargetName="Caption" Property="Label.TextColor"
+                                        Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource InkDark}}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Unchecked" />
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </VisualStateManager.VisualStateGroups>
+        </Border>
+    </ControlTemplate>
 
     <Style TargetType="Switch">
         <Setter Property="OnColor"

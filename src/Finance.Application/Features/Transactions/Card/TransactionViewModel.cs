@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain;
@@ -16,8 +17,6 @@ namespace Finance.Application.Features.Transactions.Card;
 /// </summary>
 public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 {
-    private const int SuggestionLimit = 8;
-
     private static readonly TransactionKind[] KindOrder =
         [TransactionKind.Expense, TransactionKind.Income, TransactionKind.Transfer];
 
@@ -27,10 +26,10 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     private readonly IDeleteTransactionHandler _delete;
     private readonly IAccountsQuery _accounts;
     private readonly IClock _clock;
+    private readonly TransactionPicks _picks;
 
     private IReadOnlyList<AccountOption> _allAccounts = [];
     private IReadOnlyList<CategoryOption> _allCategories = [];
-    private IReadOnlyList<PlaceOption> _allPlaces = [];
 
     private Snapshot _saved;
 
@@ -41,13 +40,15 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <param name="delete">Удаление операции.</param>
     /// <param name="accounts">Балансы счетов — для текста подтверждения удаления.</param>
     /// <param name="clock">Часы: «сегодня» пользователя.</param>
+    /// <param name="picks">Выбор, вернувшийся с экрана выбора счёта, категории или места.</param>
     public TransactionViewModel(
         ITransactionFormQuery form,
         ITransactionCardQuery card,
         ISaveTransactionHandler save,
         IDeleteTransactionHandler delete,
         IAccountsQuery accounts,
-        IClock clock)
+        IClock clock,
+        TransactionPicks picks)
     {
         ArgumentNullException.ThrowIfNull(form);
         ArgumentNullException.ThrowIfNull(card);
@@ -55,6 +56,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         ArgumentNullException.ThrowIfNull(delete);
         ArgumentNullException.ThrowIfNull(accounts);
         ArgumentNullException.ThrowIfNull(clock);
+        ArgumentNullException.ThrowIfNull(picks);
 
         _form = form;
         _card = card;
@@ -62,6 +64,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         _delete = delete;
         _accounts = accounts;
         _clock = clock;
+        _picks = picks;
 
         OccurredOn = clock.Today;
     }
@@ -102,6 +105,12 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
     /// <summary>Подпись счёта списания: у перевода «Откуда», у остальных просто «Счёт».</summary>
     public string SourceLabel => IsTransfer ? "Откуда" : "Счёт";
+
+    /// <summary>
+    /// Вид категорий, подходящих операции: расходной — расходные. Тем же видом
+    /// открывается экран выбора подкатегории.
+    /// </summary>
+    public CategoryKind CategoryKind => Kind is TransactionKind.Income ? CategoryKind.Income : CategoryKind.Expense;
 
     /// <summary>Сумма, как набрана: выражение из четырёх действий или число.</summary>
     [ObservableProperty]
@@ -174,15 +183,13 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <summary>Подкатегории вида операции.</summary>
     public ObservableCollection<CategoryOption> Categories { get; } = [];
 
-    /// <summary>Места, подходящие под набранное: по первым буквам, от частых к редким.</summary>
-    public ObservableCollection<PlaceOption> PlaceSuggestions { get; } = [];
-
     /// <summary>Счёт списания.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(AmountPreview))]
     [NotifyPropertyChangedFor(nameof(NeedsTargetAmount))]
     [NotifyPropertyChangedFor(nameof(EarliestDate))]
     [NotifyPropertyChangedFor(nameof(CanSave))]
+    [NotifyPropertyChangedFor(nameof(SourceAccountCaption))]
     public partial AccountOption? SourceAccount { get; set; }
 
     /// <summary>Счёт зачисления — у перевода.</summary>
@@ -191,15 +198,40 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     [NotifyPropertyChangedFor(nameof(NeedsTargetAmount))]
     [NotifyPropertyChangedFor(nameof(EarliestDate))]
     [NotifyPropertyChangedFor(nameof(CanSave))]
+    [NotifyPropertyChangedFor(nameof(TargetAccountCaption))]
     public partial AccountOption? TargetAccount { get; set; }
 
     /// <summary>Подкатегория — у дохода и расхода.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CategoryCaption))]
+    [NotifyPropertyChangedFor(nameof(HasCategory))]
     public partial CategoryOption? Category { get; set; }
 
     /// <summary>Место, как набрано. Совпавшее с существующим подставит его, новое заведётся при сохранении.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PlaceCaption))]
+    [NotifyPropertyChangedFor(nameof(HasPlace))]
     public partial string PlaceName { get; set; } = string.Empty;
+
+    /// <summary>Счёт списания в строке-поле: название, пока не выбран — приглашение выбрать.</summary>
+    public string SourceAccountCaption => SourceAccount?.Name ?? "Выбрать";
+
+    /// <summary>Счёт зачисления в строке-поле.</summary>
+    public string TargetAccountCaption => TargetAccount?.Name ?? "Выбрать";
+
+    /// <summary>Подкатегория в строке-поле: группа и название, как в ленте.</summary>
+    public string CategoryCaption => Category is { } category
+        ? $"{category.GroupName} · {category.Name}"
+        : "Выбрать";
+
+    /// <summary>Место в строке-поле. Место необязательно, и пустое так и подписано.</summary>
+    public string PlaceCaption => PlaceName.Length > 0 ? PlaceName : "Необязательно";
+
+    /// <summary>Категория выбрана: иначе строка показывает приглашение приглушённо.</summary>
+    public bool HasCategory => Category is not null;
+
+    /// <summary>Место указано.</summary>
+    public bool HasPlace => PlaceName.Length > 0;
 
     /// <summary>Дата операции.</summary>
     [ObservableProperty]
@@ -303,8 +335,16 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// </summary>
     /// <param name="key">Ключ правимой операции или <c>null</c> для новой.</param>
     /// <param name="accountKey">Счёт для подстановки в новую операцию — с чьей ленты пришли.</param>
+    /// <param name="kind">
+    /// Вид новой операции: им приходят с ярлыка на значке приложения, где вид
+    /// уже выбран. У правки вид берётся из самой записи, и параметр не действует.
+    /// </param>
     /// <param name="cancellationToken">Признак отмены.</param>
-    public async Task LoadAsync(Guid? key, Guid? accountKey = null, CancellationToken cancellationToken = default)
+    public async Task LoadAsync(
+        Guid? key,
+        Guid? accountKey = null,
+        TransactionKind? kind = null,
+        CancellationToken cancellationToken = default)
     {
         // ConfigureAwait(false) здесь недопустим: следом наполняются привязанные
         // коллекции, а их правка вне потока интерфейса роняет разметку
@@ -312,7 +352,6 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
         _allAccounts = form.Accounts;
         _allCategories = form.Categories;
-        _allPlaces = form.Places;
 
         TransactionCard? card = key is { } existing ? await _card.ReadAsync(existing, cancellationToken) : null;
 
@@ -340,6 +379,14 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         }
         else
         {
+            // Вид ставится до снимка: после него форма считалась бы правленой,
+            // и уход с неё, к которой не притронулись, спрашивал бы подтверждение.
+            // Смена вида сама пересоберёт списки категорий и счетов зачисления
+            if (kind is { } wantedKind)
+            {
+                Kind = wantedKind;
+            }
+
             // Закрытый последний счёт не подставляется: он не предлагается
             // и в выборе, а подставленный молча привёл бы к отказу при сохранении
             Guid? preset = accountKey ?? form.LastAccountKey;
@@ -348,8 +395,6 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         }
 
         _saved = Take();
-
-        RefreshSuggestions();
     }
 
     /// <summary>
@@ -597,13 +642,37 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     [RelayCommand]
     public void SetYesterday() => OccurredOn = _clock.Today.AddDays(-1);
 
-    /// <summary>Подставляет место из подсказки.</summary>
-    /// <param name="place">Выбранное место.</param>
-    public void PickPlace(PlaceOption place)
+    /// <summary>
+    /// Забирает выбор, сделанный на экране счёта, категории или места. Зовётся
+    /// при каждом появлении формы: экран выбора уходит обычным «назад», и другого
+    /// места узнать о его решении у формы нет. Пустой выбор ничего не меняет —
+    /// возврат без выбора оставляет форму как была.
+    /// </summary>
+    public void ApplyPicks()
     {
-        ArgumentNullException.ThrowIfNull(place);
+        if (_picks.Account is { } account && Find(account) is { } chosen)
+        {
+            SourceAccount = chosen;
+        }
 
-        PlaceName = place.Name;
+        if (_picks.TargetAccount is { } target
+            && TargetAccounts.FirstOrDefault(option => option.Key == target) is { } chosenTarget)
+        {
+            TargetAccount = chosenTarget;
+        }
+
+        if (_picks.Category is { } category
+            && Categories.FirstOrDefault(option => option.Key == category) is { } chosenCategory)
+        {
+            Category = chosenCategory;
+        }
+
+        if (_picks.PlaceName is { } place)
+        {
+            PlaceName = place;
+        }
+
+        _picks.Clear();
     }
 
     /// <summary>
@@ -630,8 +699,6 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         OnPropertyChanged(nameof(NeedsTargetAmount));
         OnPropertyChanged(nameof(EarliestDate));
     }
-
-    partial void OnPlaceNameChanged(string value) => RefreshSuggestions();
 
     /// <summary>Счета к выбору: открытые, плюс закрытые, на которых уже стоит правимая операция.</summary>
     private void FillAccounts(TransactionCard? card)
@@ -692,7 +759,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
             return;
         }
 
-        CategoryKind kind = Kind is TransactionKind.Income ? CategoryKind.Income : CategoryKind.Expense;
+        CategoryKind kind = CategoryKind;
 
         foreach (CategoryOption category in _allCategories)
         {
@@ -704,34 +771,6 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
         // Категория другого вида в новом списке не существует — сбрасывается
         Category = chosen is not null && Categories.Contains(chosen) ? chosen : null;
-    }
-
-    /// <summary>Подсказки мест: по вхождению набранного, от частых к редким, не больше горсти.</summary>
-    private void RefreshSuggestions()
-    {
-        PlaceSuggestions.Clear();
-
-        if (IsTransfer)
-        {
-            return;
-        }
-
-        ReadOnlySpan<char> typed = PlaceName.AsSpan().Trim();
-
-        foreach (PlaceOption place in _allPlaces)
-        {
-            if (PlaceSuggestions.Count == SuggestionLimit)
-            {
-                break;
-            }
-
-            bool exact = Names.AreSame(place.Name, PlaceName);
-
-            if (!exact && place.Name.AsSpan().Contains(typed, StringComparison.OrdinalIgnoreCase))
-            {
-                PlaceSuggestions.Add(place);
-            }
-        }
     }
 
     private AccountOption? Find(Guid key) => Accounts.FirstOrDefault(account => account.Key == key);

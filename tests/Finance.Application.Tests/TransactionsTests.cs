@@ -1,4 +1,5 @@
 using Finance.Application.Features.Transactions.Card;
+using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
@@ -191,11 +192,10 @@ public sealed class TransactionsTests
         await given.SaveAsync(given.Expense(cash, 10m, place: "Пятёрочка"));
         await given.SaveAsync(given.Expense(cash, 20m, place: "  пятёрочка "));
 
-        TransactionForm form = await given.Database.Resolve<ITransactionFormQuery>().ReadAsync();
+        PlaceListItem place = Assert.Single(await given.Database.Resolve<IPlacesQuery>().ReadAsync());
 
-        PlaceOption place = Assert.Single(form.Places);
         Assert.Equal("Пятёрочка", place.Name);
-        Assert.Equal(2, place.UsageCount);
+        Assert.Equal(2, place.TransactionCount);
     }
 
     /// <summary>Счёт списания запоминается и подставляется в следующую операцию.</summary>

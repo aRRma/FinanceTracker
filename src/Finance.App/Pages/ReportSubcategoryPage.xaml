@@ -19,7 +19,19 @@
                Style="{StaticResource SecondaryLabel}" />
 
         <Label Grid.Row="1" Padding="16,4,16,8" Text="{Binding Total}" HorizontalTextAlignment="End"
-               IsVisible="{Binding HasItems}" Style="{StaticResource TotalLabel}" />
+               IsVisible="{Binding HasItems}" Style="{StaticResource TotalLabel}">
+            <Label.Triggers>
+                <!-- Цвет, а не стиль: у итога свой шрифт, и подмена стиля его потеряла бы -->
+                <DataTrigger TargetType="Label" Binding="{Binding IsTotalExpense}" Value="True">
+                    <Setter Property="TextColor"
+                            Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+                </DataTrigger>
+                <DataTrigger TargetType="Label" Binding="{Binding IsTotalExpense}" Value="False">
+                    <Setter Property="TextColor"
+                            Value="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
+                </DataTrigger>
+            </Label.Triggers>
+        </Label>
 
         <CollectionView Grid.Row="2" ItemsSource="{Binding Rows}" SelectionMode="None">
             <CollectionView.ItemTemplate>
@@ -38,6 +50,9 @@
                             <Label.Triggers>
                                 <DataTrigger TargetType="Label" Binding="{Binding IsPositive}" Value="True">
                                     <Setter Property="Style" Value="{StaticResource PositiveLabel}" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsExpense}" Value="True">
+                                    <Setter Property="Style" Value="{StaticResource NegativeLabel}" />
                                 </DataTrigger>
                             </Label.Triggers>
                         </Label>

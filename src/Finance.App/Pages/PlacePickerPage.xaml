@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран B-07: выбор места. Частые сверху: справочник наполняется сам, а ищут
+    в нём обычно то, чем пользуются. Набранного нет в справочнике — место
+    заводится прямо отсюда, вместе с операцией; брошенная форма пустышки
+    в справочнике не оставит.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.PlacePickerPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:pick="clr-namespace:Finance.Application.Features.Transactions.Pick;assembly=Finance.Application"
+    x:DataType="pick:PlacePickerViewModel"
+    Title="Место">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
+
+        <SearchBar Grid.Row="0" Text="{Binding Filter}" Placeholder="Поиск по названию" />
+
+        <!-- Заведение нового: строкой списка, а не кнопкой в углу — набирают
+             название и тут же его создают, не переводя взгляд -->
+        <Grid Grid.Row="1" Padding="16,10" ColumnDefinitions="Auto,*" ColumnSpacing="12"
+              IsVisible="{Binding CanCreate}"
+              MinimumHeightRequest="{StaticResource TouchTarget}">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnCreate" />
+            </Grid.GestureRecognizers>
+
+            <controls:Icon Grid.Column="0" Key="plus" Style="{StaticResource AccentIcon}" />
+            <Label Grid.Column="1" Text="{Binding CreateCaption}" VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+        </Grid>
+
+        <!-- Снять место: иначе поставленное по ошибке нечем убрать -->
+        <Grid Grid.Row="2" Padding="16,10" ColumnDefinitions="Auto,*" ColumnSpacing="12"
+              IsVisible="{Binding CanClear}"
+              MinimumHeightRequest="{StaticResource TouchTarget}">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnClear" />
+            </Grid.GestureRecognizers>
+
+            <controls:Icon Grid.Column="0" Key="dots" Style="{StaticResource MutedIcon}" />
+            <Label Grid.Column="1" Text="Без места" VerticalOptions="Center"
+                   Style="{StaticResource SecondaryLabel}" />
+        </Grid>
+
+        <CollectionView Grid.Row="3" ItemsSource="{Binding Rows}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="pick:PlacePickerRow">
+                    <Grid Padding="16,10" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12"
+                          RowDefinitions="Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnPlaceTapped" />
+                        </Grid.GestureRecognizers>
+                        <Grid.Triggers>
+                            <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="BackgroundColor"
+                                        Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}" />
+                            </DataTrigger>
+                        </Grid.Triggers>
+
+                        <controls:Icon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Key="map-pin" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="{Binding Name}" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}"
+                               IsVisible="{Binding HasCaption}" Style="{StaticResource SecondaryLabel}" />
+
+                        <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Style="{StaticResource Badge}">
+                            <Label Text="{Binding Count}" Style="{StaticResource CaptionLabel}" />
+                        </Border>
+
+                        <controls:Icon Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" Key="check"
+                                       IsVisible="{Binding IsSelected}"
+                                       SemanticProperties.Description="Выбрано"
+                                       Style="{StaticResource AccentIcon}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <!-- Пустое состояние — внутри списка: соседом в той же ячейке оно оказалось бы
+                 под ним, и пустой список перехватывал бы касания поверх текста -->
+            <CollectionView.EmptyView>
+                <ContentView>
+                    <Label Padding="16,24" IsVisible="{Binding IsEmpty}"
+                           Text="Мест пока нет. Наберите название — оно заведётся вместе с операцией."
+                           Style="{StaticResource SecondaryLabel}" />
+                </ContentView>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+    </Grid>
+
+</pages:DataPage>

@@ -21,11 +21,58 @@ public sealed class CategoryScreenTests
         CategoriesViewModel model = Catalog(database);
         await model.LoadAsync();
 
-        CategoryGroupItem group = Assert.Single(model.Groups);
+        CategoryLine group = Assert.Single(model.Lines, line => line.IsGroup);
 
         Assert.Equal("Еда", group.Name);
-        Assert.Equal(["Продукты", "Прочее"], group.Select(row => row.Name));
-        Assert.Equal(2, group.SubcategoryCount);
+        Assert.Equal(2, group.Count);
+
+        // Свёрнутая группа показывает только шапку: подкатегории появляются по развороту
+        Assert.DoesNotContain(model.Lines, line => line.IsSubcategory);
+
+        model.Toggle(group);
+
+        Assert.Equal(["Продукты", "Прочее"], model.Lines.Where(line => line.IsSubcategory).Select(line => line.Name));
+    }
+
+    /// <summary>
+    /// Разворот и сворачивание правят список поштучно и оставляют на месте саму
+    /// шапку: полная пересборка приходит в список как сброс, и тот перерисовывает
+    /// себя целиком, без плавного появления строк.
+    /// </summary>
+    [Fact]
+    public async Task Разворот_группы_не_пересобирает_список()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        Guid food = await SaveAsync(database, Group("Еда", CategoryKind.Expense));
+        await SaveAsync(database, Subcategory(food, "Продукты"));
+
+        Guid home = await SaveAsync(database, Group("Жильё", CategoryKind.Expense));
+        await SaveAsync(database, Subcategory(home, "Аренда"));
+
+        CategoriesViewModel model = Catalog(database);
+        await model.LoadAsync();
+
+        CategoryLine first = model.Lines[0];
+        CategoryLine second = model.Lines[1];
+
+        model.Toggle(first);
+
+        Assert.Same(first, model.Lines[0]);
+        Assert.True(first.IsExpanded);
+        Assert.Equal("chevron-down", first.ChevronIcon);
+
+        // Строки встали под своей шапкой, соседняя группа осталась той же строкой
+        Assert.Equal(2, model.Lines.Count(line => line.IsSubcategory));
+        Assert.Same(second, model.Lines[^1]);
+
+        model.Toggle(first);
+
+        Assert.Same(first, model.Lines[0]);
+        Assert.Same(second, model.Lines[1]);
+        Assert.False(first.IsExpanded);
+        Assert.Equal("chevron-right", first.ChevronIcon);
+        Assert.DoesNotContain(model.Lines, line => line.IsSubcategory);
     }
 
     /// <summary>
@@ -45,12 +92,12 @@ public sealed class CategoryScreenTests
 
         await model.LoadAsync();
 
-        Assert.Equal("Еда", Assert.Single(model.Groups).Name);
+        Assert.Equal("Еда", Assert.Single(model.Lines, line => line.IsGroup).Name);
         Assert.Equal(1, categories.Reads);
 
         model.Kind = CategoryKind.Income;
 
-        Assert.Equal("Зарплата", Assert.Single(model.Groups).Name);
+        Assert.Equal("Зарплата", Assert.Single(model.Lines, line => line.IsGroup).Name);
         Assert.Equal(1, categories.Reads);
     }
 
@@ -67,12 +114,12 @@ public sealed class CategoryScreenTests
         {
             await model.LoadAsync();
 
-            Assert.Empty(model.Groups);
+            Assert.Empty(model.Lines);
             Assert.True(model.IsEmpty);
 
             await SaveAsync(database, Group("Еда", CategoryKind.Expense));
 
-            Assert.Equal("Еда", Assert.Single(model.Groups).Name);
+            Assert.Equal("Еда", Assert.Single(model.Lines, line => line.IsGroup).Name);
         }
         finally
         {

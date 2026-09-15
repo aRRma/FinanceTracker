@@ -224,6 +224,42 @@ public sealed class FeedTests
         Assert.Equal(Money.Restore(-5m, Currency.RUB).DisplaySigned, model.Days[0].Total);
     }
 
+    /// <summary>
+    /// Цвет суммы в строке: доход зелёным, расход красным, списание перевода —
+    /// обычным текстом. Перевод тоже уходит минусом, но тратой не является,
+    /// и красный на нём читался бы как ещё один расход.
+    /// </summary>
+    [Fact]
+    public async Task Расход_красится_смысловым_цветом_а_перевод_нет()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 100_000m);
+        Guid card = await given.AccountAsync("Карта");
+        DateOnly today = given.Today;
+
+        await given.SaveAsync(given.Expense(cash, 100m, on: today));
+        await given.SaveAsync(given.Income(cash, 200m, on: today));
+        await given.SaveAsync(given.Transfer(cash, card, 300m));
+
+        FeedViewModel model = new(
+            new PagedFeed(given.Database.Resolve<IFeedQuery>(), pageSize: 20),
+            given.Database.Resolve<IAccountsQuery>(),
+            given.Database.Resolve<IClock>(),
+            given.Database.Resolve<IChangeNotifier>());
+
+        await model.LoadAsync(accountKey: null);
+
+        FeedRowItem transfer = model.Days[0].Single(row => row.Icon is "swap");
+        FeedRowItem income = model.Days[0].Single(row => row.IsPositive);
+        FeedRowItem expense = model.Days[0].Single(row => row.IsExpense);
+
+        Assert.False(transfer.IsExpense);
+        Assert.False(transfer.IsPositive);
+        Assert.False(income.IsExpense);
+        Assert.False(expense.IsPositive);
+    }
+
     /// <summary>Пустая лента счёта: модель говорит об этом и несёт начальный остаток для строки-заглушки.</summary>
     [Fact]
     public async Task Пустая_лента_счёта_несёт_начальный_остаток()

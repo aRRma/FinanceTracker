@@ -191,10 +191,7 @@ public sealed class PlacesTests
 
         await fixture.Database.Resolve<IDeletePlaceHandler>().HandleAsync(place.Key);
 
-        TransactionForm form = await fixture.Database.Resolve<ITransactionFormQuery>().ReadAsync();
-
         Assert.Empty(await fixture.Database.Resolve<IPlacesQuery>().ReadAsync());
-        Assert.Empty(form.Places);
     }
 
     /// <summary>

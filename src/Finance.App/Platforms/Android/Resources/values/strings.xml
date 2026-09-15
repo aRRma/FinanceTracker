@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Подписи ярлыков на значке приложения. Только ресурсом: литеральный текст
+    в описании ярлыков система не принимает вовсе.
+
+    Язык один, русский, и папки на каждый язык нет: интерфейс приложения
+    не переводится — пользователь у него один.
+-->
+<resources>
+    <string name="shortcut_expense_short">Расход</string>
+    <string name="shortcut_expense_long">Записать расход</string>
+    <string name="shortcut_income_short">Доход</string>
+    <string name="shortcut_income_long">Записать доход</string>
+    <string name="shortcut_transfer_short">Перевод</string>
+    <string name="shortcut_transfer_long">Перевести между счетами</string>
+</resources>

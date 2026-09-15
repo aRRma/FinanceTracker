@@ -16,20 +16,22 @@
 
     <Grid RowDefinitions="Auto,*">
 
-        <Border Grid.Row="0" Style="{StaticResource Card}" Margin="16,12,16,0">
-            <VerticalStackLayout Padding="14,10" Spacing="2">
-                <Label Text="Баланс" Style="{StaticResource CaptionLabel}" />
-                <Label Text="{Binding AccountBalance}" Style="{StaticResource TotalLabel}">
-                    <Label.Triggers>
-                        <!-- Цвет, а не стиль: крупный шрифт шапки обязан остаться -->
-                        <DataTrigger TargetType="Label" Binding="{Binding IsAccountBalanceNegative}" Value="True">
-                            <Setter Property="TextColor"
-                                    Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
-                        </DataTrigger>
-                    </Label.Triggers>
-                </Label>
-            </VerticalStackLayout>
-        </Border>
+        <!-- Баланс строкой, а не карточкой: в макете он стоит подзаголовком
+             у названия счёта, и четверть первого экрана под одно число не уходит -->
+        <Grid Grid.Row="0" Padding="16,10" ColumnDefinitions="*,Auto">
+            <Label Grid.Column="0" Text="Баланс" VerticalOptions="Center"
+                   Style="{StaticResource SecondaryLabel}" />
+            <Label Grid.Column="1" Text="{Binding AccountBalance}" VerticalOptions="Center"
+                   FontFamily="OpenSansSemibold" FontSize="17">
+                <Label.Triggers>
+                    <!-- Цвет, а не стиль: начертание подзаголовка обязано остаться -->
+                    <DataTrigger TargetType="Label" Binding="{Binding IsAccountBalanceNegative}" Value="True">
+                        <Setter Property="TextColor"
+                                Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+        </Grid>
 
         <controls:FeedList Grid.Row="1">
             <controls:FeedList.Empty>

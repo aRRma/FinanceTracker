@@ -53,11 +53,15 @@ public sealed partial class ReportViewModel : ScreenViewModel
     /// <summary>Какой вид показан.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EmptyTitle))]
+    [NotifyPropertyChangedFor(nameof(IsTotalExpense))]
     public partial CategoryKind Kind { get; set; } = CategoryKind.Expense;
 
     /// <summary>Итог месяца со знаком: «−84 260,00 ₽».</summary>
     [ObservableProperty]
     public partial string Total { get; private set; } = string.Empty;
+
+    /// <summary>Итог — расходный: красится тем же цветом, что строки под ним.</summary>
+    public bool IsTotalExpense => Kind is CategoryKind.Expense;
 
     /// <summary>Операций этого вида за месяц нет — показывается пустое состояние.</summary>
     [ObservableProperty]

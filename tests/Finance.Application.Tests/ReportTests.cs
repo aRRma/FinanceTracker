@@ -186,11 +186,19 @@ public sealed partial class ReportTests
         Assert.Equal(Money.Restore(-300m, Currency.RUB).DisplaySigned, model.Total);
         Assert.Single(model.Rows);
 
+        Assert.True(model.IsTotalExpense);
+        Assert.True(model.Rows[0].IsExpense);
+
         model.Kind = CategoryKind.Income;
 
         Assert.Equal(Money.Restore(90_000m, Currency.RUB).DisplaySigned, model.Total);
         Assert.Single(model.Rows);
         Assert.Equal("100%", model.Rows[0].Share);
+
+        // Знак у сумм разный, и цвет обязан идти за ним: иначе доход и расход
+        // на одном экране различаются только минусом
+        Assert.False(model.IsTotalExpense);
+        Assert.False(model.Rows[0].IsExpense);
     }
 
     /// <summary>Обе граничные даты прошедшего месяца входят в его сумму.</summary>
