@@ -111,6 +111,7 @@ public sealed partial class PlaceViewModel : ObservableObject
         }
 
         IsSaving = true;
+        bool done = false;
         Error = null;
         OnPropertyChanged(nameof(HasError));
 
@@ -121,6 +122,8 @@ public sealed partial class PlaceViewModel : ObservableObject
             // Записанное имя теперь новое: заголовок удаления обязан назвать его,
             // а не то, что было до переименования
             _savedName = Name.Trim();
+
+            done = true;
 
             return true;
         }
@@ -133,7 +136,9 @@ public sealed partial class PlaceViewModel : ObservableObject
         }
         finally
         {
-            IsSaving = false;
+            // После удачи флаг остаётся: экран закрывается, и второе нажатие
+            // в этот промежуток записало бы то же самое ещё раз
+            IsSaving = !done;
         }
     }
 
@@ -166,16 +171,21 @@ public sealed partial class PlaceViewModel : ObservableObject
         }
 
         IsSaving = true;
+        bool done = false;
 
         try
         {
             await _delete.HandleAsync(key, cancellationToken);
 
+            done = true;
+
             return true;
         }
         finally
         {
-            IsSaving = false;
+            // После удачи флаг остаётся: экран закрывается, и второе нажатие
+            // в этот промежуток записало бы то же самое ещё раз
+            IsSaving = !done;
         }
     }
 }
