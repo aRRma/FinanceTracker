@@ -33,12 +33,12 @@
                     <BoxView Style="{StaticResource Divider}" />
 
                     <Label Text="Вид" Style="{StaticResource CaptionLabel}" />
-                    <HorizontalStackLayout Spacing="8" IsVisible="{Binding KindEditable}"
-                                           RadioButtonGroup.GroupName="groupKind"
-                                           RadioButtonGroup.SelectedValue="{Binding Kind}">
-                        <RadioButton Content="Расход" Value="{x:Static domain:CategoryKind.Expense}" />
-                        <RadioButton Content="Доход" Value="{x:Static domain:CategoryKind.Income}" />
-                    </HorizontalStackLayout>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="6" IsVisible="{Binding KindEditable}"
+                          RadioButtonGroup.GroupName="groupKind"
+                          RadioButtonGroup.SelectedValue="{Binding Kind}">
+                        <RadioButton Grid.Column="0" Content="Расход" Value="{x:Static domain:CategoryKind.Expense}" />
+                        <RadioButton Grid.Column="1" Content="Доход" Value="{x:Static domain:CategoryKind.Income}" />
+                    </Grid>
                     <Label Text="{Binding KindCaption}" IsVisible="{Binding KindLocked}" />
                     <Label Text="Вид задаётся при создании и не меняется: его наследуют все подкатегории"
                            Style="{StaticResource CaptionLabel}" />

@@ -2,6 +2,7 @@ using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Categories.Card;
 using Finance.Application.Features.Places.Card;
 using Finance.Application.Features.Transactions.Card;
+using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain;
@@ -26,6 +27,30 @@ public sealed class UnsavedFormTests
         await model.LoadAsync(key: null);
 
         Assert.False(model.IsDirty);
+    }
+
+    /// <summary>
+    /// Вид, пришедший с ярлыка на значке, стоит в форме и не делает её правленой:
+    /// пользователь к ней не притронулся, и вопрос на выходе был бы о чужом выборе.
+    /// </summary>
+    [Theory]
+    [InlineData(TransactionKind.Income)]
+    [InlineData(TransactionKind.Transfer)]
+    public async Task Вид_с_ярлыка_подставлен_и_не_считается_правкой(TransactionKind kind)
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+        await given.AccountAsync("Карта");
+        await given.AccountAsync("Наличные");
+
+        TransactionViewModel model = Transaction(given);
+        await model.LoadAsync(key: null, kind: kind);
+
+        Assert.Equal(kind, model.Kind);
+        Assert.False(model.IsDirty);
+
+        // Списки под видом уже пересобраны: у перевода категорий нет,
+        // у дохода предлагаются только доходные
+        Assert.Equal(kind is TransactionKind.Transfer, model.Categories.Count is 0);
     }
 
     /// <summary>Набранная сумма — потеря: ради неё диалог и заведён.</summary>
@@ -147,5 +172,6 @@ public sealed class UnsavedFormTests
         fixture.Database.Resolve<ISaveTransactionHandler>(),
         fixture.Database.Resolve<IDeleteTransactionHandler>(),
         fixture.Database.Resolve<IAccountsQuery>(),
-        fixture.Database.Resolve<IClock>());
+        fixture.Database.Resolve<IClock>(),
+        fixture.Database.Resolve<TransactionPicks>());
 }

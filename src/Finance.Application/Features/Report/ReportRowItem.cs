@@ -10,7 +10,15 @@ namespace Finance.Application.Features.Report;
 /// <param name="Amount">Сумма со знаком: расход минусом, доход плюсом.</param>
 /// <param name="Share">Доля в процентах, целыми: «37%».</param>
 /// <param name="Fraction">Та же доля долей единицы — ширина полосы.</param>
-public sealed record ReportRowItem(Guid Key, string Name, string Icon, string Amount, string Share, double Fraction)
+/// <param name="IsExpense">Расход — красится смысловым цветом, доход другим.</param>
+public sealed record ReportRowItem(
+    Guid Key,
+    string Name,
+    string Icon,
+    string Amount,
+    string Share,
+    double Fraction,
+    bool IsExpense)
 {
     /// <summary>Полоса тоньше этого не видна, а невидимая полоса читается как её отсутствие.</summary>
     private const double MinimalFraction = 0.02;
@@ -37,7 +45,8 @@ public sealed record ReportRowItem(Guid Key, string Name, string Icon, string Am
             row.Icon,
             Signed(row.Total, row.Kind).DisplaySigned,
             $"{percent}%",
-            Math.Max(fraction, MinimalFraction));
+            Math.Max(fraction, MinimalFraction),
+            row.Kind is CategoryKind.Expense);
     }
 
     /// <summary>Расход показывается минусом: в базе суммы всегда положительны, знак задаёт вид.</summary>

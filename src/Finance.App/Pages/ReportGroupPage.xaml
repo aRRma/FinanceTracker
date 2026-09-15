@@ -19,7 +19,19 @@
                Style="{StaticResource SecondaryLabel}" />
 
         <Label Grid.Row="1" Padding="16,4,16,8" Text="{Binding Total}" HorizontalTextAlignment="End"
-               IsVisible="{Binding HasItems}" Style="{StaticResource TotalLabel}" />
+               IsVisible="{Binding HasItems}" Style="{StaticResource TotalLabel}">
+            <Label.Triggers>
+                <!-- Цвет, а не стиль: у итога свой шрифт, и подмена стиля его потеряла бы -->
+                <DataTrigger TargetType="Label" Binding="{Binding IsTotalExpense}" Value="True">
+                    <Setter Property="TextColor"
+                            Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+                </DataTrigger>
+                <DataTrigger TargetType="Label" Binding="{Binding IsTotalExpense}" Value="False">
+                    <Setter Property="TextColor"
+                            Value="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
+                </DataTrigger>
+            </Label.Triggers>
+        </Label>
 
         <CollectionView Grid.Row="2" ItemsSource="{Binding Rows}" SelectionMode="None">
             <CollectionView.ItemTemplate>
@@ -33,7 +45,16 @@
 
                         <controls:Icon Grid.Column="0" Grid.Row="0" Key="{Binding Icon}" />
                         <Label Grid.Column="1" Grid.Row="0" Text="{Binding Name}" VerticalOptions="Center" />
-                        <Label Grid.Column="2" Grid.Row="0" Text="{Binding Amount}" VerticalOptions="Center" />
+                        <Label Grid.Column="2" Grid.Row="0" Text="{Binding Amount}" VerticalOptions="Center">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsExpense}" Value="True">
+                                    <Setter Property="Style" Value="{StaticResource NegativeLabel}" />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsExpense}" Value="False">
+                                    <Setter Property="Style" Value="{StaticResource PositiveLabel}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
                         <Label Grid.Column="3" Grid.Row="0" Text="{Binding Share}" VerticalOptions="Center"
                                MinimumWidthRequest="40" HorizontalTextAlignment="End"
                                Style="{StaticResource SecondaryLabel}" />

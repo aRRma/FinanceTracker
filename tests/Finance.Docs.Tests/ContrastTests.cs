@@ -42,9 +42,22 @@ public sealed partial class ContrastTests
             // Карточка нарушенного правила: сообщение и обычный текст на её фоне
             ("Negative", "NegativeBackground"), ("Ink", "NegativeBackground"),
 
+            // Сегменты вида операции: выбранный расход и выбранный доход стоят
+            // на своей плашке, подписанные тем же смысловым цветом
+            ("Positive", "PositiveBackground"),
+            ("Ink", "PositiveBackground"), ("Ink2", "PositiveBackground"),
+
             // Выбранная строка справочника настроек. Ink3 на этот фон не ставится:
             // подписи выбранной строки — основной текст и вторичная подпись
             ("Ink", "AccentBackground"), ("Ink2", "AccentBackground")
+        ];
+
+        // Пары, встречающиеся только в одной теме. Выбранный сегмент переключателя
+        // вида подписан цветом действия, но в тёмной теме акцент на своём фоне до
+        // порога не дотягивает, и там подпись основным текстом — пара выше
+        (string Foreground, string Background, string Theme)[] single =
+        [
+            ("Accent", "AccentBackground", "Light")
         ];
 
         TheoryData<string, string, string> data = [];
@@ -53,6 +66,11 @@ public sealed partial class ContrastTests
         {
             data.Add(foreground, background, "Light");
             data.Add(foreground, background, "Dark");
+        }
+
+        foreach ((string foreground, string background, string theme) in single)
+        {
+            data.Add(foreground, background, theme);
         }
 
         return data;

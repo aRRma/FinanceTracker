@@ -46,6 +46,10 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
     [ObservableProperty]
     public partial string Total { get; private set; } = string.Empty;
 
+    /// <summary>Итог — расходный: красится тем же цветом, что строки под ним.</summary>
+    [ObservableProperty]
+    public partial bool IsTotalExpense { get; private set; }
+
     /// <summary>Группа за месяц пуста: операции переехали или удалены после перехода сюда.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasItems))]
@@ -156,6 +160,7 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
         Name = self.Name;
         Caption = $"{Month.Caption} · {share.Share} {ofWhat}";
         Total = share.Amount;
+        IsTotalExpense = share.IsExpense;
     }
 
     /// <inheritdoc />

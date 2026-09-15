@@ -58,6 +58,8 @@
     <Color x:Key="NegativeDark">#D48A8A</Color>
     <Color x:Key="NegativeBackgroundLight">#F7EAEA</Color>
     <Color x:Key="NegativeBackgroundDark">#372525</Color>
+    <Color x:Key="PositiveBackgroundLight">#E9F2E7</Color>
+    <Color x:Key="PositiveBackgroundDark">#22331F</Color>
 
     <!-- Кружок переключателя -->
     <Color x:Key="KnobLight">#FFFFFF</Color>

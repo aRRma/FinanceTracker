@@ -9,6 +9,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:balances="clr-namespace:Finance.Application.Features.Balances;assembly=Finance.Application"
     x:DataType="balances:BalancesViewModel"
     Title="Балансы">
@@ -17,15 +18,27 @@
         <!-- Один шаблон на тратимые счета и на накопления: строка у них одинаковая,
              разное только то, входит ли счёт в подытог -->
         <DataTemplate x:Key="AccountTileTemplate" x:DataType="balances:AccountTile">
-            <Grid Padding="14,12" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto"
+            <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"
                   MinimumHeightRequest="{StaticResource TouchTarget}">
                 <Grid.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnAccountTapped" />
                 </Grid.GestureRecognizers>
-                <Label Grid.Column="0" Grid.Row="0" Text="{Binding Name}" />
-                <Label Grid.Column="0" Grid.Row="1" Text="{Binding Kind}"
-                       Style="{StaticResource SecondaryLabel}" />
-                <Label Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Balance}"
+
+                <!-- Значок вместо подписи типа: наличные от карты отличают
+                     взглядом, а строка остаётся однострочной -->
+                <controls:Icon Grid.Column="0" Key="{Binding Icon}" />
+
+                <Label Grid.Column="1" Text="{Binding Name}" VerticalOptions="Center">
+                    <Label.Triggers>
+                        <!-- Накопления приглушены: в подытог они не входят -->
+                        <DataTrigger TargetType="Label" Binding="{Binding IsSavings}" Value="True">
+                            <Setter Property="TextColor"
+                                    Value="{AppThemeBinding Light={StaticResource Ink2Light}, Dark={StaticResource Ink2Dark}}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+
+                <Label Grid.Column="2" Text="{Binding Balance}"
                        VerticalOptions="Center">
                     <Label.Triggers>
                         <!-- Минус на счёте — смысловым цветом: обычным текстом его
@@ -43,42 +56,64 @@
         <!-- Тот же признак занятости гасит и ожидание первого чтения, и жест обновления -->
         <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding LoadCommand}">
             <ScrollView IsVisible="{Binding HasAccounts}" SafeAreaEdges="Container">
-                <VerticalStackLayout Padding="16,12,16,12" Spacing="20"
-                                     BindableLayout.ItemsSource="{Binding Sections}">
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate x:DataType="balances:CurrencySection">
-                            <VerticalStackLayout Spacing="8">
-                                <Label Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
+                <!-- Разделы валют лежат своим слоем: BindableLayout наполняет
+                     layout целиком и стёр бы соседей, оказавшихся рядом с ним -->
+                <VerticalStackLayout Padding="16,12,16,12" Spacing="20">
+                    <VerticalStackLayout Spacing="20"
+                                         BindableLayout.ItemsSource="{Binding Sections}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="balances:CurrencySection">
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
 
-                                <Label Text="Доступно" Style="{StaticResource CaptionLabel}" />
-                                <Label Text="{Binding Available}" Style="{StaticResource TotalLabel}">
-                                    <Label.Triggers>
-                                        <DataTrigger TargetType="Label" Binding="{Binding IsAvailableNegative}" Value="True">
-                                            <Setter Property="TextColor"
-                                                    Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
+                                    <Label Text="Доступно" Style="{StaticResource CaptionLabel}" />
+                                    <Label Text="{Binding Available}" Style="{StaticResource TotalLabel}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsAvailableNegative}" Value="True">
+                                                <Setter Property="TextColor"
+                                                        Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
 
-                                <Border Style="{StaticResource Card}">
-                                    <VerticalStackLayout
-                                        BindableLayout.ItemsSource="{Binding Spendable}"
-                                        BindableLayout.ItemTemplate="{StaticResource AccountTileTemplate}" />
-                                </Border>
+                                    <Border Style="{StaticResource Card}">
+                                        <VerticalStackLayout
+                                            BindableLayout.ItemsSource="{Binding Spendable}"
+                                            BindableLayout.ItemTemplate="{StaticResource AccountTileTemplate}" />
+                                    </Border>
 
-                                <Label Text="Накопления" Style="{StaticResource SectionLabel}"
-                                       IsVisible="{Binding HasSavings}" />
-                                <Label Text="Скрыты из расчётов" Style="{StaticResource CaptionLabel}"
-                                       IsVisible="{Binding HasSavings}" />
+                                    <Label Text="Накопления" Style="{StaticResource SectionLabel}"
+                                           IsVisible="{Binding HasSavings}" />
+                                    <Label Text="Скрыты из расчётов" Style="{StaticResource CaptionLabel}"
+                                           IsVisible="{Binding HasSavings}" />
 
-                                <Border Style="{StaticResource Card}" IsVisible="{Binding HasSavings}">
-                                    <VerticalStackLayout
-                                        BindableLayout.ItemsSource="{Binding Savings}"
-                                        BindableLayout.ItemTemplate="{StaticResource AccountTileTemplate}" />
-                                </Border>
-                            </VerticalStackLayout>
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
+                                    <Border Style="{StaticResource Card}" IsVisible="{Binding HasSavings}">
+                                        <VerticalStackLayout
+                                            BindableLayout.ItemsSource="{Binding Savings}"
+                                            BindableLayout.ItemTemplate="{StaticResource AccountTileTemplate}" />
+                                    </Border>
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                    <!-- Завести счёт можно и отсюда: справочник за вкладкой «Ещё»
+                         ищут долго, а второй счёт заводят, глядя как раз на балансы.
+                         Строкой, а не второй плавающей кнопкой: плавающая уже занята
+                         операцией, и две одинаковые кнопки рядом не различить -->
+                    <Border Style="{StaticResource Card}">
+                        <Grid Padding="14,12" ColumnDefinitions="Auto,*" ColumnSpacing="12"
+                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnCreateAccount" />
+                            </Grid.GestureRecognizers>
+
+                            <controls:Icon Grid.Column="0" Key="plus" Style="{StaticResource AccentIcon}" />
+                            <Label Grid.Column="1" Text="Добавить счёт" VerticalOptions="Center"
+                                   AutomationId="AddAccount"
+                                   TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                        </Grid>
+                    </Border>
 
                     <!-- Место под плавающую кнопку: последний счёт не должен прятаться за ней -->
                     <BoxView HeightRequest="{StaticResource FloatingButtonClearance}" Color="Transparent" />

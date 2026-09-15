@@ -1,11 +1,13 @@
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
+using Finance.Domain;
 
 namespace Finance.App.Pages;
 
 /// <summary>Экраны B-01…B-06 и C-07: форма операции — запись, правка, удаление.</summary>
 [QueryProperty(nameof(Key), "key")]
 [QueryProperty(nameof(Account), "account")]
+[QueryProperty(nameof(Kind), "kind")]
 public partial class TransactionPage : DataPage
 {
     private readonly TransactionViewModel _model;
@@ -30,6 +32,9 @@ public partial class TransactionPage : DataPage
     /// <summary>Счёт для подстановки в новую операцию — с чьей ленты пришли.</summary>
     public string? Account { get; set; }
 
+    /// <summary>Вид новой операции: им приходят с ярлыка на значке приложения.</summary>
+    public string? Kind { get; set; }
+
     /// <inheritdoc />
     protected override bool ReloadsOnAppearing => false;
 
@@ -38,7 +43,8 @@ public partial class TransactionPage : DataPage
     {
         await _model.LoadAsync(
             Guid.TryParse(Key, out Guid key) ? key : null,
-            Guid.TryParse(Account, out Guid account) ? account : null);
+            Guid.TryParse(Account, out Guid account) ? account : null,
+            Enum.TryParse(Kind, out TransactionKind kind) ? kind : null);
 
         // Удалять нечего, пока операция не записана, поэтому пункт появляется,
         // а не гасится: на панели заголовка погашенный выглядит поломкой.
@@ -56,8 +62,20 @@ public partial class TransactionPage : DataPage
     }
 
     /// <summary>
+    /// Забирает выбор со своего экрана. Форма при возврате не перечитывается —
+    /// набранная сумма должна пережить поход за счётом, — и это единственное место,
+    /// где она узнаёт о выбранном.
+    /// </summary>
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        _model.ApplyPicks();
+    }
+
+    /// <summary>
     /// Буквенная клавиатура системы и клавиши суммы на экран вместе не влезают,
-    /// поэтому на время набора места и заметки клавиши уходят. Клавиша сохранения
+    /// поэтому на время набора заметки клавиши уходят. Клавиша сохранения
     /// остаётся: снятие фокуса с поля зависит от системной клавиатуры, а закончить
     /// операцию пользователь должен мочь всегда.
     /// </summary>
@@ -95,11 +113,25 @@ public partial class TransactionPage : DataPage
         }
     }
 
-    private void OnPlacePicked(object? sender, EventArgs e)
-    {
-        if (sender is BindableObject { BindingContext: PlaceOption place })
-        {
-            _model.PickPlace(place);
-        }
-    }
+    private void OnPickAccount(object? sender, TappedEventArgs e) =>
+        Go($"{Routes.PickAccount}?selected={_model.SourceAccount?.Key}");
+
+    /// <summary>
+    /// Счёт списания в список «Куда» не попадает: перевод на себя запрещён доменом,
+    /// и предлагать его значило бы рассказывать о запрете уже после сохранения.
+    /// </summary>
+    private void OnPickTargetAccount(object? sender, TappedEventArgs e) =>
+        Go($"{Routes.PickAccount}?selected={_model.TargetAccount?.Key}&excluded={_model.SourceAccount?.Key}&target=1");
+
+    private void OnPickCategory(object? sender, TappedEventArgs e) =>
+        Go($"{Routes.PickCategory}?kind={_model.CategoryKind}&selected={_model.Category?.Key}");
+
+    /// <summary>
+    /// Название места уезжает в маршрут экранированным: в нём кириллица и пробелы,
+    /// а неэкранированное оборвалось бы на первом же знаке разметки адреса.
+    /// </summary>
+    private void OnPickPlace(object? sender, TappedEventArgs e) =>
+        Go($"{Routes.PickPlace}?current={Uri.EscapeDataString(_model.PlaceName)}");
+
+    private static void Go(string route) => Guarded.Run(() => Shell.Current.GoToAsync(route));
 }

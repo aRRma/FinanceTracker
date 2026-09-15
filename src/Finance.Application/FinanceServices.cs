@@ -12,6 +12,7 @@ using Finance.Application.Features.Settings.About;
 using Finance.Application.Features.Settings.Appearance;
 using Finance.Application.Features.Settings.TimeZones;
 using Finance.Application.Features.Transactions.Card;
+using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
@@ -107,6 +108,10 @@ public static class FinanceServices
         services.AddSingleton<IDeleteTransactionHandler, DeleteTransactionHandler>();
         services.AddSingleton<IReportQuery, ReportQuery>();
 
+        // Один на приложение: сюда экран выбора кладёт решение, а форма операции
+        // забирает его при возвращении. Экраны при этом живут порознь
+        services.AddSingleton<TransactionPicks>();
+
         // Модель представления живёт ровно столько, сколько экран: общая на всё
         // приложение держала бы в памяти списки закрытых экранов
         services.AddTransient<BalancesViewModel>();
@@ -114,6 +119,9 @@ public static class FinanceServices
         services.AddTransient<AccountViewModel>();
         services.AddTransient<FeedViewModel>();
         services.AddTransient<TransactionViewModel>();
+        services.AddTransient<AccountPickerViewModel>();
+        services.AddTransient<CategoryPickerViewModel>();
+        services.AddTransient<PlacePickerViewModel>();
         services.AddTransient<PlacesViewModel>();
         services.AddTransient<PlaceViewModel>();
         services.AddTransient<CategoriesViewModel>();

@@ -1,3 +1,4 @@
+using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
@@ -52,47 +53,25 @@ public sealed class TransactionFormQuery : ITransactionFormQuery
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        // Счётчик — коррелированным подсчётом по индексу места: мест десятки,
-        // и по одному подзапросу на место дешевле сводки по всей ленте.
-        // Место без операций тоже предлагается, просто в конце списка
-        var usage = await context.Places
-            .AsNoTracking()
-            .Select(place => new
-            {
-                place.Key,
-                place.Name,
-                Count = context.Transactions.Count(row => row.PlaceKey == place.Key)
-            })
-            .OrderByDescending(place => place.Count)
-            .ThenBy(place => place.Name)
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        List<PlaceOption> places = new(usage.Count);
-
-        foreach (var place in usage)
-        {
-            places.Add(new PlaceOption(place.Key, place.Name, place.Count));
-        }
-
         List<AccountOption> options = new(accounts.Count);
 
         foreach (AccountListItem account in accounts)
         {
             options.Add(new AccountOption(
                 account.Key,
+                AccountIcon.For(account.Type, account.ExcludedFromTotals),
                 account.Name,
                 account.Balance.Currency,
                 account.Balance,
                 account.OpenedOn,
-                account.IsClosed));
+                account.IsClosed,
+                account.ExcludedFromTotals));
         }
 
         return new TransactionForm
         {
             Accounts = options,
             Categories = categories,
-            Places = places,
             LastAccountKey = Guid.TryParse(lastAccount, out Guid key) ? key : null
         };
     }

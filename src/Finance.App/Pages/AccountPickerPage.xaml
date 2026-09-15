@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран B-02: выбор счёта для операции. Разделы — валюты: вместе со счётом
+    меняется валюта суммы, и знать об этом надо до выбора. Тот же экран выбирает
+    счёт зачисления перевода, только без счёта списания в списке.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.AccountPickerPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:pick="clr-namespace:Finance.Application.Features.Transactions.Pick;assembly=Finance.Application"
+    x:DataType="pick:AccountPickerViewModel"
+    Title="{Binding Title}">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <CollectionView Grid.Row="0" ItemsSource="{Binding Sections}" IsGrouped="True" SelectionMode="None">
+
+            <CollectionView.GroupHeaderTemplate>
+                <DataTemplate x:DataType="pick:AccountPickerSection">
+                    <Label Padding="16,16,16,6" Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
+                </DataTemplate>
+            </CollectionView.GroupHeaderTemplate>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="pick:AccountPickerRow">
+                    <Grid Padding="16,10" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12"
+                          RowDefinitions="Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnAccountTapped" />
+                        </Grid.GestureRecognizers>
+                        <Grid.Triggers>
+                            <!-- Выбранное видно не только галочкой: строка целиком
+                                 находится быстрее, чем знак у её края -->
+                            <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="BackgroundColor"
+                                        Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}" />
+                            </DataTrigger>
+                        </Grid.Triggers>
+
+                        <controls:Icon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Key="{Binding Icon}" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="{Binding Name}" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}"
+                               IsVisible="{Binding HasCaption}" Style="{StaticResource SecondaryLabel}" />
+
+                        <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Balance}"
+                               VerticalOptions="Center">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsNegative}" Value="True">
+                                    <Setter Property="Style" Value="{StaticResource NegativeLabel}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+
+                        <controls:Icon Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" Key="check"
+                                       IsVisible="{Binding IsSelected}"
+                                       SemanticProperties.Description="Выбрано"
+                                       Style="{StaticResource AccentIcon}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Label Grid.Row="1" Padding="16,8,16,16"
+               Text="Валюта суммы изменится вместе со счётом."
+               Style="{StaticResource CaptionLabel}" />
+
+    </Grid>
+
+</pages:DataPage>

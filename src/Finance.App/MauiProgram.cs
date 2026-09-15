@@ -81,6 +81,9 @@ public static class MauiProgram
         services.AddTransient<GroupPage>();
         services.AddTransient<SubcategoryPage>();
         services.AddTransient<TransactionPage>();
+        services.AddTransient<AccountPickerPage>();
+        services.AddTransient<CategoryPickerPage>();
+        services.AddTransient<PlacePickerPage>();
         services.AddTransient<AppearancePage>();
         services.AddTransient<TimeZonePage>();
         services.AddTransient<AboutPage>();

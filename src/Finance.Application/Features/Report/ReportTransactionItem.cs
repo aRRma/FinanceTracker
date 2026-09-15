@@ -14,6 +14,12 @@ public sealed record ReportTransactionItem(Guid Key, string Title, string Captio
     private static readonly CultureInfo Russian = CultureInfo.GetCultureInfo("ru-RU");
 
     /// <summary>
+    /// Расход — красится смысловым цветом. Отдельного признака вида не нужно:
+    /// переводы в отчёт не входят вовсе, и отрицательная сумма здесь — всегда трата.
+    /// </summary>
+    public bool IsExpense => !IsPositive;
+
+    /// <summary>
     /// Собирает строку. Заголовком служит место: подкатегория уже стоит в шапке
     /// экрана, и повторять её в каждой строке значит не сказать ничего. Год в дате
     /// не пишется — месяц стоит в той же шапке.

@@ -28,21 +28,28 @@ public partial class CategoriesPage : DataPage
     private void OnCreateGroup(object? sender, EventArgs e) =>
         Guarded.Run(() => Shell.Current.GoToAsync(Routes.Group));
 
-    private void OnGroupTapped(object? sender, TappedEventArgs e)
+    /// <summary>
+    /// Открывает карточку. «Прочее» и служебные не открываются: переносить
+    /// и удалять их нельзя, а карточка без единого доступного действия сбивает
+    /// с толку. Разворот группы живёт на шевроне — у него своя зона касания.
+    /// </summary>
+    private void OnLineTapped(object? sender, TappedEventArgs e)
     {
-        if (sender is BindableObject { BindingContext: CategoryGroupItem group })
+        if (sender is not BindableObject { BindingContext: CategoryLine { IsEditable: true } line })
         {
-            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Group}?key={group.Key}"));
+            return;
         }
+
+        string route = line.IsGroup ? Routes.Group : Routes.Subcategory;
+
+        Guarded.Run(() => Shell.Current.GoToAsync($"{route}?key={line.Key}"));
     }
 
-    // «Прочее» и служебная не открываются: переносить и удалять их нельзя,
-    // а карточка без единого доступного действия сбивает с толку
-    private void OnSubcategoryTapped(object? sender, TappedEventArgs e)
+    private void OnToggleTapped(object? sender, TappedEventArgs e)
     {
-        if (sender is BindableObject { BindingContext: CategoryRowItem { IsEditable: true } subcategory })
+        if (sender is BindableObject { BindingContext: CategoryLine line })
         {
-            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Subcategory}?key={subcategory.Key}"));
+            Guarded.Run(() => Chevron.TurnAsync(sender, line.IsExpanded, () => _model.Toggle(line)));
         }
     }
 }

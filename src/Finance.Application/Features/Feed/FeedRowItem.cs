@@ -10,8 +10,19 @@ namespace Finance.Application.Features.Feed;
 /// <param name="Caption">Подпись под заголовком: заметка, место или группа, в общей ленте ещё и счёт.</param>
 /// <param name="Amount">Сумма со знаком, уже отформатированная.</param>
 /// <param name="IsPositive">Сумма положительна — доход или зачисление показывают смысловым цветом.</param>
+/// <param name="IsExpense">
+/// Расход — красится смысловым цветом. Списание перевода тоже отрицательно, но расходом
+/// не считается: деньги не потрачены, а переложены, и красный на нём читался бы как трата.
+/// </param>
 /// <param name="Icon">Ключ значка: подкатегории или перевода.</param>
-public sealed record FeedRowItem(Guid Key, string Title, string Caption, string Amount, bool IsPositive, string Icon)
+public sealed record FeedRowItem(
+    Guid Key,
+    string Title,
+    string Caption,
+    string Amount,
+    bool IsPositive,
+    bool IsExpense,
+    string Icon)
 {
     private const string TransferIcon = "swap";
 
@@ -45,6 +56,7 @@ public sealed record FeedRowItem(Guid Key, string Title, string Caption, string 
             caption,
             item.Amount.DisplaySigned,
             item.Amount.IsPositive,
+            item.Kind is TransactionKind.Expense,
             item.Kind is TransactionKind.Transfer ? TransferIcon : item.Icon ?? string.Empty);
     }
 }

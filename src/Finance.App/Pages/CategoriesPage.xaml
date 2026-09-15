@@ -19,50 +19,45 @@
         <ToolbarItem Text="+" Clicked="OnCreateGroup" AutomationId="CreateGroup" />
     </ContentPage.ToolbarItems>
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,Auto,*">
 
-        <HorizontalStackLayout Grid.Row="0" Padding="16,12" Spacing="8" HorizontalOptions="Center"
-                               RadioButtonGroup.GroupName="categoryKind"
-                               RadioButtonGroup.SelectedValue="{Binding Kind}">
-            <RadioButton Content="Расходы" Value="{x:Static domain:CategoryKind.Expense}" />
-            <RadioButton Content="Доходы" Value="{x:Static domain:CategoryKind.Income}" />
-        </HorizontalStackLayout>
+        <Grid Grid.Row="0" Padding="16,12" ColumnDefinitions="*,*" ColumnSpacing="6"
+              RadioButtonGroup.GroupName="categoryKind"
+              RadioButtonGroup.SelectedValue="{Binding Kind}">
+            <RadioButton Grid.Column="0" Content="Расходы" Value="{x:Static domain:CategoryKind.Expense}" />
+            <RadioButton Grid.Column="1" Content="Доходы" Value="{x:Static domain:CategoryKind.Income}" />
+        </Grid>
+
+        <SearchBar Grid.Row="1" Text="{Binding Filter}" Placeholder="Поиск по названию" />
 
         <!-- Тот же признак занятости гасит и ожидание первого чтения, и жест обновления -->
-        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsBusy}" Command="{Binding LoadCommand}">
+        <RefreshView Grid.Row="2" IsRefreshing="{Binding IsBusy}" Command="{Binding LoadCommand}">
 
-            <CollectionView ItemsSource="{Binding Groups}" IsGrouped="True" SelectionMode="None">
-
-                <CollectionView.GroupHeaderTemplate>
-                    <DataTemplate x:DataType="catalog:CategoryGroupItem">
-                        <Grid Padding="16,16,16,6" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"
-                              MinimumHeightRequest="{StaticResource TouchTarget}">
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnGroupTapped" />
-                            </Grid.GestureRecognizers>
-
-                            <controls:Icon Grid.Column="0" Key="{Binding Icon}" />
-                            <Label Grid.Column="1" Text="{Binding Name}" Style="{StaticResource SectionLabel}"
-                                   VerticalOptions="Center" />
-                            <Label Grid.Column="2" Text="{Binding SubcategoryCount}" Style="{StaticResource SectionLabel}"
-                                   VerticalOptions="Center" />
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.GroupHeaderTemplate>
+            <!-- Список плоский, а не с группировкой: группировка прячет заголовок
+                 вместе с содержимым, а свёрнутой группе заголовок как раз и нужен.
+                 Шапка и строка различаются признаком, отступ второго уровня даёт
+                 распорка слева -->
+            <CollectionView ItemsSource="{Binding Lines}" SelectionMode="None">
 
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="catalog:CategoryRowItem">
-                        <!-- Отступ слева отделяет второй уровень от первого: дерево здесь
-                             показано отступом, а не рамками -->
-                        <Grid Padding="52,10,16,10" ColumnDefinitions="Auto,*" ColumnSpacing="12"
+                    <DataTemplate x:DataType="catalog:CategoryLine">
+                        <Grid Padding="16,10" ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12"
                               MinimumHeightRequest="{StaticResource TouchTarget}">
                             <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnSubcategoryTapped" />
+                                <TapGestureRecognizer Tapped="OnLineTapped" />
                             </Grid.GestureRecognizers>
 
-                            <controls:Icon Grid.Column="0" Key="{Binding Icon}" />
-                            <Label Grid.Column="1" Text="{Binding Name}" VerticalOptions="Center">
+                            <BoxView Grid.Column="0" WidthRequest="24" Color="Transparent"
+                                     IsVisible="{Binding IsSubcategory}" />
+
+                            <controls:Icon Grid.Column="1" Key="{Binding Icon}" />
+
+                            <Label Grid.Column="2" Text="{Binding Name}" VerticalOptions="Center">
                                 <Label.Triggers>
+                                    <!-- Шапка группы крупнее строк: иначе уровни не различить -->
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsGroup}" Value="True">
+                                        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+                                    </DataTrigger>
                                     <!-- Приёмник и служебная приглушены: они не открываются -->
                                     <DataTrigger TargetType="Label" Binding="{Binding IsProtected}" Value="True">
                                         <Setter Property="TextColor"
@@ -70,6 +65,23 @@
                                     </DataTrigger>
                                 </Label.Triggers>
                             </Label>
+
+                            <Border Grid.Column="3" Style="{StaticResource Badge}" IsVisible="{Binding IsGroup}">
+                                <Label Text="{Binding Count}" Style="{StaticResource CaptionLabel}" />
+                            </Border>
+
+                            <!-- Шеврон со своей зоной касания: по строке открывается
+                                 карточка группы, по шеврону — разворот. Знак шириной
+                                 в два десятка точек пальцем не поймать -->
+                            <Grid Grid.Column="4" Padding="12,0" IsVisible="{Binding IsGroup}">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnToggleTapped" />
+                                </Grid.GestureRecognizers>
+
+                                <controls:Icon Key="{Binding ChevronIcon}" Style="{StaticResource MutedIcon}"
+                                               AutomationId="Chevron"
+                                               SemanticProperties.Description="Развернуть группу" />
+                            </Grid>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
@@ -79,7 +91,7 @@
                 <CollectionView.EmptyView>
                     <ContentView>
                         <Label Padding="16,24" IsVisible="{Binding IsEmpty}"
-                               Text="Групп этого вида пока нет. Заведите первую кнопкой «+» — подкатегория «Прочее» создастся сама."
+                               Text="Ничего не нашлось. Заведите группу кнопкой «+» — подкатегория «Прочее» создастся сама."
                                Style="{StaticResource SecondaryLabel}" />
                     </ContentView>
                 </CollectionView.EmptyView>

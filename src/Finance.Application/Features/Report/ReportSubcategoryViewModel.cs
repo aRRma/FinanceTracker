@@ -50,6 +50,10 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
     [ObservableProperty]
     public partial string Total { get; private set; } = string.Empty;
 
+    /// <summary>Итог — расходный: красится тем же цветом, что строки под ним.</summary>
+    [ObservableProperty]
+    public partial bool IsTotalExpense { get; private set; }
+
     /// <summary>Операций за месяц нет: они переехали или удалены после перехода сюда.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasItems))]
@@ -138,6 +142,7 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
 
         Name = name;
         Total = total.DisplaySigned;
+        IsTotalExpense = !total.IsPositive;
         Caption = $"{Month.Caption} · {Plural.Of(items.Count, "операция", "операции", "операций")}";
         IsEmpty = Rows.Count is 0;
         IsLoaded = true;

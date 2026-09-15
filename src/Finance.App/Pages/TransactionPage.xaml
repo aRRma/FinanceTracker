@@ -27,14 +27,19 @@
         <ScrollView Grid.Row="0">
             <VerticalStackLayout Padding="16,12" Spacing="16">
 
-                <!-- Вид операции. По умолчанию расход — он записывается чаще всего -->
-                <HorizontalStackLayout Spacing="8" HorizontalOptions="Center"
-                                       RadioButtonGroup.GroupName="kind"
-                                       RadioButtonGroup.SelectedValue="{Binding Kind}">
-                    <RadioButton Content="Расход" Value="{x:Static domain:TransactionKind.Expense}" />
-                    <RadioButton Content="Доход" Value="{x:Static domain:TransactionKind.Income}" />
-                    <RadioButton Content="Перевод" Value="{x:Static domain:TransactionKind.Transfer}" />
-                </HorizontalStackLayout>
+                <!-- Вид операции. По умолчанию расход — он записывается чаще всего.
+                     У каждого вида свой цвет и свой знак: три одинаковых слова
+                     читаются как подпись, а не как выбор -->
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="6"
+                      RadioButtonGroup.GroupName="kind"
+                      RadioButtonGroup.SelectedValue="{Binding Kind}">
+                    <RadioButton Grid.Column="0" Content="Расход" Value="{x:Static domain:TransactionKind.Expense}"
+                                 ControlTemplate="{StaticResource ExpenseSegmentTemplate}" />
+                    <RadioButton Grid.Column="1" Content="Доход" Value="{x:Static domain:TransactionKind.Income}"
+                                 ControlTemplate="{StaticResource IncomeSegmentTemplate}" />
+                    <RadioButton Grid.Column="2" Content="Перевод" Value="{x:Static domain:TransactionKind.Transfer}"
+                                 ControlTemplate="{StaticResource TransferSegmentTemplate}" />
+                </Grid>
 
                 <!-- Набранное выражение сверху, вычисленный итог под ним: считать в уме
                      при разделе счёта не приходится, а сохраняется именно итог -->
@@ -74,41 +79,92 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <!--
+                    Счёт, категория и место выбираются на своих экранах: списков
+                    здесь по полсотни строк, и системный выпадающий список показывал
+                    бы их сплошняком, без групп, значков и поиска. В форме остаётся
+                    строка со значением и знаком перехода.
+                -->
                 <Border Style="{StaticResource Card}">
-                    <VerticalStackLayout Padding="14,10" Spacing="10">
-                        <Label Text="{Binding SourceLabel}" Style="{StaticResource CaptionLabel}" />
-                        <Picker ItemsSource="{Binding Accounts}" ItemDisplayBinding="{Binding Label, x:DataType=card:AccountOption}"
-                                SelectedItem="{Binding SourceAccount}" Title="Выбрать счёт" />
+                    <VerticalStackLayout>
+                        <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12"
+                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPickAccount" />
+                            </Grid.GestureRecognizers>
 
-                        <VerticalStackLayout Spacing="10" IsVisible="{Binding IsTransfer}">
+                            <controls:Icon Grid.Column="0" Key="wallet" Style="{StaticResource MutedIcon}" />
+                            <Label Grid.Column="1" Text="{Binding SourceLabel}" VerticalOptions="Center"
+                                   Style="{StaticResource SecondaryLabel}" />
+                            <Label Grid.Column="2" Text="{Binding SourceAccountCaption}" VerticalOptions="Center" />
+                            <controls:Icon Grid.Column="3" Key="chevron-right" Style="{StaticResource MutedIcon}" />
+                        </Grid>
+
+                        <VerticalStackLayout IsVisible="{Binding IsTransfer}">
                             <BoxView Style="{StaticResource Divider}" />
-                            <Label Text="Куда" Style="{StaticResource CaptionLabel}" />
-                            <Picker ItemsSource="{Binding TargetAccounts}" ItemDisplayBinding="{Binding Label, x:DataType=card:AccountOption}"
-                                    SelectedItem="{Binding TargetAccount}" Title="Выбрать счёт" />
-                            <Label Text="Перевод не попадает ни в доходы, ни в расходы"
+
+                            <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12"
+                                  MinimumHeightRequest="{StaticResource TouchTarget}">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnPickTargetAccount" />
+                                </Grid.GestureRecognizers>
+
+                                <controls:Icon Grid.Column="0" Key="swap" Style="{StaticResource MutedIcon}" />
+                                <Label Grid.Column="1" Text="Куда" VerticalOptions="Center"
+                                       Style="{StaticResource SecondaryLabel}" />
+                                <Label Grid.Column="2" Text="{Binding TargetAccountCaption}" VerticalOptions="Center" />
+                                <controls:Icon Grid.Column="3" Key="chevron-right" Style="{StaticResource MutedIcon}" />
+                            </Grid>
+
+                            <Label Padding="14,0,14,10" Text="Перевод не попадает ни в доходы, ни в расходы"
                                    Style="{StaticResource CaptionLabel}" />
                         </VerticalStackLayout>
 
-                        <VerticalStackLayout Spacing="10" IsVisible="{Binding IsNotTransfer}">
+                        <VerticalStackLayout IsVisible="{Binding IsNotTransfer}">
                             <BoxView Style="{StaticResource Divider}" />
-                            <Label Text="Категория" Style="{StaticResource CaptionLabel}" />
-                            <Picker ItemsSource="{Binding Categories}" ItemDisplayBinding="{Binding Label, x:DataType=card:CategoryOption}"
-                                    SelectedItem="{Binding Category}" Title="Выбрать" />
+
+                            <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12"
+                                  MinimumHeightRequest="{StaticResource TouchTarget}">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnPickCategory" />
+                                </Grid.GestureRecognizers>
+
+                                <controls:Icon Grid.Column="0" Key="tag" Style="{StaticResource MutedIcon}" />
+                                <Label Grid.Column="1" Text="Категория" VerticalOptions="Center"
+                                       Style="{StaticResource SecondaryLabel}" />
+                                <Label Grid.Column="2" Text="{Binding CategoryCaption}" VerticalOptions="Center">
+                                    <Label.Triggers>
+                                        <!-- Невыбранная категория подписана приглушённо: это
+                                             приглашение, а не значение поля -->
+                                        <DataTrigger TargetType="Label" Binding="{Binding HasCategory}" Value="False">
+                                            <Setter Property="TextColor"
+                                                    Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <controls:Icon Grid.Column="3" Key="chevron-right" Style="{StaticResource MutedIcon}" />
+                            </Grid>
 
                             <BoxView Style="{StaticResource Divider}" />
-                            <Label Text="Место" Style="{StaticResource CaptionLabel}" />
-                            <!-- Пока набирают буквы, клавиатура суммы уходит: две сразу на экран не помещаются -->
-                            <Entry Text="{Binding PlaceName}" Placeholder="Необязательно"
-                                   Focused="OnTextFocused" Unfocused="OnTextUnfocused" />
-                            <!-- Подстановка по набранному: совпадения от частых к редким; новое место заведётся при сохранении -->
-                            <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding PlaceSuggestions}">
-                                <BindableLayout.ItemTemplate>
-                                    <DataTemplate x:DataType="card:PlaceOption">
-                                        <Button Text="{Binding Name}" Clicked="OnPlacePicked"
-                                                Style="{StaticResource GhostButton}" />
-                                    </DataTemplate>
-                                </BindableLayout.ItemTemplate>
-                            </HorizontalStackLayout>
+
+                            <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12"
+                                  MinimumHeightRequest="{StaticResource TouchTarget}">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnPickPlace" />
+                                </Grid.GestureRecognizers>
+
+                                <controls:Icon Grid.Column="0" Key="map-pin" Style="{StaticResource MutedIcon}" />
+                                <Label Grid.Column="1" Text="Место" VerticalOptions="Center"
+                                       Style="{StaticResource SecondaryLabel}" />
+                                <Label Grid.Column="2" Text="{Binding PlaceCaption}" VerticalOptions="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding HasPlace}" Value="False">
+                                            <Setter Property="Style" Value="{StaticResource CaptionLabel}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <controls:Icon Grid.Column="3" Key="chevron-right" Style="{StaticResource MutedIcon}" />
+                            </Grid>
                         </VerticalStackLayout>
                     </VerticalStackLayout>
                 </Border>
