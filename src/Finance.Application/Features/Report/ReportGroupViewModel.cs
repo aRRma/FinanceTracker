@@ -15,6 +15,7 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
     private readonly IReportQuery _report;
 
     private Guid _groupKey;
+    private int _generation;
 
     /// <summary>Создаёт модель представления группы отчёта.</summary>
     /// <param name="report">Суммы отчёта.</param>
@@ -69,6 +70,11 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
     {
         _groupKey = groupKey;
         Month = month;
+
+        // Номер чтения: перечитывание по чужой правке может обогнать первое чтение,
+        // и строки более раннего запроса легли бы поверх более свежих
+        int generation = ++_generation;
+
         IsBusy = true;
 
         try
@@ -78,11 +84,19 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
             IReadOnlyList<ReportTotal> groups = await _report.ReadGroupsAsync(month, cancellationToken);
             IReadOnlyList<ReportTotal> rows = await _report.ReadSubcategoriesAsync(groupKey, month, cancellationToken);
 
+            if (generation != _generation)
+            {
+                return;
+            }
+
             Rebuild(groups, rows);
         }
         finally
         {
-            IsBusy = false;
+            if (generation == _generation)
+            {
+                IsBusy = false;
+            }
         }
     }
 

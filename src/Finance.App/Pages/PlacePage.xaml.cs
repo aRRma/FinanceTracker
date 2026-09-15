@@ -27,6 +27,9 @@ public partial class PlacePage : DataPage
     public string? Key { get; set; }
 
     /// <inheritdoc />
+    protected override bool ReloadsOnAppearing => false;
+
+    /// <inheritdoc />
     protected override Task LoadAsync() =>
         Guid.TryParse(Key, out Guid key) ? _model.LoadAsync(key) : Task.CompletedTask;
 

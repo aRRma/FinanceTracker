@@ -30,11 +30,15 @@ internal static class TransactionSides
         return row.ToDomain();
     }
 
-    /// <summary>Собирает доменную операцию из строки, дочитав валюты её счетов.</summary>
+    /// <summary>
+    /// Валюты счетов операции — то, чего не хватает строке, чтобы стать доменной
+    /// операцией. Читаются один раз на строку: правке нужны два экземпляра из одной
+    /// строки, и читать счета под каждый значило бы ходить в базу дважды.
+    /// </summary>
     /// <param name="context">Контекст базы.</param>
     /// <param name="row">Строка операции.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
-    public static async Task<Transaction> ToDomainAsync(
+    public static async Task<(Currency Source, Currency? Target)> CurrenciesAsync(
         FinanceDbContext context,
         TransactionRow row,
         CancellationToken cancellationToken)
@@ -45,6 +49,20 @@ internal static class TransactionSides
             ? (await AccountAsync(context, target, cancellationToken).ConfigureAwait(false)).Currency
             : null;
 
-        return row.ToDomain(source.Currency, targetCurrency);
+        return (source.Currency, targetCurrency);
+    }
+
+    /// <summary>Собирает доменную операцию из строки, дочитав валюты её счетов.</summary>
+    /// <param name="context">Контекст базы.</param>
+    /// <param name="row">Строка операции.</param>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    public static async Task<Transaction> ToDomainAsync(
+        FinanceDbContext context,
+        TransactionRow row,
+        CancellationToken cancellationToken)
+    {
+        (Currency source, Currency? target) = await CurrenciesAsync(context, row, cancellationToken).ConfigureAwait(false);
+
+        return row.ToDomain(source, target);
     }
 }

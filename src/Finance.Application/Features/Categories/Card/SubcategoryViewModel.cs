@@ -70,6 +70,18 @@ public sealed partial class SubcategoryViewModel : ObservableObject
     [ObservableProperty]
     public partial string? Error { get; private set; }
 
+    /// <summary>
+    /// Идёт сохранение или удаление. Кнопки зовут методы напрямую, минуя команду
+    /// с её защитой от повторного запуска: без флага второе нажатие до ухода
+    /// экрана завело бы вторую подкатегорию.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanSave))]
+    public partial bool IsSaving { get; private set; }
+
+    /// <summary>Сохранять и удалять можно: предыдущее действие не идёт.</summary>
+    public bool CanSave => !IsSaving;
+
     /// <summary>Выбранная группа — номером в списке.</summary>
     public int GroupIndex
     {
@@ -151,6 +163,11 @@ public sealed partial class SubcategoryViewModel : ObservableObject
     [RelayCommand]
     public async Task<bool> SaveAsync(CancellationToken cancellationToken = default)
     {
+        if (IsSaving)
+        {
+            return false;
+        }
+
         Error = null;
         OnPropertyChanged(nameof(HasError));
 
@@ -161,6 +178,8 @@ public sealed partial class SubcategoryViewModel : ObservableObject
 
             return false;
         }
+
+        IsSaving = true;
 
         try
         {
@@ -184,6 +203,10 @@ public sealed partial class SubcategoryViewModel : ObservableObject
             OnPropertyChanged(nameof(HasError));
 
             return false;
+        }
+        finally
+        {
+            IsSaving = false;
         }
     }
 
@@ -220,11 +243,12 @@ public sealed partial class SubcategoryViewModel : ObservableObject
     [RelayCommand]
     public async Task<bool> DeleteAsync(CancellationToken cancellationToken = default)
     {
-        if (Key is not { } key)
+        if (Key is not { } key || IsSaving)
         {
             return false;
         }
 
+        IsSaving = true;
         Error = null;
         OnPropertyChanged(nameof(HasError));
 
@@ -240,6 +264,10 @@ public sealed partial class SubcategoryViewModel : ObservableObject
             OnPropertyChanged(nameof(HasError));
 
             return false;
+        }
+        finally
+        {
+            IsSaving = false;
         }
     }
 

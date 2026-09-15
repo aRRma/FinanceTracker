@@ -35,6 +35,22 @@ internal sealed class TestDatabase : IAsyncDisposable
         Action<Theme>? applyTheme = null,
         string? applicationVersion = null)
     {
+        TestDatabase database = CreateUnprepared(applyTheme, applicationVersion);
+        await database.Resolve<DatabaseBootstrapper>().InitializeAsync();
+
+        return database;
+    }
+
+    /// <summary>
+    /// Службы без единого обращения к базе: файла ещё нет. Нужно тестам первого
+    /// запуска, где сама подготовка и проверяется.
+    /// </summary>
+    /// <param name="applyTheme">Чем подменяется переключение оформления: платформы в тестах нет.</param>
+    /// <param name="applicationVersion">Версия приложения для экрана «О программе».</param>
+    public static TestDatabase CreateUnprepared(
+        Action<Theme>? applyTheme = null,
+        string? applicationVersion = null)
+    {
         string folder = Path.Combine(Path.GetTempPath(), "finance-tests", Guid.CreateVersion7().ToString("N"));
         Directory.CreateDirectory(folder);
 
@@ -42,10 +58,7 @@ internal sealed class TestDatabase : IAsyncDisposable
             .AddFinance(Path.Combine(folder, "finance.db"), applyTheme: applyTheme, applicationVersion: applicationVersion)
             .BuildServiceProvider();
 
-        TestDatabase database = new(folder, services);
-        await database.Resolve<DatabaseBootstrapper>().InitializeAsync();
-
-        return database;
+        return new TestDatabase(folder, services);
     }
 
     public async ValueTask DisposeAsync()

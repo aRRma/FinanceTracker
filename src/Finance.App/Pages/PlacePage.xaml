@@ -29,9 +29,9 @@
                 <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
             </Border>
 
-            <Button Text="Сохранить" Clicked="OnSave" IsVisible="{Binding IsLoaded}" />
+            <Button Text="Сохранить" Clicked="OnSave" IsVisible="{Binding IsLoaded}" IsEnabled="{Binding CanSave}" />
 
-            <Button Text="Удалить место" Clicked="OnDelete" IsVisible="{Binding IsLoaded}"
+            <Button Text="Удалить место" Clicked="OnDelete" IsVisible="{Binding IsLoaded}" IsEnabled="{Binding CanSave}"
                     Style="{StaticResource DangerButton}" />
 
         </VerticalStackLayout>

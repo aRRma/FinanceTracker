@@ -138,6 +138,31 @@ public sealed class FeedTests
         Assert.False(last.HasMore);
     }
 
+    /// <summary>
+    /// День, разрезанный границей страницы: итог в шапке — за весь день на обеих
+    /// страницах, а не сумма строк, попавших в страницу.
+    /// </summary>
+    [Fact]
+    public async Task Итог_дня_на_границе_страницы_считается_за_весь_день()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные");
+
+        for (int index = 0; index < 5; index++)
+        {
+            await given.SaveAsync(given.Expense(cash, 10m));
+        }
+
+        FeedPage first = await given.FeedAsync(take: 3);
+        FeedPage second = await given.FeedAsync(skip: 3, take: 3);
+
+        Money expected = Money.Restore(-50m, Currency.RUB);
+
+        Assert.Equal(expected, first.DayTotals[given.Today]);
+        Assert.Equal(expected, second.DayTotals[given.Today]);
+    }
+
     /// <summary>Место, удалённое из справочника, в строке не показывается — операция как без места.</summary>
     [Fact]
     public async Task Строка_несёт_название_места_и_группы()

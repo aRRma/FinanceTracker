@@ -65,6 +65,51 @@ public sealed class DatabaseBootstrapperTests
     }
 
     /// <summary>
+    /// Откат идёт именно из копии, а не транзакцией миграции: база портится уже
+    /// после снятия копии, и вернуть таблицу может только она.
+    /// </summary>
+    [Fact]
+    public async Task Откат_возвращает_то_что_испорчено_после_снятия_копии()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+        await database.Resolve<DatabaseInitializer>().InitializeAsync();
+
+        int categories = await CountCategoriesAsync(database);
+        Assert.NotEqual(0, categories);
+
+        await ExecuteAsync(database, "DELETE FROM __EFMigrationsHistory");
+
+        DatabaseBootstrapper bootstrapper = database.Resolve<DatabaseBootstrapper>();
+        bootstrapper.BeforeMigrate = () => ExecuteAsync(database, "DROP TABLE categories");
+
+        await Assert.ThrowsAsync<DatabaseMigrationException>(() => bootstrapper.InitializeAsync());
+
+        Assert.Equal(categories, await CountCategoriesAsync(database));
+    }
+
+    /// <summary>
+    /// На первом запуске копии нет, и сообщение не обещает возврата из неё:
+    /// советовать вернуть прежнюю версию, которой не было, значит послать
+    /// пользователя искать несуществующее.
+    /// </summary>
+    [Fact]
+    public async Task Сбой_первого_запуска_не_обещает_возврата_из_копии()
+    {
+        await using TestDatabase database = TestDatabase.CreateUnprepared();
+
+        DatabaseBootstrapper bootstrapper = database.Resolve<DatabaseBootstrapper>();
+
+        // Чужая таблица с именем из схемы: накат споткнётся о неё
+        bootstrapper.BeforeMigrate = () => ExecuteAsync(database, "CREATE TABLE accounts (x INTEGER)");
+
+        DatabaseMigrationException error = await Assert.ThrowsAsync<DatabaseMigrationException>(
+            () => bootstrapper.InitializeAsync());
+
+        Assert.DoesNotContain("копии", error.Message, StringComparison.Ordinal);
+        Assert.False(File.Exists(database.Location.BackupPath));
+    }
+
+    /// <summary>
     /// Сорвавшееся копирование не трогает прежнюю копию и не выходит наружу
     /// сырым исключением: схема ещё цела, и пользователю говорят именно это.
     /// </summary>

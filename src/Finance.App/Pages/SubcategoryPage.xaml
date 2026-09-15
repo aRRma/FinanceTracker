@@ -72,9 +72,9 @@
                 <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
             </Border>
 
-            <Button Text="Сохранить" Clicked="OnSave" />
+            <Button Text="Сохранить" Clicked="OnSave" IsEnabled="{Binding CanSave}" />
 
-            <Button Text="Удалить подкатегорию" Clicked="OnDelete" IsVisible="{Binding CanDelete}"
+            <Button Text="Удалить подкатегорию" Clicked="OnDelete" IsVisible="{Binding CanDelete}" IsEnabled="{Binding CanSave}"
                     Style="{StaticResource DangerButton}" />
 
         </VerticalStackLayout>

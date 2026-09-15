@@ -30,6 +30,9 @@ public partial class AccountPage : DataPage
     public string? Key { get; set; }
 
     /// <inheritdoc />
+    protected override bool ReloadsOnAppearing => false;
+
+    /// <inheritdoc />
     protected override Task LoadAsync() =>
         _model.LoadAsync(Guid.TryParse(Key, out Guid key) ? key : null);
 

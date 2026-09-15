@@ -215,6 +215,53 @@ public sealed class TransactionsTests
         Assert.Equal(card.ToString(), await given.Database.Resolve<ILocalSettings>().GetAsync(SettingName.LastAccountKey));
     }
 
+    /// <summary>Подстановка — для новых операций: правка старой записи последний счёт не трогает.</summary>
+    [Fact]
+    public async Task Правка_операции_не_меняет_последний_счёт()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные");
+        Guid card = await given.AccountAsync("Карта");
+
+        Guid old = await given.SaveAsync(given.Expense(cash, 10m));
+        await given.SaveAsync(given.Expense(card, 20m));
+
+        await given.SaveAsync(given.Expense(cash, 15m) with { Key = old });
+
+        TransactionForm form = await given.Database.Resolve<ITransactionFormQuery>().ReadAsync();
+
+        Assert.Equal(card, form.LastAccountKey);
+    }
+
+    /// <summary>
+    /// Правка перевода меняет валютность: одновалютный становится разновалютным
+    /// и получает вторую сумму, разновалютный — одновалютным и теряет её.
+    /// </summary>
+    [Fact]
+    public async Task Правка_перевода_меняет_валютность_в_обе_стороны()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+        Guid card = await given.AccountAsync("Карта", 1_000m);
+        Guid euro = await given.AccountAsync("Карта евро", 100m, Currency.EUR);
+
+        Guid key = await given.SaveAsync(given.Transfer(cash, card, 200m));
+
+        await given.SaveAsync(given.Transfer(cash, euro, 200m, targetAmount: 2m) with { Key = key });
+
+        Assert.Equal(Money.Create(800m, Currency.RUB), await given.BalanceAsync(cash));
+        Assert.Equal(Money.Create(1_000m, Currency.RUB), await given.BalanceAsync(card));
+        Assert.Equal(Money.Create(102m, Currency.EUR), await given.BalanceAsync(euro));
+
+        await given.SaveAsync(given.Transfer(cash, card, 300m) with { Key = key });
+
+        Assert.Equal(Money.Create(700m, Currency.RUB), await given.BalanceAsync(cash));
+        Assert.Equal(Money.Create(1_300m, Currency.RUB), await given.BalanceAsync(card));
+        Assert.Equal(Money.Create(100m, Currency.EUR), await given.BalanceAsync(euro));
+    }
+
     /// <summary>Неудавшееся сохранение не запоминает счёт: подстановка ссылалась бы на операцию, которой нет.</summary>
     [Fact]
     public async Task Отвергнутая_операция_не_меняет_последний_счёт()

@@ -226,6 +226,25 @@ public sealed partial class ReportTests
         Assert.Empty(await given.ReportAsync(month));
     }
 
+    /// <summary>Последний день високосного февраля — ещё февраль, а первое марта — уже нет.</summary>
+    [Fact]
+    public async Task Двадцать_девятое_февраля_входит_в_февраль()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 10_000m, openedOn: new DateOnly(2024, 1, 1));
+        ReportMonth february = ReportMonth.Of(new DateOnly(2024, 2, 1));
+
+        Assert.Equal(new DateOnly(2024, 2, 29), february.Last);
+
+        await given.SaveAsync(given.Expense(card, 1m, on: february.Last));
+        await given.SaveAsync(given.Expense(card, 2m, on: new DateOnly(2024, 3, 1)));
+
+        ReportTotal group = Assert.Single(await given.ReportAsync(february));
+
+        Assert.Equal(Money.Restore(1m, Currency.RUB), group.Total);
+    }
+
     /// <summary>По умолчанию — месяц сегодняшней даты пользователя и расходы.</summary>
     [Fact]
     public async Task Отчёт_открывается_на_текущем_месяце_с_расходами()
@@ -484,6 +503,65 @@ public sealed partial class ReportTests
         CategoryListItem group = categories.Single(item => item.IsGroup && item.Role is CategoryRole.Service && item.Kind == kind);
 
         return categories.Single(item => item.ParentKey == group.Key).Key;
+    }
+
+    /// <summary>
+    /// Быстрое листание: первое чтение отстало и завершилось после второго.
+    /// Его строки уже не к месту — под шапкой позапрошлого месяца обязаны стоять
+    /// группы позапрошлого, а не прошлого.
+    /// </summary>
+    [Fact]
+    public async Task Отставшее_чтение_не_перекрывает_свежий_месяц()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта");
+        DateOnly monthBefore = given.PreviousMonth.AddMonths(-1);
+
+        await given.SaveAsync(given.Expense(card, 300m, on: given.PreviousMonth));
+        await given.SaveAsync(given.Expense(card, 700m, on: monthBefore));
+
+        DelayingReport report = new(given.Database.Resolve<IReportQuery>());
+        ReportViewModel model = new(report, given.Database.Resolve<IClock>(), given.Database.Resolve<IChangeNotifier>());
+
+        await model.LoadAsync();
+
+        // Первое листание задерживается, второе проходит сразу
+        report.Delay = new TaskCompletionSource();
+        Task slow = model.PreviousMonthCommand.ExecuteAsync(null);
+
+        TaskCompletionSource hold = report.Delay;
+        report.Delay = null;
+        await model.PreviousMonthCommand.ExecuteAsync(null);
+
+        hold.SetResult();
+        await slow;
+
+        Assert.Equal(ReportMonth.Of(monthBefore), model.Month);
+        Assert.Contains("700,00", model.Total, StringComparison.Ordinal);
+        Assert.False(model.IsBusy);
+    }
+
+    /// <summary>Задерживает чтение групп по сигналу теста, чтобы подстроить гонку.</summary>
+    private sealed class DelayingReport(IReportQuery inner) : IReportQuery
+    {
+        public TaskCompletionSource? Delay { get; set; }
+
+        public async Task<IReadOnlyList<ReportTotal>> ReadGroupsAsync(ReportMonth month, CancellationToken cancellationToken = default)
+        {
+            if (Delay is { } delay)
+            {
+                await delay.Task;
+            }
+
+            return await inner.ReadGroupsAsync(month, cancellationToken);
+        }
+
+        public Task<IReadOnlyList<ReportTotal>> ReadSubcategoriesAsync(Guid groupKey, ReportMonth month, CancellationToken cancellationToken = default) =>
+            inner.ReadSubcategoriesAsync(groupKey, month, cancellationToken);
+
+        public Task<IReadOnlyList<ReportTransaction>> ReadTransactionsAsync(Guid subcategoryKey, ReportMonth month, CancellationToken cancellationToken = default) =>
+            inner.ReadTransactionsAsync(subcategoryKey, month, cancellationToken);
     }
 
     /// <summary>Считает обращения к базе: пересборка списка в памяти не должна ходить за данными заново.</summary>
