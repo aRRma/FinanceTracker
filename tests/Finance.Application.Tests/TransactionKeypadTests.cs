@@ -137,10 +137,51 @@ public sealed class TransactionKeypadTests
         Assert.Equal("12,34", model.Amount);
     }
 
-    private static TransactionViewModel Model(TransactionFixture fixture) => new(
+    /// <summary>
+    /// Два нажатия «Сохранить» подряд записывают одну операцию: кнопка зовёт
+    /// метод напрямую, и без флага занятости второе нажатие до ухода экрана
+    /// завело бы вторую запись с новым ключом.
+    /// </summary>
+    [Fact]
+    public async Task Двойное_нажатие_сохраняет_одну_операцию()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        Guid card = await fixture.AccountAsync("Карта");
+
+        // Запись в SQLite завершается на месте, и гонку без задержки не подстроить
+        DelayingSave save = new(fixture.Database.Resolve<ISaveTransactionHandler>());
+        TransactionViewModel model = Model(fixture, save);
+        await model.LoadAsync(key: null);
+        model.Category = model.Categories[0];
+        model.PressKeyCommand.Execute("5");
+
+        Task<bool> first = model.SaveAsync();
+        Task<bool> second = model.SaveAsync();
+
+        save.Delay.SetResult();
+
+        Assert.True(await first);
+        Assert.False(await second);
+        Assert.Single((await fixture.FeedAsync(card)).Items);
+    }
+
+    /// <summary>Держит сохранение, пока тест не отпустит: так второе нажатие приходится на первое.</summary>
+    private sealed class DelayingSave(ISaveTransactionHandler inner) : ISaveTransactionHandler
+    {
+        public TaskCompletionSource Delay { get; } = new();
+
+        public async Task<Guid> HandleAsync(SaveTransactionCommand command, CancellationToken cancellationToken = default)
+        {
+            await Delay.Task;
+
+            return await inner.HandleAsync(command, cancellationToken);
+        }
+    }
+
+    private static TransactionViewModel Model(TransactionFixture fixture, ISaveTransactionHandler? save = null) => new(
         fixture.Database.Resolve<ITransactionFormQuery>(),
         fixture.Database.Resolve<ITransactionCardQuery>(),
-        fixture.Database.Resolve<ISaveTransactionHandler>(),
+        save ?? fixture.Database.Resolve<ISaveTransactionHandler>(),
         fixture.Database.Resolve<IDeleteTransactionHandler>(),
         fixture.Database.Resolve<IAccountsQuery>(),
         fixture.Database.Resolve<Finance.Application.Infrastructure.IClock>());

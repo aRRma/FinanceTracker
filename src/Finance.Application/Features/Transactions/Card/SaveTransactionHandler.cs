@@ -54,11 +54,22 @@ public sealed class SaveTransactionHandler : ISaveTransactionHandler
                 Money amount = Money.Create(command.Amount, source.Currency);
                 Money? targetAmount = target is null ? null : TargetAmount(command, source, target);
 
-                Guid key = command.Key is { } existing
-                    ? await UpdateAsync(context, command, existing, source, target, category, group, amount, targetAmount, placeKey, token).ConfigureAwait(false)
-                    : Create(context, command, source, target, category, group, amount, targetAmount, placeKey);
+                Guid key;
 
-                await RememberAccountAsync(context, source.Key, token).ConfigureAwait(false);
+                if (command.Key is { } existing)
+                {
+                    key = await UpdateAsync(context, command, existing, source, target, category, group, amount, targetAmount, placeKey, token).ConfigureAwait(false);
+                }
+                else
+                {
+                    key = Create(context, command, source, target, category, group, amount, targetAmount, placeKey);
+
+                    // Подстановка — для новых операций, поэтому и запоминается счёт
+                    // только у новой: правка старой записи не говорит, куда пользователь
+                    // тратит сейчас
+                    await RememberAccountAsync(context, source.Key, token).ConfigureAwait(false);
+                }
+
                 await context.SaveChangesAsync(token).ConfigureAwait(false);
 
                 DataChange change = DataChange.Transactions;
@@ -124,9 +135,13 @@ public sealed class SaveTransactionHandler : ISaveTransactionHandler
 
         // Два экземпляра из одной строки: один правится, другой остаётся снимком
         // «как было» — по нему домен отличает уже задействованный закрытый счёт
-        // от подставленного впервые
-        Transaction previous = await TransactionSides.ToDomainAsync(context, row, cancellationToken).ConfigureAwait(false);
-        Transaction transaction = await TransactionSides.ToDomainAsync(context, row, cancellationToken).ConfigureAwait(false);
+        // от подставленного впервые. Валюты прежних счетов читаются один раз на оба
+        (Currency previousSource, Currency? previousTarget) = await TransactionSides
+            .CurrenciesAsync(context, row, cancellationToken)
+            .ConfigureAwait(false);
+
+        Transaction previous = row.ToDomain(previousSource, previousTarget);
+        Transaction transaction = row.ToDomain(previousSource, previousTarget);
 
         transaction.Replace(
             command.Kind,

@@ -56,6 +56,18 @@ public sealed partial class PlaceViewModel : ObservableObject
     /// <summary>Правило нарушено — сообщение показывается рядом с формой.</summary>
     public bool HasError => !string.IsNullOrEmpty(Error);
 
+    /// <summary>
+    /// Идёт сохранение или удаление. Кнопки зовут методы напрямую, минуя команду
+    /// с её защитой от повторного запуска: без флага второе нажатие до ухода
+    /// экрана запустило бы второе действие.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanSave))]
+    public partial bool IsSaving { get; private set; }
+
+    /// <summary>Сохранять и удалять можно: предыдущее действие не идёт.</summary>
+    public bool CanSave => !IsSaving;
+
     /// <summary>Место загрузилось — есть что править и что удалять.</summary>
     public bool IsLoaded => Key is not null;
 
@@ -93,17 +105,22 @@ public sealed partial class PlaceViewModel : ObservableObject
     [RelayCommand]
     public async Task<bool> SaveAsync(CancellationToken cancellationToken = default)
     {
-        if (Key is not { } key)
+        if (Key is not { } key || IsSaving)
         {
             return false;
         }
 
+        IsSaving = true;
         Error = null;
         OnPropertyChanged(nameof(HasError));
 
         try
         {
             await _rename.HandleAsync(key, Name, cancellationToken);
+
+            // Записанное имя теперь новое: заголовок удаления обязан назвать его,
+            // а не то, что было до переименования
+            _savedName = Name.Trim();
 
             return true;
         }
@@ -113,6 +130,10 @@ public sealed partial class PlaceViewModel : ObservableObject
             OnPropertyChanged(nameof(HasError));
 
             return false;
+        }
+        finally
+        {
+            IsSaving = false;
         }
     }
 
@@ -139,13 +160,22 @@ public sealed partial class PlaceViewModel : ObservableObject
     [RelayCommand]
     public async Task<bool> DeleteAsync(CancellationToken cancellationToken = default)
     {
-        if (Key is not { } key)
+        if (Key is not { } key || IsSaving)
         {
             return false;
         }
 
-        await _delete.HandleAsync(key, cancellationToken);
+        IsSaving = true;
 
-        return true;
+        try
+        {
+            await _delete.HandleAsync(key, cancellationToken);
+
+            return true;
+        }
+        finally
+        {
+            IsSaving = false;
+        }
     }
 }

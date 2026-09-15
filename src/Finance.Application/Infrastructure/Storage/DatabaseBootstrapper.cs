@@ -34,17 +34,9 @@ public sealed class DatabaseBootstrapper
     {
         bool existed = File.Exists(_location.Path);
 
-        await using FinanceDbContext context = await _contexts
-            .CreateDbContextAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        IEnumerable<string> pending = await context.Database
-            .GetPendingMigrationsAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        if (!pending.Any())
+        if (!await HasPendingMigrationsAsync(cancellationToken).ConfigureAwait(false))
         {
-            await EnableWriteAheadLogAsync(context, cancellationToken).ConfigureAwait(false);
+            await EnableWriteAheadLogAsync(cancellationToken).ConfigureAwait(false);
 
             return;
         }
@@ -55,16 +47,29 @@ public sealed class DatabaseBootstrapper
             await BackupAsync(cancellationToken).ConfigureAwait(false);
         }
 
+        if (BeforeMigrate is { } beforeMigrate)
+        {
+            await beforeMigrate().ConfigureAwait(false);
+        }
+
         try
         {
-            await context.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
+            // Контекст миграции живёт внутри и освобождается до отката: откат
+            // подменяет файл базы, и открытое соединение к нему держать нельзя
+            await MigrateAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception error) when (error is not OperationCanceledException)
         {
-            if (existed)
+            // Без прежней базы нечего ни возвращать, ни советовать вернуть
+            // прежнюю версию: копии не было, и данных — тоже
+            if (!existed)
             {
-                RestoreFromBackup();
+                throw new DatabaseMigrationException(
+                    "Не удалось создать базу. Данных ещё не было, терять нечего",
+                    error);
             }
+
+            RestoreFromBackup();
 
             throw new DatabaseMigrationException(
                 "Не удалось обновить схему базы. База возвращена из резервной копии; " +
@@ -72,7 +77,36 @@ public sealed class DatabaseBootstrapper
                 error);
         }
 
-        await EnableWriteAheadLogAsync(context, cancellationToken).ConfigureAwait(false);
+        await EnableWriteAheadLogAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Точка для тестов: что сделать между снятием копии и миграцией. Только так
+    /// проверяется сам откат из копии — миграция транзакционна, и порча базы до
+    /// копии восстановилась бы и без копии.
+    /// </summary>
+    internal Func<Task>? BeforeMigrate { get; set; }
+
+    private async Task<bool> HasPendingMigrationsAsync(CancellationToken cancellationToken)
+    {
+        await using FinanceDbContext context = await _contexts
+            .CreateDbContextAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        IEnumerable<string> pending = await context.Database
+            .GetPendingMigrationsAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return pending.Any();
+    }
+
+    private async Task MigrateAsync(CancellationToken cancellationToken)
+    {
+        await using FinanceDbContext context = await _contexts
+            .CreateDbContextAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        await context.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -134,10 +168,14 @@ public sealed class DatabaseBootstrapper
     /// Включает журналирование с упреждающей записью. Режим запоминается в самом
     /// файле базы, поэтому выставляется один раз, а не на каждое соединение.
     /// </summary>
-    private static async Task EnableWriteAheadLogAsync(
-        FinanceDbContext context,
-        CancellationToken cancellationToken) =>
+    private async Task EnableWriteAheadLogAsync(CancellationToken cancellationToken)
+    {
+        await using FinanceDbContext context = await _contexts
+            .CreateDbContextAsync(cancellationToken)
+            .ConfigureAwait(false);
+
         await context.Database
             .ExecuteSqlRawAsync("PRAGMA journal_mode=WAL;", cancellationToken)
             .ConfigureAwait(false);
+    }
 }

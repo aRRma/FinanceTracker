@@ -52,14 +52,14 @@ internal sealed class TransactionFixture : IAsyncDisposable
         return new TransactionFixture(database, expense, income);
     }
 
-    public Task<Guid> AccountAsync(string name, decimal openingBalance = 0m, Currency currency = Currency.RUB, bool excluded = false) =>
+    public Task<Guid> AccountAsync(string name, decimal openingBalance = 0m, Currency currency = Currency.RUB, bool excluded = false, DateOnly? openedOn = null) =>
         Database.Resolve<ISaveAccountHandler>().HandleAsync(new SaveAccountCommand
         {
             Name = name,
             Type = AccountType.Card,
             Currency = currency,
             OpeningBalance = openingBalance,
-            OpenedOn = OpenedOn,
+            OpenedOn = openedOn ?? OpenedOn,
             ExcludedFromTotals = excluded,
             IsClosed = false
         });

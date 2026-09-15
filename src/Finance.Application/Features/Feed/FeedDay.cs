@@ -23,7 +23,7 @@ public sealed class FeedDay : ObservableCollection<FeedRowItem>
         Date = date;
         Title = Format(date, today);
         Total = total?.DisplaySigned ?? string.Empty;
-        IsTotalNegative = total is { IsNegative: true };
+        IsTotalPositive = total is { IsPositive: true };
     }
 
     /// <summary>Дата дня.</summary>
@@ -35,8 +35,8 @@ public sealed class FeedDay : ObservableCollection<FeedRowItem>
     /// <summary>Итог дня со знаком. Пусто — итога нет: ни одна строка дня в него не входит.</summary>
     public string Total { get; }
 
-    /// <summary>Итог отрицателен: день закончился в минус.</summary>
-    public bool IsTotalNegative { get; }
+    /// <summary>Итог положителен: день в плюсе показывается смысловым цветом, как доход в строке.</summary>
+    public bool IsTotalPositive { get; }
 
     /// <summary>Год пишется только чужой: в ленте за этот год он был бы шумом в каждой шапке.</summary>
     private static string Format(DateOnly date, DateOnly today) =>

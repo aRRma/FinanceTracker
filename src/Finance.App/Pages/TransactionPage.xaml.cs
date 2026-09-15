@@ -31,6 +31,9 @@ public partial class TransactionPage : DataPage
     public string? Account { get; set; }
 
     /// <inheritdoc />
+    protected override bool ReloadsOnAppearing => false;
+
+    /// <inheritdoc />
     protected override async Task LoadAsync()
     {
         await _model.LoadAsync(

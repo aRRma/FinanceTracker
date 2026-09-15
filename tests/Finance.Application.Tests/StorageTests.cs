@@ -38,6 +38,30 @@ public sealed class StorageTests
         Assert.Equal(123_456L, await ScalarAsync<long>(database, "SELECT opening_balance FROM accounts"));
     }
 
+    /// <summary>
+    /// Доля копейки в базу не записывается: домен её не выпускает, а приведение
+    /// к копейкам обязано проверить, а не срезать молча.
+    /// </summary>
+    [Fact]
+    public async Task Доля_копейки_в_базу_не_записывается()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        // Минуя домен: Money.Create такую сумму не пропустит, а проверяется сам конвертер
+        Account account = Account.Restore(
+            Keys.New(), "Наличные", AccountType.Cash, Currency.RUB, 1.005m, new DateOnly(2026, 1, 1),
+            excludedFromTotals: false, isClosed: false, sortOrder: 0,
+            NowUtc, NowUtc, deletedAtUtc: null, syncedAtUtc: null, externalId: null);
+
+        await using FinanceDbContext context = await database.Contexts.CreateDbContextAsync();
+        context.Accounts.Add(account.ToRow());
+
+        // EF заворачивает сбой конвертера в ошибку сохранения; причина — внутри
+        DbUpdateException error = await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
+
+        Assert.IsType<InvalidOperationException>(error.InnerException);
+    }
+
     /// <summary>Суммы складываются запросом к базе — иначе баланс потребовал бы поднять всю ленту.</summary>
     [Fact]
     public async Task Суммы_складываются_на_стороне_базы()

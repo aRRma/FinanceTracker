@@ -12,6 +12,8 @@ public abstract class DataPage : ContentPage
 {
     private readonly FinanceStartup _startup;
 
+    private bool _loaded;
+
     /// <summary>Создаёт страницу.</summary>
     /// <param name="startup">Подготовка приложения: миграции, стартовый набор, часовой пояс.</param>
     protected DataPage(FinanceStartup startup)
@@ -23,6 +25,13 @@ public abstract class DataPage : ContentPage
 
     /// <summary>Читает то, что показывает страница.</summary>
     protected abstract Task LoadAsync();
+
+    /// <summary>
+    /// Перечитывать ли страницу при каждом появлении. Списки — да: вернувшись
+    /// с карточки, пользователь ждёт свежих чисел. Формы — нет: появление приходит
+    /// и при возврате приложения из фона, и перечитывание стёрло бы набранное.
+    /// </summary>
+    protected virtual bool ReloadsOnAppearing => true;
 
     /// <inheritdoc />
     protected override void OnAppearing()
@@ -39,7 +48,11 @@ public abstract class DataPage : ContentPage
             screen.Activate();
         }
 
-        Guarded.Run(PrepareAndLoadAsync);
+        if (ReloadsOnAppearing || !_loaded)
+        {
+            _loaded = true;
+            Guarded.Run(PrepareAndLoadAsync);
+        }
     }
 
     /// <summary>

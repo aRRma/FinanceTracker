@@ -20,6 +20,11 @@ public sealed partial class ReportViewModel : ScreenViewModel
 
     private IReadOnlyList<ReportTotal> _all = [];
 
+    // Номер чтения: по нему завершившееся чтение узнаёт, что месяц за время
+    // запроса сменили ещё раз и его строки уже не к месту. Без него два быстрых
+    // нажатия «назад» показали бы группы одного месяца под шапкой другого
+    private int _generation;
+
     /// <summary>Создаёт модель представления отчёта.</summary>
     /// <param name="report">Суммы отчёта.</param>
     /// <param name="clock">Часы приложения: от них зависит, какой месяц текущий.</param>
@@ -93,19 +98,33 @@ public sealed partial class ReportViewModel : ScreenViewModel
     [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
+        int generation = ++_generation;
+
         IsBusy = true;
 
         try
         {
             // ConfigureAwait(false) здесь недопустим: дальше наполняются
             // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-            _all = await _report.ReadGroupsAsync(Month, cancellationToken);
+            IReadOnlyList<ReportTotal> all = await _report.ReadGroupsAsync(Month, cancellationToken);
+
+            if (generation != _generation)
+            {
+                return;
+            }
+
+            _all = all;
 
             Rebuild();
         }
         finally
         {
-            IsBusy = false;
+            // Занятость снимает только последнее чтение: более раннее ещё не значит,
+            // что экран готов
+            if (generation == _generation)
+            {
+                IsBusy = false;
+            }
         }
     }
 

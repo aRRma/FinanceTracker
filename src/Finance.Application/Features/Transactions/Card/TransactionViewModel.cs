@@ -156,7 +156,8 @@ public sealed partial class TransactionViewModel : ObservableObject
     /// на клавиатуре гаснет, а не отказывает после нажатия.
     /// </summary>
     public bool CanSave =>
-        SourceAccount is not null
+        !IsSaving
+        && SourceAccount is not null
         && AmountExpression.TryEvaluate(Amount, out decimal amount)
         && amount > 0m
         && (!NeedsTargetAmount
@@ -218,6 +219,15 @@ public sealed partial class TransactionViewModel : ObservableObject
 
     /// <summary>Правило нарушено — сообщение показывается рядом с формой.</summary>
     public bool HasError => !string.IsNullOrEmpty(Error);
+
+    /// <summary>
+    /// Идёт сохранение или удаление. Кнопки зовут методы напрямую, минуя команду
+    /// с её защитой от повторного запуска: без флага второе нажатие до ухода
+    /// экрана записало бы операцию дважды.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanSave))]
+    public partial bool IsSaving { get; private set; }
 
     /// <summary>
     /// Вторая сумма нужна: перевод между счетами в разных валютах. При одной валюте
@@ -320,6 +330,11 @@ public sealed partial class TransactionViewModel : ObservableObject
     [RelayCommand]
     public async Task<bool> SaveAsync(CancellationToken cancellationToken = default)
     {
+        if (IsSaving)
+        {
+            return false;
+        }
+
         Error = null;
 
         if (SourceAccount is not { } source)
@@ -364,6 +379,8 @@ public sealed partial class TransactionViewModel : ObservableObject
             return false;
         }
 
+        IsSaving = true;
+
         try
         {
             await _save.HandleAsync(
@@ -389,6 +406,10 @@ public sealed partial class TransactionViewModel : ObservableObject
             Error = error.Message;
 
             return false;
+        }
+        finally
+        {
+            IsSaving = false;
         }
     }
 
@@ -452,14 +473,23 @@ public sealed partial class TransactionViewModel : ObservableObject
     [RelayCommand]
     public async Task<bool> DeleteAsync(CancellationToken cancellationToken = default)
     {
-        if (Key is not { } key)
+        if (Key is not { } key || IsSaving)
         {
             return false;
         }
 
-        await _delete.HandleAsync(key, cancellationToken);
+        IsSaving = true;
 
-        return true;
+        try
+        {
+            await _delete.HandleAsync(key, cancellationToken);
+
+            return true;
+        }
+        finally
+        {
+            IsSaving = false;
+        }
     }
 
     /// <summary>Нажата клавиша суммы: цифра, запятая или знак действия.</summary>

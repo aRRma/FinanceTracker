@@ -129,6 +129,18 @@ public sealed partial class AccountViewModel : ObservableObject
     [ObservableProperty]
     public partial string? Error { get; private set; }
 
+    /// <summary>
+    /// Идёт сохранение. Кнопка зовёт метод напрямую, минуя команду с её защитой
+    /// от повторного запуска: без флага второе нажатие до ухода экрана
+    /// завело бы второй счёт.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanSave))]
+    public partial bool IsSaving { get; private set; }
+
+    /// <summary>Сохранять можно: предыдущее сохранение не идёт.</summary>
+    public bool CanSave => !IsSaving;
+
     /// <summary>Заголовок экрана.</summary>
     public string Title => Key is null ? "Новый счёт" : "Счёт";
 
@@ -181,6 +193,11 @@ public sealed partial class AccountViewModel : ObservableObject
     [RelayCommand]
     public async Task<bool> SaveAsync(CancellationToken cancellationToken = default)
     {
+        if (IsSaving)
+        {
+            return false;
+        }
+
         Error = null;
         OnPropertyChanged(nameof(HasError));
 
@@ -191,6 +208,8 @@ public sealed partial class AccountViewModel : ObservableObject
 
             return false;
         }
+
+        IsSaving = true;
 
         try
         {
@@ -217,6 +236,10 @@ public sealed partial class AccountViewModel : ObservableObject
             OnPropertyChanged(nameof(HasError));
 
             return false;
+        }
+        finally
+        {
+            IsSaving = false;
         }
     }
 }

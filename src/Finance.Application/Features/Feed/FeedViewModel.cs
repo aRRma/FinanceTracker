@@ -125,7 +125,12 @@ public sealed partial class FeedViewModel : ScreenViewModel
         }
         finally
         {
-            IsBusy = false;
+            // Занятость снимает только последнее чтение: более раннее, завершившись,
+            // открыло бы дочитывание, пока свежее ещё наполняет ленту
+            if (generation == _generation)
+            {
+                IsBusy = false;
+            }
         }
     }
 

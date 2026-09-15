@@ -16,6 +16,7 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
     private readonly ICategoriesQuery _categories;
 
     private Guid _subcategoryKey;
+    private int _generation;
 
     /// <summary>Создаёт модель представления подкатегории отчёта.</summary>
     /// <param name="report">Суммы и операции отчёта.</param>
@@ -69,6 +70,11 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
     {
         _subcategoryKey = subcategoryKey;
         Month = month;
+
+        // Номер чтения: перечитывание по чужой правке может обогнать первое чтение,
+        // и строки более раннего запроса легли бы поверх более свежих
+        int generation = ++_generation;
+
         IsBusy = true;
 
         try
@@ -81,11 +87,19 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
             // в памяти, и заводить ради одного поля четвёртый запрос незачем
             IReadOnlyList<CategoryListItem> categories = await _categories.ReadAsync(cancellationToken);
 
+            if (generation != _generation)
+            {
+                return;
+            }
+
             Rebuild(items, categories);
         }
         finally
         {
-            IsBusy = false;
+            if (generation == _generation)
+            {
+                IsBusy = false;
+            }
         }
     }
 

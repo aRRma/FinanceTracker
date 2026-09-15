@@ -23,7 +23,16 @@
             <DataTemplate x:DataType="feed:FeedDay">
                 <Grid Padding="16,16,16,6" ColumnDefinitions="*,Auto">
                     <Label Grid.Column="0" Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
-                    <Label Grid.Column="1" Text="{Binding Total}" Style="{StaticResource SectionLabel}" />
+                    <Label Grid.Column="1" Text="{Binding Total}" Style="{StaticResource SectionLabel}">
+                        <Label.Triggers>
+                            <!-- День в плюсе — смысловым цветом, как доход в строке; цвет, а не стиль:
+                                 стиль шапки со своим шрифтом обязан остаться -->
+                            <DataTrigger TargetType="Label" Binding="{Binding IsTotalPositive}" Value="True">
+                                <Setter Property="TextColor"
+                                        Value="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
                 </Grid>
             </DataTemplate>
         </CollectionView.GroupHeaderTemplate>

@@ -64,6 +64,18 @@ public sealed partial class GroupViewModel : ObservableObject
     [ObservableProperty]
     public partial string? Error { get; private set; }
 
+    /// <summary>
+    /// Идёт сохранение. Кнопка зовёт метод напрямую, минуя команду с её защитой
+    /// от повторного запуска: без флага второе нажатие до ухода экрана
+    /// завело бы вторую группу.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanSave))]
+    public partial bool IsSaving { get; private set; }
+
+    /// <summary>Сохранять можно: предыдущее сохранение не идёт.</summary>
+    public bool CanSave => !IsSaving;
+
     /// <summary>Выбранный вид — номером в переключателе.</summary>
     public int KindIndex
     {
@@ -143,6 +155,12 @@ public sealed partial class GroupViewModel : ObservableObject
     [RelayCommand]
     public async Task<bool> SaveAsync(CancellationToken cancellationToken = default)
     {
+        if (IsSaving)
+        {
+            return false;
+        }
+
+        IsSaving = true;
         Error = null;
         OnPropertyChanged(nameof(HasError));
 
@@ -172,6 +190,10 @@ public sealed partial class GroupViewModel : ObservableObject
             OnPropertyChanged(nameof(HasError));
 
             return false;
+        }
+        finally
+        {
+            IsSaving = false;
         }
     }
 
