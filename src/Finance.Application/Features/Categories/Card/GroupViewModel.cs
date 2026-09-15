@@ -161,6 +161,7 @@ public sealed partial class GroupViewModel : ObservableObject
         }
 
         IsSaving = true;
+        bool done = false;
         Error = null;
         OnPropertyChanged(nameof(HasError));
 
@@ -182,6 +183,8 @@ public sealed partial class GroupViewModel : ObservableObject
 
             Refresh();
 
+            done = true;
+
             return true;
         }
         catch (DomainException error)
@@ -193,7 +196,9 @@ public sealed partial class GroupViewModel : ObservableObject
         }
         finally
         {
-            IsSaving = false;
+            // После удачи флаг остаётся: экран закрывается, и второе нажатие
+            // в этот промежуток записало бы то же самое ещё раз
+            IsSaving = !done;
         }
     }
 

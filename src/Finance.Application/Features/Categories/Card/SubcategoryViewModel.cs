@@ -180,6 +180,7 @@ public sealed partial class SubcategoryViewModel : ObservableObject
         }
 
         IsSaving = true;
+        bool done = false;
 
         try
         {
@@ -195,6 +196,8 @@ public sealed partial class SubcategoryViewModel : ObservableObject
 
             Refresh();
 
+            done = true;
+
             return true;
         }
         catch (DomainException error)
@@ -206,7 +209,9 @@ public sealed partial class SubcategoryViewModel : ObservableObject
         }
         finally
         {
-            IsSaving = false;
+            // После удачи флаг остаётся: экран закрывается, и второе нажатие
+            // в этот промежуток записало бы то же самое ещё раз
+            IsSaving = !done;
         }
     }
 
@@ -249,12 +254,15 @@ public sealed partial class SubcategoryViewModel : ObservableObject
         }
 
         IsSaving = true;
+        bool done = false;
         Error = null;
         OnPropertyChanged(nameof(HasError));
 
         try
         {
             await _delete.HandleAsync(key, cancellationToken);
+
+            done = true;
 
             return true;
         }
@@ -267,7 +275,9 @@ public sealed partial class SubcategoryViewModel : ObservableObject
         }
         finally
         {
-            IsSaving = false;
+            // После удачи флаг остаётся: экран закрывается, и второе нажатие
+            // в этот промежуток записало бы то же самое ещё раз
+            IsSaving = !done;
         }
     }
 

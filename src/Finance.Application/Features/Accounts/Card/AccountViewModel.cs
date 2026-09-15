@@ -228,6 +228,7 @@ public sealed partial class AccountViewModel : ObservableObject
         }
 
         IsSaving = true;
+        bool done = false;
 
         try
         {
@@ -246,6 +247,8 @@ public sealed partial class AccountViewModel : ObservableObject
                     },
                     cancellationToken);
 
+            done = true;
+
             return true;
         }
         catch (DomainException error)
@@ -257,7 +260,9 @@ public sealed partial class AccountViewModel : ObservableObject
         }
         finally
         {
-            IsSaving = false;
+            // После удачи флаг остаётся: экран закрывается, и второе нажатие
+            // в этот промежуток записало бы то же самое ещё раз
+            IsSaving = !done;
         }
     }
 }

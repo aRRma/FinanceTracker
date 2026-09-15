@@ -380,6 +380,7 @@ public sealed partial class TransactionViewModel : ObservableObject
         }
 
         IsSaving = true;
+        bool done = false;
 
         try
         {
@@ -399,6 +400,8 @@ public sealed partial class TransactionViewModel : ObservableObject
                 },
                 cancellationToken);
 
+            done = true;
+
             return true;
         }
         catch (DomainException error)
@@ -409,7 +412,9 @@ public sealed partial class TransactionViewModel : ObservableObject
         }
         finally
         {
-            IsSaving = false;
+            // После удачи флаг остаётся: экран закрывается, и второе нажатие
+            // в этот промежуток записало бы то же самое ещё раз
+            IsSaving = !done;
         }
     }
 
@@ -479,16 +484,21 @@ public sealed partial class TransactionViewModel : ObservableObject
         }
 
         IsSaving = true;
+        bool done = false;
 
         try
         {
             await _delete.HandleAsync(key, cancellationToken);
 
+            done = true;
+
             return true;
         }
         finally
         {
-            IsSaving = false;
+            // После удачи флаг остаётся: экран закрывается, и второе нажатие
+            // в этот промежуток записало бы то же самое ещё раз
+            IsSaving = !done;
         }
     }
 
