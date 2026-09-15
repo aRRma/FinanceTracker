@@ -12,12 +12,14 @@ namespace Finance.Application.Features.Categories.Card;
 /// Вид не показывается для выбора — он наследуется от группы, и переезд в группу
 /// другого вида запрещён.
 /// </summary>
-public sealed partial class SubcategoryViewModel : ObservableObject
+public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
 {
     private readonly ICategoriesQuery _categories;
     private readonly ISaveCategoryHandler _handler;
     private readonly ICategoryDeletionQuery _deletion;
     private readonly IDeleteSubcategoryHandler _delete;
+
+    private (string, Guid?, string) _saved;
 
     private CategoryKind _kind = CategoryKind.Expense;
     private bool _isProtected;
@@ -76,11 +78,19 @@ public sealed partial class SubcategoryViewModel : ObservableObject
     /// экрана завело бы вторую подкатегорию.
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsIdle))]
     [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial bool IsSaving { get; private set; }
 
-    /// <summary>Сохранять и удалять можно: предыдущее действие не идёт.</summary>
-    public bool CanSave => !IsSaving;
+    /// <summary>
+    /// Предыдущее действие закончилось — можно начинать следующее. Отдельно
+    /// от <see cref="CanSave"/>: к нему привязана и кнопка удаления, а «можно
+    /// сохранить» о ней ничего не говорит.
+    /// </summary>
+    public bool IsIdle => !IsSaving;
+
+    /// <summary>Сохранять можно: предыдущее действие не идёт.</summary>
+    public bool CanSave => IsIdle;
 
     /// <summary>Выбранная группа — номером в списке.</summary>
     public int GroupIndex
@@ -103,6 +113,16 @@ public sealed partial class SubcategoryViewModel : ObservableObject
 
     /// <summary>Правило нарушено — сообщение показывается рядом с формой.</summary>
     public bool HasError => !string.IsNullOrEmpty(Error);
+
+    /// <inheritdoc />
+    public bool IsDirty => Snapshot() != _saved;
+
+    /// <summary>
+    /// Правимые поля формы одним значением. Кортеж сравнивается сам, по всем полям
+    /// сразу: список «что считать правкой» отдельно от полей разошёлся бы с ними
+    /// при первом же новом поле.
+    /// </summary>
+    private (string Name, Guid? Group, string Icon) Snapshot() => (Name, Group?.Key, Icon.Selected);
 
     /// <summary>
     /// Загружает подкатегорию для правки или готовит новую в указанной группе.
@@ -130,6 +150,8 @@ public sealed partial class SubcategoryViewModel : ObservableObject
 
         if (categories.FirstOrDefault(item => item.Key == parentKey && item.IsGroup) is not { } parent)
         {
+            _saved = Snapshot();
+
             return;
         }
 
@@ -150,6 +172,7 @@ public sealed partial class SubcategoryViewModel : ObservableObject
         }
 
         Group = Groups.FirstOrDefault(option => option.Key == parent.Key);
+        _saved = Snapshot();
 
         Refresh();
     }

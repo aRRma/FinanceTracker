@@ -19,11 +19,17 @@ public sealed partial class IconPicker : ObservableObject
         ArgumentNullException.ThrowIfNull(catalog);
 
         _catalog = catalog;
+        Choices = [.. catalog.Keys.Select(static key => new IconChoice(key))];
         Selected = catalog.Fallback;
+
+        Mark(Selected);
     }
 
-    /// <summary>Все значки набора в порядке файла — так они и показываются.</summary>
-    public IReadOnlyList<string> Keys => _catalog.Keys;
+    /// <summary>
+    /// Все значки набора в порядке файла — так они и показываются. Каждый знает,
+    /// выбран ли он: без этого в раскрытой сетке не видно, что выбрано сейчас.
+    /// </summary>
+    public IReadOnlyList<IconChoice> Choices { get; }
 
     /// <summary>Выбранный значок.</summary>
     [ObservableProperty]
@@ -39,6 +45,8 @@ public sealed partial class IconPicker : ObservableObject
     {
         Selected = _catalog.Resolve(icon);
         IsOpen = false;
+
+        Mark(Selected);
     }
 
     /// <summary>Раскрывает и закрывает сетку значков.</summary>
@@ -52,5 +60,22 @@ public sealed partial class IconPicker : ObservableObject
     {
         Selected = _catalog.Resolve(icon);
         IsOpen = false;
+
+        Mark(Selected);
+    }
+
+    // Правятся только две строки из восьми десятков — та, что была выбрана,
+    // и та, что стала: пересборка коллекции целиком мигала бы всей сеткой
+    private void Mark(string key)
+    {
+        foreach (IconChoice choice in Choices)
+        {
+            bool selected = string.Equals(choice.Key, key, StringComparison.Ordinal);
+
+            if (choice.IsSelected != selected)
+            {
+                choice.IsSelected = selected;
+            }
+        }
     }
 }

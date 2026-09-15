@@ -29,19 +29,33 @@ public sealed partial class BalancesViewModel : ScreenViewModel
     /// <summary>Разделы по валютам, в порядке появления счетов.</summary>
     public ObservableCollection<CurrencySection> Sections { get; } = [];
 
-    /// <summary>Идёт чтение — экран показывает ожидание вместо пустоты.</summary>
+    /// <summary>
+    /// Идёт чтение — экран показывает ожидание вместо пустоты. Запись открыта
+    /// намеренно: к этому признаку привязан жест «потянуть вниз», и он сам
+    /// поднимает его в начале обновления.
+    /// </summary>
     [ObservableProperty]
-    public partial bool IsBusy { get; private set; }
+    public partial bool IsBusy { get; set; }
+
+    /// <summary>
+    /// Счета прочитаны хотя бы раз. До этого экран не знает, пусто на нём или нет,
+    /// и не имеет права ни показать приглашение завести счёт, ни предложить
+    /// записать операцию: и то и другое мигнуло бы и сменилось на противоположное.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasAccounts))]
+    public partial bool IsLoaded { get; private set; }
 
     /// <summary>
     /// Счетов нет вовсе: главный экран предлагает завести первый вместо списка,
     /// а добавление операции недоступно — записывать её некуда.
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasAccounts))]
     public partial bool IsEmpty { get; private set; }
 
     /// <summary>Счета есть — показывается список, а не приглашение завести первый.</summary>
-    public bool HasAccounts => !IsEmpty;
+    public bool HasAccounts => IsLoaded && !IsEmpty;
 
     /// <summary>Перечитывает счета и балансы.</summary>
     /// <param name="cancellationToken">Признак отмены.</param>
@@ -71,7 +85,7 @@ public sealed partial class BalancesViewModel : ScreenViewModel
             // Пусто — когда счетов нет вовсе, а не когда все они закрыты:
             // иначе закрытие последнего счёта выглядело бы как первый запуск
             IsEmpty = accounts.Count == 0;
-            OnPropertyChanged(nameof(HasAccounts));
+            IsLoaded = true;
         }
         finally
         {
@@ -96,6 +110,7 @@ public sealed partial class BalancesViewModel : ScreenViewModel
             yield return new CurrencySection(
                 group.Key.SectionTitle,
                 available.Display,
+                available.IsNegative,
                 [.. spendable.Select(AccountTile.From)],
                 [.. group.Where(static account => account.ExcludedFromTotals).Select(AccountTile.From)]);
         }

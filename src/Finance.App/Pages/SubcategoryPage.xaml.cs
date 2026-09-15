@@ -39,14 +39,6 @@ public partial class SubcategoryPage : DataPage
             Guid.TryParse(Key, out Guid key) ? key : null,
             Guid.TryParse(Group, out Guid group) ? group : null);
 
-    private void OnIconTapped(object? sender, TappedEventArgs e)
-    {
-        if (sender is BindableObject { BindingContext: string icon })
-        {
-            _model.Icon.Pick(icon);
-        }
-    }
-
     private void OnSave(object? sender, EventArgs e) => Guarded.Run(SaveAsync);
 
     private async Task SaveAsync()

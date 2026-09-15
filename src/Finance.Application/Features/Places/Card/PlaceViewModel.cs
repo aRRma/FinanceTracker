@@ -11,7 +11,7 @@ namespace Finance.Application.Features.Places.Card;
 /// появляется из формы операции, а сюда приходят исправлять опечатку или
 /// убирать дубль.
 /// </summary>
-public sealed partial class PlaceViewModel : ObservableObject
+public sealed partial class PlaceViewModel : ObservableObject, IFormModel
 {
     private readonly IPlacesQuery _places;
     private readonly IRenamePlaceHandler _rename;
@@ -62,14 +62,25 @@ public sealed partial class PlaceViewModel : ObservableObject
     /// экрана запустило бы второе действие.
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsIdle))]
     [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial bool IsSaving { get; private set; }
 
-    /// <summary>Сохранять и удалять можно: предыдущее действие не идёт.</summary>
-    public bool CanSave => !IsSaving;
+    /// <summary>
+    /// Предыдущее действие закончилось — можно начинать следующее. Отдельно
+    /// от <see cref="CanSave"/>: к нему привязана и кнопка удаления, а «можно
+    /// сохранить» о ней ничего не говорит.
+    /// </summary>
+    public bool IsIdle => !IsSaving;
+
+    /// <summary>Сохранять можно: предыдущее действие не идёт.</summary>
+    public bool CanSave => IsIdle;
 
     /// <summary>Место загрузилось — есть что править и что удалять.</summary>
     public bool IsLoaded => Key is not null;
+
+    /// <inheritdoc />
+    public bool IsDirty => !string.Equals(Name.Trim(), _savedName, StringComparison.Ordinal);
 
     /// <summary>Загружает место для правки.</summary>
     /// <param name="key">Ключ места.</param>

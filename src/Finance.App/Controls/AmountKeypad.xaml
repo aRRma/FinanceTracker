@@ -38,11 +38,16 @@
             <Button Grid.Row="2" Grid.Column="2" Text="3" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
             <Button Grid.Row="2" Grid.Column="3" Text="−" Style="{StaticResource KeypadOperator}" Clicked="OnKey" />
 
-            <Button Grid.Row="3" Grid.Column="0" Text="," Style="{StaticResource KeypadKey}" Clicked="OnKey" />
+            <!-- Знак разделителя — культуры устройства, не жёсткая запятая: {x:Static},
+                 потому что привязка static-свойства не видит (оставила бы клавишу пустой) -->
+            <Button Grid.Row="3" Grid.Column="0" Text="{x:Static controls:AmountKeypad.Separator}"
+                    Style="{StaticResource KeypadKey}" Clicked="OnKey" />
             <Button Grid.Row="3" Grid.Column="1" Text="0" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
 
-            <!-- Стирание значком, а не знаком: «⌫» в системном шрифте набирается не везде -->
-            <Border Grid.Row="3" Grid.Column="2" Style="{StaticResource KeypadCell}">
+            <!-- Стирание значком, а не знаком: «⌫» в системном шрифте набирается не везде.
+                 Описание обязательно: у клавиши нет подписи, и вслух она молчит -->
+            <Border Grid.Row="3" Grid.Column="2" Style="{StaticResource KeypadCell}"
+                    SemanticProperties.Description="Стереть знак" AutomationId="Backspace">
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnBackspace" />
                 </Border.GestureRecognizers>
@@ -53,7 +58,7 @@
 
         </Grid>
 
-        <Button Grid.Row="1" Text="Сохранить"
+        <Button Grid.Row="1" Text="Сохранить" AutomationId="SaveTransaction"
                 Style="{StaticResource KeypadGo}" Clicked="OnSave"
                 IsEnabled="{Binding CanSave, Source={x:Reference Keypad}}" />
 

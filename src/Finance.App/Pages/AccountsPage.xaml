@@ -14,7 +14,7 @@
     Title="Счета">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="+" Clicked="OnCreateAccount" />
+        <ToolbarItem Text="+" Clicked="OnCreateAccount" AutomationId="CreateAccount" />
     </ContentPage.ToolbarItems>
 
     <ContentPage.Resources>
@@ -31,34 +31,49 @@
                 <Label Grid.Column="0" Grid.Row="1" Text="{Binding Caption}"
                        Style="{StaticResource SecondaryLabel}" />
                 <Label Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Balance}"
-                       VerticalOptions="Center" />
+                       VerticalOptions="Center">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding IsNegative}" Value="True">
+                            <Setter Property="Style" Value="{StaticResource NegativeLabel}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
             </Grid>
         </DataTemplate>
     </ContentPage.Resources>
 
-    <ScrollView>
-        <VerticalStackLayout Padding="16,12" Spacing="16">
-            <Label Text="Доступно к тратам" Style="{StaticResource SectionLabel}" />
-            <Border Style="{StaticResource Card}">
-                <VerticalStackLayout
-                    BindableLayout.ItemsSource="{Binding Spendable}"
-                    BindableLayout.ItemTemplate="{StaticResource AccountRowTemplate}" />
-            </Border>
+    <!-- Тот же признак занятости гасит и ожидание первого чтения, и жест обновления -->
+    <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding LoadCommand}">
+        <!-- Container: .NET 10 пускает страницу под системные полосы, а ScrollView
+             из всех областей понимает только эту -->
+        <ScrollView SafeAreaEdges="Container">
+            <VerticalStackLayout Padding="16,12" Spacing="16">
+                <Label Text="Доступно к тратам" Style="{StaticResource SectionLabel}" />
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout
+                        BindableLayout.ItemsSource="{Binding Spendable}"
+                        BindableLayout.ItemTemplate="{StaticResource AccountRowTemplate}" />
+                </Border>
 
-            <Label Text="Накопления" Style="{StaticResource SectionLabel}" />
-            <Border Style="{StaticResource Card}">
-                <VerticalStackLayout
-                    BindableLayout.ItemsSource="{Binding Savings}"
-                    BindableLayout.ItemTemplate="{StaticResource AccountRowTemplate}" />
-            </Border>
+                <!-- Пустой раздел не показывается: заголовок без единой строки под ним
+                     читается как потерянные счета, а не как «накоплений нет» -->
+                <Label Text="Накопления" Style="{StaticResource SectionLabel}"
+                       IsVisible="{Binding HasSavings}" />
+                <Border Style="{StaticResource Card}" IsVisible="{Binding HasSavings}">
+                    <VerticalStackLayout
+                        BindableLayout.ItemsSource="{Binding Savings}"
+                        BindableLayout.ItemTemplate="{StaticResource AccountRowTemplate}" />
+                </Border>
 
-            <Label Text="Закрытые" Style="{StaticResource SectionLabel}" />
-            <Border Style="{StaticResource Card}">
-                <VerticalStackLayout
-                    BindableLayout.ItemsSource="{Binding Closed}"
-                    BindableLayout.ItemTemplate="{StaticResource AccountRowTemplate}" />
-            </Border>
-        </VerticalStackLayout>
-    </ScrollView>
+                <Label Text="Закрытые" Style="{StaticResource SectionLabel}"
+                       IsVisible="{Binding HasClosed}" />
+                <Border Style="{StaticResource Card}" IsVisible="{Binding HasClosed}">
+                    <VerticalStackLayout
+                        BindableLayout.ItemsSource="{Binding Closed}"
+                        BindableLayout.ItemTemplate="{StaticResource AccountRowTemplate}" />
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
 
 </pages:DataPage>

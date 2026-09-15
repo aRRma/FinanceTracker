@@ -16,7 +16,7 @@
     Title="Категории">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="+" Clicked="OnCreateGroup" />
+        <ToolbarItem Text="+" Clicked="OnCreateGroup" AutomationId="CreateGroup" />
     </ContentPage.ToolbarItems>
 
     <Grid RowDefinitions="Auto,*">
@@ -28,54 +28,65 @@
             <RadioButton Content="Доходы" Value="{x:Static domain:CategoryKind.Income}" />
         </HorizontalStackLayout>
 
-        <Label Grid.Row="1" Padding="16,24" IsVisible="{Binding IsEmpty}"
-               Text="Групп этого вида пока нет. Заведите первую кнопкой «+» — подкатегория «Прочее» создастся сама."
-               Style="{StaticResource SecondaryLabel}" />
+        <!-- Тот же признак занятости гасит и ожидание первого чтения, и жест обновления -->
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsBusy}" Command="{Binding LoadCommand}">
 
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Groups}" IsGrouped="True" SelectionMode="None">
+            <CollectionView ItemsSource="{Binding Groups}" IsGrouped="True" SelectionMode="None">
 
-            <CollectionView.GroupHeaderTemplate>
-                <DataTemplate x:DataType="catalog:CategoryGroupItem">
-                    <Grid Padding="16,16,16,6" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"
-                          MinimumHeightRequest="{StaticResource TouchTarget}">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnGroupTapped" />
-                        </Grid.GestureRecognizers>
+                <CollectionView.GroupHeaderTemplate>
+                    <DataTemplate x:DataType="catalog:CategoryGroupItem">
+                        <Grid Padding="16,16,16,6" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"
+                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnGroupTapped" />
+                            </Grid.GestureRecognizers>
 
-                        <controls:Icon Grid.Column="0" Key="{Binding Icon}" />
-                        <Label Grid.Column="1" Text="{Binding Name}" Style="{StaticResource SectionLabel}"
-                               VerticalOptions="Center" />
-                        <Label Grid.Column="2" Text="{Binding SubcategoryCount}" Style="{StaticResource SectionLabel}"
-                               VerticalOptions="Center" />
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.GroupHeaderTemplate>
+                            <controls:Icon Grid.Column="0" Key="{Binding Icon}" />
+                            <Label Grid.Column="1" Text="{Binding Name}" Style="{StaticResource SectionLabel}"
+                                   VerticalOptions="Center" />
+                            <Label Grid.Column="2" Text="{Binding SubcategoryCount}" Style="{StaticResource SectionLabel}"
+                                   VerticalOptions="Center" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.GroupHeaderTemplate>
 
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="catalog:CategoryRowItem">
-                    <!-- Отступ слева отделяет второй уровень от первого: дерево здесь
-                         показано отступом, а не рамками -->
-                    <Grid Padding="52,10,16,10" ColumnDefinitions="Auto,*" ColumnSpacing="12"
-                          MinimumHeightRequest="{StaticResource TouchTarget}">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnSubcategoryTapped" />
-                        </Grid.GestureRecognizers>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="catalog:CategoryRowItem">
+                        <!-- Отступ слева отделяет второй уровень от первого: дерево здесь
+                             показано отступом, а не рамками -->
+                        <Grid Padding="52,10,16,10" ColumnDefinitions="Auto,*" ColumnSpacing="12"
+                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSubcategoryTapped" />
+                            </Grid.GestureRecognizers>
 
-                        <controls:Icon Grid.Column="0" Key="{Binding Icon}" />
-                        <Label Grid.Column="1" Text="{Binding Name}" VerticalOptions="Center">
-                            <Label.Triggers>
-                                <!-- Приёмник и служебная приглушены: они не открываются -->
-                                <DataTrigger TargetType="Label" Binding="{Binding IsProtected}" Value="True">
-                                    <Setter Property="TextColor"
-                                            Value="{AppThemeBinding Light={StaticResource Ink3Light}, Dark={StaticResource Ink3Dark}}" />
-                                </DataTrigger>
-                            </Label.Triggers>
-                        </Label>
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
+                            <controls:Icon Grid.Column="0" Key="{Binding Icon}" />
+                            <Label Grid.Column="1" Text="{Binding Name}" VerticalOptions="Center">
+                                <Label.Triggers>
+                                    <!-- Приёмник и служебная приглушены: они не открываются -->
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsProtected}" Value="True">
+                                        <Setter Property="TextColor"
+                                                Value="{AppThemeBinding Light={StaticResource Ink3Light}, Dark={StaticResource Ink3Dark}}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
 
-        </CollectionView>
+                <!-- Пустое состояние — внутри списка: соседом в той же ячейке оно оказалось бы
+                     под ним, и пустой список перехватывал бы касания поверх текста -->
+                <CollectionView.EmptyView>
+                    <ContentView>
+                        <Label Padding="16,24" IsVisible="{Binding IsEmpty}"
+                               Text="Групп этого вида пока нет. Заведите первую кнопкой «+» — подкатегория «Прочее» создастся сама."
+                               Style="{StaticResource SecondaryLabel}" />
+                    </ContentView>
+                </CollectionView.EmptyView>
+
+            </CollectionView>
+
+        </RefreshView>
 
     </Grid>
 

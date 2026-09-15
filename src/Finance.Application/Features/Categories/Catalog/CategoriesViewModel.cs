@@ -41,9 +41,12 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
     [ObservableProperty]
     public partial CategoryKind Kind { get; set; } = CategoryKind.Expense;
 
-    /// <summary>Идёт чтение.</summary>
+    /// <summary>
+    /// Идёт чтение. Запись открыта намеренно: к этому признаку привязан жест
+    /// «потянуть вниз», и он сам поднимает его в начале обновления.
+    /// </summary>
     [ObservableProperty]
-    public partial bool IsBusy { get; private set; }
+    public partial bool IsBusy { get; set; }
 
     /// <summary>Выбранный вид — номером в переключателе.</summary>
     public int KindIndex
@@ -52,8 +55,17 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
         set => Kind = KindOrder[Math.Clamp(value, 0, KindOrder.Length - 1)];
     }
 
+    /// <summary>
+    /// Справочник прочитан хотя бы раз. Пустая коллекция до чтения значит «ещё
+    /// не читали», а не «групп нет», и приглашение завести первую мигнуло бы
+    /// на каждом заходе.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEmpty))]
+    public partial bool IsLoaded { get; private set; }
+
     /// <summary>Групп этого вида нет — показывается пустое состояние.</summary>
-    public bool IsEmpty => Groups.Count is 0;
+    public bool IsEmpty => IsLoaded && Groups.Count is 0;
 
     /// <summary>Перечитывает справочник.</summary>
     /// <param name="cancellationToken">Признак отмены.</param>
@@ -69,6 +81,9 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
             _all = await _categories.ReadAsync(cancellationToken);
 
             Rebuild();
+
+            // Не в Rebuild: его же зовёт переключатель вида, а он о чтении ничего не говорит
+            IsLoaded = true;
         }
         finally
         {

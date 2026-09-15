@@ -2,6 +2,10 @@
 <!--
     Четыре вкладки каркаса (экраны A-01…A-04). Пятой не будет: всё остальное —
     справочники и настройки — живёт за вкладкой «Ещё».
+
+    Значки вкладок — картинками, а не контролом Icon: вкладке Shell нужен
+    ImageSource. Контуры те же, что в макете; цвет даёт Shell.TabBar*Color,
+    поэтому в самих файлах он не важен.
 -->
 <Shell
     x:Class="Finance.App.AppShell"
@@ -14,21 +18,25 @@
         <ShellContent
             Title="Балансы"
             ContentTemplate="{DataTemplate pages:BalancesPage}"
+            Icon="tab_balances.png"
             Route="balances" />
 
         <ShellContent
             Title="Операции"
             ContentTemplate="{DataTemplate pages:FeedPage}"
+            Icon="tab_feed.png"
             Route="feed" />
 
         <ShellContent
             Title="Отчёт"
             ContentTemplate="{DataTemplate pages:ReportPage}"
+            Icon="tab_report.png"
             Route="report" />
 
         <ShellContent
             Title="Ещё"
             ContentTemplate="{DataTemplate pages:MorePage}"
+            Icon="tab_more.png"
             Route="more" />
     </TabBar>
 

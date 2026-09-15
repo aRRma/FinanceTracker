@@ -1,3 +1,7 @@
+using System.Diagnostics;
+using Finance.Application.Infrastructure.Storage;
+using Finance.Domain;
+
 namespace Finance.App;
 
 /// <summary>
@@ -38,11 +42,16 @@ internal static class Guarded
     /// </summary>
     private static async Task ReportAsync(Exception error)
     {
+        // Текст исключения написан для того, кто читает код. Пользователю он
+        // говорит или ничего, или лишнее, поэтому наружу выходят только те
+        // сообщения, которые для него и составлялись
+        Debug.WriteLine(error);
+
         try
         {
             if (Shell.Current?.CurrentPage is { } page)
             {
-                await page.DisplayAlertAsync("Не удалось выполнить действие", error.Message, "Закрыть");
+                await page.DisplayAlertAsync("Не удалось выполнить действие", Explain(error), "Закрыть");
             }
         }
         catch (Exception failure) when (failure is not OperationCanceledException)
@@ -50,4 +59,16 @@ internal static class Guarded
             // Показать было нечем. Роняя процесс отсюда, мы потеряли бы и исходный сбой
         }
     }
+
+    /// <summary>
+    /// Что сказать пользователю. Нарушенное доменное правило и сорванная миграция
+    /// объясняют себя сами — их сообщения писались для экрана. Всё остальное
+    /// пришло из библиотек, и показывать это значит пугать текстом, по которому
+    /// всё равно нечего сделать.
+    /// </summary>
+    private static string Explain(Exception error) => error switch
+    {
+        DomainException or DatabaseMigrationException => error.Message,
+        _ => "Что-то пошло не так. Попробуйте ещё раз; подробности — в журнале устройства."
+    };
 }

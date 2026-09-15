@@ -14,7 +14,9 @@
     x:DataType="more:MoreViewModel"
     Title="Ещё">
 
-    <ScrollView>
+    <!-- Container: .NET 10 пускает страницу под системные полосы, а ScrollView
+         из всех областей понимает только эту -->
+    <ScrollView SafeAreaEdges="Container">
         <VerticalStackLayout Padding="16,12" Spacing="16">
 
             <Label Text="Справочники" Style="{StaticResource SectionLabel}" />

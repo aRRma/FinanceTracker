@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Globalization;
 
 namespace Finance.Application.Infrastructure;
 
@@ -17,8 +18,12 @@ public static class AmountInput
     /// <summary>Знаки действий клавиатуры — типографские, как на её клавишах.</summary>
     private static readonly SearchValues<char> Operators = SearchValues.Create("+−×÷");
 
-    /// <summary>Разделитель дробной части. На клавиатуре он один — запятая.</summary>
-    public const char Separator = ',';
+    /// <summary>
+    /// Разделитель дробной части — знак культуры устройства. Клавиша берёт его же:
+    /// иначе на английской локали сумма показывалась бы с точкой, а набрать её
+    /// было бы нечем.
+    /// </summary>
+    public static char Separator => CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
 
     // Предел суммы — 999 999 999 999,99, тот же, что у Invariant.AmountWithinLimit.
     // Клавиатура не принимает лишние разряды вместо того, чтобы дать набрать
@@ -38,7 +43,7 @@ public static class AmountInput
         return key switch
         {
             _ when char.IsAsciiDigit(key) => AppendDigit(expression, key),
-            Separator => AppendSeparator(expression),
+            _ when key == Separator => AppendSeparator(expression),
             _ when Operators.Contains(key) => AppendOperator(expression, key),
             _ => throw new ArgumentOutOfRangeException(nameof(key), key, "Такой клавиши на клавиатуре суммы нет")
         };
@@ -78,7 +83,7 @@ public static class AmountInput
             return expression;
         }
 
-        return number.IsEmpty ? expression + "0," : expression + Separator;
+        return number.IsEmpty ? expression + '0' + Separator : expression + Separator;
     }
 
     /// <summary>

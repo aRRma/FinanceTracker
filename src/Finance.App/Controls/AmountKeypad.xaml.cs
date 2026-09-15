@@ -1,4 +1,5 @@
 using System.Windows.Input;
+using Finance.Application.Infrastructure;
 
 namespace Finance.App.Controls;
 
@@ -29,6 +30,12 @@ public partial class AmountKeypad : ContentView
     {
         InitializeComponent();
     }
+
+    /// <summary>
+    /// Подпись клавиши разделителя. Берётся из тех же правил набора, что и разбор
+    /// нажатия: разойдись подпись со знаком — клавиша молча перестала бы приниматься.
+    /// </summary>
+    public static string Separator { get; } = AmountInput.Separator.ToString();
 
     /// <summary>
     /// Нажата клавиша сохранения. Событием, а не командой: сохранение закрывает

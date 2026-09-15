@@ -35,12 +35,24 @@ public sealed partial class PlacesViewModel : ScreenViewModel
     [ObservableProperty]
     public partial string Filter { get; set; } = string.Empty;
 
-    /// <summary>Идёт чтение.</summary>
+    /// <summary>
+    /// Идёт чтение. Запись открыта намеренно: к этому признаку привязан жест
+    /// «потянуть вниз», и он сам поднимает его в начале обновления.
+    /// </summary>
     [ObservableProperty]
-    public partial bool IsBusy { get; private set; }
+    public partial bool IsBusy { get; set; }
+
+    /// <summary>
+    /// Справочник прочитан хотя бы раз. Пустой список до чтения значит «ещё
+    /// не читали», а не «мест нет», и объяснение про пустой справочник мигнуло бы
+    /// на каждом заходе.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEmpty))]
+    public partial bool IsLoaded { get; private set; }
 
     /// <summary>Справочник пуст вовсе — не отобран до пустоты, а не наполнен ни разу.</summary>
-    public bool IsEmpty => _all.Count is 0;
+    public bool IsEmpty => IsLoaded && _all.Count is 0;
 
     /// <summary>Отбор не нашёл ни одного места.</summary>
     public bool IsFilteredOut => _all.Count > 0 && Places.Count is 0;
@@ -59,6 +71,9 @@ public sealed partial class PlacesViewModel : ScreenViewModel
             _all = await _places.ReadAsync(cancellationToken);
 
             Rebuild();
+
+            // Не в Rebuild: его же зовёт набор букв в поиске, а он о чтении ничего не говорит
+            IsLoaded = true;
         }
         finally
         {

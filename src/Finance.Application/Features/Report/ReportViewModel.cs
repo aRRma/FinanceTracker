@@ -64,12 +64,23 @@ public sealed partial class ReportViewModel : ScreenViewModel
     [NotifyPropertyChangedFor(nameof(HasItems))]
     public partial bool IsEmpty { get; private set; }
 
-    /// <summary>Идёт чтение.</summary>
+    /// <summary>
+    /// Идёт чтение. Запись открыта намеренно: к этому признаку привязан жест
+    /// «потянуть вниз», и он сам поднимает его в начале обновления.
+    /// </summary>
     [ObservableProperty]
-    public partial bool IsBusy { get; private set; }
+    public partial bool IsBusy { get; set; }
+
+    /// <summary>
+    /// Отчёт прочитан хотя бы раз. До этого сказать «трат не было» нельзя:
+    /// пустое состояние мигнуло бы и сменилось списком групп.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasItems))]
+    public partial bool IsLoaded { get; private set; }
 
     /// <summary>Есть что показать: список и итог видны.</summary>
-    public bool HasItems => !IsEmpty;
+    public bool HasItems => IsLoaded && !IsEmpty;
 
     /// <summary>Шапка переключателя месяцев: «Август 2026».</summary>
     public string MonthTitle => Month.Title;
@@ -134,6 +145,9 @@ public sealed partial class ReportViewModel : ScreenViewModel
             EmptyHint = hasUncounted ? UncountedHint : MonthHint;
 
             Rebuild();
+
+            // Не в Rebuild: его же зовёт переключатель вида, а он о чтении ничего не говорит
+            IsLoaded = true;
         }
         finally
         {

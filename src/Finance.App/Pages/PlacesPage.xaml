@@ -19,34 +19,47 @@
 
         <SearchBar Grid.Row="0" Text="{Binding Filter}" Placeholder="Поиск по названию" />
 
-        <Label Grid.Row="1" Padding="16,24" IsVisible="{Binding IsEmpty}"
-               Text="Мест пока нет. Они заводятся из формы операции и накапливаются сами — заходить сюда стоит, когда захочется навести порядок."
-               Style="{StaticResource SecondaryLabel}" />
+        <!-- Тот же признак занятости гасит и ожидание первого чтения, и жест обновления -->
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsBusy}" Command="{Binding LoadCommand}">
 
-        <Label Grid.Row="1" Padding="16,24" IsVisible="{Binding IsFilteredOut}"
-               Text="Ни одно место не подходит под набранные буквы."
-               Style="{StaticResource SecondaryLabel}" />
+            <CollectionView ItemsSource="{Binding Places}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="queries:PlaceListItem">
+                        <Grid Padding="16,10" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto"
+                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPlaceTapped" />
+                            </Grid.GestureRecognizers>
 
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Places}" SelectionMode="None">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="queries:PlaceListItem">
-                    <Grid Padding="16,10" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto"
-                          MinimumHeightRequest="{StaticResource TouchTarget}">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnPlaceTapped" />
-                        </Grid.GestureRecognizers>
+                            <Label Grid.Column="0" Grid.Row="0" Text="{Binding Name}" />
+                            <Label Grid.Column="0" Grid.Row="1" Text="{Binding TopCategoryName}"
+                                   IsVisible="{Binding HasTopCategory}"
+                                   Style="{StaticResource SecondaryLabel}" />
+                            <Label Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+                                   Text="{Binding TransactionCount}" VerticalOptions="Center"
+                                   Style="{StaticResource SecondaryLabel}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
 
-                        <Label Grid.Column="0" Grid.Row="0" Text="{Binding Name}" />
-                        <Label Grid.Column="0" Grid.Row="1" Text="{Binding TopCategoryName}"
-                               IsVisible="{Binding HasTopCategory}"
-                               Style="{StaticResource SecondaryLabel}" />
-                        <Label Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
-                               Text="{Binding TransactionCount}" VerticalOptions="Center"
-                               Style="{StaticResource SecondaryLabel}" />
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                <!-- Пустое состояние — внутри списка: соседом в той же ячейке оно оказалось бы
+                     под ним, и пустой список перехватывал бы касания поверх текста.
+                     Два текста, потому что пустота бывает двух разных смыслов -->
+                <CollectionView.EmptyView>
+                    <ContentView>
+                        <VerticalStackLayout>
+                            <Label Padding="16,24" IsVisible="{Binding IsEmpty}"
+                                   Text="Мест пока нет. Они заводятся из формы операции и накапливаются сами — заходить сюда стоит, когда захочется навести порядок."
+                                   Style="{StaticResource SecondaryLabel}" />
+                            <Label Padding="16,24" IsVisible="{Binding IsFilteredOut}"
+                                   Text="Ни одно место не подходит под набранные буквы."
+                                   Style="{StaticResource SecondaryLabel}" />
+                        </VerticalStackLayout>
+                    </ContentView>
+                </CollectionView.EmptyView>
+            </CollectionView>
+
+        </RefreshView>
 
     </Grid>
 

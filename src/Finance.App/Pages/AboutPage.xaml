@@ -13,10 +13,12 @@
     x:DataType="about:AboutViewModel"
     Title="О программе">
 
-    <ScrollView>
+    <!-- Container: .NET 10 пускает страницу под системные полосы, а ScrollView
+         из всех областей понимает только эту -->
+    <ScrollView SafeAreaEdges="Container">
         <VerticalStackLayout Padding="16,12" Spacing="16">
 
-            <Label Text="Личный трекер финансов" Style="{StaticResource TotalLabel}" />
+            <Label Text="Личный трекер финансов" Style="{StaticResource TitleLabel}" />
 
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout>

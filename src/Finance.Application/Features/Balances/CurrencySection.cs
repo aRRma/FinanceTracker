@@ -7,11 +7,13 @@ namespace Finance.Application.Features.Balances;
 /// </summary>
 /// <param name="Title">Заголовок раздела: «Рубли», «Евро».</param>
 /// <param name="Available">Доступно к тратам, уже отформатировано.</param>
+/// <param name="IsAvailableNegative">Доступно к тратам ушло в минус: подытог показывают смысловым цветом.</param>
 /// <param name="Spendable">Счета, деньги которых пользователь считает тратимыми.</param>
 /// <param name="Savings">Накопления — счета со «скрыть из расчётов».</param>
 public sealed record CurrencySection(
     string Title,
     string Available,
+    bool IsAvailableNegative,
     IReadOnlyList<AccountTile> Spendable,
     IReadOnlyList<AccountTile> Savings)
 {

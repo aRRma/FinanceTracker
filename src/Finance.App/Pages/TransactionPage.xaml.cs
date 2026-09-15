@@ -40,11 +40,18 @@ public partial class TransactionPage : DataPage
             Guid.TryParse(Key, out Guid key) ? key : null,
             Guid.TryParse(Account, out Guid account) ? account : null);
 
-        // Удалять нечего, пока операция не записана: кнопка убирается,
-        // а не гасится — на панели заголовка погашенная выглядит поломкой
-        if (!_model.IsExisting)
+        // Удалять нечего, пока операция не записана, поэтому пункт появляется,
+        // а не гасится: на панели заголовка погашенный выглядит поломкой.
+        // Ставится отсюда, а не убирается из разметки: убранный повторным
+        // чтением было бы уже не вернуть
+        if (_model.IsExisting && ToolbarItems.Count is 0)
         {
-            ToolbarItems.Clear();
+            ToolbarItems.Add(new ToolbarItem
+            {
+                Text = "Удалить",
+                AutomationId = "DeleteTransaction",
+                Command = new Command(() => Guarded.Run(DeleteAsync))
+            });
         }
     }
 
@@ -60,50 +67,17 @@ public partial class TransactionPage : DataPage
 
     private void OnSave(object? sender, EventArgs e) => Guarded.Run(SaveAsync);
 
+    /// <summary>
+    /// Сохраняет и уходит с экрана. Нарушенное правило показывать нечем: карточка
+    /// правила стоит над клавиатурой и попадает на экран сама.
+    /// </summary>
     private async Task SaveAsync()
     {
         if (await _model.SaveAsync())
         {
             await Shell.Current.GoToAsync("..");
-
-            return;
-        }
-
-        // Нарушенное правило стоит последним в форме и с нижней части экрана не
-        // видно: без подвода к нему нажатие выглядит так, будто ничего не произошло
-        if (_model.HasError)
-        {
-            ScrollToError();
         }
     }
-
-    /// <summary>
-    /// Подводит форму к нарушенному правилу. Карточка правила до этого была скрыта,
-    /// и до конца разметки её положение ещё нулевое — прокрутка по нему увела бы
-    /// экран в начало формы. Поэтому уже измеренную двигаем сразу, а только что
-    /// показанную — по первому же измерению.
-    /// </summary>
-    private void ScrollToError()
-    {
-        if (ErrorCard.Height > 0)
-        {
-            _ = Form.ScrollToAsync(ErrorCard, ScrollToPosition.End, animated: true);
-
-            return;
-        }
-
-        ErrorCard.SizeChanged -= OnErrorMeasured;
-        ErrorCard.SizeChanged += OnErrorMeasured;
-    }
-
-    private void OnErrorMeasured(object? sender, EventArgs e)
-    {
-        ErrorCard.SizeChanged -= OnErrorMeasured;
-
-        _ = Form.ScrollToAsync(ErrorCard, ScrollToPosition.End, animated: true);
-    }
-
-    private void OnDelete(object? sender, EventArgs e) => Guarded.Run(DeleteAsync);
 
     /// <summary>
     /// Подтверждение обязательно: отмены и корзины нет, и диалог — единственная

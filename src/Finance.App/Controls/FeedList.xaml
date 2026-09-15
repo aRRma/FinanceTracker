@@ -3,6 +3,9 @@
     Список ленты: дни с шапками, строки, дочитывание страниц у конца прокрутки.
     Общий для вкладки операций (A-02) и ленты счёта (A-03): разметка строки
     одна, а разница — в подписи — уже собрана моделью.
+
+    Пустое состояние приходит снаружи: у общей ленты это приглашение записать
+    первую операцию, у ленты счёта — ещё и строка начального остатка.
 -->
 <ContentView
     x:Class="Finance.App.Controls.FeedList"
@@ -10,62 +13,69 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:feed="clr-namespace:Finance.Application.Features.Feed;assembly=Finance.Application"
     xmlns:controls="clr-namespace:Finance.App.Controls"
-    x:DataType="feed:FeedViewModel">
+    x:DataType="feed:FeedViewModel"
+    x:Name="Root">
 
-    <CollectionView
-        ItemsSource="{Binding Days}"
-        IsGrouped="True"
-        SelectionMode="None"
-        RemainingItemsThreshold="10"
-        RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
+    <!-- Тот же признак занятости гасит и ожидание первого чтения, и жест обновления -->
+    <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding RefreshCommand}">
 
-        <CollectionView.GroupHeaderTemplate>
-            <DataTemplate x:DataType="feed:FeedDay">
-                <Grid Padding="16,16,16,6" ColumnDefinitions="*,Auto">
-                    <Label Grid.Column="0" Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
-                    <Label Grid.Column="1" Text="{Binding Total}" Style="{StaticResource SectionLabel}">
-                        <Label.Triggers>
-                            <!-- День в плюсе — смысловым цветом, как доход в строке; цвет, а не стиль:
-                                 стиль шапки со своим шрифтом обязан остаться -->
-                            <DataTrigger TargetType="Label" Binding="{Binding IsTotalPositive}" Value="True">
-                                <Setter Property="TextColor"
-                                        Value="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
-                            </DataTrigger>
-                        </Label.Triggers>
-                    </Label>
-                </Grid>
-            </DataTemplate>
-        </CollectionView.GroupHeaderTemplate>
+        <CollectionView
+            ItemsSource="{Binding Days}"
+            IsGrouped="True"
+            SelectionMode="None"
+            RemainingItemsThreshold="10"
+            RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}"
+            EmptyView="{Binding Empty, Source={x:Reference Root}}">
 
-        <CollectionView.ItemTemplate>
-            <DataTemplate x:DataType="feed:FeedRowItem">
-                <Grid Padding="16,10" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" RowDefinitions="Auto,Auto"
-                      MinimumHeightRequest="{StaticResource TouchTarget}">
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnRowTapped" />
-                    </Grid.GestureRecognizers>
+            <CollectionView.GroupHeaderTemplate>
+                <DataTemplate x:DataType="feed:FeedDay">
+                    <Grid Padding="16,16,16,6" ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
+                        <Label Grid.Column="1" Text="{Binding Total}" Style="{StaticResource SectionLabel}">
+                            <Label.Triggers>
+                                <!-- День в плюсе — смысловым цветом, как доход в строке; цвет, а не стиль:
+                                     стиль шапки со своим шрифтом обязан остаться -->
+                                <DataTrigger TargetType="Label" Binding="{Binding IsTotalPositive}" Value="True">
+                                    <Setter Property="TextColor"
+                                            Value="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.GroupHeaderTemplate>
 
-                    <controls:Icon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Key="{Binding Icon}" />
-                    <Label Grid.Column="1" Grid.Row="0" Text="{Binding Title}" />
-                    <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}"
-                           Style="{StaticResource SecondaryLabel}" />
-                    <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Amount}"
-                           VerticalOptions="Center">
-                        <Label.Triggers>
-                            <!-- Доход и зачисление — смысловым цветом, расход — обычным текстом -->
-                            <DataTrigger TargetType="Label" Binding="{Binding IsPositive}" Value="True">
-                                <Setter Property="Style" Value="{StaticResource PositiveLabel}" />
-                            </DataTrigger>
-                        </Label.Triggers>
-                    </Label>
-                </Grid>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="feed:FeedRowItem">
+                    <Grid Padding="16,10" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" RowDefinitions="Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRowTapped" />
+                        </Grid.GestureRecognizers>
 
-        <CollectionView.Footer>
-            <!-- Место под плавающую кнопку: последняя строка не должна прятаться за ней -->
-            <BoxView HeightRequest="88" Color="Transparent" />
-        </CollectionView.Footer>
-    </CollectionView>
+                        <controls:Icon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Key="{Binding Icon}" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="{Binding Title}" />
+                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}"
+                               Style="{StaticResource SecondaryLabel}" />
+                        <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Amount}"
+                               VerticalOptions="Center">
+                            <Label.Triggers>
+                                <!-- Доход и зачисление — смысловым цветом, расход — обычным текстом -->
+                                <DataTrigger TargetType="Label" Binding="{Binding IsPositive}" Value="True">
+                                    <Setter Property="Style" Value="{StaticResource PositiveLabel}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.Footer>
+                <!-- Место под плавающую кнопку: последняя строка не должна прятаться за ней -->
+                <BoxView HeightRequest="{StaticResource FloatingButtonClearance}" Color="Transparent" />
+            </CollectionView.Footer>
+        </CollectionView>
+
+    </RefreshView>
 
 </ContentView>
