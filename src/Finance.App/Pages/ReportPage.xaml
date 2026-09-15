@@ -48,7 +48,7 @@
                              VerticalOptions="Center" HorizontalOptions="Center">
             <Label Text="{Binding EmptyTitle}" HorizontalTextAlignment="Center"
                    Style="{StaticResource TotalLabel}" />
-            <Label Text="Выберите другой месяц стрелками вверху."
+            <Label Text="{Binding EmptyHint}"
                    HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
         </VerticalStackLayout>
 

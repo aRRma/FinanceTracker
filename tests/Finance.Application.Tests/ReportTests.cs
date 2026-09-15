@@ -302,6 +302,28 @@ public sealed partial class ReportTests
         Assert.False(model.IsEmpty);
     }
 
+    /// <summary>
+    /// Пустой отчёт при валютном счёте объясняет правило, а не советует листать месяцы:
+    /// операции есть, в ленте видны, и пустота без объяснения выглядела бы поломкой.
+    /// </summary>
+    [Fact]
+    public async Task Пустой_отчёт_объясняет_почему_валютный_счёт_не_вошёл()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid euro = await given.AccountAsync("Карта евро", 1_000m, Currency.EUR);
+
+        ReportViewModel before = await LoadedModelAsync(given);
+        Assert.Contains("другой месяц", before.EmptyHint, StringComparison.Ordinal);
+
+        await given.SaveAsync(given.Expense(euro, 48m));
+
+        ReportViewModel after = await LoadedModelAsync(given);
+
+        Assert.True(after.IsEmpty);
+        Assert.Contains("рублёвые счета", after.EmptyHint, StringComparison.Ordinal);
+    }
+
     /// <summary>Переключатель видов пересобирает список из прочитанного: обращение к базе одно.</summary>
     [Fact]
     public async Task Переключение_вида_не_ходит_в_базу()
@@ -562,6 +584,9 @@ public sealed partial class ReportTests
 
         public Task<IReadOnlyList<ReportTransaction>> ReadTransactionsAsync(Guid subcategoryKey, ReportMonth month, CancellationToken cancellationToken = default) =>
             inner.ReadTransactionsAsync(subcategoryKey, month, cancellationToken);
+
+        public Task<bool> HasUncountedAsync(ReportMonth month, CancellationToken cancellationToken = default) =>
+            inner.HasUncountedAsync(month, cancellationToken);
     }
 
     /// <summary>Считает обращения к базе: пересборка списка в памяти не должна ходить за данными заново.</summary>
@@ -589,5 +614,10 @@ public sealed partial class ReportTests
 
             return inner.ReadTransactionsAsync(subcategoryKey, month, cancellationToken);
         }
+
+        // Подсказка пустого состояния читается вместе с группами и к переключателю
+        // видов отношения не имеет — в счёт обращений не идёт
+        public Task<bool> HasUncountedAsync(ReportMonth month, CancellationToken cancellationToken = default) =>
+            inner.HasUncountedAsync(month, cancellationToken);
     }
 }

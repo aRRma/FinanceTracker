@@ -79,6 +79,20 @@ public sealed partial class ReportViewModel : ScreenViewModel
         ? "В этом месяце трат не было"
         : "В этом месяце доходов не было";
 
+    /// <summary>
+    /// Подпись пустого состояния. Когда операции месяца есть, но в суммы не вошли,
+    /// пустота объясняется правилом отчёта: иначе пользователь с валютным счётом
+    /// принял бы пустой отчёт за поломку.
+    /// </summary>
+    [ObservableProperty]
+    public partial string EmptyHint { get; private set; } = MonthHint;
+
+    private const string MonthHint = "Выберите другой месяц стрелками вверху.";
+
+    private const string UncountedHint =
+        "В отчёт входят только рублёвые счета без признака «скрыть из расчётов». " +
+        "Операции по остальным счетам видны в ленте.";
+
     /// <summary>Выбранный вид — номером в переключателе.</summary>
     public int KindIndex
     {
@@ -108,12 +122,16 @@ public sealed partial class ReportViewModel : ScreenViewModel
             // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
             IReadOnlyList<ReportTotal> all = await _report.ReadGroupsAsync(Month, cancellationToken);
 
+            // Второй запрос только когда отчёт пуст целиком: при строках подсказка не видна
+            bool hasUncounted = all.Count is 0 && await _report.HasUncountedAsync(Month, cancellationToken);
+
             if (generation != _generation)
             {
                 return;
             }
 
             _all = all;
+            EmptyHint = hasUncounted ? UncountedHint : MonthHint;
 
             Rebuild();
         }

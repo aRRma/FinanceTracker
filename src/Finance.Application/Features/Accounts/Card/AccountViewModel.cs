@@ -17,6 +17,11 @@ public sealed partial class AccountViewModel : ObservableObject
     private readonly ISaveAccountHandler _handler;
     private readonly IClock _clock;
 
+    // Как счёт записан: закрыт ли и сколько на нём. По ним видно, закрывают ли
+    // счёт именно этой правкой и остаются ли на нём деньги
+    private bool _savedClosed;
+    private Money? _balance;
+
     /// <summary>Создаёт модель представления карточки счёта.</summary>
     /// <param name="query">Чтение счёта для правки.</param>
     /// <param name="handler">Сохранение счёта.</param>
@@ -144,6 +149,17 @@ public sealed partial class AccountViewModel : ObservableObject
     /// <summary>Заголовок экрана.</summary>
     public string Title => Key is null ? "Новый счёт" : "Счёт";
 
+    /// <summary>
+    /// Предупреждение перед закрытием счёта с деньгами; пусто — подтверждать нечего.
+    /// Домен закрытию с остатком не мешает, но молча увести деньги из «доступно
+    /// к тратам» нельзя: пользователь мог забыть перевести остаток.
+    /// </summary>
+    public string? ClosingWarning =>
+        IsClosed && !_savedClosed && _balance is { Amount: not 0m } balance
+            ? $"На счёте {balance.Display}. После закрытия они не войдут в «доступно к тратам», " +
+              "а перевести их будет некуда — закрытый счёт в выборе не предлагается."
+            : null;
+
     /// <summary>Загружает счёт для правки. Пустой ключ оставляет форму пустой.</summary>
     /// <param name="key">Ключ счёта или <c>null</c> для нового.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
@@ -174,6 +190,8 @@ public sealed partial class AccountViewModel : ObservableObject
         IsClosed = card.IsClosed;
         CurrencyLocked = card.CurrencyLocked;
         EarliestTransactionOn = card.EarliestTransactionOn;
+        _savedClosed = card.IsClosed;
+        _balance = card.Balance;
 
         OnPropertyChanged(nameof(Title));
         OnPropertyChanged(nameof(TypeIndex));

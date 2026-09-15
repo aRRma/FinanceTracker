@@ -1,5 +1,6 @@
 using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Accounts.Catalog;
+using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Domain;
@@ -190,6 +191,35 @@ public sealed class AccountsTests
         Assert.False(await IsClosedAsync(database, key));
     }
 
+    /// <summary>
+    /// Закрытие счёта с деньгами требует подтверждения; с нулевым балансом и у уже
+    /// закрытого счёта подтверждать нечего.
+    /// </summary>
+    [Fact]
+    public async Task Закрытие_счёта_с_деньгами_предупреждает()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        Guid rich = await SaveAsync(database, Command("Карта", 1_000m));
+        Guid empty = await SaveAsync(database, Command("Пустая", 0m));
+        Guid closed = await SaveAsync(database, Command("Старая", 500m) with { IsClosed = true });
+
+        AccountViewModel model = Model(database);
+
+        await model.LoadAsync(rich);
+        Assert.Null(model.ClosingWarning);
+        model.IsClosed = true;
+        Assert.Contains(Money.Create(1_000m, Currency.RUB).Display, model.ClosingWarning, StringComparison.Ordinal);
+
+        await model.LoadAsync(empty);
+        model.IsClosed = true;
+        Assert.Null(model.ClosingWarning);
+
+        await model.LoadAsync(closed);
+        Assert.True(model.IsClosed);
+        Assert.Null(model.ClosingWarning);
+    }
+
     /// <summary>Порядок задаётся перетаскиванием и сохраняется целым списком.</summary>
     [Fact]
     public async Task Порядок_счетов_сохраняется()
@@ -227,6 +257,11 @@ public sealed class AccountsTests
             ExcludedFromTotals = false,
             IsClosed = false
         };
+
+    private static AccountViewModel Model(TestDatabase database) => new(
+        database.Resolve<IAccountCardQuery>(),
+        database.Resolve<ISaveAccountHandler>(),
+        database.Resolve<Finance.Application.Infrastructure.IClock>());
 
     private static Task<Guid> SaveAsync(TestDatabase database, SaveAccountCommand command) =>
         database.Resolve<ISaveAccountHandler>().HandleAsync(command);

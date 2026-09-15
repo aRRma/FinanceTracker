@@ -33,6 +33,12 @@ public sealed record AccountCard
     /// <summary>«Счёт закрыт».</summary>
     public required bool IsClosed { get; init; }
 
+    /// <summary>
+    /// Текущий баланс. Нужен карточке ради одного вопроса: остались ли на счёте
+    /// деньги в момент закрытия — тогда закрытие подтверждается отдельно.
+    /// </summary>
+    public required Money Balance { get; init; }
+
     /// <summary>Валюту менять нельзя: по счёту уже была операция, пусть и удалённая.</summary>
     public required bool CurrencyLocked { get; init; }
 
