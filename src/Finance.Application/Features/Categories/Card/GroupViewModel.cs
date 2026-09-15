@@ -13,12 +13,14 @@ namespace Finance.Application.Features.Categories.Card;
 /// заведении и дальше заперт — его наследуют все подкатегории, и смена вида
 /// перевернула бы знак у всей их истории.
 /// </summary>
-public sealed partial class GroupViewModel : ObservableObject
+public sealed partial class GroupViewModel : ObservableObject, IFormModel
 {
     private static readonly CategoryKind[] KindOrder = [CategoryKind.Expense, CategoryKind.Income];
 
     private readonly ICategoriesQuery _categories;
     private readonly ISaveCategoryHandler _handler;
+
+    private (string, CategoryKind, string) _saved;
 
     /// <summary>Создаёт модель представления карточки группы.</summary>
     /// <param name="categories">Список категорий: из него берутся подкатегории группы.</param>
@@ -110,6 +112,16 @@ public sealed partial class GroupViewModel : ObservableObject
     /// <summary>Правило нарушено — сообщение показывается рядом с формой.</summary>
     public bool HasError => !string.IsNullOrEmpty(Error);
 
+    /// <inheritdoc />
+    public bool IsDirty => Snapshot() != _saved;
+
+    /// <summary>
+    /// Правимые поля формы одним значением. Кортеж сравнивается сам, по всем полям
+    /// сразу: список «что считать правкой» отдельно от полей разошёлся бы с ними
+    /// при первом же новом поле.
+    /// </summary>
+    private (string Name, CategoryKind Kind, string Icon) Snapshot() => (Name, Kind, Icon.Selected);
+
     /// <summary>Загружает группу для правки. Пустой ключ оставляет форму пустой.</summary>
     /// <param name="key">Ключ группы или <c>null</c> для новой.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
@@ -118,6 +130,8 @@ public sealed partial class GroupViewModel : ObservableObject
     {
         if (key is not { } existing)
         {
+            _saved = Snapshot();
+
             return;
         }
 
@@ -127,6 +141,8 @@ public sealed partial class GroupViewModel : ObservableObject
 
         if (categories.FirstOrDefault(item => item.Key == existing && item.IsGroup) is not { } group)
         {
+            _saved = Snapshot();
+
             return;
         }
 
@@ -142,6 +158,8 @@ public sealed partial class GroupViewModel : ObservableObject
         {
             Subcategories.Add(CategoryRowItem.From(subcategory));
         }
+
+        _saved = Snapshot();
 
         Refresh();
     }

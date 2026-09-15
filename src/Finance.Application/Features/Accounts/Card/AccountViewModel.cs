@@ -11,7 +11,7 @@ namespace Finance.Application.Features.Accounts.Card;
 /// валюта заперта операциями, дата открытия дальше первой операции не двигается, —
 /// потому что узнать о них при сохранении поздно: пользователь уже всё ввёл.
 /// </summary>
-public sealed partial class AccountViewModel : ObservableObject
+public sealed partial class AccountViewModel : ObservableObject, IFormModel
 {
     private readonly IAccountCardQuery _query;
     private readonly ISaveAccountHandler _handler;
@@ -21,6 +21,10 @@ public sealed partial class AccountViewModel : ObservableObject
     // счёт именно этой правкой и остаются ли на нём деньги
     private bool _savedClosed;
     private Money? _balance;
+
+    // Снимок формы на момент загрузки: с ним сравнивается нынешнее состояние,
+    // когда экран покидают, не сохранив. У новой формы снимок — её пустое начало
+    private (string, AccountType, Currency, string, DateOnly, bool, bool) _saved;
 
     /// <summary>Создаёт модель представления карточки счёта.</summary>
     /// <param name="query">Чтение счёта для правки.</param>
@@ -146,6 +150,17 @@ public sealed partial class AccountViewModel : ObservableObject
     /// <summary>Сохранять можно: предыдущее сохранение не идёт.</summary>
     public bool CanSave => !IsSaving;
 
+    /// <inheritdoc />
+    public bool IsDirty => Snapshot() != _saved;
+
+    /// <summary>
+    /// Правимые поля формы одним значением. Кортеж сравнивается сам, по всем
+    /// полям сразу: список «что считать правкой» отдельно от полей разошёлся бы
+    /// с ними при первом же новом поле.
+    /// </summary>
+    private (string Name, AccountType Type, Currency Currency, string OpeningBalance, DateOnly OpenedOn, bool Excluded, bool Closed) Snapshot() =>
+        (Name, Type, Currency, OpeningBalance, OpenedOn, ExcludedFromTotals, IsClosed);
+
     /// <summary>Заголовок экрана.</summary>
     public string Title => Key is null ? "Новый счёт" : "Счёт";
 
@@ -168,6 +183,9 @@ public sealed partial class AccountViewModel : ObservableObject
     {
         if (key is not { } existing)
         {
+            // Новый счёт: правкой считается всё, что наберут поверх пустой формы
+            _saved = Snapshot();
+
             return;
         }
 
@@ -177,6 +195,8 @@ public sealed partial class AccountViewModel : ObservableObject
 
         if (card is null)
         {
+            _saved = Snapshot();
+
             return;
         }
 
@@ -192,6 +212,7 @@ public sealed partial class AccountViewModel : ObservableObject
         EarliestTransactionOn = card.EarliestTransactionOn;
         _savedClosed = card.IsClosed;
         _balance = card.Balance;
+        _saved = Snapshot();
 
         OnPropertyChanged(nameof(Title));
         OnPropertyChanged(nameof(TypeIndex));

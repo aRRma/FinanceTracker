@@ -17,13 +17,14 @@
     x:DataType="card:TransactionViewModel"
     Title="{Binding Title}">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Удалить" Clicked="OnDelete" />
-    </ContentPage.ToolbarItems>
+    <!--
+        Клавиатура прижата к низу, а в .NET 10 страница по умолчанию идёт от края
+        до края: без этого клавиша сохранения уезжает под жестовую полосу, а при
+        наборе места и заметки — под системную клавиатуру.
+    -->
+    <Grid RowDefinitions="*,Auto,Auto" SafeAreaEdges="Container, Container, Container, SoftInput">
 
-    <Grid RowDefinitions="*,Auto">
-
-        <ScrollView Grid.Row="0" x:Name="Form">
+        <ScrollView Grid.Row="0">
             <VerticalStackLayout Padding="16,12" Spacing="16">
 
                 <!-- Вид операции. По умолчанию расход — он записывается чаще всего -->
@@ -131,14 +132,17 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <Border x:Name="ErrorCard" Style="{StaticResource Card}" IsVisible="{Binding HasError}">
-                    <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
-                </Border>
-
             </VerticalStackLayout>
         </ScrollView>
 
-        <controls:AmountKeypad Grid.Row="1" AreKeysVisible="{Binding AreKeysVisible}"
+        <!-- Нарушенное правило стоит над клавиатурой, а не в конце формы: внизу
+             экрана оно видно всегда, и подводить к нему прокруткой не нужно -->
+        <Border Grid.Row="1" Style="{StaticResource ErrorCard}" IsVisible="{Binding HasError}"
+                Margin="16,0,16,8">
+            <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
+        </Border>
+
+        <controls:AmountKeypad Grid.Row="2" AreKeysVisible="{Binding AreKeysVisible}"
                                KeyCommand="{Binding PressKeyCommand}"
                                BackspaceCommand="{Binding BackspaceCommand}"
                                CanSave="{Binding CanSave}"

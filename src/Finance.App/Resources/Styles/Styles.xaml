@@ -12,6 +12,10 @@
     <!-- Зона касания: меньше 48 dp попасть пальцем не получается (NFR-25) -->
     <x:Double x:Key="TouchTarget">48</x:Double>
 
+    <!-- Сколько места оставить под плавающей кнопкой: её сторона плюс поля с двух
+         сторон. Считается отсюда, а не подбирается на каждом списке заново -->
+    <x:Double x:Key="FloatingButtonClearance">96</x:Double>
+
     <!-- Значок рядом с текстом: тем же тоном, что вторичная подпись -->
     <Style TargetType="controls:Icon">
         <Setter Property="Stroke"
@@ -79,10 +83,17 @@
         <Setter Property="FontSize" Value="12" />
     </Style>
 
-    <!-- Крупная сумма: «доступно к тратам», итог отчёта -->
+    <!-- Крупная сумма: «доступно к тратам», итог отчёта. Только числам: заголовок,
+         набранный этим кеглем, кричит громче главной цифры экрана -->
     <Style x:Key="TotalLabel" TargetType="Label">
         <Setter Property="FontFamily" Value="OpenSansSemibold" />
         <Setter Property="FontSize" Value="28" />
+    </Style>
+
+    <!-- Заголовок пустого состояния и название экрана внутри страницы -->
+    <Style x:Key="TitleLabel" TargetType="Label">
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="20" />
     </Style>
 
     <!-- Доход и отрицательный баланс: различимы в обеих темах (NFR-25) -->
@@ -107,6 +118,15 @@
         <Setter Property="Padding" Value="0" />
     </Style>
 
+    <!-- Карточка нарушенного правила: своим фоном, а не обычной карточкой с красным
+         текстом. Красный текст на белом читается как подпись, а не как ошибка -->
+    <Style x:Key="ErrorCard" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource NegativeBackgroundLight}, Dark={StaticResource NegativeBackgroundDark}}" />
+        <Setter Property="Stroke"
+                Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+    </Style>
+
     <!-- Разделитель строк внутри карточки -->
     <Style x:Key="Divider" TargetType="BoxView">
         <Setter Property="HeightRequest" Value="1" />
@@ -126,7 +146,10 @@
         <Setter Property="Padding" Value="20,0" />
     </Style>
 
-    <!-- Плавающая кнопка добавления операции: правый нижний угол, поверх списка -->
+    <!-- Плавающая кнопка добавления операции: правый нижний угол, поверх списка.
+         Знак «+» подписью, а не картинкой: подпись перекрашивается вместе с темой,
+         а растр пришлось бы держать в двух вариантах и переключать привязкой.
+         Тень отделяет кнопку от списка под ней: без неё она читается как наклейка -->
     <Style x:Key="FloatingButton" TargetType="Button">
         <Setter Property="BackgroundColor"
                 Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
@@ -140,6 +163,22 @@
         <Setter Property="Margin" Value="20" />
         <Setter Property="HorizontalOptions" Value="End" />
         <Setter Property="VerticalOptions" Value="End" />
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="{AppThemeBinding Light={StaticResource InkLight}, Dark={StaticResource PaperDark}}"
+                        Offset="0,3" Radius="8" Opacity="0.28" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Кнопка сохранения формы. Пока запись идёт, подпись говорит об этом:
+         погашенная кнопка без объяснения читается как поломка, а не как ожидание -->
+    <Style x:Key="SaveButton" TargetType="Button">
+        <Style.Triggers>
+            <DataTrigger TargetType="Button" Binding="{Binding IsSaving}" Value="True">
+                <Setter Property="Text" Value="Сохраняю…" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Второстепенное действие: «Отмена», «Прервать» -->

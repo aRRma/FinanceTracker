@@ -55,8 +55,16 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
     [ObservableProperty]
     public partial bool IsBusy { get; private set; }
 
+    /// <summary>
+    /// Уровень прочитан хотя бы раз. До этого сказать «операций группы нет» нельзя:
+    /// пустое состояние мигнуло бы и сменилось списком подкатегорий.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasItems))]
+    public partial bool IsLoaded { get; private set; }
+
     /// <summary>Есть что показать: список и итог видны.</summary>
-    public bool HasItems => !IsEmpty;
+    public bool HasItems => IsLoaded && !IsEmpty;
 
     /// <summary>
     /// Читает группу за месяц. Первый уровень читается ради шапки: название, вид
@@ -128,6 +136,7 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
         }
 
         IsEmpty = self is null || rows.Count is 0;
+        IsLoaded = true;
 
         if (self is null)
         {

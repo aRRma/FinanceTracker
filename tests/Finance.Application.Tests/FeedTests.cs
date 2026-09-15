@@ -243,6 +243,30 @@ public sealed class FeedTests
         Assert.True(model.IsEmpty);
         Assert.Equal(Money.Restore(1_240m, Currency.EUR).Display, model.OpeningBalance);
         Assert.Equal("1 января 2026", model.OpenedOn);
+        Assert.False(model.IsAccountBalanceNegative);
+    }
+
+    /// <summary>
+    /// Минус в шапке ленты счёта помечен признаком: экран красит такой баланс
+    /// смысловым цветом, и различать его по минусу в строке нельзя.
+    /// </summary>
+    [Fact]
+    public async Task Отрицательный_баланс_в_шапке_ленты_счёта_помечен()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 100m);
+        await given.SaveAsync(given.Expense(card, 250m));
+
+        FeedViewModel model = new(
+            given.Database.Resolve<IFeedQuery>(),
+            given.Database.Resolve<IAccountsQuery>(),
+            given.Database.Resolve<IClock>(),
+            given.Database.Resolve<IChangeNotifier>());
+
+        await model.LoadAsync(card);
+
+        Assert.True(model.IsAccountBalanceNegative);
     }
 
     /// <summary>

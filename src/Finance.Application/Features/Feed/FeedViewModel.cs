@@ -64,6 +64,10 @@ public sealed partial class FeedViewModel : ScreenViewModel
     [ObservableProperty]
     public partial string AccountBalance { get; private set; } = string.Empty;
 
+    /// <summary>Баланс счёта отрицателен: в шапке ленты его показывают смысловым цветом.</summary>
+    [ObservableProperty]
+    public partial bool IsAccountBalanceNegative { get; private set; }
+
     /// <summary>Начальный остаток — строка пустой ленты счёта, иначе непонятно, откуда взялся баланс.</summary>
     [ObservableProperty]
     public partial string OpeningBalance { get; private set; } = string.Empty;
@@ -77,16 +81,37 @@ public sealed partial class FeedViewModel : ScreenViewModel
     [NotifyPropertyChangedFor(nameof(HasItems))]
     public partial bool IsEmpty { get; private set; }
 
+    /// <summary>
+    /// Лента прочитана хотя бы раз. До этого сказать «операций нет» нельзя:
+    /// пустое состояние мигнуло бы и сменилось списком.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasItems))]
+    public partial bool IsLoaded { get; private set; }
+
     /// <summary>Операции есть — показывается список.</summary>
-    public bool HasItems => !IsEmpty;
+    public bool HasItems => IsLoaded && !IsEmpty;
 
     /// <summary>За последней строкой есть ещё: прокрутка к концу дочитает следующую страницу.</summary>
     [ObservableProperty]
     public partial bool HasMore { get; private set; }
 
-    /// <summary>Идёт чтение.</summary>
+    /// <summary>
+    /// Идёт чтение. Запись открыта намеренно: к этому признаку привязан жест
+    /// «потянуть вниз», и он сам поднимает его в начале обновления.
+    /// </summary>
     [ObservableProperty]
-    public partial bool IsBusy { get; private set; }
+    public partial bool IsBusy { get; set; }
+
+    /// <summary>
+    /// Перечитывает ту же ленту заново — жест «потянуть вниз». Отдельно от
+    /// <see cref="LoadAsync"/>: тому нужен счёт параметром, а жест знает только,
+    /// что показано сейчас.
+    /// </summary>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    [RelayCommand]
+    public Task RefreshAsync(CancellationToken cancellationToken = default) =>
+        LoadAsync(AccountKey, cancellationToken);
 
     /// <summary>Перечитывает ленту с начала.</summary>
     /// <param name="accountKey">Счёт, чью ленту читать; пусто — общая лента.</param>
@@ -122,6 +147,7 @@ public sealed partial class FeedViewModel : ScreenViewModel
             Append(page);
 
             IsEmpty = page.Items.Count == 0;
+            IsLoaded = true;
         }
         finally
         {
@@ -164,7 +190,12 @@ public sealed partial class FeedViewModel : ScreenViewModel
         }
         finally
         {
-            IsBusy = false;
+            // Занятость снимает только последнее чтение: более раннее, завершившись
+            // позже перечитывания с начала, сбросило бы занятость свежего запроса
+            if (generation == _generation)
+            {
+                IsBusy = false;
+            }
         }
     }
 
@@ -209,6 +240,7 @@ public sealed partial class FeedViewModel : ScreenViewModel
 
         AccountName = account.Name;
         AccountBalance = account.Balance.Display;
+        IsAccountBalanceNegative = account.Balance.IsNegative;
         OpeningBalance = account.OpeningBalance.Display;
         OpenedOn = account.OpenedOn.ToString("d MMMM yyyy", Russian);
     }

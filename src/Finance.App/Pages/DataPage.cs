@@ -38,6 +38,16 @@ public abstract class DataPage : ContentPage
     {
         base.OnAppearing();
 
+        // Стрелка в шапке мимо OnBackButtonPressed не идёт вовсе: Shell уводит
+        // её своим переходом. Перехватывать приходится обе кнопки порознь
+        if (BindingContext is IFormModel)
+        {
+            Shell.SetBackButtonBehavior(this, new BackButtonBehavior
+            {
+                Command = new Command(() => Guarded.Run(LeaveAsync))
+            });
+        }
+
         // Подписка на изменения живёт только пока экран на виду: оповещение
         // одно на приложение, и подписка от создания модели копилась бы
         // с каждым заходом на экран
@@ -81,6 +91,38 @@ public abstract class DataPage : ContentPage
             // что экран просто пуст, нельзя: данные целы, а приложение — нет
             await DisplayAlertAsync("База не обновилась", error.Message, "Закрыть");
         }
+    }
+
+    /// <summary>
+    /// Аппаратная и жестовая «назад». Возвращает <c>true</c> — «переход обработан
+    /// здесь»: пока пользователь не ответил, экран остаётся на месте.
+    /// </summary>
+    protected override bool OnBackButtonPressed()
+    {
+        if (BindingContext is IFormModel { IsDirty: true })
+        {
+            Guarded.Run(LeaveAsync);
+
+            return true;
+        }
+
+        return base.OnBackButtonPressed();
+    }
+
+    /// <summary>
+    /// Уходит с формы, спросив про набранное. Спрашивает только когда терять
+    /// есть что: вопрос на каждом выходе перестали бы читать, и однажды он
+    /// увёл бы с заполненной формы вместе со всеми остальными.
+    /// </summary>
+    private async Task LeaveAsync()
+    {
+        if (BindingContext is IFormModel { IsDirty: true }
+            && !await DisplayAlertAsync("Уйти без сохранения?", "Набранное не сохранится.", "Уйти", "Остаться"))
+        {
+            return;
+        }
+
+        await Shell.Current.GoToAsync("..");
     }
 
     /// <inheritdoc />

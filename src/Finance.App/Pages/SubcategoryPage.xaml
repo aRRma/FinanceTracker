@@ -14,7 +14,9 @@
     x:DataType="card:SubcategoryViewModel"
     Title="{Binding Title}">
 
-    <ScrollView>
+    <!-- Container: .NET 10 пускает страницу под системные полосы, а ScrollView
+         из всех областей понимает только эту -->
+    <ScrollView SafeAreaEdges="Container">
         <VerticalStackLayout Padding="16,12" Spacing="16">
 
             <Border Style="{StaticResource Card}">
@@ -24,31 +26,7 @@
 
                     <BoxView Style="{StaticResource Divider}" />
 
-                    <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Icon.ToggleCommand}" />
-                        </Grid.GestureRecognizers>
-
-                        <Label Grid.Column="0" Text="Значок" VerticalOptions="Center" />
-                        <controls:Icon Grid.Column="1" Key="{Binding Icon.Selected}" Style="{StaticResource AccentIcon}" />
-                    </Grid>
-
-                    <CollectionView ItemsSource="{Binding Icon.Keys}" IsVisible="{Binding Icon.IsOpen}"
-                                    SelectionMode="None" HeightRequest="220">
-                        <CollectionView.ItemsLayout>
-                            <GridItemsLayout Orientation="Vertical" Span="6" />
-                        </CollectionView.ItemsLayout>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="x:String">
-                                <Grid MinimumHeightRequest="{StaticResource TouchTarget}">
-                                    <Grid.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnIconTapped" />
-                                    </Grid.GestureRecognizers>
-                                    <controls:Icon Key="{Binding .}" HorizontalOptions="Center" />
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                    <controls:IconGrid BindingContext="{Binding Icon}" />
 
                     <BoxView Style="{StaticResource Divider}" />
 
@@ -68,13 +46,15 @@
                 </VerticalStackLayout>
             </Border>
 
-            <Border Style="{StaticResource Card}" IsVisible="{Binding HasError}">
+            <Border Style="{StaticResource ErrorCard}" IsVisible="{Binding HasError}">
                 <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
             </Border>
 
-            <Button Text="Сохранить" Clicked="OnSave" IsEnabled="{Binding CanSave}" />
+            <Button Text="Сохранить" Clicked="OnSave" IsEnabled="{Binding CanSave}"
+                    Style="{StaticResource SaveButton}" AutomationId="SaveSubcategory" />
 
-            <Button Text="Удалить подкатегорию" Clicked="OnDelete" IsVisible="{Binding CanDelete}" IsEnabled="{Binding CanSave}"
+            <Button Text="Удалить подкатегорию" Clicked="OnDelete" IsVisible="{Binding CanDelete}" IsEnabled="{Binding IsIdle}"
+                    AutomationId="DeleteSubcategory"
                     Style="{StaticResource DangerButton}" />
 
         </VerticalStackLayout>

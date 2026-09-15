@@ -13,7 +13,9 @@
     x:DataType="card:PlaceViewModel"
     Title="Место">
 
-    <ScrollView>
+    <!-- Container: .NET 10 пускает страницу под системные полосы, а ScrollView
+         из всех областей понимает только эту -->
+    <ScrollView SafeAreaEdges="Container">
         <VerticalStackLayout Padding="16,12" Spacing="16">
 
             <Border Style="{StaticResource Card}">
@@ -25,13 +27,15 @@
                 </VerticalStackLayout>
             </Border>
 
-            <Border Style="{StaticResource Card}" IsVisible="{Binding HasError}">
+            <Border Style="{StaticResource ErrorCard}" IsVisible="{Binding HasError}">
                 <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
             </Border>
 
-            <Button Text="Сохранить" Clicked="OnSave" IsVisible="{Binding IsLoaded}" IsEnabled="{Binding CanSave}" />
+            <Button Text="Сохранить" Clicked="OnSave" IsVisible="{Binding IsLoaded}" IsEnabled="{Binding CanSave}"
+                    Style="{StaticResource SaveButton}" AutomationId="SavePlace" />
 
-            <Button Text="Удалить место" Clicked="OnDelete" IsVisible="{Binding IsLoaded}" IsEnabled="{Binding CanSave}"
+            <Button Text="Удалить место" Clicked="OnDelete" IsVisible="{Binding IsLoaded}" IsEnabled="{Binding IsIdle}"
+                    AutomationId="DeletePlace"
                     Style="{StaticResource DangerButton}" />
 
         </VerticalStackLayout>

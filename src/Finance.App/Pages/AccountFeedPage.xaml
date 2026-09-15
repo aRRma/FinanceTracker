@@ -19,36 +19,49 @@
         <Border Grid.Row="0" Style="{StaticResource Card}" Margin="16,12,16,0">
             <VerticalStackLayout Padding="14,10" Spacing="2">
                 <Label Text="Баланс" Style="{StaticResource CaptionLabel}" />
-                <Label Text="{Binding AccountBalance}" Style="{StaticResource TotalLabel}" />
+                <Label Text="{Binding AccountBalance}" Style="{StaticResource TotalLabel}">
+                    <Label.Triggers>
+                        <!-- Цвет, а не стиль: крупный шрифт шапки обязан остаться -->
+                        <DataTrigger TargetType="Label" Binding="{Binding IsAccountBalanceNegative}" Value="True">
+                            <Setter Property="TextColor"
+                                    Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
             </VerticalStackLayout>
         </Border>
 
-        <controls:FeedList Grid.Row="1" IsVisible="{Binding HasItems}" />
+        <controls:FeedList Grid.Row="1">
+            <controls:FeedList.Empty>
+                <VerticalStackLayout Padding="16,12" Spacing="16" IsVisible="{Binding IsEmpty}">
+                    <!-- Откуда взялся баланс в шапке, пока операций нет -->
+                    <Border Style="{StaticResource Card}">
+                        <Grid Padding="14,12" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto"
+                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Label Grid.Column="0" Grid.Row="0" Text="Начальный остаток"
+                                   Style="{StaticResource SecondaryLabel}" />
+                            <Label Grid.Column="0" Grid.Row="1" Text="{Binding OpenedOn}"
+                                   Style="{StaticResource CaptionLabel}" />
+                            <Label Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Text="{Binding OpeningBalance}"
+                                   VerticalOptions="Center" Style="{StaticResource SecondaryLabel}" />
+                        </Grid>
+                    </Border>
 
-        <VerticalStackLayout Grid.Row="1" IsVisible="{Binding IsEmpty}" Padding="16,12" Spacing="16">
-            <Border Style="{StaticResource Card}">
-                <Grid Padding="14,12" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto"
-                      MinimumHeightRequest="{StaticResource TouchTarget}">
-                    <Label Grid.Column="0" Grid.Row="0" Text="Начальный остаток"
-                           Style="{StaticResource SecondaryLabel}" />
-                    <Label Grid.Column="0" Grid.Row="1" Text="{Binding OpenedOn}"
-                           Style="{StaticResource CaptionLabel}" />
-                    <Label Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Text="{Binding OpeningBalance}"
-                           VerticalOptions="Center" Style="{StaticResource SecondaryLabel}" />
-                </Grid>
-            </Border>
+                    <VerticalStackLayout Padding="16,24" Spacing="12">
+                        <Label Text="Операций пока нет" HorizontalTextAlignment="Center"
+                               Style="{StaticResource TitleLabel}" />
+                        <Label Text="Первая запись появится здесь сразу после сохранения."
+                               HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
+                        <Button Text="Добавить операцию" Clicked="OnAdd" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </controls:FeedList.Empty>
+        </controls:FeedList>
 
-            <VerticalStackLayout Padding="16,24" Spacing="12">
-                <Label Text="Операций пока нет" HorizontalTextAlignment="Center"
-                       Style="{StaticResource TotalLabel}" />
-                <Label Text="Первая запись появится здесь сразу после сохранения."
-                       HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
-                <Button Text="Добавить операцию" Clicked="OnAdd" />
-            </VerticalStackLayout>
-        </VerticalStackLayout>
-
+        <!-- Пока лента пуста, добавлять предлагает кнопка в самом пустом состоянии -->
         <Button Grid.Row="1" Text="+" Clicked="OnAdd" IsVisible="{Binding HasItems}"
-                Style="{StaticResource FloatingButton}" />
+                Style="{StaticResource FloatingButton}"
+                SemanticProperties.Description="Записать операцию по этому счёту" />
     </Grid>
 
 </pages:DataPage>

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Finance.Application.Infrastructure;
 
 namespace Finance.Application.Tests;
@@ -88,4 +89,28 @@ public sealed class AmountInputTests
     [Fact]
     public void Незнакомая_клавиша_отвергается() =>
         Assert.Throws<ArgumentOutOfRangeException>(() => AmountInput.Append("12", 'x'));
+
+    /// <summary>
+    /// Разделитель — знак культуры устройства, а не жёсткая запятая. На английской
+    /// локали набирается точка: иначе сумма показывалась бы с точкой, а набрать её
+    /// было бы нечем. Культура ставится вокруг вызова — она читается на каждом нажатии.
+    /// </summary>
+    [Theory]
+    [InlineData("ru-RU", ',', "12,")]
+    [InlineData("en-US", '.', "12.")]
+    public void Разделитель_берётся_из_культуры(string culture, char key, string expected)
+    {
+        CultureInfo previous = CultureInfo.CurrentCulture;
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
+
+        try
+        {
+            Assert.Equal(key, AmountInput.Separator);
+            Assert.Equal(expected, AmountInput.Append("12", key));
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = previous;
+        }
+    }
 }

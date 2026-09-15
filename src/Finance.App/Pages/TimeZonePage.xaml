@@ -22,10 +22,6 @@
                Text="Пояс решает, какой день считается сегодняшним. Сами операции он не меняет."
                Style="{StaticResource SecondaryLabel}" />
 
-        <Label Grid.Row="2" Padding="16,24" IsVisible="{Binding IsFilteredOut}"
-               Text="Ни одна зона не подходит под набранные буквы."
-               Style="{StaticResource SecondaryLabel}" />
-
         <CollectionView Grid.Row="2" ItemsSource="{Binding Zones}" SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="zones:TimeZoneOption">
@@ -34,15 +30,34 @@
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnZoneTapped" />
                         </Grid.GestureRecognizers>
+                        <Grid.Triggers>
+                            <!-- Выбранное видно не только галочкой справа: в списке
+                                 из сотен зон строка целиком находится быстрее -->
+                            <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="BackgroundColor"
+                                        Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}" />
+                            </DataTrigger>
+                        </Grid.Triggers>
 
                         <Label Grid.Column="0" Text="{Binding Caption}" VerticalOptions="Center" />
                         <Label Grid.Column="1" Margin="8,0" Text="{Binding Offset}" VerticalOptions="Center"
                                Style="{StaticResource SecondaryLabel}" />
                         <controls:Icon Grid.Column="2" Key="check" IsVisible="{Binding IsSelected}"
+                                       SemanticProperties.Description="Выбрано"
                                        Style="{StaticResource AccentIcon}" />
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
+
+            <!-- Пустое состояние — внутри списка: соседом в той же ячейке оно оказалось бы
+                 под ним, и пустой список перехватывал бы касания поверх текста -->
+            <CollectionView.EmptyView>
+                <ContentView>
+                    <Label Padding="16,24" IsVisible="{Binding IsFilteredOut}"
+                           Text="Ни одна зона не подходит под набранные буквы."
+                           Style="{StaticResource SecondaryLabel}" />
+                </ContentView>
+            </CollectionView.EmptyView>
         </CollectionView>
 
     </Grid>

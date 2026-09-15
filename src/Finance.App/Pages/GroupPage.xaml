@@ -16,7 +16,9 @@
     x:DataType="card:GroupViewModel"
     Title="{Binding Title}">
 
-    <ScrollView>
+    <!-- Container: .NET 10 пускает страницу под системные полосы, а ScrollView
+         из всех областей понимает только эту -->
+    <ScrollView SafeAreaEdges="Container">
         <VerticalStackLayout Padding="16,12" Spacing="16">
 
             <Border Style="{StaticResource Card}">
@@ -26,34 +28,7 @@
 
                     <BoxView Style="{StaticResource Divider}" />
 
-                    <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Icon.ToggleCommand}" />
-                        </Grid.GestureRecognizers>
-
-                        <Label Grid.Column="0" Text="Значок" VerticalOptions="Center" />
-                        <controls:Icon Grid.Column="1" Key="{Binding Icon.Selected}" Style="{StaticResource AccentIcon}" />
-                    </Grid>
-
-                    <!-- Сетка значков раскрывается прямо под полем: отдельный экран
-                         ради одного выбора уводил бы с формы и терял набранное -->
-                    <CollectionView ItemsSource="{Binding Icon.Keys}" IsVisible="{Binding Icon.IsOpen}"
-                                    SelectionMode="None" HeightRequest="220">
-                        <CollectionView.ItemsLayout>
-                            <GridItemsLayout Orientation="Vertical" Span="6" />
-                        </CollectionView.ItemsLayout>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="x:String">
-                                <!-- Ячейка не меньше зоны касания, значок в её центре -->
-                                <Grid MinimumHeightRequest="{StaticResource TouchTarget}">
-                                    <Grid.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnIconTapped" />
-                                    </Grid.GestureRecognizers>
-                                    <controls:Icon Key="{Binding .}" HorizontalOptions="Center" />
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                    <controls:IconGrid BindingContext="{Binding Icon}" />
 
                     <BoxView Style="{StaticResource Divider}" />
 
@@ -123,11 +98,12 @@
                 </Border>
             </VerticalStackLayout>
 
-            <Border Style="{StaticResource Card}" IsVisible="{Binding HasError}">
+            <Border Style="{StaticResource ErrorCard}" IsVisible="{Binding HasError}">
                 <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
             </Border>
 
-            <Button Text="Сохранить" Clicked="OnSave" IsEnabled="{Binding CanSave}" />
+            <Button Text="Сохранить" Clicked="OnSave" IsEnabled="{Binding CanSave}"
+                    Style="{StaticResource SaveButton}" AutomationId="SaveGroup" />
 
         </VerticalStackLayout>
     </ScrollView>

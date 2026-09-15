@@ -21,16 +21,7 @@
         <Label Grid.Row="1" Padding="16,4,16,8" Text="{Binding Total}" HorizontalTextAlignment="End"
                IsVisible="{Binding HasItems}" Style="{StaticResource TotalLabel}" />
 
-        <VerticalStackLayout Grid.Row="2" IsVisible="{Binding IsEmpty}" Padding="32" Spacing="12"
-                             VerticalOptions="Center" HorizontalOptions="Center">
-            <Label Text="В этом месяце операций нет" HorizontalTextAlignment="Center"
-                   Style="{StaticResource TotalLabel}" />
-            <Label Text="Они переехали или удалены. Вернитесь к отчёту."
-                   HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
-        </VerticalStackLayout>
-
-        <CollectionView Grid.Row="2" ItemsSource="{Binding Rows}" IsVisible="{Binding HasItems}"
-                        SelectionMode="None">
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Rows}" SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="report:ReportTransactionItem">
                     <Grid Padding="16,10" ColumnDefinitions="*,Auto" ColumnSpacing="12" RowDefinitions="Auto,Auto"
@@ -59,6 +50,20 @@
                        Text="Строка открывает ту же карточку операции, что и лента."
                        Style="{StaticResource CaptionLabel}" />
             </CollectionView.Footer>
+
+            <!-- Пустое состояние — внутри списка: соседом в той же ячейке оно оказалось бы
+                 под ним, и пустой список перехватывал бы касания поверх текста -->
+            <CollectionView.EmptyView>
+                <ContentView>
+                    <VerticalStackLayout IsVisible="{Binding IsEmpty}" Padding="32" Spacing="12"
+                                         VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label Text="В этом месяце операций нет" HorizontalTextAlignment="Center"
+                               Style="{StaticResource TitleLabel}" />
+                        <Label Text="Они переехали или удалены. Вернитесь к отчёту."
+                               HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
+                    </VerticalStackLayout>
+                </ContentView>
+            </CollectionView.EmptyView>
         </CollectionView>
 
     </Grid>

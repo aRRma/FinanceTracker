@@ -59,8 +59,16 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
     [ObservableProperty]
     public partial bool IsBusy { get; private set; }
 
+    /// <summary>
+    /// Уровень прочитан хотя бы раз. До этого сказать «операций нет» нельзя:
+    /// пустое состояние мигнуло бы и сменилось списком операций.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasItems))]
+    public partial bool IsLoaded { get; private set; }
+
     /// <summary>Есть что показать: список и итог видны.</summary>
-    public bool HasItems => !IsEmpty;
+    public bool HasItems => IsLoaded && !IsEmpty;
 
     /// <summary>Читает операции подкатегории за месяц.</summary>
     /// <param name="subcategoryKey">Ключ подкатегории.</param>
@@ -132,6 +140,7 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
         Total = total.DisplaySigned;
         Caption = $"{Month.Caption} · {Plural.Of(items.Count, "операция", "операции", "операций")}";
         IsEmpty = Rows.Count is 0;
+        IsLoaded = true;
     }
 
     /// <summary>Место стоит заголовком строки, поэтому и его переименование устаревает экран.</summary>

@@ -41,9 +41,21 @@ public sealed partial class AccountsViewModel : ScreenViewModel
     /// <summary>Закрытые счета. Остаются в справочнике, ленте и отчёте.</summary>
     public ObservableCollection<AccountRowItem> Closed { get; } = [];
 
-    /// <summary>Идёт чтение.</summary>
+    /// <summary>
+    /// В справочнике есть накопления. Заголовок раздела без единой строки под ним
+    /// выглядит потерянными данными, а не пустым разделом.
+    /// </summary>
+    public bool HasSavings => Savings.Count > 0;
+
+    /// <summary>В справочнике есть закрытые счета.</summary>
+    public bool HasClosed => Closed.Count > 0;
+
+    /// <summary>
+    /// Идёт чтение. Запись открыта намеренно: к этому признаку привязан жест
+    /// «потянуть вниз», и он сам поднимает его в начале обновления.
+    /// </summary>
     [ObservableProperty]
-    public partial bool IsBusy { get; private set; }
+    public partial bool IsBusy { get; set; }
 
     /// <summary>Перечитывает справочник.</summary>
     /// <param name="cancellationToken">Признак отмены.</param>
@@ -61,6 +73,9 @@ public sealed partial class AccountsViewModel : ScreenViewModel
             Fill(Spendable, accounts.Where(static account => !account.IsClosed && !account.ExcludedFromTotals));
             Fill(Savings, accounts.Where(static account => !account.IsClosed && account.ExcludedFromTotals));
             Fill(Closed, accounts.Where(static account => account.IsClosed));
+
+            OnPropertyChanged(nameof(HasSavings));
+            OnPropertyChanged(nameof(HasClosed));
         }
         finally
         {

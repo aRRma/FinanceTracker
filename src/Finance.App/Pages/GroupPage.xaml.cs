@@ -37,14 +37,6 @@ public partial class GroupPage : DataPage
     protected override Task LoadAsync() =>
         _model.LoadAsync(Guid.TryParse(Key, out Guid key) ? key : null);
 
-    private void OnIconTapped(object? sender, TappedEventArgs e)
-    {
-        if (sender is BindableObject { BindingContext: string icon })
-        {
-            _model.Icon.Pick(icon);
-        }
-    }
-
     private void OnSubcategoryTapped(object? sender, TappedEventArgs e)
     {
         if (sender is BindableObject { BindingContext: CategoryRowItem { IsEditable: true } subcategory })

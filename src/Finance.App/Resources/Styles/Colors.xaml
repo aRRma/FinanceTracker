@@ -7,6 +7,11 @@
     Прямые значения цвета живут только в этом файле. В разметке экранов их быть
     не должно: забытый там hex не переключается вместе с темой и находится
     потом глазами по всем страницам.
+
+    Контраст текста к фону сверяет ContrastTests: новый токен текста
+    добавляется и в таблицу пар того теста. Палитра приложения —
+    подмножество палитры макетов: то, что нужно только рамке телефона
+    и модальным окнам макета, здесь не повторяется.
 -->
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -27,16 +32,14 @@
     <!-- Текст: основной, вторичный, третичный -->
     <Color x:Key="InkLight">#16191C</Color>
     <Color x:Key="InkDark">#E7EAEC</Color>
-    <Color x:Key="Ink2Light">#5A6169</Color>
+    <Color x:Key="Ink2Light">#4C535A</Color>
     <Color x:Key="Ink2Dark">#A8AFB5</Color>
-    <Color x:Key="Ink3Light">#8E949B</Color>
-    <Color x:Key="Ink3Dark">#798188</Color>
+    <Color x:Key="Ink3Light">#676D74</Color>
+    <Color x:Key="Ink3Dark">#8A9299</Color>
 
-    <!-- Разделители: тонкий и заметный -->
+    <!-- Разделитель строк и граница карточки -->
     <Color x:Key="LineLight">#E3E6E9</Color>
     <Color x:Key="LineDark">#282E32</Color>
-    <Color x:Key="Line2Light">#CBD1D6</Color>
-    <Color x:Key="Line2Dark">#3A4147</Color>
 
     <!-- Акцент и его фон -->
     <Color x:Key="AccentLight">#0F5C4C</Color>
@@ -59,9 +62,5 @@
     <!-- Кружок переключателя -->
     <Color x:Key="KnobLight">#FFFFFF</Color>
     <Color x:Key="KnobDark">#E7EAEC</Color>
-
-    <!-- Подложка модальных диалогов -->
-    <Color x:Key="VeilLight">#6B16191C</Color>
-    <Color x:Key="VeilDark">#9E040607</Color>
 
 </ResourceDictionary>

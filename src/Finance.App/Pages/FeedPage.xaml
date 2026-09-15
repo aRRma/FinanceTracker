@@ -15,17 +15,22 @@
     Title="Операции">
 
     <Grid>
-        <controls:FeedList IsVisible="{Binding HasItems}" />
+        <!-- Пустое состояние — внутри списка: соседом в той же ячейке оно оказалось бы
+             под ним, и пустой список перехватывал бы касания поверх текста -->
+        <controls:FeedList>
+            <controls:FeedList.Empty>
+                <VerticalStackLayout Padding="32" Spacing="12" IsVisible="{Binding IsEmpty}"
+                                     VerticalOptions="Center" HorizontalOptions="Center">
+                    <Label Text="Операций пока нет" HorizontalTextAlignment="Center"
+                           Style="{StaticResource TitleLabel}" />
+                    <Label Text="Первая запись появится здесь сразу после сохранения."
+                           HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
+                </VerticalStackLayout>
+            </controls:FeedList.Empty>
+        </controls:FeedList>
 
-        <VerticalStackLayout IsVisible="{Binding IsEmpty}" Padding="32" Spacing="12"
-                             VerticalOptions="Center" HorizontalOptions="Center">
-            <Label Text="Операций пока нет" HorizontalTextAlignment="Center"
-                   Style="{StaticResource TotalLabel}" />
-            <Label Text="Первая запись появится здесь сразу после сохранения."
-                   HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
-        </VerticalStackLayout>
-
-        <Button Text="+" Clicked="OnAdd" Style="{StaticResource FloatingButton}" />
+        <Button Text="+" Clicked="OnAdd" Style="{StaticResource FloatingButton}"
+                SemanticProperties.Description="Записать операцию" AutomationId="AddTransaction" />
     </Grid>
 
 </pages:DataPage>

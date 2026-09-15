@@ -14,16 +14,12 @@ namespace Finance.Application.Features.Transactions.Card;
 /// дата, — а категория выбирается каждый раз: подставленная не глядя категория
 /// портит отчёт молча.
 /// </summary>
-public sealed partial class TransactionViewModel : ObservableObject
+public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 {
     private const int SuggestionLimit = 8;
 
     private static readonly TransactionKind[] KindOrder =
         [TransactionKind.Expense, TransactionKind.Income, TransactionKind.Transfer];
-
-    // Клавиатура набирает запятую, и сумма правимой операции обязана
-    // выглядеть так же: точка в поле появилась бы там, где её нечем стереть и нечем набрать
-    private static readonly NumberFormatInfo CommaSeparator = new() { NumberDecimalSeparator = "," };
 
     private readonly ITransactionFormQuery _form;
     private readonly ITransactionCardQuery _card;
@@ -35,6 +31,8 @@ public sealed partial class TransactionViewModel : ObservableObject
     private IReadOnlyList<AccountOption> _allAccounts = [];
     private IReadOnlyList<CategoryOption> _allCategories = [];
     private IReadOnlyList<PlaceOption> _allPlaces = [];
+
+    private Snapshot _saved;
 
     /// <summary>Создаёт модель представления формы операции.</summary>
     /// <param name="form">Списки выбора формы.</param>
@@ -220,6 +218,37 @@ public sealed partial class TransactionViewModel : ObservableObject
     /// <summary>Правило нарушено — сообщение показывается рядом с формой.</summary>
     public bool HasError => !string.IsNullOrEmpty(Error);
 
+    /// <inheritdoc />
+    public bool IsDirty => Take() != _saved;
+
+    /// <summary>
+    /// Правимые поля формы одним значением. Запись сравнивается сама, по всем полям
+    /// сразу: список «что считать правкой» отдельно от полей разошёлся бы с ними
+    /// при первом же новом поле.
+    /// </summary>
+    private Snapshot Take() => new(
+        Kind,
+        SourceAccount?.Key,
+        TargetAccount?.Key,
+        Amount,
+        TargetAmount,
+        Category?.Key,
+        PlaceName,
+        OccurredOn,
+        Note);
+
+    /// <summary>Состояние формы, с которым сверяется уход с экрана.</summary>
+    private readonly record struct Snapshot(
+        TransactionKind Kind,
+        Guid? SourceAccount,
+        Guid? TargetAccount,
+        string Amount,
+        string TargetAmount,
+        Guid? Category,
+        string PlaceName,
+        DateOnly OccurredOn,
+        string Note);
+
     /// <summary>
     /// Идёт сохранение или удаление. Кнопки зовут методы напрямую, минуя команду
     /// с её защитой от повторного запуска: без флага второе нажатие до ухода
@@ -302,8 +331,8 @@ public sealed partial class TransactionViewModel : ObservableObject
             Kind = card.Kind;
             SourceAccount = Find(card.SourceAccountKey);
             TargetAccount = card.TargetAccountKey is { } target ? Find(target) : null;
-            Amount = card.Amount.ToString(CommaSeparator);
-            TargetAmount = card.TargetAmount?.ToString(CommaSeparator) ?? string.Empty;
+            Amount = card.Amount.ToString(CultureInfo.CurrentCulture);
+            TargetAmount = card.TargetAmount?.ToString(CultureInfo.CurrentCulture) ?? string.Empty;
             Category = Categories.FirstOrDefault(option => option.Key == card.CategoryKey);
             PlaceName = card.PlaceName ?? string.Empty;
             OccurredOn = card.OccurredOn;
@@ -317,6 +346,8 @@ public sealed partial class TransactionViewModel : ObservableObject
             SourceAccount = preset is { } wanted ? Find(wanted) : null;
             SourceAccount ??= Accounts.FirstOrDefault();
         }
+
+        _saved = Take();
 
         RefreshSuggestions();
     }
