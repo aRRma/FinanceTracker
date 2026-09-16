@@ -1,8 +1,10 @@
+using Finance.Application.Texts;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
 using Finance.Domain.Entities;
 using Finance.Domain.Enums;
+using Finance.Domain.Errors;
 using Finance.Domain.Rules;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +21,7 @@ public sealed class SaveCategoryHandler : ISaveCategoryHandler
     /// Имя приёмника. Совпадает с именем приёмников стартового набора: группа,
     /// заведённая руками, обязана выглядеть так же, как наборная.
     /// </summary>
-    private const string ReceiverName = "Прочее";
+    private static string ReceiverName => UiTexts.CategoryOther;
 
     private readonly UnitOfWork _unitOfWork;
     private readonly IClock _clock;
@@ -75,7 +77,7 @@ public sealed class SaveCategoryHandler : ISaveCategoryHandler
         CancellationToken cancellationToken)
     {
         CategoryKind kind = command.Kind
-                            ?? throw new ArgumentException("Вид заводимой группы обязателен", nameof(command));
+                            ?? throw new ArgumentException(Faults.GroupKindRequired(), nameof(command));
 
         await EnsureGroupNameFreeAsync(context, command.Name, kind, self: null, cancellationToken)
             .ConfigureAwait(false);
@@ -128,7 +130,7 @@ public sealed class SaveCategoryHandler : ISaveCategoryHandler
         CategoryRow row = await context.Categories
             .FirstOrDefaultAsync(existing => existing.Key == key, cancellationToken)
             .ConfigureAwait(false)
-            ?? throw new InvalidOperationException($"Категория {key} не найдена");
+            ?? throw new InvalidOperationException(Faults.CategoryNotFound(key));
 
         Category category = row.ToDomain();
 
@@ -154,7 +156,7 @@ public sealed class SaveCategoryHandler : ISaveCategoryHandler
         CancellationToken cancellationToken)
     {
         CategoryKind kind = group.Kind
-                            ?? throw new InvalidOperationException($"У группы «{group.Name}» не задан вид");
+                            ?? throw new InvalidOperationException(Faults.GroupKindMissing(group.Name));
 
         await EnsureGroupNameFreeAsync(context, command.Name, kind, group.Key, cancellationToken)
             .ConfigureAwait(false);
@@ -211,7 +213,9 @@ public sealed class SaveCategoryHandler : ISaveCategoryHandler
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        string what = kind is CategoryKind.Expense ? "группа расходов" : "группа доходов";
+        RuleText what = kind is CategoryKind.Expense
+            ? RuleText.SubjectExpenseGroup
+            : RuleText.SubjectIncomeGroup;
 
         if (self is { } key)
         {
@@ -244,19 +248,22 @@ public sealed class SaveCategoryHandler : ISaveCategoryHandler
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        string what = $"подкатегория группы «{parent.Name}»";
-
         if (self is { } key)
         {
             NameUniqueness.EnsureForRename(
                 name,
                 taken.Select(static subcategory => (subcategory.Key, subcategory.Name)),
                 key,
-                what);
+                RuleText.SubjectSubcategoryOfGroup,
+                parent.Name);
         }
         else
         {
-            NameUniqueness.Ensure(name, taken.Select(static subcategory => subcategory.Name), what);
+            NameUniqueness.Ensure(
+                name,
+                taken.Select(static subcategory => subcategory.Name),
+                RuleText.SubjectSubcategoryOfGroup,
+                parent.Name);
         }
     }
 
@@ -269,7 +276,7 @@ public sealed class SaveCategoryHandler : ISaveCategoryHandler
             .AsNoTracking()
             .FirstOrDefaultAsync(group => group.Key == key, cancellationToken)
             .ConfigureAwait(false)
-            ?? throw new InvalidOperationException($"Группа {key} не найдена");
+            ?? throw new InvalidOperationException(Faults.GroupNotFound(key));
 
         return row.ToDomain();
     }

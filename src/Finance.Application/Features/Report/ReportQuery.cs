@@ -1,3 +1,4 @@
+using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
@@ -223,7 +224,7 @@ public sealed class ReportQuery : IReportQuery
                 Key = bucket.Key,
                 Name = bucket.Name,
                 Icon = bucket.Icon,
-                Kind = bucket.Kind ?? throw new InvalidOperationException($"У группы «{bucket.Name}» не задан вид"),
+                Kind = bucket.Kind ?? throw new InvalidOperationException(Faults.GroupKindMissing(bucket.Name)),
                 Total = Money.Restore(bucket.Total, Currency.RUB)
             });
         }

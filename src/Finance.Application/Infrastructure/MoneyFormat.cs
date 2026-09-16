@@ -1,4 +1,4 @@
-using System.Globalization;
+using Finance.Application.Texts;
 using Finance.Domain.Enums;
 using Finance.Domain.Values;
 
@@ -10,16 +10,6 @@ namespace Finance.Application.Infrastructure;
 /// </summary>
 public static class MoneyFormat
 {
-    /// <summary>
-    /// Пробел между разрядами — неразрывный: иначе сумма переносится по строке пополам.
-    /// </summary>
-    private static readonly NumberFormatInfo Numbers = new()
-    {
-        NumberGroupSeparator = " ",
-        NumberDecimalSeparator = ",",
-        NumberDecimalDigits = 2
-    };
-
     extension(Currency currency)
     {
         /// <summary>
@@ -38,9 +28,9 @@ public static class MoneyFormat
         /// </summary>
         public string SectionTitle => currency switch
         {
-            Currency.RUB => "Рубли",
-            Currency.USD => "Доллары",
-            Currency.EUR => "Евро",
+            Currency.RUB => UiTexts.CurrencyRubles,
+            Currency.USD => UiTexts.CurrencyDollars,
+            Currency.EUR => UiTexts.CurrencyEuros,
             _ => currency.ToString()
         };
     }
@@ -50,7 +40,7 @@ public static class MoneyFormat
         /// <summary>
         /// Сумма со знаком валюты: <c>82 430,50 ₽</c>.
         /// </summary>
-        public string Display => $"{money.Amount.ToString("N", Numbers)} {money.Currency.Symbol}";
+        public string Display => $"{money.Amount.ToString("N", UiCulture.Money)} {money.Currency.Symbol}";
 
         /// <summary>
         /// Сумма с явным знаком для ленты: доход показан с плюсом, расход с минусом.

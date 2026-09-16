@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
 
@@ -74,7 +75,7 @@ public abstract class DataPage : ContentPage
     /// пользователь ничего не нажимал и принял бы устаревшие числа за нынешние.
     /// </summary>
     private void OnReloadFailed(Exception error) =>
-        Guarded.Run(() => DisplayAlertAsync("Данные не обновились", error.Message, "Закрыть"));
+        Guarded.Run(() => DisplayAlertAsync(UiTexts.ErrorReloadFailedTitle, error.Message, UiTexts.CommonClose));
 
     /// <summary>
     /// Подготовка базы и первое чтение. Общий перехват живёт в <see cref="Guarded"/>;
@@ -93,7 +94,7 @@ public abstract class DataPage : ContentPage
         {
             // Со старой схемой новый код работать не может, и делать вид,
             // что экран просто пуст, нельзя: данные целы, а приложение — нет
-            await DisplayAlertAsync("База не обновилась", error.Message, "Закрыть");
+            await DisplayAlertAsync(UiTexts.ErrorDatabaseFailedTitle, error.Message, UiTexts.CommonClose);
         }
     }
 
@@ -121,7 +122,11 @@ public abstract class DataPage : ContentPage
     private async Task LeaveAsync()
     {
         if (BindingContext is IFormModel { IsDirty: true }
-            && !await DisplayAlertAsync("Уйти без сохранения?", "Набранное не сохранится.", "Уйти", "Остаться"))
+            && !await DisplayAlertAsync(
+                UiTexts.LeaveWithoutSavingTitle,
+                UiTexts.LeaveWithoutSavingPrompt,
+                UiTexts.LeaveWithoutSavingConfirm,
+                UiTexts.LeaveWithoutSavingCancel))
         {
             return;
         }

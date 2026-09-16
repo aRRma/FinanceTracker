@@ -8,6 +8,7 @@
     x:Class="Finance.App.Pages.GroupPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:card="clr-namespace:Finance.Application.Features.Categories.Card;assembly=Finance.Application"
     xmlns:catalog="clr-namespace:Finance.Application.Features.Categories.Catalog;assembly=Finance.Application"
@@ -23,8 +24,8 @@
 
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="14,10" Spacing="10">
-                    <Label Text="Название" Style="{StaticResource CaptionLabel}" />
-                    <Entry Text="{Binding Name}" Placeholder="Еда" />
+                    <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
+                    <Entry Text="{Binding Name}" Placeholder="{x:Static texts:UiTexts.GroupNamePlaceholder}" />
 
                     <BoxView Style="{StaticResource Divider}" />
 
@@ -32,15 +33,15 @@
 
                     <BoxView Style="{StaticResource Divider}" />
 
-                    <Label Text="Вид" Style="{StaticResource CaptionLabel}" />
+                    <Label Text="{x:Static texts:UiTexts.CommonKind}" Style="{StaticResource CaptionLabel}" />
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="6" IsVisible="{Binding KindEditable}"
                           RadioButtonGroup.GroupName="groupKind"
                           RadioButtonGroup.SelectedValue="{Binding Kind}">
-                        <RadioButton Grid.Column="0" Content="Расход" Value="{x:Static domain:CategoryKind.Expense}" />
-                        <RadioButton Grid.Column="1" Content="Доход" Value="{x:Static domain:CategoryKind.Income}" />
+                        <RadioButton Grid.Column="0" Content="{x:Static texts:UiTexts.KindExpense}" Value="{x:Static domain:CategoryKind.Expense}" />
+                        <RadioButton Grid.Column="1" Content="{x:Static texts:UiTexts.KindIncome}" Value="{x:Static domain:CategoryKind.Income}" />
                     </Grid>
                     <Label Text="{Binding KindCaption}" IsVisible="{Binding KindLocked}" />
-                    <Label Text="Вид задаётся при создании и не меняется: его наследуют все подкатегории"
+                    <Label Text="{x:Static texts:UiTexts.GroupKindHint}"
                            Style="{StaticResource CaptionLabel}" />
                 </VerticalStackLayout>
             </Border>
@@ -48,20 +49,20 @@
             <!-- Превью новой группы: приёмник «Прочее» создаётся вместе с ней,
                  и узнать об этом лучше до сохранения, а не после -->
             <VerticalStackLayout Spacing="8" IsVisible="{Binding ShowPreview}">
-                <Label Text="Будет создано" Style="{StaticResource SectionLabel}" />
+                <Label Text="{x:Static texts:UiTexts.GroupWillBeCreated}" Style="{StaticResource SectionLabel}" />
                 <Border Style="{StaticResource Card}">
                     <VerticalStackLayout Padding="14,10" Spacing="4">
                         <Label Text="{Binding Name}" />
                         <Label Text="{Binding PreviewCaption}" Style="{StaticResource SecondaryLabel}" />
                         <BoxView Style="{StaticResource Divider}" />
                         <Label Text="{Binding ReceiverName}" Style="{StaticResource SecondaryLabel}" />
-                        <Label Text="Создаётся автоматически" Style="{StaticResource CaptionLabel}" />
+                        <Label Text="{x:Static texts:UiTexts.GroupCreatedAutomatically}" Style="{StaticResource CaptionLabel}" />
                     </VerticalStackLayout>
                 </Border>
             </VerticalStackLayout>
 
             <VerticalStackLayout Spacing="8" IsVisible="{Binding KindLocked}">
-                <Label Text="Подкатегории" Style="{StaticResource SectionLabel}" />
+                <Label Text="{x:Static texts:UiTexts.GroupSubcategories}" Style="{StaticResource SectionLabel}" />
                 <Border Style="{StaticResource Card}">
                     <VerticalStackLayout>
                         <VerticalStackLayout BindableLayout.ItemsSource="{Binding Subcategories}">
@@ -91,7 +92,7 @@
                                 <TapGestureRecognizer Tapped="OnAddSubcategory" />
                             </Grid.GestureRecognizers>
 
-                            <Label Text="Добавить подкатегорию"
+                            <Label Text="{x:Static texts:UiTexts.GroupAddSubcategory}"
                                    TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
                         </Grid>
                     </VerticalStackLayout>
@@ -102,7 +103,7 @@
                 <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
             </Border>
 
-            <Button Text="Сохранить" Clicked="OnSave" IsEnabled="{Binding CanSave}"
+            <Button Text="{x:Static texts:UiTexts.CommonSave}" Clicked="OnSave" IsEnabled="{Binding CanSave}"
                     Style="{StaticResource SaveButton}" AutomationId="SaveGroup" />
 
         </VerticalStackLayout>

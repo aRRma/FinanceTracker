@@ -47,7 +47,7 @@ public static class TransactionRules
         if (previous is not null && previous.Key != transaction.Key)
         {
             throw new ArgumentException(
-                $"Прежнее состояние относится к операции {previous.Key}, а правится {transaction.Key}",
+                DomainFaults.PreviousIsOther(previous.Key, transaction.Key),
                 nameof(previous));
         }
 
@@ -75,8 +75,7 @@ public static class TransactionRules
         if (expectedKey != account?.Key)
         {
             throw new ArgumentException(
-                $"Передан счёт {account?.Key.ToString() ?? "null"}, " +
-                $"а операция ссылается на {expectedKey?.ToString() ?? "null"}",
+                DomainFaults.AccountMismatch(account?.Key, expectedKey),
                 nameof(account));
         }
 
@@ -90,7 +89,7 @@ public static class TransactionRules
         if (amount is { } value && value.Currency != account.Currency)
         {
             throw new ArgumentException(
-                $"Сумма {value} не в валюте счёта «{account.Name}» ({account.Currency})",
+                DomainFaults.AmountNotInAccountCurrency(value, account.Name, account.Currency),
                 nameof(transaction));
         }
 
@@ -100,13 +99,14 @@ public static class TransactionRules
         DomainException.ThrowIf(
             account.IsClosed && !wasAlreadyUsed,
             Invariant.ClosedAccountNotInNewTransaction,
-            $"Счёт «{account.Name}» закрыт и в новой операции использован быть не может");
+            RuleText.ClosedAccountNotInNewTransaction,
+            account.Name);
 
         DomainException.ThrowIf(
             transaction.OccurredOn < account.OpenedOn,
             Invariant.TransactionNotBeforeAccountOpened,
-            $"Дата операции {transaction.OccurredOn:yyyy-MM-dd} раньше открытия счёта " +
-            $"«{account.Name}» ({account.OpenedOn:yyyy-MM-dd})");
+            RuleText.TransactionNotBeforeAccountOpened,
+            transaction.OccurredOn, account.Name, account.OpenedOn);
     }
 
     /// <summary>
@@ -125,19 +125,20 @@ public static class TransactionRules
         if (category.Key != transaction.CategoryKey)
         {
             throw new ArgumentException(
-                $"Передана категория {category.Key}, а операция ссылается на {transaction.CategoryKey}",
+                DomainFaults.CategoryMismatch(category.Key, transaction.CategoryKey),
                 nameof(category));
         }
 
         DomainException.ThrowIf(
             !category.IsSubcategory,
             Invariant.CategoryIsSubcategory,
-            $"«{category.Name}» — группа: в операции указывается подкатегория");
+            RuleText.CategoryIsSubcategory,
+            category.Name);
 
         if (category.ParentKey != categoryGroup.Key)
         {
             throw new ArgumentException(
-                $"«{categoryGroup.Name}» не является группой подкатегории «{category.Name}»",
+                DomainFaults.NotGroupOfCategory(categoryGroup.Name, category.Name),
                 nameof(categoryGroup));
         }
 
@@ -148,6 +149,7 @@ public static class TransactionRules
         DomainException.ThrowIf(
             categoryGroup.Kind != expected,
             Invariant.CategoryKindMatchesTransaction,
-            $"Операция вида {transaction.Kind} не относится к группе «{categoryGroup.Name}» вида {categoryGroup.Kind}");
+            RuleText.CategoryKindMatchesTransaction,
+            transaction.Kind, categoryGroup.Name, categoryGroup.Kind);
     }
 }

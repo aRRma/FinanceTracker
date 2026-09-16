@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Finance.Application.Infrastructure;
@@ -183,7 +184,7 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
         }
 
         ReportRowItem share = ReportRowItem.From(self, monthTotal);
-        string ofWhat = self.Kind is CategoryKind.Expense ? "расходов" : "доходов";
+        string ofWhat = self.Kind is CategoryKind.Expense ? UiTexts.KindExpenseGenitive : UiTexts.KindIncomeGenitive;
 
         Name = self.Name;
         Caption = $"{Month.Caption} · {share.Share} {ofWhat}";

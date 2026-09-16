@@ -8,12 +8,13 @@
     x:Class="Finance.App.Pages.ReportPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:report="clr-namespace:Finance.Application.Features.Report;assembly=Finance.Application"
     xmlns:domain="clr-namespace:Finance.Domain.Enums;assembly=Finance.Domain"
     x:DataType="report:ReportViewModel"
-    Title="Отчёт">
+    Title="{x:Static texts:UiTexts.ReportTitle}">
 
     <Grid RowDefinitions="Auto,Auto,Auto,*">
 
@@ -22,9 +23,9 @@
               RadioButtonGroup.SelectedValue="{Binding Kind}">
             <!-- Своим цветом и знаком, как вид операции в форме: общая плашка цветом
                  действия под словом «Расходы» читалась цветом дохода -->
-            <RadioButton Grid.Column="0" Content="Расходы" Value="{x:Static domain:CategoryKind.Expense}"
+            <RadioButton Grid.Column="0" Content="{x:Static texts:UiTexts.KindExpensePlural}" Value="{x:Static domain:CategoryKind.Expense}"
                          ControlTemplate="{StaticResource ExpenseSegmentTemplate}" />
-            <RadioButton Grid.Column="1" Content="Доходы" Value="{x:Static domain:CategoryKind.Income}"
+            <RadioButton Grid.Column="1" Content="{x:Static texts:UiTexts.KindIncomePlural}" Value="{x:Static domain:CategoryKind.Income}"
                          ControlTemplate="{StaticResource IncomeSegmentTemplate}" />
         </Grid>
 
@@ -32,7 +33,7 @@
             <!-- Стрелки — круглые кнопки со значком. Знак ничего не говорит вслух:
                  описание обязательно. Шеврон один, «назад» — тот же, повёрнутый -->
             <Border Grid.Column="0" Style="{StaticResource IconButton}"
-                    SemanticProperties.Description="Предыдущий месяц" AutomationId="PreviousMonth">
+                    SemanticProperties.Description="{x:Static texts:UiTexts.ReportPreviousMonth}" AutomationId="PreviousMonth">
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding PreviousMonthCommand}" />
                 </Border.GestureRecognizers>
@@ -41,7 +42,7 @@
             <Label Grid.Column="1" Text="{Binding MonthTitle}" HorizontalTextAlignment="Center"
                    VerticalOptions="Center" FontFamily="OpenSansSemibold" />
             <Border Grid.Column="2" Style="{StaticResource IconButton}"
-                    SemanticProperties.Description="Следующий месяц" AutomationId="NextMonth"
+                    SemanticProperties.Description="{x:Static texts:UiTexts.ReportNextMonth}" AutomationId="NextMonth"
                     IsEnabled="{Binding CanGoForward}">
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding NextMonthCommand}" />
@@ -111,7 +112,7 @@
 
                 <CollectionView.Footer>
                     <Label Padding="16,12,16,24"
-                           Text="Переводы между своими счетами в отчёт не входят: деньги не потрачены, а переложены. Счета, скрытые из расчётов, тоже не учитываются."
+                           Text="{x:Static texts:UiTexts.ReportHint}"
                            Style="{StaticResource CaptionLabel}" />
                 </CollectionView.Footer>
 

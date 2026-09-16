@@ -34,7 +34,7 @@ internal sealed class MinorUnitsConverter : ValueConverter<decimal, long>
 
         if (minor != decimal.Truncate(minor))
         {
-            throw new InvalidOperationException($"Сумма {amount} точнее копейки и в базу не записывается");
+            throw new InvalidOperationException(Faults.AmountTooPrecise(amount));
         }
 
         // decimal.ToInt64 бросает на переполнении, приведение (long) — молча заворачивает

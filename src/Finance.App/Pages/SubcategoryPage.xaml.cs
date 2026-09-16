@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using Finance.Application.Features.Categories.Card;
 using Finance.Application.Infrastructure;
 
@@ -65,7 +66,11 @@ public partial class SubcategoryPage : DataPage
     {
         string prompt = await _model.DeletePromptAsync();
 
-        if (!await DisplayAlertAsync($"Удалить «{_model.Name}»?", prompt, "Удалить", "Отмена"))
+        if (!await DisplayAlertAsync(
+            string.Format(UiCulture.Current, UiTexts.SubcategoryDeleteConfirmTitle, _model.Name),
+            prompt,
+            UiTexts.CommonDelete,
+            UiTexts.CommonCancel))
         {
             return;
         }

@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
@@ -118,10 +119,18 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
         _savedName = found.Name;
         _transactionCount = found.TransactionCount;
 
-        UsageCaption = found.TransactionCount is 0
-            ? "Место ещё не использовано ни в одной операции"
-            : $"{Plural.Of(found.TransactionCount, "операция", "операции", "операций")}"
-              + (found.TopCategoryName is { } category ? $" · чаще всего «{category}»" : string.Empty);
+        string usage = Plural.Of(
+            found.TransactionCount,
+            UiTexts.PlaceUsageOne,
+            UiTexts.PlaceUsageFew,
+            UiTexts.PlaceUsageMany);
+
+        UsageCaption = (found.TransactionCount, found.TopCategoryName) switch
+        {
+            (0, _) => UiTexts.PlaceUnused,
+            (_, { } category) => string.Format(UiCulture.Current, UiTexts.PlaceTopCategory, usage, category),
+            _ => usage
+        };
 
         OnPropertyChanged(nameof(IsLoaded));
     }
@@ -177,7 +186,7 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
     /// в поле: удаляется место как оно сохранено, и правка в поле к удалению
     /// отношения не имеет.
     /// </summary>
-    public string DeleteTitle => $"Удалить «{_savedName}»?";
+    public string DeleteTitle => string.Format(UiCulture.Current, UiTexts.PlaceDeleteConfirmTitle, _savedName);
 
     /// <summary>
     /// Текст подтверждения удаления. Называет число операций, которые останутся
@@ -185,9 +194,15 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
     /// </summary>
     public string DeletePrompt =>
         _transactionCount is 0
-            ? "Операций с этим местом нет. Отменить удаление будет нельзя."
-            : $"{Plural.Of(_transactionCount, "операция останется", "операции останутся", "операций останутся")}"
-              + " без места. Суммы, даты и балансы не изменятся.";
+            ? UiTexts.PlaceDeleteEmpty
+            : string.Format(
+                UiCulture.Current,
+                UiTexts.PlaceDeletePrompt,
+                Plural.Of(
+                    _transactionCount,
+                    UiTexts.PlaceStayingOne,
+                    UiTexts.PlaceStayingFew,
+                    UiTexts.PlaceStayingMany));
 
     /// <summary>
     /// Удаляет место.

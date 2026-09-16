@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain.Enums;
@@ -36,7 +37,7 @@ public sealed record AccountRowItem(
     {
         ArgumentNullException.ThrowIfNull(account);
 
-        string kind = account.Type is AccountType.Cash ? "Наличные" : "Карта";
+        string kind = account.Type is AccountType.Cash ? UiTexts.AccountTypeCash : UiTexts.AccountTypeCard;
 
         return new AccountRowItem(
             account.Key,

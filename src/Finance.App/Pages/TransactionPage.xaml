@@ -10,6 +10,7 @@
     x:Class="Finance.App.Pages.TransactionPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:card="clr-namespace:Finance.Application.Features.Transactions.Card;assembly=Finance.Application"
@@ -27,9 +28,9 @@
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4" Margin="0,0,10,0" HorizontalOptions="Fill">
             <Label Grid.Column="0" Text="{Binding Title}" Style="{StaticResource BarTitleLabel}" />
-            <Button Grid.Column="1" Text="Удалить" Style="{StaticResource BarDangerButton}"
+            <Button Grid.Column="1" Text="{x:Static texts:UiTexts.CommonDelete}" Style="{StaticResource BarDangerButton}"
                     IsVisible="{Binding IsExisting}" AutomationId="DeleteTransaction" Clicked="OnDelete" />
-            <Button Grid.Column="2" Text="Сохранить" Style="{StaticResource BarSaveButton}"
+            <Button Grid.Column="2" Text="{x:Static texts:UiTexts.CommonSave}" Style="{StaticResource BarSaveButton}"
                     IsEnabled="{Binding CanSave}" AutomationId="SaveTransaction" Clicked="OnSave" />
         </Grid>
     </Shell.TitleView>
@@ -50,11 +51,11 @@
                 <Grid ColumnDefinitions="*,*,*" ColumnSpacing="6"
                       RadioButtonGroup.GroupName="kind"
                       RadioButtonGroup.SelectedValue="{Binding Kind}">
-                    <RadioButton Grid.Column="0" Content="Расход" Value="{x:Static domain:TransactionKind.Expense}"
+                    <RadioButton Grid.Column="0" Content="{x:Static texts:UiTexts.KindExpense}" Value="{x:Static domain:TransactionKind.Expense}"
                                  ControlTemplate="{StaticResource ExpenseSegmentTemplate}" />
-                    <RadioButton Grid.Column="1" Content="Доход" Value="{x:Static domain:TransactionKind.Income}"
+                    <RadioButton Grid.Column="1" Content="{x:Static texts:UiTexts.KindIncome}" Value="{x:Static domain:TransactionKind.Income}"
                                  ControlTemplate="{StaticResource IncomeSegmentTemplate}" />
-                    <RadioButton Grid.Column="2" Content="Перевод" Value="{x:Static domain:TransactionKind.Transfer}"
+                    <RadioButton Grid.Column="2" Content="{x:Static texts:UiTexts.KindTransfer}" Value="{x:Static domain:TransactionKind.Transfer}"
                                  ControlTemplate="{StaticResource TransferSegmentTemplate}" />
                 </Grid>
 
@@ -77,7 +78,7 @@
                          ноль в валюте: пустая рамка читалась как поломка. С незакрытым
                          действием итога нет — вместо него видно само выражение -->
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Сумма" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="Center" />
+                        <Label Text="{x:Static texts:UiTexts.TransactionAmount}" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="Center" />
                         <Label Text="{Binding AmountDisplay}" Style="{StaticResource AmountExpression}" />
                         <Label Text="{Binding AmountPreview}" Style="{StaticResource AmountHero}" />
                     </VerticalStackLayout>
@@ -95,7 +96,7 @@
                     </Border.GestureRecognizers>
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Зачисление" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="Center" />
+                        <Label Text="{x:Static texts:UiTexts.TransactionTargetAmount}" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="Center" />
                         <Label Text="{Binding TargetAmountDisplay}" Style="{StaticResource AmountExpression}" />
                         <Label Text="{Binding TargetAmountPreview}" Style="{StaticResource AmountHero}" />
                     </VerticalStackLayout>
@@ -132,13 +133,13 @@
                                 </Grid.GestureRecognizers>
 
                                 <controls:Icon Grid.Column="0" Key="swap" Style="{StaticResource MutedIcon}" />
-                                <Label Grid.Column="1" Text="Куда" VerticalOptions="Center"
+                                <Label Grid.Column="1" Text="{x:Static texts:UiTexts.TransactionTarget}" VerticalOptions="Center"
                                        Style="{StaticResource SecondaryLabel}" />
                                 <Label Grid.Column="2" Text="{Binding TargetAccountCaption}" VerticalOptions="Center" />
                                 <controls:Icon Grid.Column="3" Key="chevron-right" Style="{StaticResource MutedIcon}" />
                             </Grid>
 
-                            <Label Padding="14,0,14,10" Text="Перевод не попадает ни в доходы, ни в расходы"
+                            <Label Padding="14,0,14,10" Text="{x:Static texts:UiTexts.TransactionTransferHint}"
                                    Style="{StaticResource CaptionLabel}" />
                         </VerticalStackLayout>
 
@@ -152,7 +153,7 @@
                                 </Grid.GestureRecognizers>
 
                                 <controls:Icon Grid.Column="0" Key="tag" Style="{StaticResource MutedIcon}" />
-                                <Label Grid.Column="1" Text="Категория" VerticalOptions="Center"
+                                <Label Grid.Column="1" Text="{x:Static texts:UiTexts.TransactionCategory}" VerticalOptions="Center"
                                        Style="{StaticResource SecondaryLabel}" />
                                 <Label Grid.Column="2" Text="{Binding CategoryCaption}" VerticalOptions="Center">
                                     <Label.Triggers>
@@ -176,7 +177,7 @@
                                 </Grid.GestureRecognizers>
 
                                 <controls:Icon Grid.Column="0" Key="map-pin" Style="{StaticResource MutedIcon}" />
-                                <Label Grid.Column="1" Text="Место" VerticalOptions="Center"
+                                <Label Grid.Column="1" Text="{x:Static texts:UiTexts.TransactionPlace}" VerticalOptions="Center"
                                        Style="{StaticResource SecondaryLabel}" />
                                 <Label Grid.Column="2" Text="{Binding PlaceCaption}" VerticalOptions="Center">
                                     <Label.Triggers>
@@ -214,7 +215,7 @@
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding SetTodayCommand}" />
                                     </Border.GestureRecognizers>
-                                    <Label Text="Сегодня" Style="{StaticResource ChipLabel}">
+                                    <Label Text="{x:Static texts:UiTexts.TransactionToday}" Style="{StaticResource ChipLabel}">
                                         <Label.Triggers>
                                             <DataTrigger TargetType="Label" Binding="{Binding IsToday}" Value="True">
                                                 <Setter Property="Style" Value="{StaticResource ChipSelectedLabel}" />
@@ -231,7 +232,7 @@
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding SetYesterdayCommand}" />
                                     </Border.GestureRecognizers>
-                                    <Label Text="Вчера" Style="{StaticResource ChipLabel}">
+                                    <Label Text="{x:Static texts:UiTexts.TransactionYesterday}" Style="{StaticResource ChipLabel}">
                                         <Label.Triggers>
                                             <DataTrigger TargetType="Label" Binding="{Binding IsYesterday}" Value="True">
                                                 <Setter Property="Style" Value="{StaticResource ChipSelectedLabel}" />
@@ -240,7 +241,7 @@
                                     </Label>
                                 </Border>
                                 <Border Style="{StaticResource Chip}" AutomationId="DateOther"
-                                        SemanticProperties.Description="Выбрать дату в календаре">
+                                        SemanticProperties.Description="{x:Static texts:UiTexts.TransactionCalendarHint}">
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnPickDate" />
                                     </Border.GestureRecognizers>
@@ -260,7 +261,7 @@
                         <BoxView Style="{StaticResource Divider}" />
                         <Grid Padding="14,4,14,4" ColumnDefinitions="Auto,*" ColumnSpacing="12">
                             <controls:Icon Grid.Column="0" Key="pencil" Style="{StaticResource MutedIcon}" />
-                            <Entry Grid.Column="1" Text="{Binding Note}" Placeholder="Заметка — необязательно"
+                            <Entry Grid.Column="1" Text="{Binding Note}" Placeholder="{x:Static texts:UiTexts.TransactionNotePlaceholder}"
                                    Focused="OnTextFocused" Unfocused="OnTextUnfocused" />
                         </Grid>
                     </VerticalStackLayout>

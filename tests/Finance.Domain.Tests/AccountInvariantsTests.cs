@@ -161,7 +161,7 @@ public sealed class AccountInvariantsTests
     public void Имя_занятое_соседом_отвергается()
     {
         DomainException error = Assert.Throws<DomainException>(
-            () => NameUniqueness.Ensure("  пятёрочка ", ["Пятёрочка", "Магнит"], "место"));
+            () => NameUniqueness.Ensure("  пятёрочка ", ["Пятёрочка", "Магнит"], RuleText.SubjectPlace));
 
         Assert.Equal(Invariant.NameUnique, error.Invariant);
     }
@@ -170,7 +170,7 @@ public sealed class AccountInvariantsTests
     [Trait("Инвариант", nameof(Invariant.NameUnique))]
     public void Свободное_имя_принимается()
     {
-        NameUniqueness.Ensure("Лента", ["Пятёрочка", "Магнит"], "место");
+        NameUniqueness.Ensure("Лента", ["Пятёрочка", "Магнит"], RuleText.SubjectPlace);
     }
 
     [Fact]
@@ -180,7 +180,7 @@ public sealed class AccountInvariantsTests
         Guid self = Keys.New();
         (Guid, string)[] neighbours = [(self, "Пятёрочка"), (Keys.New(), "Магнит")];
 
-        NameUniqueness.EnsureForRename("Пятёрочка ", neighbours, self, "место");
+        NameUniqueness.EnsureForRename("Пятёрочка ", neighbours, self, RuleText.SubjectPlace);
     }
 
     [Theory]

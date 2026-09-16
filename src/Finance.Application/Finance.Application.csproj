@@ -24,6 +24,20 @@
     <InternalsVisibleTo Include="Finance.Application.Tests" />
   </ItemGroup>
 
+  <!-- Класс доступа к текстам собирается из .resx самой сборкой: PublicClass —
+       чтобы разметка в Finance.App читала его через {x:Static}, а сгенерированный
+       файл кладётся в obj, иначе он попал бы под проверки исходников -->
+  <ItemGroup>
+    <EmbeddedResource Update="Texts\UiTexts.resx">
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>Finance.Application.Texts</StronglyTypedNamespace>
+      <StronglyTypedClassName>UiTexts</StronglyTypedClassName>
+      <StronglyTypedManifestPrefix>Finance.Application.Texts</StronglyTypedManifestPrefix>
+      <StronglyTypedFileName>$(IntermediateOutputPath)UiTexts.Designer.cs</StronglyTypedFileName>
+      <PublicClass>true</PublicClass>
+    </EmbeddedResource>
+  </ItemGroup>
+
   <!-- Стартовый набор и значки едут внутри сборки: инициализация базы идёт
        без обращения к сети и без файлов рядом с приложением (SEED-01, NFR-21) -->
   <ItemGroup>

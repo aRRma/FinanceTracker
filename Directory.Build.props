@@ -5,6 +5,14 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
+    <!-- Язык, на котором написаны сами ресурсы: их строки лежат в основной
+         сборке, и за русским текстом ходить в сателлит не нужно. Появится
+         перевод — он и станет сателлитом, а этот останется запасным.
+
+         InvariantGlobalization включать нельзя никогда: на нём умирают
+         и «25 августа», и разбор часовых поясов, а сборка об этом молчит. -->
+    <NeutralLanguage>ru</NeutralLanguage>
+
     <!-- Предупреждение, замеченное поздно, стоит дороже сломанной сборки -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>

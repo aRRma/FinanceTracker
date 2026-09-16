@@ -8,11 +8,12 @@
     x:Class="Finance.App.Pages.BalancesPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:balances="clr-namespace:Finance.Application.Features.Balances;assembly=Finance.Application"
     x:DataType="balances:BalancesViewModel"
-    Title="Балансы">
+    Title="{x:Static texts:UiTexts.BalancesTitle}">
 
     <ContentPage.Resources>
         <!-- Один шаблон на тратимые счета и на накопления: строка у них одинаковая,
@@ -68,7 +69,7 @@
                                          три подписи столбиком читались как три разных заголовка -->
                                     <Grid ColumnDefinitions="*,Auto" Padding="2,0">
                                         <Label Grid.Column="0" Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
-                                        <Label Grid.Column="1" Text="Доступно" Style="{StaticResource SectionLabel}" />
+                                        <Label Grid.Column="1" Text="{x:Static texts:UiTexts.BalancesAvailable}" Style="{StaticResource SectionLabel}" />
                                     </Grid>
                                     <Label Text="{Binding Available}" Style="{StaticResource TotalLabel}"
                                            HorizontalTextAlignment="End" Padding="2,0">
@@ -86,9 +87,9 @@
                                             BindableLayout.ItemTemplate="{StaticResource AccountTileTemplate}" />
                                     </Border>
 
-                                    <Label Text="Накопления" Style="{StaticResource SectionLabel}"
+                                    <Label Text="{x:Static texts:UiTexts.BalancesSavings}" Style="{StaticResource SectionLabel}"
                                            IsVisible="{Binding HasSavings}" />
-                                    <Label Text="Скрыты из расчётов" Style="{StaticResource CaptionLabel}"
+                                    <Label Text="{x:Static texts:UiTexts.BalancesExcluded}" Style="{StaticResource CaptionLabel}"
                                            IsVisible="{Binding HasSavings}" />
 
                                     <Border Style="{StaticResource Card}" IsVisible="{Binding HasSavings}">
@@ -113,7 +114,7 @@
                             </Grid.GestureRecognizers>
 
                             <controls:Icon Grid.Column="0" Key="plus" Style="{StaticResource AccentIcon}" />
-                            <Label Grid.Column="1" Text="Добавить счёт" VerticalOptions="Center"
+                            <Label Grid.Column="1" Text="{x:Static texts:UiTexts.BalancesAddAccount}" VerticalOptions="Center"
                                    AutomationId="AddAccount"
                                    TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
                         </Grid>
@@ -129,19 +130,19 @@
              До конца чтения не показывается: иначе мигало бы на каждом заходе -->
         <VerticalStackLayout IsVisible="{Binding IsEmpty}" Padding="32" Spacing="12"
                              VerticalOptions="Center" HorizontalOptions="Center">
-            <Label Text="Заведите первый счёт" HorizontalTextAlignment="Center"
+            <Label Text="{x:Static texts:UiTexts.BalancesEmptyTitle}" HorizontalTextAlignment="Center"
                    Style="{StaticResource TitleLabel}" />
-            <Label Text="Категории уже созданы — останется записать первую операцию."
+            <Label Text="{x:Static texts:UiTexts.BalancesEmptyHint}"
                    HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
-            <Button Text="Создать счёт" Clicked="OnCreateAccount" AutomationId="CreateFirstAccount" />
+            <Button Text="{x:Static texts:UiTexts.BalancesCreateAccount}" Clicked="OnCreateAccount" AutomationId="CreateFirstAccount" />
         </VerticalStackLayout>
 
         <!-- Пока счетов нет, записывать операцию некуда — кнопки нет. С подписью,
              а не одним знаком: строка «Добавить счёт» рядом тоже начинается с плюса,
              и два одинаковых плюса на экране не различить -->
-        <Button Text="+  Операция" Clicked="OnAddTransaction" IsVisible="{Binding HasAccounts}"
+        <Button Text="{x:Static texts:UiTexts.BalancesAddTransaction}" Clicked="OnAddTransaction" IsVisible="{Binding HasAccounts}"
                 Style="{StaticResource ExtendedFloatingButton}"
-                SemanticProperties.Description="Записать операцию" AutomationId="AddTransaction" />
+                SemanticProperties.Description="{x:Static texts:UiTexts.BalancesAddTransactionHint}" AutomationId="AddTransaction" />
     </Grid>
 
 </pages:DataPage>

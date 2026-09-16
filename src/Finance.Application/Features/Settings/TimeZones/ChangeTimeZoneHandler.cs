@@ -49,7 +49,7 @@ public sealed class ChangeTimeZoneHandler : IChangeTimeZoneHandler
             // а пользователь будет уверен, что выбор сохранён
             if (!TimeZoneInfo.TryFindSystemTimeZoneById(id, out TimeZoneInfo? zone))
             {
-                throw new TimeZoneNotFoundException($"Зона «{id}» системе неизвестна");
+                throw new TimeZoneNotFoundException(Faults.TimeZoneUnknown(id));
             }
 
             await _settings

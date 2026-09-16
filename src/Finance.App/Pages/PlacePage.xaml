@@ -8,10 +8,11 @@
     x:Class="Finance.App.Pages.PlacePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:card="clr-namespace:Finance.Application.Features.Places.Card;assembly=Finance.Application"
     x:DataType="card:PlaceViewModel"
-    Title="Место">
+    Title="{x:Static texts:UiTexts.PlaceTitle}">
 
     <!-- Container: .NET 10 пускает страницу под системные полосы, а ScrollView
          из всех областей понимает только эту -->
@@ -20,8 +21,8 @@
 
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="14,10" Spacing="10">
-                    <Label Text="Название" Style="{StaticResource CaptionLabel}" />
-                    <Entry Text="{Binding Name}" Placeholder="Пятёрочка" />
+                    <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
+                    <Entry Text="{Binding Name}" Placeholder="{x:Static texts:UiTexts.PlaceNamePlaceholder}" />
 
                     <Label Text="{Binding UsageCaption}" Style="{StaticResource CaptionLabel}" />
                 </VerticalStackLayout>
@@ -31,10 +32,10 @@
                 <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
             </Border>
 
-            <Button Text="Сохранить" Clicked="OnSave" IsVisible="{Binding IsLoaded}" IsEnabled="{Binding CanSave}"
+            <Button Text="{x:Static texts:UiTexts.CommonSave}" Clicked="OnSave" IsVisible="{Binding IsLoaded}" IsEnabled="{Binding CanSave}"
                     Style="{StaticResource SaveButton}" AutomationId="SavePlace" />
 
-            <Button Text="Удалить место" Clicked="OnDelete" IsVisible="{Binding IsLoaded}" IsEnabled="{Binding IsIdle}"
+            <Button Text="{x:Static texts:UiTexts.PlaceDelete}" Clicked="OnDelete" IsVisible="{Binding IsLoaded}" IsEnabled="{Binding IsIdle}"
                     AutomationId="DeletePlace"
                     Style="{StaticResource DangerButton}" />
 

@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -79,14 +80,15 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// </summary>
     public IReadOnlyList<string> TypeNames => TypeCaptions;
 
-    private static readonly string[] TypeCaptions = ["Карта", "Наличные"];
+    private static readonly string[] TypeCaptions = [UiTexts.AccountTypeCard, UiTexts.AccountTypeCash];
 
     /// <summary>
     /// Подписи валют для списка выбора.
     /// </summary>
     public IReadOnlyList<string> CurrencyNames => CurrencyCaptions;
 
-    private static readonly string[] CurrencyCaptions = ["Рубль ₽", "Доллар $", "Евро €"];
+    private static readonly string[] CurrencyCaptions =
+        [UiTexts.CurrencyRubleOption, UiTexts.CurrencyDollarOption, UiTexts.CurrencyEuroOption];
 
     /// <summary>
     /// Выбранный тип счёта — номером в списке: список показывает подписи, а не имена членов.
@@ -129,7 +131,7 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// Пояснение, почему дату открытия дальше не сдвинуть.
     /// </summary>
     public string? OpenedOnHint => EarliestTransactionOn is { } earliest
-        ? $"Не позже {earliest:dd.MM.yyyy} — этим днём есть операция"
+        ? string.Format(UiCulture.Current, UiTexts.AccountOpenedOnLimit, earliest)
         : null;
 
     /// <summary>
@@ -212,7 +214,7 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Заголовок экрана.
     /// </summary>
-    public string Title => Key is null ? "Новый счёт" : "Счёт";
+    public string Title => Key is null ? UiTexts.AccountTitleNew : UiTexts.AccountTitleExisting;
 
     /// <summary>
     /// Предупреждение перед закрытием счёта с деньгами; пусто — подтверждать нечего.
@@ -221,8 +223,7 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// </summary>
     public string? ClosingWarning =>
         IsClosed && !_savedClosed && _balance is { Amount: not 0m } balance
-            ? $"На счёте {balance.Display}. После закрытия они не войдут в «доступно к тратам», " +
-              "а перевести их будет некуда — закрытый счёт в выборе не предлагается."
+            ? string.Format(UiCulture.Current, UiTexts.AccountClosingWarning, balance.Display)
             : null;
 
     /// <summary>
@@ -294,7 +295,7 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
 
         if (!AmountExpression.TryEvaluate(OpeningBalance, out decimal openingBalance))
         {
-            Error = "Начальный остаток введён не полностью";
+            Error = UiTexts.AccountOpeningIncomplete;
             OnPropertyChanged(nameof(HasError));
 
             return false;

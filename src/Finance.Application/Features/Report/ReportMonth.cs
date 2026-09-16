@@ -15,8 +15,6 @@ namespace Finance.Application.Features.Report;
 /// </remarks>
 public readonly record struct ReportMonth
 {
-    private static readonly CultureInfo Russian = CultureInfo.GetCultureInfo("ru-RU");
-
     private ReportMonth(DateOnly first) => First = first;
 
     /// <summary>
@@ -42,20 +40,12 @@ public readonly record struct ReportMonth
     /// <summary>
     /// Шапка переключателя: «Август 2026». Без дня формат даёт именительный падеж.
     /// </summary>
-    public string Title
-    {
-        get
-        {
-            string name = First.ToString("MMMM", Russian);
-
-            return string.Create(Russian, $"{char.ToUpper(name[0], Russian)}{name.AsSpan(1)} {First.Year}");
-        }
-    }
+    public string Title => DateText.MonthWithYearTitle(First);
 
     /// <summary>
     /// Подпись внутри строки: «август 2026».
     /// </summary>
-    public string Caption => First.ToString("MMMM yyyy", Russian);
+    public string Caption => DateText.MonthWithYear(First);
 
     /// <summary>
     /// Месяц, в который попадает дата.

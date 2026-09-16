@@ -1,3 +1,4 @@
+using System.Globalization;
 using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Accounts.Catalog;
 using Finance.Application.Features.Balances;
@@ -47,14 +48,24 @@ public static class FinanceServices
     /// <param name="applicationVersion">
     /// Версия приложения из манифеста для экрана «О программе». Её знает только платформа.
     /// </param>
+    /// <param name="culture">
+    /// Язык интерфейса: на нём показываются тексты, склоняются счётные формы
+    /// и записываются даты. Пусто — русский, пока единственный язык приложения.
+    /// </param>
     public static IServiceCollection AddFinance(
         this IServiceCollection services,
         string databasePath,
         Action<Action>? dispatchToInterface = null,
         Action<Theme>? applyTheme = null,
-        string? applicationVersion = null)
+        string? applicationVersion = null,
+        CultureInfo? culture = null)
     {
         ArgumentNullException.ThrowIfNull(services);
+
+        // До первого экрана: тексты и форматы берутся из статических точек,
+        // и к моменту, когда модель представления соберёт первую подпись,
+        // язык обязан быть уже выбран
+        UiCulture.Use(culture);
 
         DatabaseLocation location = new(databasePath);
 
@@ -109,6 +120,7 @@ public static class FinanceServices
         services.AddSingleton<ISaveTransactionHandler, SaveTransactionHandler>();
         services.AddSingleton<IDeleteTransactionHandler, DeleteTransactionHandler>();
         services.AddSingleton<IReportQuery, ReportQuery>();
+        services.AddSingleton<IFrequentCategoriesQuery, FrequentCategoriesQuery>();
 
         // Один на приложение: сюда экран выбора кладёт решение, а форма операции
         // забирает его при возвращении. Экраны при этом живут порознь

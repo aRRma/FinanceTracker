@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Finance.Application.Texts;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
@@ -86,7 +87,7 @@ public sealed partial class AppearanceViewModel : ScreenViewModel
     {
         Options.Clear();
 
-        Options.Add(Option(Theme.System, "world", "Следует настройке телефона"));
+        Options.Add(Option(Theme.System, "world", UiTexts.AppearanceSystemHint));
         Options.Add(Option(Theme.Light, "sun", hint: null));
         Options.Add(Option(Theme.Dark, "moon", hint: null));
     }

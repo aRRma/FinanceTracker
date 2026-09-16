@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -10,11 +11,23 @@ namespace Finance.Application.Features.Transactions.Pick;
 /// Выбор подкатегории для формы операции (экран B-03). Группы свёрнуты: подкатегорий
 /// шесть десятков, и сплошной список читать дольше, чем открыть нужную группу.
 /// Кто ищет глазами — разворачивает группу, кто помнит название — набирает его
-/// в поиске, и тогда группы раскрываются сами.
+/// в поиске, и тогда группы раскрываются сами. Над списком — панель частых:
+/// расход записывают несколько раз в день, и почти всегда в одну из немногих
+/// подкатегорий, а до них иначе два касания и прокрутка.
 /// </summary>
 public sealed partial class CategoryPickerViewModel : ObservableObject
 {
+    /// <summary>
+    /// Сколько частых подкатегорий показывает панель.
+    /// </summary>
+    /// <remarks>
+    /// Восемь: столько чипов проматывается пальцем за один жест, а дальше панель
+    /// перестаёт быть короткой дорогой и превращается во второй список.
+    /// </remarks>
+    private const int FrequentCount = 8;
+
     private readonly ICategoriesQuery _categories;
+    private readonly IFrequentCategoriesQuery _frequent;
     private readonly TransactionPicks _picks;
 
     private readonly List<Branch> _branches = [];
@@ -26,13 +39,19 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
     /// Создаёт модель представления выбора подкатегории.
     /// </summary>
     /// <param name="categories">Справочник категорий обоих уровней.</param>
+    /// <param name="frequent">Частые подкатегории для панели над списком.</param>
     /// <param name="picks">Куда кладётся выбор для формы операции.</param>
-    public CategoryPickerViewModel(ICategoriesQuery categories, TransactionPicks picks)
+    public CategoryPickerViewModel(
+        ICategoriesQuery categories,
+        IFrequentCategoriesQuery frequent,
+        TransactionPicks picks)
     {
         ArgumentNullException.ThrowIfNull(categories);
+        ArgumentNullException.ThrowIfNull(frequent);
         ArgumentNullException.ThrowIfNull(picks);
 
         _categories = categories;
+        _frequent = frequent;
         _picks = picks;
     }
 
@@ -42,10 +61,16 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
     public ObservableCollection<CategoryPickerLine> Lines { get; } = [];
 
     /// <summary>
+    /// Частые подкатегории панели над списком, от частых к редким. Строки те же,
+    /// что и в списке: выбор с панели и выбор из списка — одно и то же действие.
+    /// </summary>
+    public ObservableCollection<CategoryPickerLine> Frequent { get; } = [];
+
+    /// <summary>
     /// Заголовок экрана: категория расхода или дохода.
     /// </summary>
     [ObservableProperty]
-    public partial string Title { get; private set; } = "Категория";
+    public partial string Title { get; private set; } = UiTexts.PickCategoryTitle;
 
     /// <summary>
     /// Идёт чтение.
@@ -73,6 +98,15 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
     public bool IsEmpty => IsLoaded && Lines.Count is 0;
 
     /// <summary>
+    /// Панель частых видна: показывать есть что и в поиске ничего не набрано.
+    /// </summary>
+    /// <remarks>
+    /// С первой же буквой панель уходит: набравший буквы ищет как раз не частое,
+    /// а список под панелью поднимается к первой подходящей строке.
+    /// </remarks>
+    public bool IsFrequentVisible => Frequent.Count > 0 && Filter.AsSpan().Trim().Length is 0;
+
+    /// <summary>
     /// Читает категории выбранного вида.
     /// </summary>
     /// <param name="kind">Вид: расход или доход — он задан видом операции.</param>
@@ -80,16 +114,41 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
     /// <param name="cancellationToken">Признак отмены.</param>
     public async Task LoadAsync(CategoryKind kind, Guid? selected, CancellationToken cancellationToken = default)
     {
-        Title = kind is CategoryKind.Expense ? "Категория расхода" : "Категория дохода";
+        Title = kind is CategoryKind.Expense ? UiTexts.PickCategoryExpense : UiTexts.PickCategoryIncome;
         _selected = selected;
 
         IsBusy = true;
 
         try
         {
+            // Два чтения независимы и идут разом: у каждого запроса свой контекст,
+            // а последовательно экран ждал бы сумму двух обращений к базе
+            Task<IReadOnlyList<CategoryListItem>> categoriesTask = _categories.ReadAsync(cancellationToken);
+            Task<IReadOnlyList<FrequentCategory>> frequentTask =
+                _frequent.ReadAsync(kind, FrequentCount, cancellationToken);
+
             // ConfigureAwait(false) здесь недопустим: следом наполняются
             // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-            IReadOnlyList<CategoryListItem> all = await _categories.ReadAsync(cancellationToken);
+            await Task.WhenAll(categoriesTask, frequentTask);
+
+            IReadOnlyList<CategoryListItem> all = await categoriesTask;
+            IReadOnlyList<FrequentCategory> frequent = await frequentTask;
+
+            Frequent.Clear();
+
+            foreach (FrequentCategory item in frequent)
+            {
+                // Приглушения в панели нет: сюда попадает только то, чем и правда
+                // пользуются, и «Прочее» здесь такая же рабочая подкатегория
+                Frequent.Add(new CategoryPickerLine(
+                    item.Key,
+                    item.Icon,
+                    item.Name,
+                    isGroup: false,
+                    count: 0,
+                    isProtected: false,
+                    item.Key == selected));
+            }
 
             _branches.Clear();
             _expanded.Clear();
@@ -114,6 +173,8 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
             Rebuild();
 
             IsLoaded = true;
+
+            OnPropertyChanged(nameof(IsFrequentVisible));
         }
         finally
         {
@@ -195,7 +256,12 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
     /// <summary>
     /// Пересобирает список из прочитанного — в базу за этим не ходят.
     /// </summary>
-    partial void OnFilterChanged(string value) => Rebuild();
+    partial void OnFilterChanged(string value)
+    {
+        Rebuild();
+
+        OnPropertyChanged(nameof(IsFrequentVisible));
+    }
 
     private void Rebuild()
     {

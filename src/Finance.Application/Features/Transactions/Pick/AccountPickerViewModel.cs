@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -44,7 +45,7 @@ public sealed partial class AccountPickerViewModel : ObservableObject
     /// Заголовок экрана: у перевода выбирают не просто счёт, а сторону.
     /// </summary>
     [ObservableProperty]
-    public partial string Title { get; private set; } = "Счёт";
+    public partial string Title { get; private set; } = UiTexts.PickAccountTitle;
 
     /// <summary>
     /// Идёт чтение.
@@ -66,7 +67,7 @@ public sealed partial class AccountPickerViewModel : ObservableObject
         CancellationToken cancellationToken = default)
     {
         _forTarget = forTarget;
-        Title = forTarget ? "Счёт зачисления" : "Счёт списания";
+        Title = forTarget ? UiTexts.PickAccountTarget : UiTexts.PickAccountSource;
 
         IsBusy = true;
 
@@ -122,7 +123,7 @@ public sealed partial class AccountPickerViewModel : ObservableObject
         account.Key,
         AccountIcon.For(account.Type, account.ExcludedFromTotals),
         account.Name,
-        account.ExcludedFromTotals ? "Накопления" : string.Empty,
+        account.ExcludedFromTotals ? UiTexts.PickAccountSavings : string.Empty,
         account.Balance.Display,
         account.Balance.IsNegative,
         account.Key == selected);

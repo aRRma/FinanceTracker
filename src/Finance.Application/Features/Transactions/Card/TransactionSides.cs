@@ -1,3 +1,4 @@
+using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
 using Finance.Domain.Entities;
@@ -28,7 +29,7 @@ internal static class TransactionSides
             .AsNoTracking()
             .FirstOrDefaultAsync(account => account.Key == key, cancellationToken)
             .ConfigureAwait(false)
-            ?? throw new InvalidOperationException($"Счёт {key} не найден");
+            ?? throw new InvalidOperationException(Faults.AccountNotFound(key));
 
         return row.ToDomain();
     }

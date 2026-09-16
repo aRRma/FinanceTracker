@@ -11,30 +11,31 @@
     x:Class="Finance.App.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     FlyoutBehavior="Disabled">
 
     <TabBar>
         <ShellContent
-            Title="Балансы"
+            Title="{x:Static texts:UiTexts.BalancesTitle}"
             ContentTemplate="{DataTemplate pages:BalancesPage}"
             Icon="tab_balances.png"
             Route="balances" />
 
         <ShellContent
-            Title="Операции"
+            Title="{x:Static texts:UiTexts.FeedTitle}"
             ContentTemplate="{DataTemplate pages:FeedPage}"
             Icon="tab_feed.png"
             Route="feed" />
 
         <ShellContent
-            Title="Отчёт"
+            Title="{x:Static texts:UiTexts.ReportTitle}"
             ContentTemplate="{DataTemplate pages:ReportPage}"
             Icon="tab_report.png"
             Route="report" />
 
         <ShellContent
-            Title="Ещё"
+            Title="{x:Static texts:UiTexts.MoreTitle}"
             ContentTemplate="{DataTemplate pages:MorePage}"
             Icon="tab_more.png"
             Route="more" />

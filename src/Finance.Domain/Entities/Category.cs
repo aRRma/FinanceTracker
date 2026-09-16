@@ -99,11 +99,11 @@ public sealed class Category : Entity
         DomainException.ThrowIf(
             role is CategoryRole.Other,
             Invariant.GroupHasReceiver,
-            "Приёмником «Прочее» бывает только подкатегория, не группа");
+            RuleText.ReceiverIsNotGroup);
 
         return new Category(
             Keys.New(), parentKey: null, kind,
-            Names.Normalize(name, "группа"), NormalizeIcon(icon),
+            Names.Normalize(name, RuleText.SubjectGroup), NormalizeIcon(icon),
             role, excludeFromReports,
             createdAtUtc: nowUtc, updatedAtUtc: nowUtc,
             deletedAtUtc: null, syncedAtUtc: null, externalId: null);
@@ -126,7 +126,7 @@ public sealed class Category : Entity
 
         return new Category(
             Keys.New(), parent.Key, kind: null,
-            Names.Normalize(name, "подкатегория"), NormalizeIcon(icon),
+            Names.Normalize(name, RuleText.SubjectSubcategory), NormalizeIcon(icon),
             role, excludeFromReports,
             createdAtUtc: nowUtc, updatedAtUtc: nowUtc,
             deletedAtUtc: null, syncedAtUtc: null, externalId: null);
@@ -159,7 +159,7 @@ public sealed class Category : Entity
     /// Уникальность имени здесь не проверяется: она зависит от соседей, которых
     /// сущность не видит, — это делает <see cref="NameUniqueness"/>.
     /// </summary>
-    public void Rename(string name) => Name = Names.Normalize(name, "категория");
+    public void Rename(string name) => Name = Names.Normalize(name, RuleText.SubjectCategory);
 
     /// <summary>
     /// Меняет значок.
@@ -191,12 +191,14 @@ public sealed class Category : Entity
         DomainException.ThrowIf(
             IsProtected,
             Invariant.ProtectedCategoryStays,
-            $"Категория «{Name}» не удаляется: она приёмник группы или служебная");
+            RuleText.ProtectedCategoryNotDeleted,
+            Name);
 
         DomainException.ThrowIf(
             IsGroup,
             Invariant.GroupNotDeleted,
-            $"Группа «{Name}» не удаляется: опустевшая группа остаётся в списке");
+            RuleText.GroupNotDeleted,
+            Name);
 
         base.Delete(atUtc);
     }

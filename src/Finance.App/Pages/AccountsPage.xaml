@@ -8,11 +8,12 @@
     x:Class="Finance.App.Pages.AccountsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:catalog="clr-namespace:Finance.Application.Features.Accounts.Catalog;assembly=Finance.Application"
     x:DataType="catalog:AccountsViewModel"
-    Title="Счета">
+    Title="{x:Static texts:UiTexts.AccountsTitle}">
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="+" Clicked="OnCreateAccount" AutomationId="CreateAccount" />
@@ -34,12 +35,12 @@
                      У закрытого счёта её место занимает замок — его не переставляют -->
                 <controls:Icon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Key="grip-vertical"
                                IsVisible="{Binding IsOpen}"
-                               SemanticProperties.Description="Перетащить"
+                               SemanticProperties.Description="{x:Static texts:UiTexts.AccountsDragHint}"
                                Style="{StaticResource MutedIcon}" />
 
                 <controls:Icon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Key="lock"
                                IsVisible="{Binding IsClosed}"
-                               SemanticProperties.Description="Счёт закрыт"
+                               SemanticProperties.Description="{x:Static texts:UiTexts.AccountsClosedHint}"
                                Style="{StaticResource MutedIcon}" />
 
                 <controls:Icon Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Key="{Binding Icon}" />
@@ -66,7 +67,7 @@
              из всех областей понимает только эту -->
         <ScrollView SafeAreaEdges="Container">
             <VerticalStackLayout Padding="16,12" Spacing="16">
-                <Label Text="Доступно к тратам" Style="{StaticResource SectionLabel}" />
+                <Label Text="{x:Static texts:UiTexts.AccountsSpendable}" Style="{StaticResource SectionLabel}" />
                 <Border Style="{StaticResource Card}">
                     <VerticalStackLayout
                         BindableLayout.ItemsSource="{Binding Spendable}"
@@ -75,7 +76,7 @@
 
                 <!-- Пустой раздел не показывается: заголовок без единой строки под ним
                      читается как потерянные счета, а не как «накоплений нет» -->
-                <Label Text="Накопления" Style="{StaticResource SectionLabel}"
+                <Label Text="{x:Static texts:UiTexts.AccountsSavings}" Style="{StaticResource SectionLabel}"
                        IsVisible="{Binding HasSavings}" />
                 <Border Style="{StaticResource Card}" IsVisible="{Binding HasSavings}">
                     <VerticalStackLayout
@@ -83,7 +84,7 @@
                         BindableLayout.ItemTemplate="{StaticResource AccountRowTemplate}" />
                 </Border>
 
-                <Label Text="Закрытые" Style="{StaticResource SectionLabel}"
+                <Label Text="{x:Static texts:UiTexts.AccountsClosed}" Style="{StaticResource SectionLabel}"
                        IsVisible="{Binding HasClosed}" />
                 <Border Style="{StaticResource Card}" IsVisible="{Binding HasClosed}">
                     <VerticalStackLayout

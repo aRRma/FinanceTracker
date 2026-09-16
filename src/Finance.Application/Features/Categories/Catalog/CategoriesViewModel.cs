@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -43,7 +44,7 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
     /// <summary>
     /// Подписи видов для переключателя.
     /// </summary>
-    public static IReadOnlyList<string> KindNames { get; } = ["Расходы", "Доходы"];
+    public static IReadOnlyList<string> KindNames { get; } = [UiTexts.KindExpensePlural, UiTexts.KindIncomePlural];
 
     /// <summary>
     /// Какой вид показан.

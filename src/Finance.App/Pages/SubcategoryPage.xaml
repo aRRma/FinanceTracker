@@ -8,6 +8,7 @@
     x:Class="Finance.App.Pages.SubcategoryPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:card="clr-namespace:Finance.Application.Features.Categories.Card;assembly=Finance.Application"
     xmlns:controls="clr-namespace:Finance.App.Controls"
@@ -21,8 +22,8 @@
 
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="14,10" Spacing="10">
-                    <Label Text="Название" Style="{StaticResource CaptionLabel}" />
-                    <Entry Text="{Binding Name}" Placeholder="Продукты" />
+                    <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
+                    <Entry Text="{Binding Name}" Placeholder="{x:Static texts:UiTexts.SubcategoryNamePlaceholder}" />
 
                     <BoxView Style="{StaticResource Divider}" />
 
@@ -30,18 +31,18 @@
 
                     <BoxView Style="{StaticResource Divider}" />
 
-                    <Label Text="Группа" Style="{StaticResource CaptionLabel}" />
+                    <Label Text="{x:Static texts:UiTexts.SubcategoryGroupLabel}" Style="{StaticResource CaptionLabel}" />
                     <!-- Только группы того же вида: перенос в чужой вид перевернул бы
                          знак у всей истории подкатегории -->
                     <Picker ItemsSource="{Binding Groups}"
                             ItemDisplayBinding="{Binding Name, x:DataType=card:CategoryGroupOption}"
-                            SelectedItem="{Binding Group}" Title="Выбрать группу" />
+                            SelectedItem="{Binding Group}" Title="{x:Static texts:UiTexts.SubcategoryChooseGroup}" />
 
                     <BoxView Style="{StaticResource Divider}" />
 
-                    <Label Text="Вид" Style="{StaticResource CaptionLabel}" />
+                    <Label Text="{x:Static texts:UiTexts.CommonKind}" Style="{StaticResource CaptionLabel}" />
                     <Label Text="{Binding KindCaption}" />
-                    <Label Text="Вид наследуется от группы и не меняется"
+                    <Label Text="{x:Static texts:UiTexts.SubcategoryKindHint}"
                            Style="{StaticResource CaptionLabel}" />
                 </VerticalStackLayout>
             </Border>
@@ -50,10 +51,10 @@
                 <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
             </Border>
 
-            <Button Text="Сохранить" Clicked="OnSave" IsEnabled="{Binding CanSave}"
+            <Button Text="{x:Static texts:UiTexts.CommonSave}" Clicked="OnSave" IsEnabled="{Binding CanSave}"
                     Style="{StaticResource SaveButton}" AutomationId="SaveSubcategory" />
 
-            <Button Text="Удалить подкатегорию" Clicked="OnDelete" IsVisible="{Binding CanDelete}" IsEnabled="{Binding IsIdle}"
+            <Button Text="{x:Static texts:UiTexts.SubcategoryDelete}" Clicked="OnDelete" IsVisible="{Binding CanDelete}" IsEnabled="{Binding IsIdle}"
                     AutomationId="DeleteSubcategory"
                     Style="{StaticResource DangerButton}" />
 

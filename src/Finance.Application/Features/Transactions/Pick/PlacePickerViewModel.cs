@@ -1,3 +1,5 @@
+using Finance.Application.Infrastructure;
+using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -82,7 +84,7 @@ public sealed partial class PlacePickerViewModel : ObservableObject
     /// <summary>
     /// Подпись строки заведения нового места.
     /// </summary>
-    public string CreateCaption => $"Создать «{Filter.Trim()}»";
+    public string CreateCaption => string.Format(UiCulture.Current, UiTexts.PickPlaceCreate, Filter.Trim());
 
     /// <summary>
     /// Мест нет вовсе, и набрать пока нечего.

@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 namespace Finance.Application.Infrastructure.Settings;
 
 /// <summary>
@@ -10,5 +11,5 @@ public sealed class AboutInfo(string? version = null)
     /// <summary>
     /// Версия приложения. Незаданной она бывает только вне устройства — в тестах.
     /// </summary>
-    public string Version { get; } = string.IsNullOrWhiteSpace(version) ? "не задана" : version;
+    public string Version { get; } = string.IsNullOrWhiteSpace(version) ? UiTexts.AboutVersionUnknown : version;
 }

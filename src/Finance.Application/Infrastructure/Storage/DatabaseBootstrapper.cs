@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -67,15 +68,14 @@ public sealed class DatabaseBootstrapper
             if (!existed)
             {
                 throw new DatabaseMigrationException(
-                    "Не удалось создать базу. Данных ещё не было, терять нечего",
+                    UiTexts.DatabaseCreateFailed,
                     error);
             }
 
             RestoreFromBackup();
 
             throw new DatabaseMigrationException(
-                "Не удалось обновить схему базы. База возвращена из резервной копии; " +
-                "верните предыдущую версию приложения — данные целы",
+                UiTexts.DatabaseMigrateFailed,
                 error);
         }
 
@@ -143,7 +143,7 @@ public sealed class DatabaseBootstrapper
             // Схема ещё не тронута, но накатывать её без копии нельзя:
             // сообщение то же, что при неудачной миграции, — данные целы
             throw new DatabaseMigrationException(
-                "Не удалось снять резервную копию перед обновлением схемы; схема не тронута, данные целы",
+                UiTexts.DatabaseBackupFailed,
                 error);
         }
     }

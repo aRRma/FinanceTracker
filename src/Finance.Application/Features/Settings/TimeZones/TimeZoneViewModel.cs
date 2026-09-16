@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Finance.Application.Texts;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -128,7 +129,7 @@ public sealed partial class TimeZoneViewModel : ScreenViewModel
         Zones.Add(new TimeZoneOption
         {
             Id = null,
-            Caption = "Как в системе",
+            Caption = UiTexts.TimeZoneSystem,
             Offset = Offset(TimeZoneInfo.Local),
             IsSelected = IsFromSystem
         });

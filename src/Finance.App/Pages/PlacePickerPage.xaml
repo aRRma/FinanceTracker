@@ -9,16 +9,17 @@
     x:Class="Finance.App.Pages.PlacePickerPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:pick="clr-namespace:Finance.Application.Features.Transactions.Pick;assembly=Finance.Application"
     x:DataType="pick:PlacePickerViewModel"
-    Title="Место"
+    Title="{x:Static texts:UiTexts.PickPlaceTitle}"
     Shell.TabBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,Auto,Auto,*">
 
-        <SearchBar Grid.Row="0" Text="{Binding Filter}" Placeholder="Поиск по названию" />
+        <SearchBar Grid.Row="0" Text="{Binding Filter}" Placeholder="{x:Static texts:UiTexts.CommonSearchByName}" />
 
         <!-- Заведение нового: строкой списка, а не кнопкой в углу — набирают
              название и тут же его создают, не переводя взгляд -->
@@ -43,7 +44,7 @@
             </Grid.GestureRecognizers>
 
             <controls:Icon Grid.Column="0" Key="dots" Style="{StaticResource MutedIcon}" />
-            <Label Grid.Column="1" Text="Без места" VerticalOptions="Center"
+            <Label Grid.Column="1" Text="{x:Static texts:UiTexts.PickPlaceNone}" VerticalOptions="Center"
                    Style="{StaticResource SecondaryLabel}" />
         </Grid>
 
@@ -74,7 +75,7 @@
 
                         <controls:Icon Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" Key="check"
                                        IsVisible="{Binding IsSelected}"
-                                       SemanticProperties.Description="Выбрано"
+                                       SemanticProperties.Description="{x:Static texts:UiTexts.CommonSelected}"
                                        Style="{StaticResource AccentIcon}" />
                     </Grid>
                 </DataTemplate>
@@ -85,7 +86,7 @@
             <CollectionView.EmptyView>
                 <ContentView>
                     <Label Padding="16,24" IsVisible="{Binding IsEmpty}"
-                           Text="Мест пока нет. Наберите название — оно заведётся вместе с операцией."
+                           Text="{x:Static texts:UiTexts.PickPlaceEmpty}"
                            Style="{StaticResource SecondaryLabel}" />
                 </ContentView>
             </CollectionView.EmptyView>

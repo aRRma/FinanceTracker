@@ -1,3 +1,4 @@
+using Finance.Application.Infrastructure;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -41,7 +42,7 @@ public sealed record Preset(
     /// <param name="json">Содержимое <c>preset.json</c>.</param>
     public static Preset Parse(string json) =>
         JsonSerializer.Deserialize<Preset>(json, Options)
-        ?? throw new InvalidOperationException("Стартовый набор пуст");
+        ?? throw new InvalidOperationException(Faults.PresetEmpty());
 
     /// <summary>
     /// Читает набор, вшитый в сборку. Инициализация базы идёт без обращения к сети
@@ -50,8 +51,7 @@ public sealed record Preset(
     public static Preset Embedded()
     {
         using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(ResourceName)
-                              ?? throw new InvalidOperationException(
-                                  $"Ресурс {ResourceName} не вшит в сборку");
+                              ?? throw new InvalidOperationException(Faults.ResourceMissing(ResourceName));
 
         using StreamReader reader = new(stream);
 

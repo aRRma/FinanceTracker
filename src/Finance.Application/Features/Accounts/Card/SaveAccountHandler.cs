@@ -3,6 +3,7 @@ using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
 using Finance.Domain.Entities;
+using Finance.Domain.Errors;
 using Finance.Domain.Rules;
 using Microsoft.EntityFrameworkCore;
 
@@ -98,7 +99,7 @@ public sealed class SaveAccountHandler : ISaveAccountHandler
         AccountRow row = await context.Accounts
             .FirstOrDefaultAsync(existing => existing.Key == key, cancellationToken)
             .ConfigureAwait(false)
-            ?? throw new InvalidOperationException($"Счёт {key} не найден");
+            ?? throw new InvalidOperationException(Faults.AccountNotFound(key));
 
         Account account = row.ToDomain();
 
@@ -167,11 +168,11 @@ public sealed class SaveAccountHandler : ISaveAccountHandler
                 name,
                 taken.Select(static account => (account.Key, account.Name)),
                 key,
-                "счёт");
+                RuleText.SubjectAccount);
         }
         else
         {
-            NameUniqueness.Ensure(name, taken.Select(static account => account.Name), "счёт");
+            NameUniqueness.Ensure(name, taken.Select(static account => account.Name), RuleText.SubjectAccount);
         }
     }
 }

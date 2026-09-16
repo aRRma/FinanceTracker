@@ -31,7 +31,7 @@ internal static class TransactionMapping
                 // и молча обнулить её нельзя: перевод потерял бы вторую сторону
                 _ => throw new ArgumentNullException(
                     nameof(targetCurrency),
-                    $"У операции {row.Key} есть сумма зачисления, а валюта счёта зачисления не передана")
+                    Faults.TargetCurrencyMissing(row.Key))
             };
 
             return Transaction.Restore(

@@ -1,4 +1,3 @@
-using System.Globalization;
 using Finance.Application.Infrastructure;
 
 namespace Finance.Application.Features.Report;
@@ -13,8 +12,6 @@ namespace Finance.Application.Features.Report;
 /// <param name="IsPositive">Сумма положительна — доход показывают смысловым цветом.</param>
 public sealed record ReportTransactionItem(Guid Key, string Title, string Caption, string Amount, bool IsPositive)
 {
-    private static readonly CultureInfo Russian = CultureInfo.GetCultureInfo("ru-RU");
-
     /// <summary>
     /// Расход — красится смысловым цветом. Отдельного признака вида не нужно:
     /// переводы в отчёт не входят вовсе, и отрицательная сумма здесь — всегда трата.
@@ -35,7 +32,7 @@ public sealed record ReportTransactionItem(Guid Key, string Title, string Captio
         return new ReportTransactionItem(
             item.Key,
             item.Place ?? item.Note ?? subcategory,
-            $"{item.OccurredOn.ToString("d MMMM", Russian)} · {item.AccountName}",
+            $"{DateText.Day(item.OccurredOn)} · {item.AccountName}",
             item.Amount.DisplaySigned,
             item.Amount.IsPositive);
     }

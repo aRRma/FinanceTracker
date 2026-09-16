@@ -286,6 +286,7 @@ public sealed class PickerTests
 
     private static CategoryPickerViewModel CategoryPicker(TransactionFixture fixture) => new(
         fixture.Database.Resolve<ICategoriesQuery>(),
+        fixture.Database.Resolve<IFrequentCategoriesQuery>(),
         fixture.Database.Resolve<TransactionPicks>());
 
     private static PlacePickerViewModel PlacePicker(TransactionFixture fixture) => new(

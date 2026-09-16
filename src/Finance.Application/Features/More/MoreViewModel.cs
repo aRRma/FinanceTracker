@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Finance.Application.Texts;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
@@ -103,24 +104,31 @@ public sealed partial class MoreViewModel : ScreenViewModel
         IReadOnlyList<CategoryListItem> categories = await categoriesTask;
         SettingsSummary settings = await settingsTask;
 
-        AccountsCaption = Plural.Of(accounts.Count, "счёт", "счёта", "счетов");
-        PlacesCaption = Plural.Of(places.Count, "место", "места", "мест");
+        AccountsCaption = Plural.Of(accounts.Count, UiTexts.MoreAccountsOne, UiTexts.MoreAccountsFew, UiTexts.MoreAccountsMany);
+        PlacesCaption = Plural.Of(places.Count, UiTexts.MorePlacesOne, UiTexts.MorePlacesFew, UiTexts.MorePlacesMany);
 
         int groups = categories.Count(static category => category.IsGroup);
 
         CategoriesCaption =
-            $"{Plural.Of(groups, "группа", "группы", "групп")}, "
-            + Plural.Of(categories.Count - groups, "подкатегория", "подкатегории", "подкатегорий");
+            string.Format(
+                UiCulture.Current,
+                UiTexts.MoreCategoriesCaption,
+                Plural.Of(groups, UiTexts.MoreGroupsOne, UiTexts.MoreGroupsFew, UiTexts.MoreGroupsMany),
+                Plural.Of(
+                    categories.Count - groups,
+                    UiTexts.MoreSubcategoriesOne,
+                    UiTexts.MoreSubcategoriesFew,
+                    UiTexts.MoreSubcategoriesMany));
 
         ThemeCaption = settings.Theme.Caption;
 
         // У системного пояса называется и то, откуда он взят: иначе непонятно,
         // почему после переезда подпись сменилась сама
         TimeZoneCaption = settings.TimeZoneFromSystem
-            ? $"Как в системе · {settings.TimeZoneId}"
+            ? string.Format(UiCulture.Current, UiTexts.MoreTimeZoneFromSystem, settings.TimeZoneId)
             : settings.TimeZoneId;
 
-        AboutCaption = $"Версия {settings.Version}, схема {settings.Schema}";
+        AboutCaption = string.Format(UiCulture.Current, UiTexts.MoreAbout, settings.Version, settings.Schema);
     }
 
     /// <inheritdoc />
