@@ -135,9 +135,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     public partial AmountField ActiveAmount { get; private set; } = AmountField.Source;
 
     /// <summary>
-    /// Клавиши суммы на виду. Прячутся, пока набирают место или заметку: там нужна
-    /// буквенная клавиатура системы, и две сразу на экран не помещаются. Клавиша
-    /// сохранения этим не управляется — она на виду всегда.
+    /// Клавиатура суммы на виду. Уходит, пока набирают заметку: там нужна буквенная
+    /// клавиатура системы, и две сразу на экран не помещаются. Сохранение этим
+    /// не управляется — оно стоит на панели заголовка.
     /// </summary>
     [ObservableProperty]
     public partial bool AreKeysVisible { get; set; } = true;
@@ -155,18 +155,21 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     public string TargetAmountDisplay => TargetAmount;
 
     /// <summary>
-    /// Вычисленный итог выражения в валюте счёта списания. Пустое поле показывает
-    /// ноль в валюте: главная цифра формы не должна пропадать. Пусто — выражение
-    /// не закончено.
+    /// Итог выражения в валюте счёта списания. Показывается, только когда в поле
+    /// уже число: пока действие не закрыто, итог даёт клавиша «=» — считать за
+    /// пользователя раньше, чем он попросил, значит показывать не тот итог,
+    /// который он набирает. Пустое поле показывает ноль в валюте: главная цифра
+    /// формы не должна пропадать.
     /// </summary>
     public string AmountPreview => Preview(Amount, SourceAccount?.Currency);
 
-    /// <summary>Вычисленный итог суммы зачисления в валюте счёта зачисления.</summary>
+    /// <summary>Итог суммы зачисления в валюте счёта зачисления — по тем же правилам.</summary>
     public string TargetAmountPreview => Preview(TargetAmount, TargetAccount?.Currency);
 
     /// <summary>
     /// Сохранять есть что: счёт выбран и суммы набраны до конца. Кнопка сохранения
-    /// на клавиатуре гаснет, а не отказывает после нажатия.
+    /// на панели заголовка гаснет, а не отказывает после нажатия. Незакрытое
+    /// действие сохранению не мешает: записывается тот же итог, что показала бы «=».
     /// </summary>
     public bool CanSave =>
         !IsSaving
@@ -511,8 +514,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         finally
         {
             // После удачи флаг остаётся: экран закрывается, и второе нажатие
-            // в этот промежуток записало бы то же самое ещё раз
-            IsSaving = !done;
+            // в этот промежуток записало бы то же самое ещё раз. При неудаче
+            // он снимается — нарушенное правило правят и сохраняют снова
+            IsSaving = done;
         }
     }
 
@@ -595,8 +599,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         finally
         {
             // После удачи флаг остаётся: экран закрывается, и второе нажатие
-            // в этот промежуток записало бы то же самое ещё раз
-            IsSaving = !done;
+            // в этот промежуток записало бы то же самое ещё раз. При неудаче
+            // он снимается — нарушенное правило правят и сохраняют снова
+            IsSaving = done;
         }
     }
 
@@ -619,6 +624,13 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <summary>Стирает последний набранный знак.</summary>
     [RelayCommand]
     public void Backspace() => Edit(AmountInput.Backspace);
+
+    /// <summary>
+    /// Сворачивает набранное выражение в итог — клавиша «=». Считает то поле,
+    /// которое набирается: у перевода между валютами их два.
+    /// </summary>
+    [RelayCommand]
+    public void Evaluate() => Edit(AmountInput.Collapse);
 
     /// <summary>Переводит клавиатуру на сумму списания.</summary>
     [RelayCommand]
@@ -813,6 +825,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     private static string Preview(string expression, Currency? currency) =>
         currency is not { } known ? string.Empty
         : expression.Length is 0 ? Money.Restore(0m, known).Display
+        : AmountInput.HasOperation(expression) ? string.Empty
         : AmountExpression.TryEvaluate(expression, out decimal value) ? Money.Restore(value, known).Display
         : string.Empty;
 }

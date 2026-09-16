@@ -12,7 +12,10 @@ namespace Finance.Application.Tests;
 /// </summary>
 public sealed class TransactionKeypadTests
 {
-    /// <summary>Набранное клавишами становится суммой, а итог выражения показан рядом.</summary>
+    /// <summary>
+    /// Набранное клавишами становится суммой. Итог незакрытого действия не
+    /// показывается: его даёт «=», а сохранение и без неё запишет тот же итог.
+    /// </summary>
     [Fact]
     public async Task Набранное_клавишами_становится_суммой()
     {
@@ -28,9 +31,77 @@ public sealed class TransactionKeypadTests
         }
 
         Assert.Equal("1250+340", model.Amount);
+        Assert.Equal(string.Empty, model.AmountPreview);
+        Assert.True(model.CanSave);
+
+        model.EvaluateCommand.Execute(null);
+
+        Assert.Equal("1590", model.Amount);
         // Разряды в показе разделены неразрывным пробелом — сверяется хвост суммы
         Assert.Contains("590,00", model.AmountPreview, StringComparison.Ordinal);
-        Assert.True(model.CanSave);
+    }
+
+    /// <summary>
+    /// «=» сворачивает выражение в число и уходит в то же поле, что и цифры:
+    /// у перевода между валютами их два.
+    /// </summary>
+    [Fact]
+    public async Task Равно_сворачивает_выражение_в_выбранном_поле()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        Guid rubles = await fixture.AccountAsync("Карта");
+        Guid euros = await fixture.AccountAsync("Валютный", currency: Currency.EUR);
+
+        TransactionViewModel model = Model(fixture);
+        await model.LoadAsync(key: null);
+
+        model.Kind = TransactionKind.Transfer;
+        model.SourceAccount = model.Accounts.First(account => account.Key == rubles);
+        model.TargetAccount = model.Accounts.First(account => account.Key == euros);
+
+        foreach (char key in "90×2")
+        {
+            model.PressKeyCommand.Execute(key.ToString());
+        }
+
+        model.ActivateTargetAmountCommand.Execute(null);
+
+        foreach (char key in "10÷4")
+        {
+            model.PressKeyCommand.Execute(key.ToString());
+        }
+
+        model.EvaluateCommand.Execute(null);
+
+        Assert.Equal("90×2", model.Amount);
+        Assert.Equal("2,5", model.TargetAmount);
+
+        // Набор продолжается с итога: он вернулся в поле теми же знаками, что набирают
+        model.PressKeyCommand.Execute("5");
+
+        Assert.Equal("2,55", model.TargetAmount);
+    }
+
+    /// <summary>Незаконченное выражение «=» не трогает: считать ей нечего.</summary>
+    [Fact]
+    public async Task Равно_не_меняет_незаконченное_выражение()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        await fixture.AccountAsync("Карта");
+
+        TransactionViewModel model = Model(fixture);
+        await model.LoadAsync(key: null);
+
+        model.EvaluateCommand.Execute(null);
+
+        Assert.Equal(string.Empty, model.Amount);
+
+        model.PressKeyCommand.Execute("7");
+        model.PressKeyCommand.Execute("+");
+        model.EvaluateCommand.Execute(null);
+
+        Assert.Equal("7+", model.Amount);
     }
 
     /// <summary>

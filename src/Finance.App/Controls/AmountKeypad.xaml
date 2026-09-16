@@ -1,66 +1,78 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
     Клавиатура суммы с макета B-01. Своя, а не системная числовая: набирается
-    выражение из четырёх действий, а сохранение стоит той же клавишей, что и
-    последняя цифра — самый частый сценарий приложения не должен требовать
-    тянуться к кнопке в другом конце экрана.
+    выражение из четырёх действий, а его итог показывает клавиша «=».
+
+    Два блока рядом: цифры сеткой с разделителями и действия отдельным столбцом
+    из пяти клавиш без разделителей между ними — столбец читается как своя
+    клавиатура, а не как пятая колонка цифр. Просвет между блоками — цветом
+    страницы, он и отделяет их друг от друга.
+
+    Сохранения здесь нет: оно живёт на панели заголовка, и клавиатура поэтому
+    уходит с экрана целиком, пока набирают заметку, — системной буквенной
+    клавиатуре нужно место.
 -->
 <ContentView
     x:Class="Finance.App.Controls.AmountKeypad"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:controls="clr-namespace:Finance.App.Controls"
-    x:DataType="controls:AmountKeypad"
-    x:Name="Keypad">
+    xmlns:controls="clr-namespace:Finance.App.Controls">
 
-    <Grid RowDefinitions="Auto,Auto" RowSpacing="1" Padding="0,1,0,0"
-          BackgroundColor="{AppThemeBinding Light={StaticResource LineLight}, Dark={StaticResource LineDark}}">
+    <Grid RowDefinitions="Auto,Auto"
+          BackgroundColor="{AppThemeBinding Light={StaticResource PaperLight}, Dark={StaticResource PaperDark}}">
 
-        <!-- Пока набирают буквы, уходят только клавиши: сохранение обязано
-             оставаться на виду, иначе записанную операцию нечем закончить -->
-        <Grid Grid.Row="0" RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,*,*,*"
-              RowSpacing="1" ColumnSpacing="1"
-              BackgroundColor="{AppThemeBinding Light={StaticResource LineLight}, Dark={StaticResource LineDark}}"
-              IsVisible="{Binding AreKeysVisible, Source={x:Reference Keypad}}">
+        <!-- Клавиатура — свой блок, а не продолжение формы -->
+        <BoxView Grid.Row="0" Style="{StaticResource Divider}" />
 
-            <Button Grid.Row="0" Grid.Column="0" Text="7" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
-            <Button Grid.Row="0" Grid.Column="1" Text="8" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
-            <Button Grid.Row="0" Grid.Column="2" Text="9" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
-            <Button Grid.Row="0" Grid.Column="3" Text="÷" Style="{StaticResource KeypadOperator}" Clicked="OnKey" />
+        <Grid Grid.Row="1" ColumnDefinitions="3*,*" ColumnSpacing="8">
 
-            <Button Grid.Row="1" Grid.Column="0" Text="4" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
-            <Button Grid.Row="1" Grid.Column="1" Text="5" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
-            <Button Grid.Row="1" Grid.Column="2" Text="6" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
-            <Button Grid.Row="1" Grid.Column="3" Text="×" Style="{StaticResource KeypadOperator}" Clicked="OnKey" />
+            <!-- Цифры: просветы сетки цветом линии служат разделителями клавиш -->
+            <Grid Grid.Column="0" RowDefinitions="*,*,*,*" ColumnDefinitions="*,*,*"
+                  RowSpacing="1" ColumnSpacing="1"
+                  BackgroundColor="{AppThemeBinding Light={StaticResource LineLight}, Dark={StaticResource LineDark}}">
 
-            <Button Grid.Row="2" Grid.Column="0" Text="1" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
-            <Button Grid.Row="2" Grid.Column="1" Text="2" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
-            <Button Grid.Row="2" Grid.Column="2" Text="3" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
-            <Button Grid.Row="2" Grid.Column="3" Text="−" Style="{StaticResource KeypadOperator}" Clicked="OnKey" />
+                <Button Grid.Row="0" Grid.Column="0" Text="7" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
+                <Button Grid.Row="0" Grid.Column="1" Text="8" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
+                <Button Grid.Row="0" Grid.Column="2" Text="9" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
 
-            <!-- Знак разделителя — культуры устройства, не жёсткая запятая: {x:Static},
-                 потому что привязка static-свойства не видит (оставила бы клавишу пустой) -->
-            <Button Grid.Row="3" Grid.Column="0" Text="{x:Static controls:AmountKeypad.Separator}"
-                    Style="{StaticResource KeypadKey}" Clicked="OnKey" />
-            <Button Grid.Row="3" Grid.Column="1" Text="0" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
+                <Button Grid.Row="1" Grid.Column="0" Text="4" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
+                <Button Grid.Row="1" Grid.Column="1" Text="5" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
+                <Button Grid.Row="1" Grid.Column="2" Text="6" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
 
-            <!-- Стирание значком, а не знаком: «⌫» в системном шрифте набирается не везде.
-                 Описание обязательно: у клавиши нет подписи, и вслух она молчит -->
-            <Border Grid.Row="3" Grid.Column="2" Style="{StaticResource KeypadCell}"
-                    SemanticProperties.Description="Стереть знак" AutomationId="Backspace">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnBackspace" />
-                </Border.GestureRecognizers>
-                <controls:Icon Key="backspace" HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
+                <Button Grid.Row="2" Grid.Column="0" Text="1" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
+                <Button Grid.Row="2" Grid.Column="1" Text="2" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
+                <Button Grid.Row="2" Grid.Column="2" Text="3" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
 
-            <Button Grid.Row="3" Grid.Column="3" Text="+" Style="{StaticResource KeypadOperator}" Clicked="OnKey" />
+                <!-- Знак разделителя — культуры устройства, не жёсткая запятая: {x:Static},
+                     потому что привязка static-свойства не видит (оставила бы клавишу пустой) -->
+                <Button Grid.Row="3" Grid.Column="0" Text="{x:Static controls:AmountKeypad.Separator}"
+                        Style="{StaticResource KeypadKey}" Clicked="OnKey" />
+                <Button Grid.Row="3" Grid.Column="1" Text="0" Style="{StaticResource KeypadKey}" Clicked="OnKey" />
+
+                <!-- Стирание значком, а не знаком: «⌫» в системном шрифте набирается не везде.
+                     Описание обязательно: у клавиши нет подписи, и вслух она молчит -->
+                <Border Grid.Row="3" Grid.Column="2" Style="{StaticResource KeypadCell}"
+                        SemanticProperties.Description="Стереть знак" AutomationId="Backspace">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBackspace" />
+                    </Border.GestureRecognizers>
+                    <controls:Icon Key="backspace" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+
+            </Grid>
+
+            <!-- Действия и «=» одним столбцом: разделителей между строками нет,
+                 клавиши стоят вплотную и читаются как один блок -->
+            <Grid Grid.Column="1" RowDefinitions="*,*,*,*,*">
+                <Button Grid.Row="0" Text="÷" Style="{StaticResource KeypadOperator}" Clicked="OnKey" />
+                <Button Grid.Row="1" Text="×" Style="{StaticResource KeypadOperator}" Clicked="OnKey" />
+                <Button Grid.Row="2" Text="−" Style="{StaticResource KeypadOperator}" Clicked="OnKey" />
+                <Button Grid.Row="3" Text="+" Style="{StaticResource KeypadOperator}" Clicked="OnKey" />
+                <Button Grid.Row="4" Text="=" AutomationId="Equals"
+                        Style="{StaticResource KeypadOperator}" Clicked="OnEquals" />
+            </Grid>
 
         </Grid>
-
-        <Button Grid.Row="1" Text="Сохранить" AutomationId="SaveTransaction"
-                Style="{StaticResource KeypadGo}" Clicked="OnSave"
-                IsEnabled="{Binding CanSave, Source={x:Reference Keypad}}" />
 
     </Grid>
 

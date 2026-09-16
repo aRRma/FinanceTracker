@@ -233,8 +233,9 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
         finally
         {
             // После удачи флаг остаётся: экран закрывается, и второе нажатие
-            // в этот промежуток записало бы то же самое ещё раз
-            IsSaving = !done;
+            // в этот промежуток записало бы то же самое ещё раз. При неудаче
+            // он снимается — нарушенное правило правят и сохраняют снова
+            IsSaving = done;
         }
     }
 
@@ -299,8 +300,9 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
         finally
         {
             // После удачи флаг остаётся: экран закрывается, и второе нажатие
-            // в этот промежуток записало бы то же самое ещё раз
-            IsSaving = !done;
+            // в этот промежуток записало бы то же самое ещё раз. При неудаче
+            // он снимается — нарушенное правило правят и сохраняют снова
+            IsSaving = done;
         }
     }
 

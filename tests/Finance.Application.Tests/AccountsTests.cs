@@ -81,6 +81,32 @@ public sealed class AccountsTests
         Assert.Equal(Invariant.NameUnique, error.Invariant);
     }
 
+    /// <summary>
+    /// Нарушенное правило снимает занятость: имя правят и сохраняют снова.
+    /// Оставшийся поднятым флаг гасил бы кнопку насовсем — форма застревала бы
+    /// с подписью «Сохраняю…», и уйти с неё удавалось бы только назад.
+    /// </summary>
+    [Fact]
+    public async Task Занятое_имя_не_оставляет_форму_в_сохранении()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        await SaveAsync(database, Command("Наличные", 0m));
+
+        AccountViewModel model = Model(database);
+        await model.LoadAsync(key: null);
+        model.Name = "Наличные";
+
+        Assert.False(await model.SaveAsync());
+        Assert.True(model.HasError);
+        Assert.False(model.IsSaving);
+        Assert.True(model.CanSave);
+
+        model.Name = "Наличные в тумбочке";
+
+        Assert.True(await model.SaveAsync());
+    }
+
     /// <summary>Переименование в собственное имя проходит: сам с собой счёт не конфликтует.</summary>
     [Fact]
     public async Task Счёт_не_конфликтует_сам_с_собой()

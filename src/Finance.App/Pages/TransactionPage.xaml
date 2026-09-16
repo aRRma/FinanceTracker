@@ -4,7 +4,7 @@
     C-01 — та же форма с нарушенным правилом; C-07 — удаление с подтверждением.
     Форма перестраивается по виду: у перевода второй счёт вместо категории и места,
     вторая сумма — только при разных валютах счетов. Клавиатура суммы прижата
-    к низу и открыта сразу: сумму меняют всегда, и сохранение стоит на ней же.
+    к низу и открыта сразу: сумму меняют всегда. Сохранение — на панели заголовка.
 -->
 <pages:DataPage
     x:Class="Finance.App.Pages.TransactionPage"
@@ -19,9 +19,25 @@
     Shell.TabBarIsVisible="False">
 
     <!--
+        Панель заголовка своя: сохранение — зелёная клавиша у правого края,
+        удаление рядом подписью. Штатный ToolbarItem фона не имеет, а с клавиатуры
+        сохранение ушло: она уходит с экрана целиком, пока набирают заметку,
+        и уносила бы сохранение с собой.
+    -->
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4" Margin="0,0,10,0" HorizontalOptions="Fill">
+            <Label Grid.Column="0" Text="{Binding Title}" Style="{StaticResource BarTitleLabel}" />
+            <Button Grid.Column="1" Text="Удалить" Style="{StaticResource BarDangerButton}"
+                    IsVisible="{Binding IsExisting}" AutomationId="DeleteTransaction" Clicked="OnDelete" />
+            <Button Grid.Column="2" Text="Сохранить" Style="{StaticResource BarSaveButton}"
+                    IsEnabled="{Binding CanSave}" AutomationId="SaveTransaction" Clicked="OnSave" />
+        </Grid>
+    </Shell.TitleView>
+
+    <!--
         Клавиатура прижата к низу, а в .NET 10 страница по умолчанию идёт от края
-        до края: без этого клавиша сохранения уезжает под жестовую полосу, а при
-        наборе места и заметки — под системную клавиатуру.
+        до края: без этого нижний ряд клавиш уезжает под жестовую полосу, а при
+        наборе заметки — под системную клавиатуру.
     -->
     <Grid RowDefinitions="*,Auto,Auto" SafeAreaEdges="Container, Container, Container, All">
 
@@ -42,8 +58,9 @@
                                  ControlTemplate="{StaticResource TransferSegmentTemplate}" />
                 </Grid>
 
-                <!-- Набранное выражение сверху, вычисленный итог под ним: считать в уме
-                     при разделе счёта не приходится, а сохраняется именно итог -->
+                <!-- Набранное выражение сверху, его итог под ним: считать в уме при
+                     разделе счёта не приходится, а сохраняется именно итог. Итог
+                     незакрытого действия показывает клавиша «=» -->
                 <Border Style="{StaticResource AmountField}">
                     <Border.Triggers>
                         <DataTrigger TargetType="Border" Binding="{Binding IsSourceAmountActive}" Value="True">
@@ -57,7 +74,8 @@
 
                     <!-- Итог — главная цифра экрана, по центру и крупно; набранное
                          выражение над ним мелким. Пока ничего не набрано, итог показывает
-                         ноль в валюте: пустая рамка читалась как поломка -->
+                         ноль в валюте: пустая рамка читалась как поломка. С незакрытым
+                         действием итога нет — вместо него видно само выражение -->
                     <VerticalStackLayout Spacing="4">
                         <Label Text="Сумма" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="Center" />
                         <Label Text="{Binding AmountDisplay}" Style="{StaticResource AmountExpression}" />
@@ -258,11 +276,10 @@
             <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
         </Border>
 
-        <controls:AmountKeypad Grid.Row="2" AreKeysVisible="{Binding AreKeysVisible}"
+        <controls:AmountKeypad Grid.Row="2" IsVisible="{Binding AreKeysVisible}"
                                KeyCommand="{Binding PressKeyCommand}"
                                BackspaceCommand="{Binding BackspaceCommand}"
-                               CanSave="{Binding CanSave}"
-                               Saved="OnSave" />
+                               EqualsCommand="{Binding EvaluateCommand}" />
 
     </Grid>
 

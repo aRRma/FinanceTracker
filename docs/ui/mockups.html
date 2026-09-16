@@ -52,6 +52,8 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .hd .sub{font-family:var(--mono);font-size:12.5px;color:var(--ink2);display:block;font-weight:400;letter-spacing:0}
 .hd .act{color:var(--ink2)}
 .hd .act.on{color:var(--acc)}
+.hd .save{background:var(--acc);color:var(--onacc);font-size:12.5px;font-weight:500;padding:7px 13px;border-radius:15px;white-space:nowrap}
+.hd .del{color:var(--neg);font-size:12.5px;white-space:nowrap}
 .sec{display:flex;align-items:baseline;justify-content:space-between;padding:14px 15px 5px}
 .sec .k{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3)}
 .sec.tight{padding-top:11px}
@@ -126,10 +128,11 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .stat .b{flex:1;background:var(--sunk);border-radius:9px;padding:10px 11px}
 .stat .b .k{font-size:11.5px;color:var(--ink3)}
 .stat .b .v{font-family:var(--mono);font-size:17px;font-weight:500;margin-top:2px;font-variant-numeric:tabular-nums}
-.kp{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.kp{display:grid;grid-template-columns:3fr 1fr;gap:8px;background:var(--paper);border-top:1px solid var(--line)}
+.kp .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}
+.kp .ops{display:grid;grid-template-rows:repeat(5,1fr)}
 .kp b{background:var(--card);text-align:center;padding:13px 0;font-size:20px;font-weight:400;font-family:var(--mono)}
-.kp b.op{background:var(--sunk);color:var(--acc);font-size:18px}
-.kp b.go{background:var(--acc);color:var(--onacc);font-size:15px;font-family:var(--sans)}
+.kp b.op{background:var(--sunk);color:var(--acc);font-size:18px;padding:0;display:flex;align-items:center;justify-content:center}
 .cal{padding:6px 10px 12px}
 .cal .wk{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11px;color:var(--ink3);padding-bottom:6px}
 .cal .gr{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
@@ -299,21 +302,25 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-01</span><b>Ввести сумму</b><span class="uc">UC-01</span><em>Клавиатура открыта сразу — сумму меняют всегда. Арифметика прямо в поле: строка выражения над результатом снимает нужду считать в уме при разделе счёта.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-01</span><b>Ввести сумму</b><span class="uc">UC-01</span><em>Клавиатура открыта сразу — сумму меняют всегда. Арифметика прямо в поле: «1250 + 340» сворачивает в итог клавиша «=», и до неё итога нет — показывать не тот, который набирают, хуже, чем не показывать никакого.</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2></div>
+  <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2><b class="save">Сохранить</b></div>
   <div class="seg kinds"><b class="exp on"><svg class="ic sm"><use href="#i-out"/></svg>Расход</b><b class="inc"><svg class="ic sm"><use href="#i-in"/></svg>Доход</b><b class="trf"><svg class="ic sm"><use href="#i-swap"/></svg>Перевод</b></div>
-  <div class="amt"><span class="expr">1250 + 340</span><span class="v">1 590,00</span><span class="c">₽</span></div>
+  <div class="amt"><span class="expr">1590</span><span class="v">1 590,00</span><span class="c">₽</span></div>
   <div class="fld" style="border-top:none"><svg class="ic dim sm"><use href="#i-card"/></svg><span class="k">Счёт</span><span class="v">Карта основная</span></div>
   <div class="fld"><svg class="ic sm" style="color:var(--acc)"><use href="#i-grid"/></svg><span class="k">Категория</span><span class="v ask">Выбрать</span></div>
   <div class="fld"><svg class="ic dim sm"><use href="#i-place"/></svg><span class="k">Место</span><span class="v none">Необязательно</span></div>
   <div class="fld"><svg class="ic dim sm"><use href="#i-cal"/></svg><span class="k">Дата</span><span class="v">Сегодня</span></div>
   <div class="kp">
-    <b>7</b><b>8</b><b>9</b><b class="op">÷</b>
-    <b>4</b><b>5</b><b>6</b><b class="op">×</b>
-    <b>1</b><b>2</b><b>3</b><b class="op">−</b>
-    <b>,</b><b>0</b><b>⌫</b><b class="op">+</b>
-    <b class="go" style="grid-column:span 4">Сохранить</b>
+    <div class="nums">
+      <b>7</b><b>8</b><b>9</b>
+      <b>4</b><b>5</b><b>6</b>
+      <b>1</b><b>2</b><b>3</b>
+      <b>,</b><b>0</b><b>⌫</b>
+    </div>
+    <div class="ops">
+      <b class="op">÷</b><b class="op">×</b><b class="op">−</b><b class="op">+</b><b class="op">=</b>
+    </div>
   </div>
 </div>
 </figure>
@@ -377,7 +384,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <figure class="unit">
 <figcaption class="cap"><span class="sid">B-05</span><b>Перевести между счетами в одной валюте</b><span class="uc">UC-04 UC-05</span><em>Сумма одна. Второе поле не появляется, потому что при совпадающих валютах суммы обязаны быть равны.</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
+  <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2><b class="save">Сохранить</b></div>
   <div class="seg kinds"><b class="exp"><svg class="ic sm"><use href="#i-out"/></svg>Расход</b><b class="inc"><svg class="ic sm"><use href="#i-in"/></svg>Доход</b><b class="trf on"><svg class="ic sm"><use href="#i-swap"/></svg>Перевод</b></div>
   <div class="amt"><span class="v">5 000,00</span><span class="c">₽</span></div>
   <div class="fld" style="border-top:none"><svg class="ic dim sm"><use href="#i-card"/></svg><span class="k">Откуда</span><span class="v">Карта основная</span><svg class="ic sm dim"><use href="#i-next"/></svg></div>
@@ -391,7 +398,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <figure class="unit">
 <figcaption class="cap"><span class="sid">B-06</span><b>Перевести между валютами</b><span class="uc">UC-10</span><em>Обе суммы вводятся вручную: курса в приложении нет. Разница между ними и есть фактический курс сделки.</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
+  <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2><b class="save">Сохранить</b></div>
   <div class="seg kinds"><b class="exp"><svg class="ic sm"><use href="#i-out"/></svg>Расход</b><b class="inc"><svg class="ic sm"><use href="#i-in"/></svg>Доход</b><b class="trf on"><svg class="ic sm"><use href="#i-swap"/></svg>Перевод</b></div>
   <div class="amt"><span class="lb">Списание</span><span class="v">500,00</span><span class="c">€</span></div>
   <div class="amt" style="border-top:none"><span class="lb">Зачисление</span><span class="v">45 000,00</span><span class="c">₽</span></div>
@@ -426,7 +433,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <figure class="unit">
 <figcaption class="cap"><span class="sid">C-01</span><b>Исправить дату раньше открытия счёта</b><span class="uc">UC-01</span><em>Ошибка объясняет причину и предлагает оба выхода. Сохранение остаётся доступным до нажатия, а не гасится заранее.</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
+  <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая операция</h2><b class="save">Сохранить</b></div>
   <div class="seg kinds"><b class="exp on"><svg class="ic sm"><use href="#i-out"/></svg>Расход</b><b class="inc"><svg class="ic sm"><use href="#i-in"/></svg>Доход</b><b class="trf"><svg class="ic sm"><use href="#i-swap"/></svg>Перевод</b></div>
   <div class="amt"><span class="v">2 400,00</span><span class="c">₽</span></div>
   <div class="fld" style="border-top:none"><svg class="ic dim sm"><use href="#i-card"/></svg><span class="k">Счёт</span><span class="v">Карта евро</span></div>
@@ -539,7 +546,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <figure class="unit">
 <figcaption class="cap"><span class="sid">C-07</span><b>Удалить операцию</b><span class="uc">UC-08 UC-07</span><em>Подтверждение называет то, что изменится — баланс счёта. Без этого пользователь подтверждает вслепую и проверяет результат постфактум.</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Операция</h2><svg class="ic act"><use href="#i-trash"/></svg></div>
+  <div class="hd"><svg class="ic act"><use href="#i-back"/></svg><h2>Операция</h2><b class="del">Удалить</b><b class="save">Сохранить</b></div>
   <div class="amt"><span class="v">−1 250,00</span><span class="c">₽</span></div>
   <div class="fld"><span class="k">Счёт</span><span class="v">Карта основная</span></div>
   <div class="fld"><span class="k">Категория</span><span class="v">Продукты</span></div>

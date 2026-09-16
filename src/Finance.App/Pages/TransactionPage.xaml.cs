@@ -39,27 +39,11 @@ public partial class TransactionPage : DataPage
     protected override bool ReloadsOnAppearing => false;
 
     /// <inheritdoc />
-    protected override async Task LoadAsync()
-    {
-        await _model.LoadAsync(
+    protected override Task LoadAsync() =>
+        _model.LoadAsync(
             Guid.TryParse(Key, out Guid key) ? key : null,
             Guid.TryParse(Account, out Guid account) ? account : null,
             Enum.TryParse(Kind, out TransactionKind kind) ? kind : null);
-
-        // Удалять нечего, пока операция не записана, поэтому пункт появляется,
-        // а не гасится: на панели заголовка погашенный выглядит поломкой.
-        // Ставится отсюда, а не убирается из разметки: убранный повторным
-        // чтением было бы уже не вернуть
-        if (_model.IsExisting && ToolbarItems.Count is 0)
-        {
-            ToolbarItems.Add(new ToolbarItem
-            {
-                Text = "Удалить",
-                AutomationId = "DeleteTransaction",
-                Command = new Command(() => Guarded.Run(DeleteAsync))
-            });
-        }
-    }
 
     /// <summary>
     /// Третий чип даты открывает системный календарь. Сам контрол на экране
@@ -81,15 +65,18 @@ public partial class TransactionPage : DataPage
 
     /// <summary>
     /// Буквенная клавиатура системы и клавиши суммы на экран вместе не влезают,
-    /// поэтому на время набора заметки клавиши уходят. Клавиша сохранения
-    /// остаётся: снятие фокуса с поля зависит от системной клавиатуры, а закончить
-    /// операцию пользователь должен мочь всегда.
+    /// поэтому на время набора заметки клавиатура уходит целиком. Сохранение
+    /// при этом остаётся на панели заголовка: снятие фокуса с поля зависит от
+    /// системной клавиатуры и приходит не всегда, а закончить операцию
+    /// пользователь должен мочь всегда.
     /// </summary>
     private void OnTextFocused(object? sender, FocusEventArgs e) => _model.AreKeysVisible = false;
 
     private void OnTextUnfocused(object? sender, FocusEventArgs e) => _model.AreKeysVisible = true;
 
     private void OnSave(object? sender, EventArgs e) => Guarded.Run(SaveAsync);
+
+    private void OnDelete(object? sender, EventArgs e) => Guarded.Run(DeleteAsync);
 
     /// <summary>
     /// Сохраняет и уходит с экрана. Нарушенное правило показывать нечем: карточка

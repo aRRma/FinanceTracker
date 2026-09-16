@@ -262,6 +262,59 @@
         </Style.Triggers>
     </Style>
 
+    <!--
+        Сохранение на панели заголовка. Своя разметка панели, а не ToolbarItem:
+        тот рисуется подписью системного вида, а зелёной клавише у правого края
+        нужен свой фон. Заголовок при этом тоже свой — штатный Shell.Title
+        вместе со своим содержимым панели не показывается.
+    -->
+    <Style x:Key="BarTitleLabel" TargetType="Label">
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="19" />
+        <Setter Property="VerticalOptions" Value="Center" />
+        <Setter Property="LineBreakMode" Value="TailTruncation" />
+    </Style>
+
+    <Style x:Key="BarSaveButton" TargetType="Button">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+        <Setter Property="TextColor"
+                Value="{AppThemeBinding Light={StaticResource OnAccentLight}, Dark={StaticResource OnAccentDark}}" />
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="CornerRadius" Value="18" />
+        <Setter Property="HeightRequest" Value="36" />
+        <Setter Property="MinimumHeightRequest" Value="36" />
+        <Setter Property="Padding" Value="16,0" />
+        <Setter Property="VerticalOptions" Value="Center" />
+        <!-- Пока сохранять нечего, клавиша гаснет: залитая цветом действия, она
+             обещает нажатие, которого не будет. Прозрачностью, а не своим цветом —
+             погашенная пара «текст на фоне» не попадает в палитру и в ContrastTests -->
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="Opacity" Value="0.35" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <!-- Удаление на той же панели — подписью: необратимое действие не должно
+         выглядеть равным сохранению, а красная клавиша рядом с зелёной спорила
+         бы с ней за нажатие -->
+    <Style x:Key="BarDangerButton" TargetType="Button" BasedOn="{StaticResource BarSaveButton}">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="TextColor"
+                Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+        <Setter Property="FontFamily" Value="OpenSansRegular" />
+        <Setter Property="Padding" Value="8,0" />
+    </Style>
+
     <!-- Второстепенное действие: «Отмена», «Прервать» -->
     <Style x:Key="GhostButton" TargetType="Button">
         <Setter Property="BackgroundColor" Value="Transparent" />
@@ -285,7 +338,10 @@
                 Value="{AppThemeBinding Light={StaticResource InkLight}, Dark={StaticResource InkDark}}" />
         <Setter Property="FontSize" Value="22" />
         <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="HeightRequest" Value="54" />
+        <!-- Высоту задаёт своя сетка блока, а не клавиша: цифр четыре ряда,
+             действий пять, и рядом они обязаны сойтись по общей высоте.
+             Снизу её держит `TouchTarget` из общего стиля кнопки -->
+        <Setter Property="VerticalOptions" Value="Fill" />
         <Setter Property="Padding" Value="0" />
     </Style>
 
@@ -345,20 +401,9 @@
         <Setter Property="BackgroundColor"
                 Value="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}" />
         <Setter Property="StrokeThickness" Value="0" />
-        <Setter Property="HeightRequest" Value="54" />
+        <Setter Property="MinimumHeightRequest" Value="{StaticResource TouchTarget}" />
+        <Setter Property="VerticalOptions" Value="Fill" />
         <Setter Property="Padding" Value="0" />
-    </Style>
-
-    <!-- Сохранение прямо на клавиатуре: рука уже здесь -->
-    <Style x:Key="KeypadGo" TargetType="Button">
-        <Setter Property="BackgroundColor"
-                Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
-        <Setter Property="TextColor"
-                Value="{AppThemeBinding Light={StaticResource OnAccentLight}, Dark={StaticResource OnAccentDark}}" />
-        <Setter Property="FontFamily" Value="OpenSansSemibold" />
-        <Setter Property="FontSize" Value="17" />
-        <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="HeightRequest" Value="54" />
     </Style>
 
     <!-- Поле суммы: набранное выражение, под ним итог. Набираемое сейчас
