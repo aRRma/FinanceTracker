@@ -23,7 +23,7 @@
         до края: без этого клавиша сохранения уезжает под жестовую полосу, а при
         наборе места и заметки — под системную клавиатуру.
     -->
-    <Grid RowDefinitions="*,Auto,Auto" SafeAreaEdges="Container, Container, Container, SoftInput">
+    <Grid RowDefinitions="*,Auto,Auto" SafeAreaEdges="Container, Container, Container, All">
 
         <ScrollView Grid.Row="0">
             <VerticalStackLayout Padding="16,12" Spacing="16">
