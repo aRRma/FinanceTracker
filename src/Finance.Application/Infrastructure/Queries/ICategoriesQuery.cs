@@ -1,6 +1,8 @@
 namespace Finance.Application.Infrastructure.Queries;
 
-/// <summary>Полный список категорий обоих уровней. Модель представления зовёт его напрямую.</summary>
+/// <summary>
+/// Полный список категорий обоих уровней. Модель представления зовёт его напрямую.
+/// </summary>
 public interface ICategoriesQuery
 {
     /// <summary>

@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Finance.Application.Infrastructure.Storage;
-using Finance.Domain;
+using Finance.Domain.Errors;
 
 namespace Finance.App;
 

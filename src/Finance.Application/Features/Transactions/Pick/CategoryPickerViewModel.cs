@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Features.Transactions.Pick;
 
@@ -22,7 +22,9 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
 
     private Guid? _selected;
 
-    /// <summary>Создаёт модель представления выбора подкатегории.</summary>
+    /// <summary>
+    /// Создаёт модель представления выбора подкатегории.
+    /// </summary>
     /// <param name="categories">Справочник категорий обоих уровней.</param>
     /// <param name="picks">Куда кладётся выбор для формы операции.</param>
     public CategoryPickerViewModel(ICategoriesQuery categories, TransactionPicks picks)
@@ -34,14 +36,20 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
         _picks = picks;
     }
 
-    /// <summary>Строки списка: шапки групп и подкатегории развёрнутых групп.</summary>
+    /// <summary>
+    /// Строки списка: шапки групп и подкатегории развёрнутых групп.
+    /// </summary>
     public ObservableCollection<CategoryPickerLine> Lines { get; } = [];
 
-    /// <summary>Заголовок экрана: категория расхода или дохода.</summary>
+    /// <summary>
+    /// Заголовок экрана: категория расхода или дохода.
+    /// </summary>
     [ObservableProperty]
     public partial string Title { get; private set; } = "Категория";
 
-    /// <summary>Идёт чтение.</summary>
+    /// <summary>
+    /// Идёт чтение.
+    /// </summary>
     [ObservableProperty]
     public partial bool IsBusy { get; set; }
 
@@ -52,15 +60,21 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
     [ObservableProperty]
     public partial string Filter { get; set; } = string.Empty;
 
-    /// <summary>Справочник прочитан — до этого пустой список ещё ничего не значит.</summary>
+    /// <summary>
+    /// Справочник прочитан — до этого пустой список ещё ничего не значит.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsEmpty))]
     public partial bool IsLoaded { get; private set; }
 
-    /// <summary>Ни одна подкатегория не подошла под набранное.</summary>
+    /// <summary>
+    /// Ни одна подкатегория не подошла под набранное.
+    /// </summary>
     public bool IsEmpty => IsLoaded && Lines.Count is 0;
 
-    /// <summary>Читает категории выбранного вида.</summary>
+    /// <summary>
+    /// Читает категории выбранного вида.
+    /// </summary>
     /// <param name="kind">Вид: расход или доход — он задан видом операции.</param>
     /// <param name="selected">Подкатегория, стоящая в форме сейчас.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
@@ -163,7 +177,9 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
         OnPropertyChanged(nameof(IsEmpty));
     }
 
-    /// <summary>Запоминает выбор: форма заберёт его, когда вернётся на экран.</summary>
+    /// <summary>
+    /// Запоминает выбор: форма заберёт его, когда вернётся на экран.
+    /// </summary>
     /// <param name="line">Выбранная подкатегория.</param>
     [RelayCommand]
     public void Pick(CategoryPickerLine line)
@@ -176,7 +192,9 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
         }
     }
 
-    /// <summary>Пересобирает список из прочитанного — в базу за этим не ходят.</summary>
+    /// <summary>
+    /// Пересобирает список из прочитанного — в базу за этим не ходят.
+    /// </summary>
     partial void OnFilterChanged(string value) => Rebuild();
 
     private void Rebuild()

@@ -1,6 +1,13 @@
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Values;
+
 namespace Finance.Domain.Tests;
 
-/// <summary>Правила операции, которые она проверяет сама, без счетов и категорий.</summary>
+/// <summary>
+/// Правила операции, которые она проверяет сама, без счетов и категорий.
+/// </summary>
 public sealed class TransactionInvariantsTests
 {
     private static readonly Account Card = Given.Account();

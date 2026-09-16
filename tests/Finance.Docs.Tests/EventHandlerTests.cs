@@ -14,7 +14,9 @@ public sealed class EventHandlerTests
 {
     private const string Application = "src/Finance.App/";
 
-    /// <summary>Единственное место, где <c>async void</c> разрешён: там он с перехватом.</summary>
+    /// <summary>
+    /// Единственное место, где <c>async void</c> разрешён: там он с перехватом.
+    /// </summary>
     private const string Wrapper = "src/Finance.App/Guarded.cs";
 
     [Fact]

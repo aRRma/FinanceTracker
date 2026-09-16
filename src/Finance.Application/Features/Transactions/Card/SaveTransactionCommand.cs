@@ -1,4 +1,4 @@
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Features.Transactions.Card;
 
@@ -9,19 +9,29 @@ namespace Finance.Application.Features.Transactions.Card;
 /// </summary>
 public sealed record SaveTransactionCommand
 {
-    /// <summary>Ключ правимой операции. Пусто — записывается новая.</summary>
+    /// <summary>
+    /// Ключ правимой операции. Пусто — записывается новая.
+    /// </summary>
     public Guid? Key { get; init; }
 
-    /// <summary>Вид операции.</summary>
+    /// <summary>
+    /// Вид операции.
+    /// </summary>
     public required TransactionKind Kind { get; init; }
 
-    /// <summary>Счёт списания.</summary>
+    /// <summary>
+    /// Счёт списания.
+    /// </summary>
     public required Guid SourceAccountKey { get; init; }
 
-    /// <summary>Сумма — уже вычисленный итог выражения из поля, в валюте счёта списания.</summary>
+    /// <summary>
+    /// Сумма — уже вычисленный итог выражения из поля, в валюте счёта списания.
+    /// </summary>
     public required decimal Amount { get; init; }
 
-    /// <summary>Счёт зачисления — у перевода.</summary>
+    /// <summary>
+    /// Счёт зачисления — у перевода.
+    /// </summary>
     public Guid? TargetAccountKey { get; init; }
 
     /// <summary>
@@ -30,7 +40,9 @@ public sealed record SaveTransactionCommand
     /// </summary>
     public decimal? TargetAmount { get; init; }
 
-    /// <summary>Подкатегория — у дохода и расхода.</summary>
+    /// <summary>
+    /// Подкатегория — у дохода и расхода.
+    /// </summary>
     public Guid? CategoryKey { get; init; }
 
     /// <summary>
@@ -39,9 +51,13 @@ public sealed record SaveTransactionCommand
     /// </summary>
     public string? PlaceName { get; init; }
 
-    /// <summary>Дата операции.</summary>
+    /// <summary>
+    /// Дата операции.
+    /// </summary>
     public required DateOnly OccurredOn { get; init; }
 
-    /// <summary>Заметка.</summary>
+    /// <summary>
+    /// Заметка.
+    /// </summary>
     public string? Note { get; init; }
 }

@@ -1,15 +1,19 @@
 using Finance.Application.Infrastructure.Storage;
-using Finance.Domain;
+using Finance.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Features.Categories.Card;
 
-/// <summary>Чтение последствий удаления подкатегории.</summary>
+/// <summary>
+/// Чтение последствий удаления подкатегории.
+/// </summary>
 public sealed class CategoryDeletionQuery : ICategoryDeletionQuery
 {
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
 
-    /// <summary>Создаёт запрос.</summary>
+    /// <summary>
+    /// Создаёт запрос.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     public CategoryDeletionQuery(IDbContextFactory<FinanceDbContext> contexts)
     {

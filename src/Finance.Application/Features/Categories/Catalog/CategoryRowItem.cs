@@ -12,10 +12,14 @@ namespace Finance.Application.Features.Categories.Catalog;
 /// <param name="IsProtected">Не открывается и не удаляется: приёмник или служебная.</param>
 public sealed record CategoryRowItem(Guid Key, string Name, string Icon, bool IsProtected)
 {
-    /// <summary>Строка открывается по нажатию.</summary>
+    /// <summary>
+    /// Строка открывается по нажатию.
+    /// </summary>
     public bool IsEditable => !IsProtected;
 
-    /// <summary>Собирает строку из модели чтения.</summary>
+    /// <summary>
+    /// Собирает строку из модели чтения.
+    /// </summary>
     /// <param name="category">Категория из справочника.</param>
     public static CategoryRowItem From(CategoryListItem category)
     {

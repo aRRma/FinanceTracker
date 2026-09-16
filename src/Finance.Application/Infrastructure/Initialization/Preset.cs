@@ -1,7 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Finance.Domain;
 
 namespace Finance.Application.Infrastructure.Initialization;
 
@@ -36,7 +35,9 @@ public sealed record Preset(
         RespectRequiredConstructorParameters = true
     };
 
-    /// <summary>Разбирает набор из текста файла.</summary>
+    /// <summary>
+    /// Разбирает набор из текста файла.
+    /// </summary>
     /// <param name="json">Содержимое <c>preset.json</c>.</param>
     public static Preset Parse(string json) =>
         JsonSerializer.Deserialize<Preset>(json, Options)
@@ -57,7 +58,9 @@ public sealed record Preset(
         return Parse(reader.ReadToEnd());
     }
 
-    /// <summary>Все категории набора обоих уровней одним списком.</summary>
+    /// <summary>
+    /// Все категории набора обоих уровней одним списком.
+    /// </summary>
     public IEnumerable<PresetCategory> All()
     {
         foreach (PresetGroup group in Groups)

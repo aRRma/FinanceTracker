@@ -1,8 +1,10 @@
-using Finance.Domain;
+using Finance.Domain.Errors;
 
 namespace Finance.Application.Features.Categories.Card;
 
-/// <summary>Запись категории. Модель представления зовёт его напрямую.</summary>
+/// <summary>
+/// Запись категории. Модель представления зовёт его напрямую.
+/// </summary>
 public interface ISaveCategoryHandler
 {
     /// <summary>

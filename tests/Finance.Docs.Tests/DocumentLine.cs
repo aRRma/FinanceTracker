@@ -10,6 +10,8 @@ namespace Finance.Docs.Tests;
 /// <param name="Text">Сама строка.</param>
 internal readonly record struct DocumentLine(string File, int Number, string Text)
 {
-    /// <summary>Адрес строки в виде <c>docs/use-cases.md:42</c>.</summary>
+    /// <summary>
+    /// Адрес строки в виде <c>docs/use-cases.md:42</c>.
+    /// </summary>
     public override string ToString() => $"{File}:{Number}";
 }

@@ -11,7 +11,9 @@ namespace Finance.Application.Tests;
 /// </summary>
 public sealed class DatabaseBootstrapperTests
 {
-    /// <summary>На первом запуске терять нечего, и копия не снимается.</summary>
+    /// <summary>
+    /// На первом запуске терять нечего, и копия не снимается.
+    /// </summary>
     [Fact]
     public async Task Первый_запуск_резервную_копию_не_снимает()
     {

@@ -9,7 +9,9 @@ namespace Finance.App;
 /// </summary>
 internal static class Chevron
 {
-    /// <summary>Имя знака в ячейке: по нему его и находят среди соседних значков.</summary>
+    /// <summary>
+    /// Имя знака в ячейке: по нему его и находят среди соседних значков.
+    /// </summary>
     internal const string Name = "Chevron";
 
     private const double Quarter = 90d;

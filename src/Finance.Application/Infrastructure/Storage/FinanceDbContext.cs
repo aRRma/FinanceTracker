@@ -1,5 +1,5 @@
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -14,7 +14,9 @@ public sealed class FinanceDbContext : DbContext
 {
     private readonly IClock _clock;
 
-    /// <summary>Создаёт контекст.</summary>
+    /// <summary>
+    /// Создаёт контекст.
+    /// </summary>
     /// <param name="options">Настройки подключения.</param>
     /// <param name="clock">Часы для метки изменения.</param>
     public FinanceDbContext(DbContextOptions<FinanceDbContext> options, IClock clock)
@@ -54,6 +56,10 @@ public sealed class FinanceDbContext : DbContext
         // Перечисления хранятся именем, а не номером: дамп базы читается глазами,
         // а перестановка членов перечисления не переименовывает молча все записи
         configurationBuilder.Properties<AccountType>().HaveConversion<string>();
+
+        // Длина под код валюты, а не под Unknown: тот значит незаполненную переменную
+        // и в базу не попадает. Расширение длины изменило бы модель EF и потребовало бы
+        // миграции ради значения, которого в колонке не бывает
         configurationBuilder.Properties<Currency>().HaveConversion<string>().HaveMaxLength(3);
         configurationBuilder.Properties<CategoryKind>().HaveConversion<string>();
         configurationBuilder.Properties<CategoryRole>().HaveConversion<string>();

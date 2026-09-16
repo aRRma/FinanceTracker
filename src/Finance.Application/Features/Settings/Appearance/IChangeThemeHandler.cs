@@ -2,7 +2,9 @@ using Finance.Application.Infrastructure.Settings;
 
 namespace Finance.Application.Features.Settings.Appearance;
 
-/// <summary>Выбор темы оформления. Модель представления зовёт его напрямую.</summary>
+/// <summary>
+/// Выбор темы оформления. Модель представления зовёт его напрямую.
+/// </summary>
 public interface IChangeThemeHandler
 {
     /// <summary>

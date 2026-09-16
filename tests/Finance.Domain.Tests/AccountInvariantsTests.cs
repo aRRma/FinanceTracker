@@ -1,6 +1,14 @@
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Rules;
+using Finance.Domain.Values;
+
 namespace Finance.Domain.Tests;
 
-/// <summary>Правила счёта и общие правила имён и удаления, проверенные на счёте и месте.</summary>
+/// <summary>
+/// Правила счёта и общие правила имён и удаления, проверенные на счёте и месте.
+/// </summary>
 public sealed class AccountInvariantsTests
 {
     [Fact]

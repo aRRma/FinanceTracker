@@ -1,5 +1,5 @@
 using Finance.Application.Infrastructure.Storage;
-using Finance.Domain;
+using Finance.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Infrastructure.Queries;

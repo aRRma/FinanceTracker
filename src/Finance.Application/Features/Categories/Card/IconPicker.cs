@@ -12,7 +12,9 @@ public sealed partial class IconPicker : ObservableObject
 {
     private readonly IconCatalog _catalog;
 
-    /// <summary>Создаёт выбор значка.</summary>
+    /// <summary>
+    /// Создаёт выбор значка.
+    /// </summary>
     /// <param name="catalog">Набор значков, вшитый в приложение.</param>
     public IconPicker(IconCatalog catalog)
     {
@@ -31,15 +33,21 @@ public sealed partial class IconPicker : ObservableObject
     /// </summary>
     public IReadOnlyList<IconChoice> Choices { get; }
 
-    /// <summary>Выбранный значок.</summary>
+    /// <summary>
+    /// Выбранный значок.
+    /// </summary>
     [ObservableProperty]
     public partial string Selected { get; private set; }
 
-    /// <summary>Сетка значков раскрыта.</summary>
+    /// <summary>
+    /// Сетка значков раскрыта.
+    /// </summary>
     [ObservableProperty]
     public partial bool IsOpen { get; private set; }
 
-    /// <summary>Показывает значок категории, подставляя запасной вместо неизвестного.</summary>
+    /// <summary>
+    /// Показывает значок категории, подставляя запасной вместо неизвестного.
+    /// </summary>
     /// <param name="icon">Ключ значка из категории.</param>
     public void Show(string? icon)
     {
@@ -49,11 +57,15 @@ public sealed partial class IconPicker : ObservableObject
         Mark(Selected);
     }
 
-    /// <summary>Раскрывает и закрывает сетку значков.</summary>
+    /// <summary>
+    /// Раскрывает и закрывает сетку значков.
+    /// </summary>
     [RelayCommand]
     public void Toggle() => IsOpen = !IsOpen;
 
-    /// <summary>Выбирает значок и закрывает сетку.</summary>
+    /// <summary>
+    /// Выбирает значок и закрывает сетку.
+    /// </summary>
     /// <param name="icon">Ключ выбранного значка.</param>
     [RelayCommand]
     public void Pick(string icon)

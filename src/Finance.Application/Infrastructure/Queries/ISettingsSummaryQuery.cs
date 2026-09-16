@@ -7,7 +7,9 @@ namespace Finance.Application.Infrastructure.Queries;
 /// </summary>
 public interface ISettingsSummaryQuery
 {
-    /// <summary>Читает текущее состояние настроек.</summary>
+    /// <summary>
+    /// Читает текущее состояние настроек.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     Task<SettingsSummary> ReadAsync(CancellationToken cancellationToken = default);
 }

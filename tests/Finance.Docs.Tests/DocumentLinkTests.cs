@@ -15,7 +15,9 @@ public sealed partial class DocumentLinkTests
             .Select(static file => Path.GetFileName(file)!)
             .ToHashSet(StringComparer.OrdinalIgnoreCase));
 
-    /// <summary>Ссылка вида <c>[текст](путь)</c> ведёт на существующий путь.</summary>
+    /// <summary>
+    /// Ссылка вида <c>[текст](путь)</c> ведёт на существующий путь.
+    /// </summary>
     [Fact]
     public void Ссылки_ведут_на_существующие_пути()
     {
@@ -48,7 +50,9 @@ public sealed partial class DocumentLinkTests
         Assert.Empty(missing);
     }
 
-    /// <summary>Ссылка на экран ведёт на нарисованный экран: иначе читать её нечем.</summary>
+    /// <summary>
+    /// Ссылка на экран ведёт на нарисованный экран: иначе читать её нечем.
+    /// </summary>
     [Fact]
     public void Ссылки_на_экраны_разыменовываются()
     {
@@ -62,7 +66,9 @@ public sealed partial class DocumentLinkTests
         Assert.Empty(dangling);
     }
 
-    /// <summary>Разбор что-то нашёл: пустой список ссылок прошёл бы проверки молча.</summary>
+    /// <summary>
+    /// Разбор что-то нашёл: пустой список ссылок прошёл бы проверки молча.
+    /// </summary>
     [Fact]
     public void Разбор_что_то_нашёл()
     {
@@ -71,11 +77,15 @@ public sealed partial class DocumentLinkTests
         Assert.NotEmpty(Screens.InMockups);
     }
 
-    /// <summary>Ссылка Markdown; якорь после <c>#</c> отбрасывается.</summary>
+    /// <summary>
+    /// Ссылка Markdown; якорь после <c>#</c> отбрасывается.
+    /// </summary>
     [GeneratedRegex("""\[[^\]]*\]\((?<path>[^)#]+?)(?:#[^)]*)?\)""")]
     private static partial Regex Link();
 
-    /// <summary>Упоминание файла прозой: <c>`tools/build_prototype.py`</c>.</summary>
+    /// <summary>
+    /// Упоминание файла прозой: <c>`tools/build_prototype.py`</c>.
+    /// </summary>
     [GeneratedRegex("""`[\w./-]+\.(?:md|html|json|py)`""")]
     private static partial Regex Mention();
 

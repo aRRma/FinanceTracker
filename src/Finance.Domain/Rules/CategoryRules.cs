@@ -1,4 +1,8 @@
-namespace Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+
+namespace Finance.Domain.Rules;
 
 /// <summary>
 /// Проверки категорий, которым мало одной категории: наличие приёмника, выбор
@@ -99,7 +103,9 @@ public static class CategoryRules
         NameUniqueness.Ensure(subcategory.Name, namesInNewGroup, $"подкатегория группы «{newGroup.Name}»");
     }
 
-    /// <summary>Переданная категория — группа, а не подкатегория.</summary>
+    /// <summary>
+    /// Переданная категория — группа, а не подкатегория.
+    /// </summary>
     /// <param name="category">Проверяемая категория.</param>
     /// <param name="parameterName">Имя параметра вызывающего метода для сообщения об ошибке.</param>
     internal static void EnsureIsGroup(Category category, string parameterName)

@@ -15,7 +15,9 @@ namespace Finance.Application.Infrastructure;
 /// </remarks>
 public static class AmountInput
 {
-    /// <summary>Знаки действий клавиатуры — типографские, как на её клавишах.</summary>
+    /// <summary>
+    /// Знаки действий клавиатуры — типографские, как на её клавишах.
+    /// </summary>
     private static readonly SearchValues<char> Operators = SearchValues.Create("+−×÷");
 
     /// <summary>
@@ -31,7 +33,9 @@ public static class AmountInput
     private const int IntegerDigitLimit = 12;
     private const int FractionDigitLimit = 2;
 
-    /// <summary>Добавляет нажатую клавишу к выражению.</summary>
+    /// <summary>
+    /// Добавляет нажатую клавишу к выражению.
+    /// </summary>
     /// <param name="expression">Набранное выражение.</param>
     /// <param name="key">Клавиша: цифра, запятая или знак действия.</param>
     /// <returns>Выражение после нажатия. Невозможное нажатие возвращает его без изменений.</returns>
@@ -49,7 +53,9 @@ public static class AmountInput
         };
     }
 
-    /// <summary>Стирает последний набранный знак.</summary>
+    /// <summary>
+    /// Стирает последний набранный знак.
+    /// </summary>
     /// <param name="expression">Набранное выражение.</param>
     /// <returns>Выражение без последнего знака. Пустое остаётся пустым.</returns>
     public static string Backspace(string expression)
@@ -90,7 +96,9 @@ public static class AmountInput
             : expression;
     }
 
-    /// <summary>Цифра: до предела разрядов, но ведущий ноль заменяется, а не наращивается.</summary>
+    /// <summary>
+    /// Цифра: до предела разрядов, но ведущий ноль заменяется, а не наращивается.
+    /// </summary>
     private static string AppendDigit(string expression, char key)
     {
         ReadOnlySpan<char> number = CurrentNumber(expression);
@@ -104,7 +112,9 @@ public static class AmountInput
         return Fits(number) ? expression + key : expression;
     }
 
-    /// <summary>Запятая: одна на число и никогда не первой — целая часть обязана быть.</summary>
+    /// <summary>
+    /// Запятая: одна на число и никогда не первой — целая часть обязана быть.
+    /// </summary>
     private static string AppendSeparator(string expression)
     {
         ReadOnlySpan<char> number = CurrentNumber(expression);
@@ -140,7 +150,9 @@ public static class AmountInput
         return typed + key;
     }
 
-    /// <summary>Число, которое набирается сейчас, — хвост выражения после последнего действия.</summary>
+    /// <summary>
+    /// Число, которое набирается сейчас, — хвост выражения после последнего действия.
+    /// </summary>
     private static ReadOnlySpan<char> CurrentNumber(string expression)
     {
         ReadOnlySpan<char> typed = expression;
@@ -149,7 +161,9 @@ public static class AmountInput
         return operation < 0 ? typed : typed[(operation + 1)..];
     }
 
-    /// <summary>Влезает ли в набираемое число ещё одна цифра.</summary>
+    /// <summary>
+    /// Влезает ли в набираемое число ещё одна цифра.
+    /// </summary>
     private static bool Fits(ReadOnlySpan<char> number)
     {
         int separator = number.IndexOf(Separator);

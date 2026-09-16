@@ -6,7 +6,9 @@ using Finance.Application.Infrastructure.Queries;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Экраны справочника мест и карточки места.</summary>
+/// <summary>
+/// Экраны справочника мест и карточки места.
+/// </summary>
 public sealed class PlaceScreenTests
 {
     /// <summary>
@@ -37,7 +39,9 @@ public sealed class PlaceScreenTests
         Assert.Equal(1, places.Reads);
     }
 
-    /// <summary>Отбор не различает регистр: набирают в спешке, а не по паспорту места.</summary>
+    /// <summary>
+    /// Отбор не различает регистр: набирают в спешке, а не по паспорту места.
+    /// </summary>
     [Fact]
     public async Task Отбор_не_различает_регистр()
     {
@@ -80,7 +84,9 @@ public sealed class PlaceScreenTests
         Assert.True(model.IsFilteredOut);
     }
 
-    /// <summary>Справочник перечитывается сам, когда место правят из карточки.</summary>
+    /// <summary>
+    /// Справочник перечитывается сам, когда место правят из карточки.
+    /// </summary>
     [Fact]
     public async Task Справочник_перечитывается_по_изменению_мест()
     {
@@ -108,7 +114,9 @@ public sealed class PlaceScreenTests
         }
     }
 
-    /// <summary>Подпись карточки называет число операций и самую частую подкатегорию.</summary>
+    /// <summary>
+    /// Подпись карточки называет число операций и самую частую подкатегорию.
+    /// </summary>
     [Fact]
     public async Task Карточка_показывает_счётчики_места()
     {
@@ -153,7 +161,9 @@ public sealed class PlaceScreenTests
         Assert.Equal("Удалить «Пятерочка»?", model.DeleteTitle);
     }
 
-    /// <summary>Неиспользованное место удаляется без разговоров о переезде операций.</summary>
+    /// <summary>
+    /// Неиспользованное место удаляется без разговоров о переезде операций.
+    /// </summary>
     [Fact]
     public async Task Подтверждение_для_места_без_операций_не_считает_операции()
     {
@@ -174,7 +184,9 @@ public sealed class PlaceScreenTests
         Assert.Equal("Операций с этим местом нет. Отменить удаление будет нельзя.", model.DeletePrompt);
     }
 
-    /// <summary>Занятое имя не сохраняется, а показывается на форме — экран остаётся открытым.</summary>
+    /// <summary>
+    /// Занятое имя не сохраняется, а показывается на форме — экран остаётся открытым.
+    /// </summary>
     [Fact]
     public async Task Занятое_имя_показывается_ошибкой_и_не_закрывает_карточку()
     {
@@ -197,7 +209,9 @@ public sealed class PlaceScreenTests
         Assert.Contains("занято", model.Error, StringComparison.Ordinal);
     }
 
-    /// <summary>Карточка несуществующего места не загружается: править и удалять нечего.</summary>
+    /// <summary>
+    /// Карточка несуществующего места не загружается: править и удалять нечего.
+    /// </summary>
     [Fact]
     public async Task Карточка_неизвестного_места_остаётся_пустой()
     {
@@ -220,7 +234,9 @@ public sealed class PlaceScreenTests
             fixture.Database.Resolve<IRenamePlaceHandler>(),
             fixture.Database.Resolve<IDeletePlaceHandler>());
 
-    /// <summary>Считает походы в базу: утверждение «список не перечитывается» иначе не проверить.</summary>
+    /// <summary>
+    /// Считает походы в базу: утверждение «список не перечитывается» иначе не проверить.
+    /// </summary>
     private sealed class CountingPlaces : IPlacesQuery
     {
         private readonly IPlacesQuery _inner;

@@ -1,6 +1,8 @@
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Infrastructure.Queries;
@@ -19,7 +21,9 @@ public sealed class FeedQuery : IFeedQuery
 {
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
 
-    /// <summary>Создаёт запрос.</summary>
+    /// <summary>
+    /// Создаёт запрос.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     public FeedQuery(IDbContextFactory<FinanceDbContext> contexts)
     {
@@ -289,7 +293,9 @@ public sealed class FeedQuery : IFeedQuery
             PlaceName = place != null ? place.Name : null
         };
 
-    /// <summary>Что база отдаёт на строку до выбора стороны.</summary>
+    /// <summary>
+    /// Что база отдаёт на строку до выбора стороны.
+    /// </summary>
     internal sealed class Projection
     {
         public required Guid Key { get; init; }

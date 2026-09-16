@@ -13,7 +13,9 @@ internal static class EntityRowConfiguration
 {
     extension<TRow>(EntityTypeBuilder<TRow> builder) where TRow : EntityRow
     {
-        /// <summary>Описывает колонки, общие для всех сущностей, и фильтр мягкого удаления.</summary>
+        /// <summary>
+        /// Описывает колонки, общие для всех сущностей, и фильтр мягкого удаления.
+        /// </summary>
         public void ConfigureEntityColumns()
         {
             builder.HasKey(row => row.Key);

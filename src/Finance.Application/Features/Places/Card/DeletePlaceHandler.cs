@@ -1,7 +1,7 @@
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Features.Places.Card;
@@ -16,7 +16,9 @@ public sealed class DeletePlaceHandler : IDeletePlaceHandler
     private readonly UnitOfWork _unitOfWork;
     private readonly IClock _clock;
 
-    /// <summary>Создаёт обработчик.</summary>
+    /// <summary>
+    /// Создаёт обработчик.
+    /// </summary>
     /// <param name="unitOfWork">Граница транзакции.</param>
     /// <param name="clock">Часы: момент удаления.</param>
     public DeletePlaceHandler(UnitOfWork unitOfWork, IClock clock)

@@ -1,16 +1,21 @@
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Infrastructure.Queries;
 
-/// <summary>Чтение списка счетов с балансами.</summary>
+/// <summary>
+/// Чтение списка счетов с балансами.
+/// </summary>
 public sealed class AccountsQuery : IAccountsQuery
 {
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
 
-    /// <summary>Создаёт запрос.</summary>
+    /// <summary>
+    /// Создаёт запрос.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     public AccountsQuery(IDbContextFactory<FinanceDbContext> contexts)
     {

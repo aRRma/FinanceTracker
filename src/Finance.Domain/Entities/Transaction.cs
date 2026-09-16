@@ -1,4 +1,9 @@
-namespace Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Rules;
+using Finance.Domain.Values;
+
+namespace Finance.Domain.Entities;
 
 /// <summary>
 /// Операция: доход, расход или перевод. Сумма всегда положительна, знак задаёт вид —
@@ -7,7 +12,9 @@ namespace Finance.Domain;
 /// </summary>
 public sealed class Transaction : Entity
 {
-    /// <summary>Предел длины заметки.</summary>
+    /// <summary>
+    /// Предел длины заметки.
+    /// </summary>
     public const int MaxNoteLength = 1000;
 
     private Transaction(
@@ -39,16 +46,24 @@ public sealed class Transaction : Entity
         Note = note;
     }
 
-    /// <summary>Вид операции. Меняется при правке наравне с прочими полями.</summary>
+    /// <summary>
+    /// Вид операции. Меняется при правке наравне с прочими полями.
+    /// </summary>
     public TransactionKind Kind { get; private set; }
 
-    /// <summary>Счёт списания. У дохода и расхода — единственный счёт операции.</summary>
+    /// <summary>
+    /// Счёт списания. У дохода и расхода — единственный счёт операции.
+    /// </summary>
     public Guid SourceAccountKey { get; private set; }
 
-    /// <summary>Счёт зачисления. Только у перевода.</summary>
+    /// <summary>
+    /// Счёт зачисления. Только у перевода.
+    /// </summary>
     public Guid? TargetAccountKey { get; private set; }
 
-    /// <summary>Сумма в валюте счёта списания. Всегда положительна.</summary>
+    /// <summary>
+    /// Сумма в валюте счёта списания. Всегда положительна.
+    /// </summary>
     public Money Amount { get; private set; }
 
     /// <summary>
@@ -57,19 +72,29 @@ public sealed class Transaction : Entity
     /// </summary>
     public Money? TargetAmount { get; private set; }
 
-    /// <summary>Подкатегория. Обязательна для дохода и расхода, запрещена для перевода.</summary>
+    /// <summary>
+    /// Подкатегория. Обязательна для дохода и расхода, запрещена для перевода.
+    /// </summary>
     public Guid? CategoryKey { get; private set; }
 
-    /// <summary>Место. Необязательно, у перевода запрещено.</summary>
+    /// <summary>
+    /// Место. Необязательно, у перевода запрещено.
+    /// </summary>
     public Guid? PlaceKey { get; private set; }
 
-    /// <summary>Календарная дата операции. Без времени и часового пояса.</summary>
+    /// <summary>
+    /// Календарная дата операции. Без времени и часового пояса.
+    /// </summary>
     public DateOnly OccurredOn { get; private set; }
 
-    /// <summary>Заметка. Пустая не хранится: пустая строка и её отсутствие — одно и то же.</summary>
+    /// <summary>
+    /// Заметка. Пустая не хранится: пустая строка и её отсутствие — одно и то же.
+    /// </summary>
     public string? Note { get; private set; }
 
-    /// <summary>Операция — перевод между своими счетами.</summary>
+    /// <summary>
+    /// Операция — перевод между своими счетами.
+    /// </summary>
     public bool IsTransfer => Kind is TransactionKind.Transfer;
 
     /// <summary>
@@ -178,7 +203,9 @@ public sealed class Transaction : Entity
         Note = cleanNote;
     }
 
-    /// <summary>Возвращает приведённую заметку и бросает исключение на первом нарушенном правиле.</summary>
+    /// <summary>
+    /// Возвращает приведённую заметку и бросает исключение на первом нарушенном правиле.
+    /// </summary>
     private static string? Validate(
         TransactionKind kind,
         Guid sourceAccountKey,
@@ -210,7 +237,9 @@ public sealed class Transaction : Entity
         return CleanNote(note);
     }
 
-    /// <summary>Сумма строго больше нуля и не превышает предела.</summary>
+    /// <summary>
+    /// Сумма строго больше нуля и не превышает предела.
+    /// </summary>
     private static void EnsureAmount(Money amount, string what)
     {
         DomainException.ThrowIf(
@@ -221,7 +250,9 @@ public sealed class Transaction : Entity
         amount.EnsureWithinLimit(what);
     }
 
-    /// <summary>Поля, существующие ровно у перевода: второй счёт и вторая сумма.</summary>
+    /// <summary>
+    /// Поля, существующие ровно у перевода: второй счёт и вторая сумма.
+    /// </summary>
     private static void EnsureTransferShape(
         bool isTransfer,
         Guid sourceAccountKey,
@@ -285,7 +316,9 @@ public sealed class Transaction : Entity
             "У перевода места не бывает");
     }
 
-    /// <summary>Заметка не длиннее предела. Пустая не хранится — это то же, что её отсутствие.</summary>
+    /// <summary>
+    /// Заметка не длиннее предела. Пустая не хранится — это то же, что её отсутствие.
+    /// </summary>
     private static string? CleanNote(string? note)
     {
         if (string.IsNullOrWhiteSpace(note))
@@ -303,7 +336,9 @@ public sealed class Transaction : Entity
         return trimmed;
     }
 
-    /// <summary>Ключ либо отсутствует, либо настоящий: <c>Guid.Empty</c> не ссылается ни на что.</summary>
+    /// <summary>
+    /// Ключ либо отсутствует, либо настоящий: <c>Guid.Empty</c> не ссылается ни на что.
+    /// </summary>
     private static void EnsureRealKey(Guid? key, string parameterName)
     {
         if (key == Guid.Empty)

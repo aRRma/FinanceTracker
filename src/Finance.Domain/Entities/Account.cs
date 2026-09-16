@@ -1,4 +1,9 @@
-namespace Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Rules;
+using Finance.Domain.Values;
+
+namespace Finance.Domain.Entities;
 
 /// <summary>
 /// Счёт — место хранения денег в одной валюте. Начальный остаток и дата открытия —
@@ -34,22 +39,34 @@ public sealed class Account : Entity
         SortOrder = sortOrder;
     }
 
-    /// <summary>Наименование счёта. Уникально среди неудалённых счетов.</summary>
+    /// <summary>
+    /// Наименование счёта. Уникально среди неудалённых счетов.
+    /// </summary>
     public string Name { get; private set; }
 
-    /// <summary>Наличные или карта. Влияет только на значок и подпись.</summary>
+    /// <summary>
+    /// Наличные или карта. Влияет только на значок и подпись.
+    /// </summary>
     public AccountType Type { get; private set; }
 
-    /// <summary>Валюта счёта. После первой операции не меняется.</summary>
+    /// <summary>
+    /// Валюта счёта. После первой операции не меняется.
+    /// </summary>
     public Currency Currency { get; private set; }
 
-    /// <summary>Начальный остаток — точка отсчёта баланса. Бывает отрицательным: долг по карте тоже остаток.</summary>
+    /// <summary>
+    /// Начальный остаток — точка отсчёта баланса. Бывает отрицательным: долг по карте тоже остаток.
+    /// </summary>
     public Money OpeningBalance { get; private set; }
 
-    /// <summary>Дата, с которой действует начальный остаток. Раньше неё операций по счёту быть не может.</summary>
+    /// <summary>
+    /// Дата, с которой действует начальный остаток. Раньше неё операций по счёту быть не может.
+    /// </summary>
     public DateOnly OpenedOn { get; private set; }
 
-    /// <summary>«Скрыть из расчётов»: счёт не входит ни в «доступно к тратам», ни в итог дня, ни в отчёт.</summary>
+    /// <summary>
+    /// «Скрыть из расчётов»: счёт не входит ни в «доступно к тратам», ни в итог дня, ни в отчёт.
+    /// </summary>
     public bool ExcludedFromTotals { get; private set; }
 
     /// <summary>
@@ -58,10 +75,14 @@ public sealed class Account : Entity
     /// </summary>
     public bool IsClosed { get; private set; }
 
-    /// <summary>Порядок на главном экране, задаётся перетаскиванием.</summary>
+    /// <summary>
+    /// Порядок на главном экране, задаётся перетаскиванием.
+    /// </summary>
     public int SortOrder { get; private set; }
 
-    /// <summary>Заводит счёт. Уникальность имени проверяется отдельно: она требует списка счетов.</summary>
+    /// <summary>
+    /// Заводит счёт. Уникальность имени проверяется отдельно: она требует списка счетов.
+    /// </summary>
     /// <param name="name">Наименование счёта.</param>
     /// <param name="type">Наличные или карта.</param>
     /// <param name="currency">Валюта счёта.</param>
@@ -126,10 +147,14 @@ public sealed class Account : Entity
             excludedFromTotals, isClosed, sortOrder,
             createdAtUtc, updatedAtUtc, deletedAtUtc, syncedAtUtc, externalId);
 
-    /// <summary>Переименовывает счёт.</summary>
+    /// <summary>
+    /// Переименовывает счёт.
+    /// </summary>
     public void Rename(string name) => Name = Names.Normalize(name, "счёт");
 
-    /// <summary>Меняет тип счёта. На расчёты не влияет.</summary>
+    /// <summary>
+    /// Меняет тип счёта. На расчёты не влияет.
+    /// </summary>
     public void ChangeType(AccountType type) => Type = type;
 
     /// <summary>
@@ -159,7 +184,9 @@ public sealed class Account : Entity
         OpeningBalance = Money.Restore(OpeningBalance.Amount, currency);
     }
 
-    /// <summary>Меняет начальный остаток. Правка меняет текущий баланс задним числом и записи в ленте не оставляет.</summary>
+    /// <summary>
+    /// Меняет начальный остаток. Правка меняет текущий баланс задним числом и записи в ленте не оставляет.
+    /// </summary>
     public void ChangeOpeningBalance(decimal openingBalance) =>
         OpeningBalance = CreateOpeningBalance(openingBalance, Currency);
 
@@ -183,19 +210,29 @@ public sealed class Account : Entity
         OpenedOn = openedOn;
     }
 
-    /// <summary>Помечает счёт признаком «скрыть из расчётов» или снимает его.</summary>
+    /// <summary>
+    /// Помечает счёт признаком «скрыть из расчётов» или снимает его.
+    /// </summary>
     public void SetExcludedFromTotals(bool excluded) => ExcludedFromTotals = excluded;
 
-    /// <summary>Закрывает счёт. Ненулевой баланс закрытию не мешает.</summary>
+    /// <summary>
+    /// Закрывает счёт. Ненулевой баланс закрытию не мешает.
+    /// </summary>
     public void Close() => IsClosed = true;
 
-    /// <summary>Открывает закрытый счёт обратно.</summary>
+    /// <summary>
+    /// Открывает закрытый счёт обратно.
+    /// </summary>
     public void Reopen() => IsClosed = false;
 
-    /// <summary>Задаёт место счёта на главном экране.</summary>
+    /// <summary>
+    /// Задаёт место счёта на главном экране.
+    /// </summary>
     public void SetSortOrder(int sortOrder) => SortOrder = sortOrder;
 
-    /// <summary>Начальный остаток проходит те же проверки точности и предела, что и сумма операции.</summary>
+    /// <summary>
+    /// Начальный остаток проходит те же проверки точности и предела, что и сумма операции.
+    /// </summary>
     private static Money CreateOpeningBalance(decimal amount, Currency currency)
     {
         Money balance = Money.Create(amount, currency);

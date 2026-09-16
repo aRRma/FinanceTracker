@@ -30,7 +30,9 @@ namespace Finance.Application;
 /// </summary>
 public static class FinanceServices
 {
-    /// <summary>Регистрирует хранилище, часы, справочник значков и подготовку базы.</summary>
+    /// <summary>
+    /// Регистрирует хранилище, часы, справочник значков и подготовку базы.
+    /// </summary>
     /// <param name="services">Набор служб приложения.</param>
     /// <param name="databasePath">Полный путь к файлу базы в папке данных приложения.</param>
     /// <param name="dispatchToInterface">

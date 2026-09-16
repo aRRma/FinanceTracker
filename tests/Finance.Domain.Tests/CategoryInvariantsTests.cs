@@ -1,6 +1,13 @@
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Rules;
+
 namespace Finance.Domain.Tests;
 
-/// <summary>Правила категорий: уровни, вид, перенос, приёмник и неудаляемые категории.</summary>
+/// <summary>
+/// Правила категорий: уровни, вид, перенос, приёмник и неудаляемые категории.
+/// </summary>
 public sealed class CategoryInvariantsTests
 {
     [Fact]

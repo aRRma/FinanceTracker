@@ -15,22 +15,34 @@ namespace Finance.App;
 /// </summary>
 public static class Routes
 {
-    /// <summary>Справочник счетов.</summary>
+    /// <summary>
+    /// Справочник счетов.
+    /// </summary>
     public const string Accounts = "accounts";
 
-    /// <summary>Карточка счёта: заведение и правка.</summary>
+    /// <summary>
+    /// Карточка счёта: заведение и правка.
+    /// </summary>
     public const string Account = "account-card";
 
-    /// <summary>Справочник мест.</summary>
+    /// <summary>
+    /// Справочник мест.
+    /// </summary>
     public const string Places = "places";
 
-    /// <summary>Карточка места: переименование и удаление. Параметр <c>key</c> — ключ места.</summary>
+    /// <summary>
+    /// Карточка места: переименование и удаление. Параметр <c>key</c> — ключ места.
+    /// </summary>
     public const string Place = "place-card";
 
-    /// <summary>Справочник категорий.</summary>
+    /// <summary>
+    /// Справочник категорий.
+    /// </summary>
     public const string Categories = "categories";
 
-    /// <summary>Карточка группы: заведение и правка. Параметр <c>key</c> — ключ группы.</summary>
+    /// <summary>
+    /// Карточка группы: заведение и правка. Параметр <c>key</c> — ключ группы.
+    /// </summary>
     public const string Group = "category-group";
 
     /// <summary>
@@ -39,7 +51,9 @@ public static class Routes
     /// </summary>
     public const string Subcategory = "category-subcategory";
 
-    /// <summary>Лента одного счёта. Параметр <c>key</c> — ключ счёта.</summary>
+    /// <summary>
+    /// Лента одного счёта. Параметр <c>key</c> — ключ счёта.
+    /// </summary>
     public const string AccountFeed = "account-feed";
 
     /// <summary>
@@ -61,7 +75,9 @@ public static class Routes
     /// </summary>
     public const string PickCategory = "transactions/pick-category";
 
-    /// <summary>Выбор места. Параметр <c>current</c> — место, стоящее в форме.</summary>
+    /// <summary>
+    /// Выбор места. Параметр <c>current</c> — место, стоящее в форме.
+    /// </summary>
     public const string PickPlace = "transactions/pick-place";
 
     /// <summary>
@@ -71,19 +87,29 @@ public static class Routes
     /// </summary>
     public const string ReportGroup = "reports/group";
 
-    /// <summary>Третий уровень отчёта: операции подкатегории. Параметры те же, <c>key</c> — ключ подкатегории.</summary>
+    /// <summary>
+    /// Третий уровень отчёта: операции подкатегории. Параметры те же, <c>key</c> — ключ подкатегории.
+    /// </summary>
     public const string ReportSubcategory = "reports/subcategory";
 
-    /// <summary>Выбор темы оформления.</summary>
+    /// <summary>
+    /// Выбор темы оформления.
+    /// </summary>
     public const string Appearance = "settings/appearance";
 
-    /// <summary>Выбор часового пояса.</summary>
+    /// <summary>
+    /// Выбор часового пояса.
+    /// </summary>
     public const string TimeZone = "settings/time-zone";
 
-    /// <summary>Версия приложения и номер схемы базы.</summary>
+    /// <summary>
+    /// Версия приложения и номер схемы базы.
+    /// </summary>
     public const string About = "settings/about";
 
-    /// <summary>Регистрирует маршруты в каркасе навигации.</summary>
+    /// <summary>
+    /// Регистрирует маршруты в каркасе навигации.
+    /// </summary>
     public static void Register()
     {
         Routing.RegisterRoute(Accounts, typeof(AccountsPage));

@@ -3,14 +3,18 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экран C-02: карточка подкатегории — заведение, правка, перенос и удаление.</summary>
+/// <summary>
+/// Экран C-02: карточка подкатегории — заведение, правка, перенос и удаление.
+/// </summary>
 [QueryProperty(nameof(Key), "key")]
 [QueryProperty(nameof(Group), "group")]
 public partial class SubcategoryPage : DataPage
 {
     private readonly SubcategoryViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления карточки подкатегории.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public SubcategoryPage(SubcategoryViewModel model, FinanceStartup startup)
@@ -24,10 +28,14 @@ public partial class SubcategoryPage : DataPage
         BindingContext = model;
     }
 
-    /// <summary>Ключ правимой подкатегории из маршрута. Пусто — заводится новая.</summary>
+    /// <summary>
+    /// Ключ правимой подкатегории из маршрута. Пусто — заводится новая.
+    /// </summary>
     public string? Key { get; set; }
 
-    /// <summary>Группа новой подкатегории из маршрута.</summary>
+    /// <summary>
+    /// Группа новой подкатегории из маршрута.
+    /// </summary>
     public string? Group { get; set; }
 
     /// <inheritdoc />

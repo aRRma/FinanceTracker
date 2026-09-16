@@ -14,7 +14,9 @@ public abstract class DataPage : ContentPage
 
     private bool _loaded;
 
-    /// <summary>Создаёт страницу.</summary>
+    /// <summary>
+    /// Создаёт страницу.
+    /// </summary>
     /// <param name="startup">Подготовка приложения: миграции, стартовый набор, часовой пояс.</param>
     protected DataPage(FinanceStartup startup)
     {
@@ -23,7 +25,9 @@ public abstract class DataPage : ContentPage
         _startup = startup;
     }
 
-    /// <summary>Читает то, что показывает страница.</summary>
+    /// <summary>
+    /// Читает то, что показывает страница.
+    /// </summary>
     protected abstract Task LoadAsync();
 
     /// <summary>

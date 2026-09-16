@@ -12,7 +12,9 @@ public sealed class DatabaseBootstrapper
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
     private readonly DatabaseLocation _location;
 
-    /// <summary>Создаёт подготовку базы.</summary>
+    /// <summary>
+    /// Создаёт подготовку базы.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     /// <param name="location">Где лежит файл базы и её резервная копия.</param>
     public DatabaseBootstrapper(IDbContextFactory<FinanceDbContext> contexts, DatabaseLocation location)
@@ -146,7 +148,9 @@ public sealed class DatabaseBootstrapper
         }
     }
 
-    /// <summary>Возвращает базу из копии, снятой перед миграцией.</summary>
+    /// <summary>
+    /// Возвращает базу из копии, снятой перед миграцией.
+    /// </summary>
     private void RestoreFromBackup()
     {
         if (!File.Exists(_location.BackupPath))

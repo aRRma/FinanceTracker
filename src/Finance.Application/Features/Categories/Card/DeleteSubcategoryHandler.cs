@@ -1,7 +1,8 @@
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Rules;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Features.Categories.Card;
@@ -16,7 +17,9 @@ public sealed class DeleteSubcategoryHandler : IDeleteSubcategoryHandler
     private readonly UnitOfWork _unitOfWork;
     private readonly IClock _clock;
 
-    /// <summary>Создаёт обработчик.</summary>
+    /// <summary>
+    /// Создаёт обработчик.
+    /// </summary>
     /// <param name="unitOfWork">Граница транзакции.</param>
     /// <param name="clock">Часы: момент удаления.</param>
     public DeleteSubcategoryHandler(UnitOfWork unitOfWork, IClock clock)
@@ -63,7 +66,9 @@ public sealed class DeleteSubcategoryHandler : IDeleteSubcategoryHandler
             },
             cancellationToken);
 
-    /// <summary>Приёмник выбирает домен: ему для этого нужны группа и все её подкатегории.</summary>
+    /// <summary>
+    /// Приёмник выбирает домен: ему для этого нужны группа и все её подкатегории.
+    /// </summary>
     private static async Task<Category> ReceiverForAsync(
         FinanceDbContext context,
         Category deleted,

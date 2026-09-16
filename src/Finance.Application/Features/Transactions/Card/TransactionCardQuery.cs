@@ -3,12 +3,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Features.Transactions.Card;
 
-/// <summary>Чтение операции для карточки правки.</summary>
+/// <summary>
+/// Чтение операции для карточки правки.
+/// </summary>
 public sealed class TransactionCardQuery : ITransactionCardQuery
 {
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
 
-    /// <summary>Создаёт запрос.</summary>
+    /// <summary>
+    /// Создаёт запрос.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     public TransactionCardQuery(IDbContextFactory<FinanceDbContext> contexts)
     {

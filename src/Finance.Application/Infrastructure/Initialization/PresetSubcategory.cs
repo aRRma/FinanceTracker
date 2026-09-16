@@ -1,8 +1,10 @@
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Infrastructure.Initialization;
 
-/// <summary>Подкатегория стартового набора.</summary>
+/// <summary>
+/// Подкатегория стартового набора.
+/// </summary>
 /// <param name="Key">Устойчивый текстовый ключ вида <c>группа.подкатегория</c>.</param>
 /// <param name="Name">Название подкатегории.</param>
 /// <param name="Icon">Ключ значка.</param>

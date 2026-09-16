@@ -1,6 +1,13 @@
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Rules;
+
 namespace Finance.Domain.Tests;
 
-/// <summary>Проверки операции против её счетов и категории.</summary>
+/// <summary>
+/// Проверки операции против её счетов и категории.
+/// </summary>
 public sealed class TransactionRulesTests
 {
     private static readonly Category Food = Given.Group("Еда");

@@ -8,21 +8,33 @@ namespace Finance.Application.Infrastructure;
 [Flags]
 public enum DataChange
 {
-    /// <summary>Ничего не изменилось.</summary>
+    /// <summary>
+    /// Ничего не изменилось.
+    /// </summary>
     None = 0,
 
-    /// <summary>Счета: состав, порядок, признаки, начальный остаток.</summary>
+    /// <summary>
+    /// Счета: состав, порядок, признаки, начальный остаток.
+    /// </summary>
     Accounts = 1,
 
-    /// <summary>Категории обоих уровней.</summary>
+    /// <summary>
+    /// Категории обоих уровней.
+    /// </summary>
     Categories = 2,
 
-    /// <summary>Справочник мест.</summary>
+    /// <summary>
+    /// Справочник мест.
+    /// </summary>
     Places = 4,
 
-    /// <summary>Операции, а вместе с ними балансы, лента и отчёт.</summary>
+    /// <summary>
+    /// Операции, а вместе с ними балансы, лента и отчёт.
+    /// </summary>
     Transactions = 8,
 
-    /// <summary>Локальные настройки устройства.</summary>
+    /// <summary>
+    /// Локальные настройки устройства.
+    /// </summary>
     Settings = 16
 }

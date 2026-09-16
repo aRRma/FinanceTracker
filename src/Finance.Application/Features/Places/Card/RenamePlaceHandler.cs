@@ -1,7 +1,8 @@
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Rules;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Features.Places.Card;
@@ -14,7 +15,9 @@ public sealed class RenamePlaceHandler : IRenamePlaceHandler
 {
     private readonly UnitOfWork _unitOfWork;
 
-    /// <summary>Создаёт обработчик.</summary>
+    /// <summary>
+    /// Создаёт обработчик.
+    /// </summary>
     /// <param name="unitOfWork">Граница транзакции.</param>
     public RenamePlaceHandler(UnitOfWork unitOfWork)
     {

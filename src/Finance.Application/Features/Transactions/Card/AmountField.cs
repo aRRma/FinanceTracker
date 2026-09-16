@@ -7,9 +7,18 @@ namespace Finance.Application.Features.Transactions.Card;
 /// </summary>
 public enum AmountField
 {
-    /// <summary>Сумма списания. Ею набор и начинается.</summary>
-    Source,
+    /// <summary>
+    /// Значение неинициализированной переменной. Набираемым полем не бывает.
+    /// </summary>
+    Unknown = 0,
 
-    /// <summary>Сумма зачисления — только у перевода между разными валютами.</summary>
-    Target
+    /// <summary>
+    /// Сумма списания. Ею набор и начинается.
+    /// </summary>
+    Source = 1,
+
+    /// <summary>
+    /// Сумма зачисления — только у перевода между разными валютами.
+    /// </summary>
+    Target = 2
 }

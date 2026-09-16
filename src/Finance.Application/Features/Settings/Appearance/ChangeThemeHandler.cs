@@ -14,7 +14,9 @@ public sealed class ChangeThemeHandler : IChangeThemeHandler
     private readonly ThemeApplier _applier;
     private readonly IChangeNotifier _changes;
 
-    /// <summary>Создаёт обработчик.</summary>
+    /// <summary>
+    /// Создаёт обработчик.
+    /// </summary>
     /// <param name="settings">Локальные настройки устройства.</param>
     /// <param name="applier">Применение темы платформой.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>

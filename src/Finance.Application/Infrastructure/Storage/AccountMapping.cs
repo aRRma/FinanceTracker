@@ -1,5 +1,6 @@
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Infrastructure.Storage;
 
@@ -12,7 +13,9 @@ internal static class AccountMapping
 {
     extension(AccountRow row)
     {
-        /// <summary>Собирает доменный счёт из строки.</summary>
+        /// <summary>
+        /// Собирает доменный счёт из строки.
+        /// </summary>
         public Account ToDomain() =>
             Account.Restore(
                 row.Key,
@@ -33,7 +36,9 @@ internal static class AccountMapping
 
     extension(Account account)
     {
-        /// <summary>Заводит новую строку по счёту.</summary>
+        /// <summary>
+        /// Заводит новую строку по счёту.
+        /// </summary>
         public AccountRow ToRow() =>
             new()
             {
@@ -53,7 +58,9 @@ internal static class AccountMapping
                 SortOrder = account.SortOrder
             };
 
-        /// <summary>Переносит изменения счёта в отслеживаемую строку.</summary>
+        /// <summary>
+        /// Переносит изменения счёта в отслеживаемую строку.
+        /// </summary>
         public void CopyTo(AccountRow row)
         {
             ArgumentNullException.ThrowIfNull(row);

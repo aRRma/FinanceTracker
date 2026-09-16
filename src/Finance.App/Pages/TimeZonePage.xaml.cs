@@ -3,12 +3,16 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экран D-08: выбор часового пояса.</summary>
+/// <summary>
+/// Экран D-08: выбор часового пояса.
+/// </summary>
 public partial class TimeZonePage : DataPage
 {
     private readonly TimeZoneViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления экрана часового пояса.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public TimeZonePage(TimeZoneViewModel model, FinanceStartup startup)

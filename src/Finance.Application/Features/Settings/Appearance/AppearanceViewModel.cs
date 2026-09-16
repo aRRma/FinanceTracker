@@ -16,7 +16,9 @@ public sealed partial class AppearanceViewModel : ScreenViewModel
     private readonly ISettingsSummaryQuery _summary;
     private readonly IChangeThemeHandler _change;
 
-    /// <summary>Создаёт модель представления экрана оформления.</summary>
+    /// <summary>
+    /// Создаёт модель представления экрана оформления.
+    /// </summary>
     /// <param name="summary">Состояние настроек.</param>
     /// <param name="change">Выбор темы.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
@@ -33,14 +35,20 @@ public sealed partial class AppearanceViewModel : ScreenViewModel
         _change = change;
     }
 
-    /// <summary>Три темы: как в системе, светлая, тёмная.</summary>
+    /// <summary>
+    /// Три темы: как в системе, светлая, тёмная.
+    /// </summary>
     public ObservableCollection<ThemeOption> Options { get; } = [];
 
-    /// <summary>Выбранная сейчас тема.</summary>
+    /// <summary>
+    /// Выбранная сейчас тема.
+    /// </summary>
     [ObservableProperty]
     public partial Theme Current { get; private set; } = Theme.System;
 
-    /// <summary>Перечитывает выбор.</summary>
+    /// <summary>
+    /// Перечитывает выбор.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
@@ -54,7 +62,9 @@ public sealed partial class AppearanceViewModel : ScreenViewModel
         Rebuild();
     }
 
-    /// <summary>Ставит тему, выбранную в списке.</summary>
+    /// <summary>
+    /// Ставит тему, выбранную в списке.
+    /// </summary>
     /// <param name="theme">Выбранная тема.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]

@@ -5,7 +5,8 @@ using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Tests;
@@ -30,13 +31,19 @@ internal sealed class TransactionFixture : IAsyncDisposable
 
     public TestDatabase Database { get; }
 
-    /// <summary>Любая расходная подкатегория стартового набора.</summary>
+    /// <summary>
+    /// Любая расходная подкатегория стартового набора.
+    /// </summary>
     public Guid ExpenseCategory { get; }
 
-    /// <summary>Любая доходная подкатегория стартового набора.</summary>
+    /// <summary>
+    /// Любая доходная подкатегория стартового набора.
+    /// </summary>
     public Guid IncomeCategory { get; }
 
-    /// <summary>Сегодняшняя дата по часам приложения: дата операции не может быть в будущем.</summary>
+    /// <summary>
+    /// Сегодняшняя дата по часам приложения: дата операции не может быть в будущем.
+    /// </summary>
     public DateOnly Today => Database.Resolve<Finance.Application.Infrastructure.IClock>().Today;
 
     public static async Task<TransactionFixture> CreateAsync()
@@ -161,7 +168,9 @@ internal sealed class TransactionFixture : IAsyncDisposable
     public Task<FeedPage> FeedAsync(Guid? account = null, int skip = 0, int take = 50) =>
         Database.Resolve<IFeedQuery>().ReadAsync(account, skip, take);
 
-    /// <summary>Первый уровень отчёта за месяц; пусто — за текущий.</summary>
+    /// <summary>
+    /// Первый уровень отчёта за месяц; пусто — за текущий.
+    /// </summary>
     public Task<IReadOnlyList<ReportTotal>> ReportAsync(ReportMonth? month = null) =>
         Database.Resolve<IReportQuery>().ReadGroupsAsync(month ?? ReportMonth.Of(Today));
 

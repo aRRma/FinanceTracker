@@ -1,4 +1,4 @@
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Features.Transactions.Card;
 
@@ -14,6 +14,8 @@ namespace Finance.Application.Features.Transactions.Card;
 /// <param name="Icon">Ключ значка.</param>
 public sealed record CategoryOption(Guid Key, string Name, string GroupName, CategoryKind Kind, string Icon)
 {
-    /// <summary>Подпись строки выбора: группа и подкатегория.</summary>
+    /// <summary>
+    /// Подпись строки выбора: группа и подкатегория.
+    /// </summary>
     public string Label => $"{GroupName} · {Name}";
 }

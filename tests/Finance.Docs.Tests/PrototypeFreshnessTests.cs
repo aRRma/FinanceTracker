@@ -16,7 +16,9 @@ namespace Finance.Docs.Tests;
 /// </remarks>
 public sealed partial class PrototypeFreshnessTests
 {
-    /// <summary>Прототип пересобран после последней правки макетов и самого сборщика.</summary>
+    /// <summary>
+    /// Прототип пересобран после последней правки макетов и самого сборщика.
+    /// </summary>
     [Fact]
     public void Прототип_собран_из_нынешних_макетов()
     {
@@ -46,7 +48,9 @@ public sealed partial class PrototypeFreshnessTests
         Assert.Equal(64, Fingerprint(Documents.Mockups).Length);
     }
 
-    /// <summary>Отпечатки источников, проставленные сборщиком.</summary>
+    /// <summary>
+    /// Отпечатки источников, проставленные сборщиком.
+    /// </summary>
     [GeneratedRegex("""<!-- отпечатки источников: mockups\.html=(?<mockups>[0-9a-f]{64}) build_prototype\.py=(?<builder>[0-9a-f]{64}) -->""")]
     private static partial Regex Stamp();
 

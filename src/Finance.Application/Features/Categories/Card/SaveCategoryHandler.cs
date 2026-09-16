@@ -1,7 +1,9 @@
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Rules;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Features.Categories.Card;
@@ -23,7 +25,9 @@ public sealed class SaveCategoryHandler : ISaveCategoryHandler
     private readonly IClock _clock;
     private readonly IconCatalog _icons;
 
-    /// <summary>Создаёт обработчик.</summary>
+    /// <summary>
+    /// Создаёт обработчик.
+    /// </summary>
     /// <param name="unitOfWork">Граница транзакции.</param>
     /// <param name="clock">Часы: момент записи.</param>
     /// <param name="icons">Набор значков: запасным помечается приёмник.</param>
@@ -190,7 +194,9 @@ public sealed class SaveCategoryHandler : ISaveCategoryHandler
         subcategory.MoveTo(current, target, neighbours.Select(static neighbour => neighbour.Name));
     }
 
-    /// <summary>Имя группы уникально среди групп своего вида: доходная и расходная «Еда» сосуществуют.</summary>
+    /// <summary>
+    /// Имя группы уникально среди групп своего вида: доходная и расходная «Еда» сосуществуют.
+    /// </summary>
     private static async Task EnsureGroupNameFreeAsync(
         FinanceDbContext context,
         string name,
@@ -221,7 +227,9 @@ public sealed class SaveCategoryHandler : ISaveCategoryHandler
         }
     }
 
-    /// <summary>Имя подкатегории уникально внутри группы; при переносе — внутри целевой.</summary>
+    /// <summary>
+    /// Имя подкатегории уникально внутри группы; при переносе — внутри целевой.
+    /// </summary>
     private static async Task EnsureSubcategoryNameFreeAsync(
         FinanceDbContext context,
         string name,

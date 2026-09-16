@@ -1,9 +1,15 @@
+using Finance.Domain.Values;
+
 namespace Finance.Domain.Tests;
 
-/// <summary>Ключи сущностей: UUIDv7 с клиента и детерминированный UUIDv5 для стартового набора.</summary>
+/// <summary>
+/// Ключи сущностей: UUIDv7 с клиента и детерминированный UUIDv5 для стартового набора.
+/// </summary>
 public sealed class KeysTests
 {
-    /// <summary>Пространство имён DNS из RFC 9562 — для эталонного вектора.</summary>
+    /// <summary>
+    /// Пространство имён DNS из RFC 9562 — для эталонного вектора.
+    /// </summary>
     private static readonly Guid DnsNamespace = Guid.Parse("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
 
     [Fact]

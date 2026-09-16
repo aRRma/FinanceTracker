@@ -12,7 +12,9 @@ public abstract class ScreenViewModel : ObservableObject, IScreenModel
 {
     private readonly IChangeNotifier _changes;
 
-    /// <summary>Создаёт модель экрана.</summary>
+    /// <summary>
+    /// Создаёт модель экрана.
+    /// </summary>
     /// <param name="changes">Оповещение об изменении данных.</param>
     protected ScreenViewModel(IChangeNotifier changes)
     {
@@ -24,10 +26,14 @@ public abstract class ScreenViewModel : ObservableObject, IScreenModel
     /// <inheritdoc />
     public event Action<Exception>? ReloadFailed;
 
-    /// <summary>Какие изменения устаревают этот экран.</summary>
+    /// <summary>
+    /// Какие изменения устаревают этот экран.
+    /// </summary>
     protected abstract DataChange Watched { get; }
 
-    /// <summary>Перечитывает экран после изменения.</summary>
+    /// <summary>
+    /// Перечитывает экран после изменения.
+    /// </summary>
     protected abstract Task ReloadAsync();
 
     /// <inheritdoc />

@@ -14,7 +14,9 @@ public sealed class ChangeTimeZoneHandler : IChangeTimeZoneHandler
     private readonly SystemClock _clock;
     private readonly IChangeNotifier _changes;
 
-    /// <summary>Создаёт обработчик.</summary>
+    /// <summary>
+    /// Создаёт обработчик.
+    /// </summary>
     /// <param name="settings">Локальные настройки устройства.</param>
     /// <param name="clock">Часы приложения: им ставится пояс.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>

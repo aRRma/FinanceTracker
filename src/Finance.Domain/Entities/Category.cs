@@ -1,4 +1,9 @@
-namespace Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Rules;
+using Finance.Domain.Values;
+
+namespace Finance.Domain.Entities;
 
 /// <summary>
 /// Категория: группа первого уровня или подкатегория второго. Ровно два уровня —
@@ -37,10 +42,14 @@ public sealed class Category : Entity
     /// </summary>
     public Guid? ParentKey { get; private set; }
 
-    /// <summary>Вид. Задан только у группы; подкатегория наследует его и своего не имеет.</summary>
+    /// <summary>
+    /// Вид. Задан только у группы; подкатегория наследует его и своего не имеет.
+    /// </summary>
     public CategoryKind? Kind { get; }
 
-    /// <summary>Название категории.</summary>
+    /// <summary>
+    /// Название категории.
+    /// </summary>
     public string Name { get; private set; }
 
     /// <summary>
@@ -49,19 +58,29 @@ public sealed class Category : Entity
     /// </summary>
     public string Icon { get; private set; }
 
-    /// <summary>Роль: обычная, приёмник «Прочее» или служебная.</summary>
+    /// <summary>
+    /// Роль: обычная, приёмник «Прочее» или служебная.
+    /// </summary>
     public CategoryRole Role { get; }
 
-    /// <summary>Не показывать в отчёте и не включать в его суммы.</summary>
+    /// <summary>
+    /// Не показывать в отчёте и не включать в его суммы.
+    /// </summary>
     public bool ExcludeFromReports { get; }
 
-    /// <summary>Категория — группа первого уровня.</summary>
+    /// <summary>
+    /// Категория — группа первого уровня.
+    /// </summary>
     public bool IsGroup => ParentKey is null;
 
-    /// <summary>Категория — подкатегория второго уровня.</summary>
+    /// <summary>
+    /// Категория — подкатегория второго уровня.
+    /// </summary>
     public bool IsSubcategory => ParentKey is not null;
 
-    /// <summary>Категория неудаляема и не переносится: приёмник «Прочее» или служебная.</summary>
+    /// <summary>
+    /// Категория неудаляема и не переносится: приёмник «Прочее» или служебная.
+    /// </summary>
     public bool IsProtected => Role is CategoryRole.Other or CategoryRole.Service;
 
     /// <summary>
@@ -142,7 +161,9 @@ public sealed class Category : Entity
     /// </summary>
     public void Rename(string name) => Name = Names.Normalize(name, "категория");
 
-    /// <summary>Меняет значок.</summary>
+    /// <summary>
+    /// Меняет значок.
+    /// </summary>
     public void ChangeIcon(string icon) => Icon = NormalizeIcon(icon);
 
     /// <summary>

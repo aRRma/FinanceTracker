@@ -3,7 +3,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Features.Balances;
 
@@ -15,7 +16,9 @@ public sealed partial class BalancesViewModel : ScreenViewModel
 {
     private readonly IAccountsQuery _accounts;
 
-    /// <summary>Создаёт модель представления главного экрана.</summary>
+    /// <summary>
+    /// Создаёт модель представления главного экрана.
+    /// </summary>
     /// <param name="accounts">Список счетов с балансами.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
     public BalancesViewModel(IAccountsQuery accounts, IChangeNotifier changes)
@@ -26,7 +29,9 @@ public sealed partial class BalancesViewModel : ScreenViewModel
         _accounts = accounts;
     }
 
-    /// <summary>Разделы по валютам, в порядке появления счетов.</summary>
+    /// <summary>
+    /// Разделы по валютам, в порядке появления счетов.
+    /// </summary>
     public ObservableCollection<CurrencySection> Sections { get; } = [];
 
     /// <summary>
@@ -54,10 +59,14 @@ public sealed partial class BalancesViewModel : ScreenViewModel
     [NotifyPropertyChangedFor(nameof(HasAccounts))]
     public partial bool IsEmpty { get; private set; }
 
-    /// <summary>Счета есть — показывается список, а не приглашение завести первый.</summary>
+    /// <summary>
+    /// Счета есть — показывается список, а не приглашение завести первый.
+    /// </summary>
     public bool HasAccounts => IsLoaded && !IsEmpty;
 
-    /// <summary>Перечитывает счета и балансы.</summary>
+    /// <summary>
+    /// Перечитывает счета и балансы.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
@@ -93,7 +102,9 @@ public sealed partial class BalancesViewModel : ScreenViewModel
         }
     }
 
-    /// <summary>Разделы по валютам: сначала те, где счета появились раньше.</summary>
+    /// <summary>
+    /// Разделы по валютам: сначала те, где счета появились раньше.
+    /// </summary>
     private static IEnumerable<CurrencySection> BuildSections(IReadOnlyList<AccountListItem> accounts)
     {
         foreach (IGrouping<Currency, AccountListItem> group in accounts.GroupBy(account => account.Balance.Currency))

@@ -1,8 +1,10 @@
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Infrastructure.Initialization;
 
-/// <summary>Группа стартового набора.</summary>
+/// <summary>
+/// Группа стартового набора.
+/// </summary>
 /// <param name="Key">Устойчивый текстовый ключ. Из него выводится идентификатор, менять нельзя.</param>
 /// <param name="Name">Название группы.</param>
 /// <param name="Kind">Доход или расход. Подкатегории наследуют.</param>

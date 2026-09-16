@@ -1,10 +1,12 @@
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Features.Feed;
 
-/// <summary>Строка ленты на экране: заголовок, подпись, сумма со знаком.</summary>
+/// <summary>
+/// Строка ленты на экране: заголовок, подпись, сумма со знаком.
+/// </summary>
 /// <param name="Key">Ключ операции — по нему открывается карточка.</param>
 /// <param name="Title">Подкатегория; у перевода — второй счёт в ленте счёта, заметка или «Перевод» в общей ленте.</param>
 /// <param name="Caption">Подпись под заголовком: заметка, место или группа, в общей ленте ещё и счёт; у перевода в общей ленте — «откуда → куда».</param>

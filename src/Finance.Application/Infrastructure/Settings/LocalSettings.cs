@@ -4,12 +4,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Infrastructure.Settings;
 
-/// <summary>Настройки в таблице <c>settings</c> локальной базы.</summary>
+/// <summary>
+/// Настройки в таблице <c>settings</c> локальной базы.
+/// </summary>
 public sealed class LocalSettings : ILocalSettings
 {
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
 
-    /// <summary>Создаёт службу настроек.</summary>
+    /// <summary>
+    /// Создаёт службу настроек.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     public LocalSettings(IDbContextFactory<FinanceDbContext> contexts)
     {

@@ -12,7 +12,9 @@ public partial class PlacePickerPage : DataPage
 {
     private readonly PlacePickerViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления выбора места.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public PlacePickerPage(PlacePickerViewModel model, FinanceStartup startup)
@@ -26,7 +28,9 @@ public partial class PlacePickerPage : DataPage
         BindingContext = model;
     }
 
-    /// <summary>Место, стоящее в форме сейчас.</summary>
+    /// <summary>
+    /// Место, стоящее в форме сейчас.
+    /// </summary>
     public string? Current { get; set; }
 
     /// <inheritdoc />

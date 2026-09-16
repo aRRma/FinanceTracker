@@ -19,7 +19,9 @@ public sealed partial class PlacePickerViewModel : ObservableObject
     private IReadOnlyList<PlaceListItem> _all = [];
     private string _current = string.Empty;
 
-    /// <summary>Создаёт модель представления выбора места.</summary>
+    /// <summary>
+    /// Создаёт модель представления выбора места.
+    /// </summary>
     /// <param name="places">Справочник мест со счётчиками.</param>
     /// <param name="picks">Куда кладётся выбор для формы операции.</param>
     public PlacePickerViewModel(IPlacesQuery places, TransactionPicks picks)
@@ -31,29 +33,41 @@ public sealed partial class PlacePickerViewModel : ObservableObject
         _picks = picks;
     }
 
-    /// <summary>Места, подходящие под набранное.</summary>
+    /// <summary>
+    /// Места, подходящие под набранное.
+    /// </summary>
     public ObservableCollection<PlacePickerRow> Rows { get; } = [];
 
-    /// <summary>Идёт чтение.</summary>
+    /// <summary>
+    /// Идёт чтение.
+    /// </summary>
     [ObservableProperty]
     public partial bool IsBusy { get; set; }
 
-    /// <summary>Набранное в поиске — оно же имя нового места.</summary>
+    /// <summary>
+    /// Набранное в поиске — оно же имя нового места.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanCreate))]
     [NotifyPropertyChangedFor(nameof(CreateCaption))]
     public partial string Filter { get; set; } = string.Empty;
 
-    /// <summary>Справочник прочитан — до этого пустой список ещё ничего не значит.</summary>
+    /// <summary>
+    /// Справочник прочитан — до этого пустой список ещё ничего не значит.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsEmpty))]
     public partial bool IsLoaded { get; private set; }
 
-    /// <summary>В форме уже стоит место — его можно снять.</summary>
+    /// <summary>
+    /// В форме уже стоит место — его можно снять.
+    /// </summary>
     [ObservableProperty]
     public partial bool CanClear { get; private set; }
 
-    /// <summary>Набрано название, которого в справочнике нет, — его предлагается завести.</summary>
+    /// <summary>
+    /// Набрано название, которого в справочнике нет, — его предлагается завести.
+    /// </summary>
     public bool CanCreate
     {
         get
@@ -65,13 +79,19 @@ public sealed partial class PlacePickerViewModel : ObservableObject
         }
     }
 
-    /// <summary>Подпись строки заведения нового места.</summary>
+    /// <summary>
+    /// Подпись строки заведения нового места.
+    /// </summary>
     public string CreateCaption => $"Создать «{Filter.Trim()}»";
 
-    /// <summary>Мест нет вовсе, и набрать пока нечего.</summary>
+    /// <summary>
+    /// Мест нет вовсе, и набрать пока нечего.
+    /// </summary>
     public bool IsEmpty => IsLoaded && Rows.Count is 0 && !CanCreate;
 
-    /// <summary>Читает справочник мест.</summary>
+    /// <summary>
+    /// Читает справочник мест.
+    /// </summary>
     /// <param name="current">Место, стоящее в форме сейчас, — оно помечено галочкой.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     public async Task LoadAsync(string? current, CancellationToken cancellationToken = default)
@@ -97,7 +117,9 @@ public sealed partial class PlacePickerViewModel : ObservableObject
         }
     }
 
-    /// <summary>Запоминает выбранное место.</summary>
+    /// <summary>
+    /// Запоминает выбранное место.
+    /// </summary>
     /// <param name="row">Выбранная строка.</param>
     [RelayCommand]
     public void Pick(PlacePickerRow row)
@@ -115,11 +137,15 @@ public sealed partial class PlacePickerViewModel : ObservableObject
     [RelayCommand]
     public void Create() => _picks.PlaceName = Filter.Trim();
 
-    /// <summary>Снимает место с операции.</summary>
+    /// <summary>
+    /// Снимает место с операции.
+    /// </summary>
     [RelayCommand]
     public void ClearPlace() => _picks.PlaceName = string.Empty;
 
-    /// <summary>Пересобирает список из прочитанного — в базу за этим не ходят.</summary>
+    /// <summary>
+    /// Пересобирает список из прочитанного — в базу за этим не ходят.
+    /// </summary>
     partial void OnFilterChanged(string value) => Rebuild();
 
     private void Rebuild()

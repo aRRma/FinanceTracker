@@ -1,14 +1,18 @@
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Entities;
 
 namespace Finance.Application.Infrastructure.Storage;
 
-/// <summary>Перекладывание места между строкой базы и доменным типом.</summary>
+/// <summary>
+/// Перекладывание места между строкой базы и доменным типом.
+/// </summary>
 internal static class PlaceMapping
 {
     extension(PlaceRow row)
     {
-        /// <summary>Собирает доменное место из строки.</summary>
+        /// <summary>
+        /// Собирает доменное место из строки.
+        /// </summary>
         public Place ToDomain() =>
             Place.Restore(
                 row.Key,
@@ -22,7 +26,9 @@ internal static class PlaceMapping
 
     extension(Place place)
     {
-        /// <summary>Заводит новую строку по месту.</summary>
+        /// <summary>
+        /// Заводит новую строку по месту.
+        /// </summary>
         public PlaceRow ToRow() =>
             new()
             {
@@ -35,7 +41,9 @@ internal static class PlaceMapping
                 Name = place.Name
             };
 
-        /// <summary>Переносит изменения места в отслеживаемую строку.</summary>
+        /// <summary>
+        /// Переносит изменения места в отслеживаемую строку.
+        /// </summary>
         public void CopyTo(PlaceRow row)
         {
             ArgumentNullException.ThrowIfNull(row);

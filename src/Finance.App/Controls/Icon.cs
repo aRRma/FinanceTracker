@@ -12,10 +12,14 @@ namespace Finance.App.Controls;
 /// </remarks>
 public sealed class Icon : Shape
 {
-    /// <summary>Сторона значка в единицах контура: набор нарисован в сетке 24×24.</summary>
+    /// <summary>
+    /// Сторона значка в единицах контура: набор нарисован в сетке 24×24.
+    /// </summary>
     private const double Side = 24;
 
-    /// <summary>Ключ значка.</summary>
+    /// <summary>
+    /// Ключ значка.
+    /// </summary>
     public static readonly BindableProperty KeyProperty = BindableProperty.Create(
         nameof(Key),
         typeof(string),
@@ -24,7 +28,9 @@ public sealed class Icon : Shape
 
     private PathF _path = IconGeometry.For(null);
 
-    /// <summary>Создаёт значок с размером и линией набора; ключ задаётся привязкой.</summary>
+    /// <summary>
+    /// Создаёт значок с размером и линией набора; ключ задаётся привязкой.
+    /// </summary>
     public Icon()
     {
         WidthRequest = Side;
@@ -34,7 +40,9 @@ public sealed class Icon : Shape
         StrokeLineJoin = PenLineJoin.Round;
     }
 
-    /// <summary>Ключ значка из набора. Неизвестный рисуется запасным.</summary>
+    /// <summary>
+    /// Ключ значка из набора. Неизвестный рисуется запасным.
+    /// </summary>
     public string? Key
     {
         get => (string?)GetValue(KeyProperty);

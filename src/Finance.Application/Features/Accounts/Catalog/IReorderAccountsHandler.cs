@@ -1,6 +1,8 @@
 namespace Finance.Application.Features.Accounts.Catalog;
 
-/// <summary>Перестановка счетов в списке перетаскиванием.</summary>
+/// <summary>
+/// Перестановка счетов в списке перетаскиванием.
+/// </summary>
 public interface IReorderAccountsHandler
 {
     /// <summary>

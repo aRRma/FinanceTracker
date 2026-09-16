@@ -12,7 +12,9 @@ namespace Finance.Application.Infrastructure.Storage;
 /// </summary>
 internal sealed class UtcMomentConverter : ValueConverter<DateTimeOffset, string>
 {
-    /// <summary>Семь знаков долей секунды всегда: разная длина ломает сравнение текста.</summary>
+    /// <summary>
+    /// Семь знаков долей секунды всегда: разная длина ломает сравнение текста.
+    /// </summary>
     private const string Format = "yyyy-MM-dd HH:mm:ss.fffffff+00:00";
 
     public UtcMomentConverter()

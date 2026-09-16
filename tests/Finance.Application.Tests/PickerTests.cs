@@ -2,7 +2,7 @@ using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Tests;
 
@@ -13,7 +13,9 @@ namespace Finance.Application.Tests;
 /// </summary>
 public sealed class PickerTests
 {
-    /// <summary>Выбранный счёт доезжает до формы и меняет валюту суммы вместе с собой.</summary>
+    /// <summary>
+    /// Выбранный счёт доезжает до формы и меняет валюту суммы вместе с собой.
+    /// </summary>
     [Fact]
     public async Task Выбранный_счёт_подставляется_в_форму()
     {
@@ -41,7 +43,9 @@ public sealed class PickerTests
         Assert.Equal("1", form.Amount);
     }
 
-    /// <summary>Выбор забирается один раз: следующее появление формы ничего не меняет.</summary>
+    /// <summary>
+    /// Выбор забирается один раз: следующее появление формы ничего не меняет.
+    /// </summary>
     [Fact]
     public async Task Выбор_забирается_один_раз()
     {
@@ -98,7 +102,9 @@ public sealed class PickerTests
         Assert.Equal(cash, form.TargetAccount?.Key);
     }
 
-    /// <summary>Закрытый счёт не предлагается: записывать на него нечего.</summary>
+    /// <summary>
+    /// Закрытый счёт не предлагается: записывать на него нечего.
+    /// </summary>
     [Fact]
     public async Task Закрытый_счёт_не_предлагается()
     {
@@ -114,7 +120,9 @@ public sealed class PickerTests
         Assert.DoesNotContain(old, picker.Sections.SelectMany(section => section).Select(row => row.Key));
     }
 
-    /// <summary>Разные валюты стоят разными разделами: вместе со счётом меняется валюта суммы.</summary>
+    /// <summary>
+    /// Разные валюты стоят разными разделами: вместе со счётом меняется валюта суммы.
+    /// </summary>
     [Fact]
     public async Task Счета_разложены_по_валютам()
     {
@@ -130,7 +138,9 @@ public sealed class PickerTests
         Assert.Equal(["Рубли", "Евро"], picker.Sections.Select(section => section.Title));
     }
 
-    /// <summary>Группы свёрнуты: подкатегория появляется только после разворота.</summary>
+    /// <summary>
+    /// Группы свёрнуты: подкатегория появляется только после разворота.
+    /// </summary>
     [Fact]
     public async Task Группы_категорий_свёрнуты_до_разворота()
     {
@@ -147,7 +157,9 @@ public sealed class PickerTests
         Assert.Contains(picker.Lines, line => line.IsSubcategory);
     }
 
-    /// <summary>Поиск раскрывает группы сам и оставляет только подходящие строки.</summary>
+    /// <summary>
+    /// Поиск раскрывает группы сам и оставляет только подходящие строки.
+    /// </summary>
     [Fact]
     public async Task Поиск_категорий_раскрывает_группы()
     {
@@ -164,7 +176,9 @@ public sealed class PickerTests
         Assert.Equal(["Питомцы", "Корм коту"], picker.Lines.Select(line => line.Name));
     }
 
-    /// <summary>Выбранная подкатегория доезжает до формы, а группа не выбирается вовсе.</summary>
+    /// <summary>
+    /// Выбранная подкатегория доезжает до формы, а группа не выбирается вовсе.
+    /// </summary>
     [Fact]
     public async Task Выбранная_подкатегория_подставляется_в_форму()
     {
@@ -193,7 +207,9 @@ public sealed class PickerTests
         Assert.Equal(subcategory.Key, form.Category?.Key);
     }
 
-    /// <summary>Выбранное место доезжает до формы, а снятие очищает поле.</summary>
+    /// <summary>
+    /// Выбранное место доезжает до формы, а снятие очищает поле.
+    /// </summary>
     [Fact]
     public async Task Место_подставляется_и_снимается()
     {

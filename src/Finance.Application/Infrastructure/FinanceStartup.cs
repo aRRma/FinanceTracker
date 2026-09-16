@@ -23,7 +23,9 @@ public sealed class FinanceStartup
 
     private Task? _prepared;
 
-    /// <summary>Создаёт подготовку приложения.</summary>
+    /// <summary>
+    /// Создаёт подготовку приложения.
+    /// </summary>
     /// <param name="bootstrapper">Подготовка файла базы: копия, миграции, режим журнала.</param>
     /// <param name="initializer">Запись стартового набора при первом запуске.</param>
     /// <param name="settings">Локальные настройки устройства.</param>
@@ -75,7 +77,9 @@ public sealed class FinanceStartup
         }
     }
 
-    /// <summary>Один прогон подготовки: файл базы, стартовый набор, пояс и тема.</summary>
+    /// <summary>
+    /// Один прогон подготовки: файл базы, стартовый набор, пояс и тема.
+    /// </summary>
     private async Task RunOnceAsync(CancellationToken cancellationToken)
     {
         await _bootstrapper.InitializeAsync(cancellationToken).ConfigureAwait(false);

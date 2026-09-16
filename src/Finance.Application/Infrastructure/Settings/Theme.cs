@@ -6,12 +6,24 @@ namespace Finance.Application.Infrastructure.Settings;
 /// </summary>
 public enum Theme
 {
-    /// <summary>Как в системе. Ею же оборачивается незаданная и незнакомая настройка.</summary>
-    System,
+    /// <summary>
+    /// Значение неинициализированной переменной. Выбором пользователя не бывает:
+    /// незаданную и незнакомую настройку разбор сводит к <see cref="System"/>.
+    /// </summary>
+    Unknown = 0,
 
-    /// <summary>Светлая независимо от системной.</summary>
-    Light,
+    /// <summary>
+    /// Как в системе. Ею же оборачивается незаданная и незнакомая настройка.
+    /// </summary>
+    System = 1,
 
-    /// <summary>Тёмная независимо от системной.</summary>
-    Dark
+    /// <summary>
+    /// Светлая независимо от системной.
+    /// </summary>
+    Light = 2,
+
+    /// <summary>
+    /// Тёмная независимо от системной.
+    /// </summary>
+    Dark = 3
 }

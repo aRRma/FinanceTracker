@@ -3,7 +3,9 @@ using Finance.Application.Infrastructure.Queries;
 
 namespace Finance.Application.Features.Balances;
 
-/// <summary>Строка счёта на главном экране: значок, название и баланс.</summary>
+/// <summary>
+/// Строка счёта на главном экране: значок, название и баланс.
+/// </summary>
 /// <param name="Key">Ключ счёта — по нему открывается лента.</param>
 /// <param name="Icon">Ключ значка: наличные, карта или накопления.</param>
 /// <param name="Name">Наименование счёта.</param>
@@ -18,7 +20,9 @@ public sealed record AccountTile(
     bool IsNegative,
     bool IsSavings)
 {
-    /// <summary>Собирает строку экрана из строки списка счетов.</summary>
+    /// <summary>
+    /// Собирает строку экрана из строки списка счетов.
+    /// </summary>
     /// <param name="account">Счёт с уже посчитанным балансом.</param>
     public static AccountTile From(AccountListItem account)
     {

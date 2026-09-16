@@ -1,4 +1,9 @@
-namespace Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Values;
+
+namespace Finance.Domain.Rules;
 
 /// <summary>
 /// Проверки операции, для которых одной операции мало: они смотрят на счета и
@@ -104,7 +109,9 @@ public static class TransactionRules
             $"«{account.Name}» ({account.OpenedOn:yyyy-MM-dd})");
     }
 
-    /// <summary>Категория второго уровня и того же вида, что операция.</summary>
+    /// <summary>
+    /// Категория второго уровня и того же вида, что операция.
+    /// </summary>
     private static void EnsureCategoryFits(Transaction transaction, Category? category, Category? categoryGroup)
     {
         if (transaction.CategoryKey is null)

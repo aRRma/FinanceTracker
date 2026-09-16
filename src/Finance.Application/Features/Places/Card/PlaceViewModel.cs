@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Errors;
 
 namespace Finance.Application.Features.Places.Card;
 
@@ -20,7 +20,9 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
     private int _transactionCount;
     private string _savedName = string.Empty;
 
-    /// <summary>Создаёт модель представления карточки места.</summary>
+    /// <summary>
+    /// Создаёт модель представления карточки места.
+    /// </summary>
     /// <param name="places">Справочник мест со счётчиками.</param>
     /// <param name="rename">Переименование места.</param>
     /// <param name="delete">Удаление места.</param>
@@ -35,14 +37,20 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
         _delete = delete;
     }
 
-    /// <summary>Ключ правимого места.</summary>
+    /// <summary>
+    /// Ключ правимого места.
+    /// </summary>
     public Guid? Key { get; private set; }
 
-    /// <summary>Название места.</summary>
+    /// <summary>
+    /// Название места.
+    /// </summary>
     [ObservableProperty]
     public partial string Name { get; set; } = string.Empty;
 
-    /// <summary>Текст нарушенного правила. Пусто — сохранять можно.</summary>
+    /// <summary>
+    /// Текст нарушенного правила. Пусто — сохранять можно.
+    /// </summary>
     [ObservableProperty]
     public partial string? Error { get; private set; }
 
@@ -53,7 +61,9 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
     [ObservableProperty]
     public partial string UsageCaption { get; private set; } = string.Empty;
 
-    /// <summary>Правило нарушено — сообщение показывается рядом с формой.</summary>
+    /// <summary>
+    /// Правило нарушено — сообщение показывается рядом с формой.
+    /// </summary>
     public bool HasError => !string.IsNullOrEmpty(Error);
 
     /// <summary>
@@ -73,16 +83,22 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
     /// </summary>
     public bool IsIdle => !IsSaving;
 
-    /// <summary>Сохранять можно: предыдущее действие не идёт.</summary>
+    /// <summary>
+    /// Сохранять можно: предыдущее действие не идёт.
+    /// </summary>
     public bool CanSave => IsIdle;
 
-    /// <summary>Место загрузилось — есть что править и что удалять.</summary>
+    /// <summary>
+    /// Место загрузилось — есть что править и что удалять.
+    /// </summary>
     public bool IsLoaded => Key is not null;
 
     /// <inheritdoc />
     public bool IsDirty => !string.Equals(Name.Trim(), _savedName, StringComparison.Ordinal);
 
-    /// <summary>Загружает место для правки.</summary>
+    /// <summary>
+    /// Загружает место для правки.
+    /// </summary>
     /// <param name="key">Ключ места.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]
@@ -110,7 +126,9 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
         OnPropertyChanged(nameof(IsLoaded));
     }
 
-    /// <summary>Сохраняет новое название.</summary>
+    /// <summary>
+    /// Сохраняет новое название.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <returns><c>true</c>, если место сохранено и экран можно закрыть.</returns>
     [RelayCommand]
@@ -171,7 +189,9 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
             : $"{Plural.Of(_transactionCount, "операция останется", "операции останутся", "операций останутся")}"
               + " без места. Суммы, даты и балансы не изменятся.";
 
-    /// <summary>Удаляет место.</summary>
+    /// <summary>
+    /// Удаляет место.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <returns><c>true</c>, если место удалено и экран можно закрыть.</returns>
     [RelayCommand]

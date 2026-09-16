@@ -17,7 +17,9 @@ public sealed class UnitOfWork
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
     private readonly IChangeNotifier _notifier;
 
-    /// <summary>Создаёт границу транзакции.</summary>
+    /// <summary>
+    /// Создаёт границу транзакции.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     /// <param name="notifier">Оповещение экранов об изменении данных.</param>
     public UnitOfWork(IDbContextFactory<FinanceDbContext> contexts, IChangeNotifier notifier)
@@ -60,7 +62,9 @@ public sealed class UnitOfWork
         return result;
     }
 
-    /// <summary>Выполняет команду, которой нечего возвращать.</summary>
+    /// <summary>
+    /// Выполняет команду, которой нечего возвращать.
+    /// </summary>
     /// <param name="command">Тело команды. Возвращает вид изменения.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     public Task ExecuteAsync(

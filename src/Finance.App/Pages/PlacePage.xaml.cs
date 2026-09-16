@@ -3,13 +3,17 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экран C-08: карточка места — переименование и удаление.</summary>
+/// <summary>
+/// Экран C-08: карточка места — переименование и удаление.
+/// </summary>
 [QueryProperty(nameof(Key), "key")]
 public partial class PlacePage : DataPage
 {
     private readonly PlaceViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления карточки места.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public PlacePage(PlaceViewModel model, FinanceStartup startup)
@@ -23,7 +27,9 @@ public partial class PlacePage : DataPage
         BindingContext = model;
     }
 
-    /// <summary>Ключ правимого места из маршрута.</summary>
+    /// <summary>
+    /// Ключ правимого места из маршрута.
+    /// </summary>
     public string? Key { get; set; }
 
     /// <inheritdoc />

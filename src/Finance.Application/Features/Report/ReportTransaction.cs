@@ -1,4 +1,5 @@
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Features.Report;
 
@@ -8,21 +9,33 @@ namespace Finance.Application.Features.Report;
 /// </summary>
 public sealed record ReportTransaction
 {
-    /// <summary>Ключ операции — по нему открывается та же карточка, что из ленты.</summary>
+    /// <summary>
+    /// Ключ операции — по нему открывается та же карточка, что из ленты.
+    /// </summary>
     public required Guid Key { get; init; }
 
-    /// <summary>Дата операции.</summary>
+    /// <summary>
+    /// Дата операции.
+    /// </summary>
     public required DateOnly OccurredOn { get; init; }
 
-    /// <summary>Сумма со знаком: расход минусом, доход плюсом. Всегда в рублях.</summary>
+    /// <summary>
+    /// Сумма со знаком: расход минусом, доход плюсом. Всегда в рублях.
+    /// </summary>
     public required Money Amount { get; init; }
 
-    /// <summary>Счёт списания.</summary>
+    /// <summary>
+    /// Счёт списания.
+    /// </summary>
     public required string AccountName { get; init; }
 
-    /// <summary>Место. Пусто, если не указано или удалено из справочника.</summary>
+    /// <summary>
+    /// Место. Пусто, если не указано или удалено из справочника.
+    /// </summary>
     public string? Place { get; init; }
 
-    /// <summary>Заметка.</summary>
+    /// <summary>
+    /// Заметка.
+    /// </summary>
     public string? Note { get; init; }
 }

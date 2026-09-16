@@ -10,7 +10,9 @@ namespace Finance.Docs.Tests;
 /// </summary>
 internal static partial class Identifiers
 {
-    /// <summary>Префиксы требований. Отдельной константой: тот же список нужен ссылке и диапазону.</summary>
+    /// <summary>
+    /// Префиксы требований. Отдельной константой: тот же список нужен ссылке и диапазону.
+    /// </summary>
     private const string Requirement = """INV|SYN|SEED|NFR|SYS|TECH|FR-(?:ACC|CAT|TRX|PAY|BAL|LED|RPT|SYN|SET)""";
 
     private static readonly Lazy<IReadOnlyList<(string Id, DocumentLine Where, bool Annulled)>> Found = new(Collect);
@@ -24,16 +26,24 @@ internal static partial class Identifiers
     /// </summary>
     public static IReadOnlyList<(string Id, DocumentLine Where, bool Annulled)> Definitions => Found.Value;
 
-    /// <summary>Определённые идентификаторы: на них и только на них разыменовывается ссылка.</summary>
+    /// <summary>
+    /// Определённые идентификаторы: на них и только на них разыменовывается ссылка.
+    /// </summary>
     public static IReadOnlySet<string> Known => Ids.Value;
 
-    /// <summary>Префикс идентификатора: <c>FR-PAY</c> у <c>FR-PAY-02</c>.</summary>
+    /// <summary>
+    /// Префикс идентификатора: <c>FR-PAY</c> у <c>FR-PAY-02</c>.
+    /// </summary>
     public static string PrefixOf(string id) => id[..id.LastIndexOf('-')];
 
-    /// <summary>Номер идентификатора.</summary>
+    /// <summary>
+    /// Номер идентификатора.
+    /// </summary>
     public static int NumberOf(string id) => int.Parse(id[(id.LastIndexOf('-') + 1)..]);
 
-    /// <summary>Наибольший занятый номер каждого префикса: по нему видно, полон ли диапазон.</summary>
+    /// <summary>
+    /// Наибольший занятый номер каждого префикса: по нему видно, полон ли диапазон.
+    /// </summary>
     public static IReadOnlyDictionary<string, int> LastNumbers() =>
         Definitions
             .GroupBy(static definition => PrefixOf(definition.Id), StringComparer.Ordinal)
@@ -42,7 +52,9 @@ internal static partial class Identifiers
                 static bucket => bucket.Max(static definition => NumberOf(definition.Id)),
                 StringComparer.Ordinal);
 
-    /// <summary>Упоминание идентификатора в тексте: и определение, и ссылка.</summary>
+    /// <summary>
+    /// Упоминание идентификатора в тексте: и определение, и ссылка.
+    /// </summary>
     [GeneratedRegex($$"""\b(?:(?:{{Requirement}}|UC)-\d{2}|ADR-\d{4})\b""")]
     public static partial Regex Reference();
 
@@ -53,15 +65,21 @@ internal static partial class Identifiers
     [GeneratedRegex($$"""\b(?<prefix>(?:{{Requirement}}|UC)-)(?<lo>\d{2})\s*(?:—|–|-|…|\.\.\.)\s*(?:\k<prefix>)?(?<hi>\d{2})\b""")]
     public static partial Regex Range();
 
-    /// <summary>Строка таблицы требований; аннулированное требование зачёркнуто.</summary>
+    /// <summary>
+    /// Строка таблицы требований; аннулированное требование зачёркнуто.
+    /// </summary>
     [GeneratedRegex($$"""^\|\s*(?<annulled>~~)?(?<id>(?:{{Requirement}})-\d{2})~?~?\s*\|""")]
     private static partial Regex DefinitionRow();
 
-    /// <summary>Заголовок сценария: <c>## UC-11 …</c>.</summary>
+    /// <summary>
+    /// Заголовок сценария: <c>## UC-11 …</c>.
+    /// </summary>
     [GeneratedRegex("""^## (?<id>UC-\d{2})\b""")]
     private static partial Regex ScenarioHeading();
 
-    /// <summary>Имя файла решения: четыре цифры номера и суть решения словами.</summary>
+    /// <summary>
+    /// Имя файла решения: четыре цифры номера и суть решения словами.
+    /// </summary>
     [GeneratedRegex("""^(?<number>\d{4})-[a-z0-9-]+\.md$""")]
     private static partial Regex DecisionFile();
 

@@ -1,6 +1,10 @@
+using Finance.Domain.Errors;
+
 namespace Finance.Domain.Tests;
 
-/// <summary>Как сообщается о нарушении доменного правила.</summary>
+/// <summary>
+/// Как сообщается о нарушении доменного правила.
+/// </summary>
 public sealed class DomainExceptionTests
 {
     [Fact]
@@ -37,7 +41,9 @@ public sealed class DomainExceptionTests
         Assert.Equal("без подстановок", error.Message);
     }
 
-    /// <summary>Считает, сколько раз её подставили в текст.</summary>
+    /// <summary>
+    /// Считает, сколько раз её подставили в текст.
+    /// </summary>
     private sealed class Counting
     {
         public int Formatted { get; private set; }

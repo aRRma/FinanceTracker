@@ -1,5 +1,6 @@
 using Finance.Application.Infrastructure;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Features.Transactions.Card;
 
@@ -25,6 +26,8 @@ public sealed record AccountOption(
     bool IsClosed,
     bool IsSavings)
 {
-    /// <summary>Подпись строки выбора: название и баланс.</summary>
+    /// <summary>
+    /// Подпись строки выбора: название и баланс.
+    /// </summary>
     public string Label => $"{Name} · {Balance.Display}";
 }

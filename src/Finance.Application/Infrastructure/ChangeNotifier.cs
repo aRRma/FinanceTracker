@@ -13,7 +13,9 @@ public sealed class ChangeNotifier : IChangeNotifier
 {
     private readonly Action<Action> _dispatch;
 
-    /// <summary>Создаёт оповещение.</summary>
+    /// <summary>
+    /// Создаёт оповещение.
+    /// </summary>
     /// <param name="dispatch">Как выполнить действие в потоке интерфейса. Пусто — выполняется на месте.</param>
     public ChangeNotifier(Action<Action>? dispatch = null) =>
         _dispatch = dispatch ?? (static action => action());

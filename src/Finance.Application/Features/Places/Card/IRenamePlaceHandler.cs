@@ -1,6 +1,8 @@
 namespace Finance.Application.Features.Places.Card;
 
-/// <summary>Переименование места. Модель представления зовёт его напрямую.</summary>
+/// <summary>
+/// Переименование места. Модель представления зовёт его напрямую.
+/// </summary>
 public interface IRenamePlaceHandler
 {
     /// <summary>

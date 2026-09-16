@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Features.Transactions.Pick;
 
@@ -21,7 +21,9 @@ public sealed partial class AccountPickerViewModel : ObservableObject
 
     private bool _forTarget;
 
-    /// <summary>Создаёт модель представления выбора счёта.</summary>
+    /// <summary>
+    /// Создаёт модель представления выбора счёта.
+    /// </summary>
     /// <param name="accounts">Список счетов с балансами.</param>
     /// <param name="picks">Куда кладётся выбор для формы операции.</param>
     public AccountPickerViewModel(IAccountsQuery accounts, TransactionPicks picks)
@@ -33,14 +35,20 @@ public sealed partial class AccountPickerViewModel : ObservableObject
         _picks = picks;
     }
 
-    /// <summary>Счета по валютам: заголовок раздела — валюта.</summary>
+    /// <summary>
+    /// Счета по валютам: заголовок раздела — валюта.
+    /// </summary>
     public ObservableCollection<AccountPickerSection> Sections { get; } = [];
 
-    /// <summary>Заголовок экрана: у перевода выбирают не просто счёт, а сторону.</summary>
+    /// <summary>
+    /// Заголовок экрана: у перевода выбирают не просто счёт, а сторону.
+    /// </summary>
     [ObservableProperty]
     public partial string Title { get; private set; } = "Счёт";
 
-    /// <summary>Идёт чтение.</summary>
+    /// <summary>
+    /// Идёт чтение.
+    /// </summary>
     [ObservableProperty]
     public partial bool IsBusy { get; set; }
 
@@ -91,7 +99,9 @@ public sealed partial class AccountPickerViewModel : ObservableObject
         }
     }
 
-    /// <summary>Запоминает выбор: форма заберёт его, когда вернётся на экран.</summary>
+    /// <summary>
+    /// Запоминает выбор: форма заберёт его, когда вернётся на экран.
+    /// </summary>
     /// <param name="row">Выбранная строка.</param>
     [RelayCommand]
     public void Pick(AccountPickerRow row)

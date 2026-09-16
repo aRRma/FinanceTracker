@@ -3,12 +3,16 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экраны E-01 и E-04: отчёт о расходах и доходах за месяц по группам.</summary>
+/// <summary>
+/// Экраны E-01 и E-04: отчёт о расходах и доходах за месяц по группам.
+/// </summary>
 public partial class ReportPage : DataPage
 {
     private readonly ReportViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления отчёта.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public ReportPage(ReportViewModel model, FinanceStartup startup)

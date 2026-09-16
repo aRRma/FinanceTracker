@@ -8,12 +8,18 @@ namespace Finance.Application.Features.Transactions.Card;
 /// </summary>
 public sealed record TransactionForm
 {
-    /// <summary>Все счета, включая закрытые: закрытый нужен, когда правится его старая операция.</summary>
+    /// <summary>
+    /// Все счета, включая закрытые: закрытый нужен, когда правится его старая операция.
+    /// </summary>
     public required IReadOnlyList<AccountOption> Accounts { get; init; }
 
-    /// <summary>Подкатегории обоих видов в порядке групп.</summary>
+    /// <summary>
+    /// Подкатегории обоих видов в порядке групп.
+    /// </summary>
     public required IReadOnlyList<CategoryOption> Categories { get; init; }
 
-    /// <summary>Счёт, подставляемый в новую операцию. Пусто — операций ещё не было.</summary>
+    /// <summary>
+    /// Счёт, подставляемый в новую операцию. Пусто — операций ещё не было.
+    /// </summary>
     public required Guid? LastAccountKey { get; init; }
 }

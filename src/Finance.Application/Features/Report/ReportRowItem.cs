@@ -1,9 +1,12 @@
 using Finance.Application.Infrastructure;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Features.Report;
 
-/// <summary>Строка отчёта: название, сумма со знаком, доля в процентах и полоса под ней.</summary>
+/// <summary>
+/// Строка отчёта: название, сумма со знаком, доля в процентах и полоса под ней.
+/// </summary>
 /// <param name="Key">Ключ группы или подкатегории — по нему проваливаются ниже.</param>
 /// <param name="Name">Название.</param>
 /// <param name="Icon">Ключ значка.</param>
@@ -20,7 +23,9 @@ public sealed record ReportRowItem(
     double Fraction,
     bool IsExpense)
 {
-    /// <summary>Полоса тоньше этого не видна, а невидимая полоса читается как её отсутствие.</summary>
+    /// <summary>
+    /// Полоса тоньше этого не видна, а невидимая полоса читается как её отсутствие.
+    /// </summary>
     private const double MinimalFraction = 0.02;
 
     /// <summary>
@@ -49,7 +54,9 @@ public sealed record ReportRowItem(
             row.Kind is CategoryKind.Expense);
     }
 
-    /// <summary>Расход показывается минусом: в базе суммы всегда положительны, знак задаёт вид.</summary>
+    /// <summary>
+    /// Расход показывается минусом: в базе суммы всегда положительны, знак задаёт вид.
+    /// </summary>
     /// <param name="total">Положительная сумма.</param>
     /// <param name="kind">Вид строки.</param>
     public static Money Signed(Money total, CategoryKind kind) =>

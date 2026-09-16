@@ -18,7 +18,9 @@ internal static class QueryPlan
     public static Task<string> ExplainAsync<T>(TestDatabase database, IQueryable<T> query) =>
         ExplainAsync(database, query.ToQueryString());
 
-    /// <summary>Снимает план готового SQL, в том числе с ведущими строками <c>.param set</c>.</summary>
+    /// <summary>
+    /// Снимает план готового SQL, в том числе с ведущими строками <c>.param set</c>.
+    /// </summary>
     public static async Task<string> ExplainAsync(TestDatabase database, string sqlWithParameters)
     {
         string sql = string.Join(

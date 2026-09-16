@@ -3,14 +3,18 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экран E-02: подкатегории группы отчёта за месяц.</summary>
+/// <summary>
+/// Экран E-02: подкатегории группы отчёта за месяц.
+/// </summary>
 [QueryProperty(nameof(Key), "key")]
 [QueryProperty(nameof(Month), "month")]
 public partial class ReportGroupPage : DataPage
 {
     private readonly ReportGroupViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления группы отчёта.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public ReportGroupPage(ReportGroupViewModel model, FinanceStartup startup)
@@ -24,10 +28,14 @@ public partial class ReportGroupPage : DataPage
         BindingContext = model;
     }
 
-    /// <summary>Ключ группы из маршрута. Строкой, а не <see cref="Guid"/>: в маршруте он и есть строка.</summary>
+    /// <summary>
+    /// Ключ группы из маршрута. Строкой, а не <see cref="Guid"/>: в маршруте он и есть строка.
+    /// </summary>
     public string? Key { get; set; }
 
-    /// <summary>Месяц отчёта из маршрута в виде «2026-08».</summary>
+    /// <summary>
+    /// Месяц отчёта из маршрута в виде «2026-08».
+    /// </summary>
     public string? Month { get; set; }
 
     /// <inheritdoc />

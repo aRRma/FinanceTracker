@@ -14,7 +14,9 @@ public partial class AccountPickerPage : DataPage
 {
     private readonly AccountPickerViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления выбора счёта.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public AccountPickerPage(AccountPickerViewModel model, FinanceStartup startup)
@@ -28,13 +30,19 @@ public partial class AccountPickerPage : DataPage
         BindingContext = model;
     }
 
-    /// <summary>Счёт, стоящий в форме сейчас.</summary>
+    /// <summary>
+    /// Счёт, стоящий в форме сейчас.
+    /// </summary>
     public string? Selected { get; set; }
 
-    /// <summary>Счёт, которого в списке быть не должно: списание при выборе «Куда».</summary>
+    /// <summary>
+    /// Счёт, которого в списке быть не должно: списание при выборе «Куда».
+    /// </summary>
     public string? Excluded { get; set; }
 
-    /// <summary>Непусто — выбирается счёт зачисления перевода.</summary>
+    /// <summary>
+    /// Непусто — выбирается счёт зачисления перевода.
+    /// </summary>
     public string? Target { get; set; }
 
     /// <inheritdoc />

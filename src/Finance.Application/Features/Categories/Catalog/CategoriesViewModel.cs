@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Features.Categories.Catalog;
 
@@ -22,7 +22,9 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
 
     private IReadOnlyList<CategoryListItem> _all = [];
 
-    /// <summary>Создаёт модель представления справочника категорий.</summary>
+    /// <summary>
+    /// Создаёт модель представления справочника категорий.
+    /// </summary>
     /// <param name="categories">Список категорий обоих уровней.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
     public CategoriesViewModel(ICategoriesQuery categories, IChangeNotifier changes)
@@ -33,13 +35,19 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
         _categories = categories;
     }
 
-    /// <summary>Строки списка: шапки групп и подкатегории развёрнутых групп.</summary>
+    /// <summary>
+    /// Строки списка: шапки групп и подкатегории развёрнутых групп.
+    /// </summary>
     public ObservableCollection<CategoryLine> Lines { get; } = [];
 
-    /// <summary>Подписи видов для переключателя.</summary>
+    /// <summary>
+    /// Подписи видов для переключателя.
+    /// </summary>
     public static IReadOnlyList<string> KindNames { get; } = ["Расходы", "Доходы"];
 
-    /// <summary>Какой вид показан.</summary>
+    /// <summary>
+    /// Какой вид показан.
+    /// </summary>
     [ObservableProperty]
     public partial CategoryKind Kind { get; set; } = CategoryKind.Expense;
 
@@ -57,7 +65,9 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
     [ObservableProperty]
     public partial bool IsBusy { get; set; }
 
-    /// <summary>Выбранный вид — номером в переключателе.</summary>
+    /// <summary>
+    /// Выбранный вид — номером в переключателе.
+    /// </summary>
     public int KindIndex
     {
         get => Array.IndexOf(KindOrder, Kind);
@@ -73,10 +83,14 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
     [NotifyPropertyChangedFor(nameof(IsEmpty))]
     public partial bool IsLoaded { get; private set; }
 
-    /// <summary>Групп этого вида нет — показывается пустое состояние.</summary>
+    /// <summary>
+    /// Групп этого вида нет — показывается пустое состояние.
+    /// </summary>
     public bool IsEmpty => IsLoaded && Lines.Count is 0;
 
-    /// <summary>Перечитывает справочник.</summary>
+    /// <summary>
+    /// Перечитывает справочник.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
@@ -162,7 +176,9 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
     /// </summary>
     partial void OnKindChanged(CategoryKind value) => Rebuild();
 
-    /// <summary>Отбор идёт по прочитанному — в базу за ним не ходят.</summary>
+    /// <summary>
+    /// Отбор идёт по прочитанному — в базу за ним не ходят.
+    /// </summary>
     partial void OnFilterChanged(string value) => Rebuild();
 
     private void Rebuild()

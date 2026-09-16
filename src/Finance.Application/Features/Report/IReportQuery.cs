@@ -15,7 +15,9 @@ public interface IReportQuery
     /// <param name="cancellationToken">Признак отмены.</param>
     Task<IReadOnlyList<ReportTotal>> ReadGroupsAsync(ReportMonth month, CancellationToken cancellationToken = default);
 
-    /// <summary>Второй уровень: подкатегории группы с суммами за месяц, по убыванию.</summary>
+    /// <summary>
+    /// Второй уровень: подкатегории группы с суммами за месяц, по убыванию.
+    /// </summary>
     /// <param name="groupKey">Ключ группы.</param>
     /// <param name="month">Месяц отчёта.</param>
     /// <param name="cancellationToken">Признак отмены.</param>

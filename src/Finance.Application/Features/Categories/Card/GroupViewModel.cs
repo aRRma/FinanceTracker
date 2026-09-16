@@ -4,7 +4,8 @@ using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Features.Categories.Catalog;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
 
 namespace Finance.Application.Features.Categories.Card;
 
@@ -22,7 +23,9 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
 
     private (string, CategoryKind, string) _saved;
 
-    /// <summary>Создаёт модель представления карточки группы.</summary>
+    /// <summary>
+    /// Создаёт модель представления карточки группы.
+    /// </summary>
     /// <param name="categories">Список категорий: из него берутся подкатегории группы.</param>
     /// <param name="handler">Сохранение категории.</param>
     /// <param name="icons">Набор значков.</param>
@@ -38,31 +41,47 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
         Icon = new IconPicker(icons);
     }
 
-    /// <summary>Ключ правимой группы. Пусто — заводится новая.</summary>
+    /// <summary>
+    /// Ключ правимой группы. Пусто — заводится новая.
+    /// </summary>
     public Guid? Key { get; private set; }
 
-    /// <summary>Выбор значка группы.</summary>
+    /// <summary>
+    /// Выбор значка группы.
+    /// </summary>
     public IconPicker Icon { get; }
 
-    /// <summary>Подкатегории группы. У новой их нет: сначала группа, потом наполнение.</summary>
+    /// <summary>
+    /// Подкатегории группы. У новой их нет: сначала группа, потом наполнение.
+    /// </summary>
     public ObservableCollection<CategoryRowItem> Subcategories { get; } = [];
 
-    /// <summary>Подписи видов для переключателя.</summary>
+    /// <summary>
+    /// Подписи видов для переключателя.
+    /// </summary>
     public static IReadOnlyList<string> KindNames { get; } = ["Расход", "Доход"];
 
-    /// <summary>Название группы.</summary>
+    /// <summary>
+    /// Название группы.
+    /// </summary>
     [ObservableProperty]
     public partial string Name { get; set; } = string.Empty;
 
-    /// <summary>Вид группы.</summary>
+    /// <summary>
+    /// Вид группы.
+    /// </summary>
     [ObservableProperty]
     public partial CategoryKind Kind { get; set; } = CategoryKind.Expense;
 
-    /// <summary>Группа служебная: в неё нельзя ни заводить, ни переносить.</summary>
+    /// <summary>
+    /// Группа служебная: в неё нельзя ни заводить, ни переносить.
+    /// </summary>
     [ObservableProperty]
     public partial bool IsService { get; private set; }
 
-    /// <summary>Текст нарушенного правила. Пусто — сохранять можно.</summary>
+    /// <summary>
+    /// Текст нарушенного правила. Пусто — сохранять можно.
+    /// </summary>
     [ObservableProperty]
     public partial string? Error { get; private set; }
 
@@ -75,41 +94,63 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial bool IsSaving { get; private set; }
 
-    /// <summary>Сохранять можно: предыдущее сохранение не идёт.</summary>
+    /// <summary>
+    /// Сохранять можно: предыдущее сохранение не идёт.
+    /// </summary>
     public bool CanSave => !IsSaving;
 
-    /// <summary>Выбранный вид — номером в переключателе.</summary>
+    /// <summary>
+    /// Выбранный вид — номером в переключателе.
+    /// </summary>
     public int KindIndex
     {
         get => Array.IndexOf(KindOrder, Kind);
         set => Kind = KindOrder[Math.Clamp(value, 0, KindOrder.Length - 1)];
     }
 
-    /// <summary>Вид уже заперт: группа существует, и её подкатегории им пользуются.</summary>
+    /// <summary>
+    /// Вид уже заперт: группа существует, и её подкатегории им пользуются.
+    /// </summary>
     public bool KindLocked => Key is not null;
 
-    /// <summary>Вид ещё выбирается.</summary>
+    /// <summary>
+    /// Вид ещё выбирается.
+    /// </summary>
     public bool KindEditable => !KindLocked;
 
-    /// <summary>Подпись вида, когда он заперт.</summary>
+    /// <summary>
+    /// Подпись вида, когда он заперт.
+    /// </summary>
     public string KindCaption => Kind is CategoryKind.Expense ? "Расход" : "Доход";
 
-    /// <summary>Заголовок экрана.</summary>
+    /// <summary>
+    /// Заголовок экрана.
+    /// </summary>
     public string Title => Key is null ? "Новая группа" : "Группа";
 
-    /// <summary>Показывать превью «Будет создано»: у существующей группы показывать нечего.</summary>
+    /// <summary>
+    /// Показывать превью «Будет создано»: у существующей группы показывать нечего.
+    /// </summary>
     public bool ShowPreview => Key is null;
 
-    /// <summary>Подпись превью: чем станет заводимая группа.</summary>
+    /// <summary>
+    /// Подпись превью: чем станет заводимая группа.
+    /// </summary>
     public string PreviewCaption => Kind is CategoryKind.Expense ? "Группа расходов" : "Группа доходов";
 
-    /// <summary>Имя приёмника, который заведётся вместе с группой.</summary>
+    /// <summary>
+    /// Имя приёмника, который заведётся вместе с группой.
+    /// </summary>
     public static string ReceiverName => "Прочее";
 
-    /// <summary>Подкатегорию можно добавить: группа уже существует и не служебная.</summary>
+    /// <summary>
+    /// Подкатегорию можно добавить: группа уже существует и не служебная.
+    /// </summary>
     public bool CanAddSubcategory => Key is not null && !IsService;
 
-    /// <summary>Правило нарушено — сообщение показывается рядом с формой.</summary>
+    /// <summary>
+    /// Правило нарушено — сообщение показывается рядом с формой.
+    /// </summary>
     public bool HasError => !string.IsNullOrEmpty(Error);
 
     /// <inheritdoc />
@@ -122,7 +163,9 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     /// </summary>
     private (string Name, CategoryKind Kind, string Icon) Snapshot() => (Name, Kind, Icon.Selected);
 
-    /// <summary>Загружает группу для правки. Пустой ключ оставляет форму пустой.</summary>
+    /// <summary>
+    /// Загружает группу для правки. Пустой ключ оставляет форму пустой.
+    /// </summary>
     /// <param name="key">Ключ группы или <c>null</c> для новой.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]

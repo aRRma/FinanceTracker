@@ -2,7 +2,9 @@ using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Tests;
 
@@ -83,7 +85,9 @@ public sealed class TransactionKeypadTests
         Assert.Equal("2,55", model.TargetAmount);
     }
 
-    /// <summary>Незаконченное выражение «=» не трогает: считать ей нечего.</summary>
+    /// <summary>
+    /// Незаконченное выражение «=» не трогает: считать ей нечего.
+    /// </summary>
     [Fact]
     public async Task Равно_не_меняет_незаконченное_выражение()
     {
@@ -178,7 +182,9 @@ public sealed class TransactionKeypadTests
         Assert.Equal("1005", model.Amount);
     }
 
-    /// <summary>Стирание работает в том же поле, что и набор.</summary>
+    /// <summary>
+    /// Стирание работает в том же поле, что и набор.
+    /// </summary>
     [Fact]
     public async Task Стирание_работает_в_выбранном_поле()
     {
@@ -241,7 +247,9 @@ public sealed class TransactionKeypadTests
         Assert.Single((await fixture.FeedAsync(card)).Items);
     }
 
-    /// <summary>Держит сохранение, пока тест не отпустит: так второе нажатие приходится на первое.</summary>
+    /// <summary>
+    /// Держит сохранение, пока тест не отпустит: так второе нажатие приходится на первое.
+    /// </summary>
     private sealed class DelayingSave(ISaveTransactionHandler inner) : ISaveTransactionHandler
     {
         public TaskCompletionSource Delay { get; } = new();

@@ -8,7 +8,9 @@ namespace Finance.Application.Infrastructure.Storage;
 /// приложение здесь не работает: приложение собирается только под Android,
 /// а миграции создаются на машине разработчика.
 /// </summary>
-/// <remarks>Файл базы при этом не открывается — команде хватает описания модели.</remarks>
+/// <remarks>
+/// Файл базы при этом не открывается — команде хватает описания модели.
+/// </remarks>
 public sealed class DesignTimeFinanceDbContextFactory : IDesignTimeDbContextFactory<FinanceDbContext>
 {
     /// <inheritdoc />

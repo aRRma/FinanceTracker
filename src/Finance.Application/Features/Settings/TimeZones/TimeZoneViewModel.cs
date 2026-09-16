@@ -20,7 +20,9 @@ public sealed partial class TimeZoneViewModel : ScreenViewModel
 
     private IReadOnlyList<TimeZoneInfo> _all = [];
 
-    /// <summary>Создаёт модель представления экрана часового пояса.</summary>
+    /// <summary>
+    /// Создаёт модель представления экрана часового пояса.
+    /// </summary>
     /// <param name="summary">Состояние настроек.</param>
     /// <param name="change">Выбор пояса.</param>
     /// <param name="clock">Часы приложения: у них действующий пояс и текущий момент.</param>
@@ -41,22 +43,32 @@ public sealed partial class TimeZoneViewModel : ScreenViewModel
         _clock = clock;
     }
 
-    /// <summary>Зоны, прошедшие отбор. Первой строкой — «Как в системе».</summary>
+    /// <summary>
+    /// Зоны, прошедшие отбор. Первой строкой — «Как в системе».
+    /// </summary>
     public ObservableCollection<TimeZoneOption> Zones { get; } = [];
 
-    /// <summary>Набранные буквы идентификатора. Пусто — показываются все зоны.</summary>
+    /// <summary>
+    /// Набранные буквы идентификатора. Пусто — показываются все зоны.
+    /// </summary>
     [ObservableProperty]
     public partial string Filter { get; set; } = string.Empty;
 
-    /// <summary>Пояс взят из системы — ручного выбора не было.</summary>
+    /// <summary>
+    /// Пояс взят из системы — ручного выбора не было.
+    /// </summary>
     [ObservableProperty]
     public partial bool IsFromSystem { get; private set; } = true;
 
-    /// <summary>Отбор не нашёл ни одной зоны.</summary>
+    /// <summary>
+    /// Отбор не нашёл ни одной зоны.
+    /// </summary>
     [ObservableProperty]
     public partial bool IsFilteredOut { get; private set; }
 
-    /// <summary>Перечитывает список зон и текущий выбор.</summary>
+    /// <summary>
+    /// Перечитывает список зон и текущий выбор.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
@@ -84,7 +96,9 @@ public sealed partial class TimeZoneViewModel : ScreenViewModel
         Rebuild();
     }
 
-    /// <summary>Ставит выбранную зону.</summary>
+    /// <summary>
+    /// Ставит выбранную зону.
+    /// </summary>
     /// <param name="option">Строка списка. У «Как в системе» идентификатора нет.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]
@@ -143,7 +157,9 @@ public sealed partial class TimeZoneViewModel : ScreenViewModel
         IsFilteredOut = found is 0;
     }
 
-    /// <summary>Смещение зоны от UTC на сегодня — по нему зону и узнают.</summary>
+    /// <summary>
+    /// Смещение зоны от UTC на сегодня — по нему зону и узнают.
+    /// </summary>
     private string Offset(TimeZoneInfo zone)
     {
         TimeSpan offset = zone.GetUtcOffset(_clock.NowUtc);

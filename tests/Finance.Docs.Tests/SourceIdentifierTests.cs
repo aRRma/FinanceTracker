@@ -47,7 +47,9 @@ public sealed class SourceIdentifierTests
         Assert.Matches(Identifiers.Reference(), "предел суммы задан INV-24");
     }
 
-    /// <summary>Строки всех файлов кода репозитория, кроме проверок документации.</summary>
+    /// <summary>
+    /// Строки всех файлов кода репозитория, кроме проверок документации.
+    /// </summary>
     private static IReadOnlyList<DocumentLine> SourceLines() =>
         Documents.Lines(Documents.Files("*.cs").Where(static file => !Documents.Relative(file).StartsWith(Allowed, StringComparison.Ordinal)))
             .ToArray();

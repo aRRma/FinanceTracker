@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace Finance.Domain;
+namespace Finance.Domain.Errors;
 
 /// <summary>
 /// Текст нарушения правила, собираемый лениво. Нужен только
@@ -28,15 +28,23 @@ public ref struct DomainMessage
         inner = broken ? new DefaultInterpolatedStringHandler(literalLength, formattedCount) : default;
     }
 
-    /// <summary>Добавляет постоянную часть текста. Вызывается только при нарушении.</summary>
+    /// <summary>
+    /// Добавляет постоянную часть текста. Вызывается только при нарушении.
+    /// </summary>
     public void AppendLiteral(string value) => inner.AppendLiteral(value);
 
-    /// <summary>Добавляет подставляемое значение. Вызывается только при нарушении.</summary>
+    /// <summary>
+    /// Добавляет подставляемое значение. Вызывается только при нарушении.
+    /// </summary>
     public void AppendFormatted<T>(T value) => inner.AppendFormatted(value);
 
-    /// <summary>Добавляет подставляемое значение с форматом. Вызывается только при нарушении.</summary>
+    /// <summary>
+    /// Добавляет подставляемое значение с форматом. Вызывается только при нарушении.
+    /// </summary>
     public void AppendFormatted<T>(T value, string? format) => inner.AppendFormatted(value, format);
 
-    /// <summary>Собранный текст. Пустой, если правило не нарушено.</summary>
+    /// <summary>
+    /// Собранный текст. Пустой, если правило не нарушено.
+    /// </summary>
     public override string ToString() => enabled ? inner.ToStringAndClear() : string.Empty;
 }

@@ -2,7 +2,9 @@ using Finance.Application.Features.Places.Card;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Tests;
@@ -102,7 +104,9 @@ public sealed class PlacesTests
         Assert.Equal(stampBefore, await TransactionStampAsync(fixture, transaction));
     }
 
-    /// <summary>Имя места уникально по всему справочнику: ни вида, ни группы у места нет.</summary>
+    /// <summary>
+    /// Имя места уникально по всему справочнику: ни вида, ни группы у места нет.
+    /// </summary>
     [Fact]
     [Trait("Инвариант", nameof(Invariant.NameUnique))]
     public async Task Переименование_в_занятое_имя_отвергается()
@@ -123,7 +127,9 @@ public sealed class PlacesTests
         Assert.Equal(Invariant.NameUnique, error.Invariant);
     }
 
-    /// <summary>Своё собственное имя месту не мешает: иначе оно конфликтовало бы само с собой.</summary>
+    /// <summary>
+    /// Своё собственное имя месту не мешает: иначе оно конфликтовало бы само с собой.
+    /// </summary>
     [Fact]
     public async Task Переименование_в_своё_же_имя_проходит()
     {
@@ -178,7 +184,9 @@ public sealed class PlacesTests
                 .SingleAsync());
     }
 
-    /// <summary>Удалённое место исчезает и из справочника, и из подсказок формы операции.</summary>
+    /// <summary>
+    /// Удалённое место исчезает и из справочника, и из подсказок формы операции.
+    /// </summary>
     [Fact]
     public async Task Удалённое_место_не_предлагается()
     {
@@ -217,7 +225,9 @@ public sealed class PlacesTests
         Assert.Equal(1, created.TransactionCount);
     }
 
-    /// <summary>Повторное удаление — не ошибка: так выглядит нажатие по неуспевшему экрану.</summary>
+    /// <summary>
+    /// Повторное удаление — не ошибка: так выглядит нажатие по неуспевшему экрану.
+    /// </summary>
     [Fact]
     public async Task Повторное_удаление_места_проходит_молча()
     {

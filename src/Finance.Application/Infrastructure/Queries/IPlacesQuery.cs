@@ -1,6 +1,8 @@
 namespace Finance.Application.Infrastructure.Queries;
 
-/// <summary>Полный справочник мест со счётчиками. Модель представления зовёт его напрямую.</summary>
+/// <summary>
+/// Полный справочник мест со счётчиками. Модель представления зовёт его напрямую.
+/// </summary>
 public interface IPlacesQuery
 {
     /// <summary>

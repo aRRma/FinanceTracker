@@ -7,7 +7,9 @@ namespace Finance.Application.Infrastructure;
 /// </summary>
 public static class Plural
 {
-    /// <summary>Собирает число со склонённым словом.</summary>
+    /// <summary>
+    /// Собирает число со склонённым словом.
+    /// </summary>
     /// <param name="count">Количество.</param>
     /// <param name="one">Форма при одном: «операция перейдёт».</param>
     /// <param name="few">Форма при двух-четырёх: «операции перейдут».</param>
@@ -15,7 +17,9 @@ public static class Plural
     public static string Of(int count, string one, string few, string many) =>
         $"{count} {FormOf(count, one, few, many)}";
 
-    /// <summary>Выбирает форму слова без числа.</summary>
+    /// <summary>
+    /// Выбирает форму слова без числа.
+    /// </summary>
     /// <param name="count">Количество.</param>
     /// <param name="one">Форма при одном.</param>
     /// <param name="few">Форма при двух-четырёх.</param>

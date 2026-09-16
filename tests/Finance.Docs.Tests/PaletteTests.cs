@@ -9,7 +9,9 @@ namespace Finance.Docs.Tests;
 /// </summary>
 public sealed partial class PaletteTests
 {
-    /// <summary>Прямых цветов вне определения палитры в макетах нет.</summary>
+    /// <summary>
+    /// Прямых цветов вне определения палитры в макетах нет.
+    /// </summary>
     [Fact]
     public void Цвета_живут_только_в_палитре()
     {
@@ -36,11 +38,15 @@ public sealed partial class PaletteTests
         Assert.Contains(outside, static line => line.Text.Contains("<figure", StringComparison.Ordinal));
     }
 
-    /// <summary>Начало блока палитры: <c>:root{…}</c> или <c>[data-theme="dark"]{…}</c>.</summary>
+    /// <summary>
+    /// Начало блока палитры: <c>:root{…}</c> или <c>[data-theme="dark"]{…}</c>.
+    /// </summary>
     [GeneratedRegex("""(:root|\[data-theme)[^{]*\{""")]
     private static partial Regex PaletteStart();
 
-    /// <summary>Цвет, записанный значением, а не токеном.</summary>
+    /// <summary>
+    /// Цвет, записанный значением, а не токеном.
+    /// </summary>
     [GeneratedRegex("""#[0-9a-fA-F]{3,8}\b|\brgba?\(""")]
     private static partial Regex Color();
 

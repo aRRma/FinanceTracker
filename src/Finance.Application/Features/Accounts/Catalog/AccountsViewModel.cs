@@ -15,7 +15,9 @@ public sealed partial class AccountsViewModel : ScreenViewModel
     private readonly IAccountsQuery _accounts;
     private readonly IReorderAccountsHandler _reorder;
 
-    /// <summary>Создаёт модель представления справочника счетов.</summary>
+    /// <summary>
+    /// Создаёт модель представления справочника счетов.
+    /// </summary>
     /// <param name="accounts">Список счетов с балансами.</param>
     /// <param name="reorder">Сохранение порядка счетов.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
@@ -32,13 +34,19 @@ public sealed partial class AccountsViewModel : ScreenViewModel
         _reorder = reorder;
     }
 
-    /// <summary>Счета, деньги которых пользователь считает тратимыми.</summary>
+    /// <summary>
+    /// Счета, деньги которых пользователь считает тратимыми.
+    /// </summary>
     public ObservableCollection<AccountRowItem> Spendable { get; } = [];
 
-    /// <summary>Накопления — счета со «скрыть из расчётов».</summary>
+    /// <summary>
+    /// Накопления — счета со «скрыть из расчётов».
+    /// </summary>
     public ObservableCollection<AccountRowItem> Savings { get; } = [];
 
-    /// <summary>Закрытые счета. Остаются в справочнике, ленте и отчёте.</summary>
+    /// <summary>
+    /// Закрытые счета. Остаются в справочнике, ленте и отчёте.
+    /// </summary>
     public ObservableCollection<AccountRowItem> Closed { get; } = [];
 
     /// <summary>
@@ -47,7 +55,9 @@ public sealed partial class AccountsViewModel : ScreenViewModel
     /// </summary>
     public bool HasSavings => Savings.Count > 0;
 
-    /// <summary>В справочнике есть закрытые счета.</summary>
+    /// <summary>
+    /// В справочнике есть закрытые счета.
+    /// </summary>
     public bool HasClosed => Closed.Count > 0;
 
     /// <summary>
@@ -57,7 +67,9 @@ public sealed partial class AccountsViewModel : ScreenViewModel
     [ObservableProperty]
     public partial bool IsBusy { get; set; }
 
-    /// <summary>Перечитывает справочник.</summary>
+    /// <summary>
+    /// Перечитывает справочник.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)

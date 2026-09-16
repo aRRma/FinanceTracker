@@ -1,4 +1,5 @@
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Features.Accounts.Card;
 
@@ -9,28 +10,44 @@ namespace Finance.Application.Features.Accounts.Card;
 /// </summary>
 public sealed record AccountCard
 {
-    /// <summary>Ключ счёта.</summary>
+    /// <summary>
+    /// Ключ счёта.
+    /// </summary>
     public required Guid Key { get; init; }
 
-    /// <summary>Наименование счёта.</summary>
+    /// <summary>
+    /// Наименование счёта.
+    /// </summary>
     public required string Name { get; init; }
 
-    /// <summary>Наличные или карта.</summary>
+    /// <summary>
+    /// Наличные или карта.
+    /// </summary>
     public required AccountType Type { get; init; }
 
-    /// <summary>Валюта счёта.</summary>
+    /// <summary>
+    /// Валюта счёта.
+    /// </summary>
     public required Currency Currency { get; init; }
 
-    /// <summary>Начальный остаток.</summary>
+    /// <summary>
+    /// Начальный остаток.
+    /// </summary>
     public required decimal OpeningBalance { get; init; }
 
-    /// <summary>Дата открытия.</summary>
+    /// <summary>
+    /// Дата открытия.
+    /// </summary>
     public required DateOnly OpenedOn { get; init; }
 
-    /// <summary>«Скрыть из расчётов».</summary>
+    /// <summary>
+    /// «Скрыть из расчётов».
+    /// </summary>
     public required bool ExcludedFromTotals { get; init; }
 
-    /// <summary>«Счёт закрыт».</summary>
+    /// <summary>
+    /// «Счёт закрыт».
+    /// </summary>
     public required bool IsClosed { get; init; }
 
     /// <summary>
@@ -39,9 +56,13 @@ public sealed record AccountCard
     /// </summary>
     public required Money Balance { get; init; }
 
-    /// <summary>Валюту менять нельзя: по счёту уже была операция, пусть и удалённая.</summary>
+    /// <summary>
+    /// Валюту менять нельзя: по счёту уже была операция, пусть и удалённая.
+    /// </summary>
     public required bool CurrencyLocked { get; init; }
 
-    /// <summary>Дата самой ранней операции по счёту — дальше неё открытие не сдвигается.</summary>
+    /// <summary>
+    /// Дата самой ранней операции по счёту — дальше неё открытие не сдвигается.
+    /// </summary>
     public required DateOnly? EarliestTransactionOn { get; init; }
 }

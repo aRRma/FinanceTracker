@@ -5,7 +5,8 @@ using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Tests;
 
@@ -16,7 +17,9 @@ namespace Finance.Application.Tests;
 /// </summary>
 public sealed class UnsavedFormTests
 {
-    /// <summary>Только что открытая форма операции ничего не потеряла.</summary>
+    /// <summary>
+    /// Только что открытая форма операции ничего не потеряла.
+    /// </summary>
     [Fact]
     public async Task Открытая_форма_операции_не_считается_правленой()
     {
@@ -53,7 +56,9 @@ public sealed class UnsavedFormTests
         Assert.Equal(kind is TransactionKind.Transfer, model.Categories.Count is 0);
     }
 
-    /// <summary>Набранная сумма — потеря: ради неё диалог и заведён.</summary>
+    /// <summary>
+    /// Набранная сумма — потеря: ради неё диалог и заведён.
+    /// </summary>
     [Fact]
     public async Task Набранная_сумма_делает_форму_правленой()
     {
@@ -68,7 +73,9 @@ public sealed class UnsavedFormTests
         Assert.True(model.IsDirty);
     }
 
-    /// <summary>Заметка и место теряются так же, как сумма.</summary>
+    /// <summary>
+    /// Заметка и место теряются так же, как сумма.
+    /// </summary>
     [Fact]
     public async Task Заметка_делает_форму_правленой()
     {
@@ -101,7 +108,9 @@ public sealed class UnsavedFormTests
         Assert.False(model.IsDirty);
     }
 
-    /// <summary>Карточка счёта: подставленные поля правкой не считаются, набранное — считается.</summary>
+    /// <summary>
+    /// Карточка счёта: подставленные поля правкой не считаются, набранное — считается.
+    /// </summary>
     [Fact]
     public async Task Правка_названия_счёта_делает_форму_правленой()
     {
@@ -121,7 +130,9 @@ public sealed class UnsavedFormTests
         Assert.True(model.IsDirty);
     }
 
-    /// <summary>Карточка места: переименование теряется, открытие — нет.</summary>
+    /// <summary>
+    /// Карточка места: переименование теряется, открытие — нет.
+    /// </summary>
     [Fact]
     public async Task Переименование_места_делает_форму_правленой()
     {
@@ -146,7 +157,9 @@ public sealed class UnsavedFormTests
         Assert.True(model.IsDirty);
     }
 
-    /// <summary>Карточка группы: выбранный значок теряется так же, как название.</summary>
+    /// <summary>
+    /// Карточка группы: выбранный значок теряется так же, как название.
+    /// </summary>
     [Fact]
     public async Task Выбранный_значок_группы_делает_форму_правленой()
     {

@@ -7,21 +7,33 @@ namespace Finance.Application.Infrastructure.Storage.Rows;
 /// </summary>
 internal abstract class EntityRow
 {
-    /// <summary>Единственный идентификатор записи. Генерируется клиентом, базой — никогда.</summary>
+    /// <summary>
+    /// Единственный идентификатор записи. Генерируется клиентом, базой — никогда.
+    /// </summary>
     public required Guid Key { get; init; }
 
-    /// <summary>Момент создания записи. Участвует в сортировке ленты.</summary>
+    /// <summary>
+    /// Момент создания записи. Участвует в сортировке ленты.
+    /// </summary>
     public required DateTimeOffset CreatedAtUtc { get; init; }
 
-    /// <summary>Момент последнего изменения. Проставляется единой точкой сохранения.</summary>
+    /// <summary>
+    /// Момент последнего изменения. Проставляется единой точкой сохранения.
+    /// </summary>
     public required DateTimeOffset UpdatedAtUtc { get; set; }
 
-    /// <summary>Надгробие мягкого удаления.</summary>
+    /// <summary>
+    /// Надгробие мягкого удаления.
+    /// </summary>
     public DateTimeOffset? DeletedAtUtc { get; set; }
 
-    /// <summary>Подтверждение доставки на сервер. В MVP всегда пусто: обмена нет.</summary>
+    /// <summary>
+    /// Подтверждение доставки на сервер. В MVP всегда пусто: обмена нет.
+    /// </summary>
     public DateTimeOffset? SyncedAtUtc { get; set; }
 
-    /// <summary>Резерв под будущий импорт из сторонних приложений.</summary>
+    /// <summary>
+    /// Резерв под будущий импорт из сторонних приложений.
+    /// </summary>
     public string? ExternalId { get; set; }
 }

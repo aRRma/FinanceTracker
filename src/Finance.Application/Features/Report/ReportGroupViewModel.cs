@@ -1,7 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Finance.Application.Infrastructure;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Features.Report;
 
@@ -17,7 +18,9 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
     private Guid _groupKey;
     private int _generation;
 
-    /// <summary>Создаёт модель представления группы отчёта.</summary>
+    /// <summary>
+    /// Создаёт модель представления группы отчёта.
+    /// </summary>
     /// <param name="report">Суммы отчёта.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
     public ReportGroupViewModel(IReportQuery report, IChangeNotifier changes)
@@ -28,34 +31,50 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
         _report = report;
     }
 
-    /// <summary>Подкатегории группы, по убыванию суммы.</summary>
+    /// <summary>
+    /// Подкатегории группы, по убыванию суммы.
+    /// </summary>
     public ObservableCollection<ReportRowItem> Rows { get; } = [];
 
-    /// <summary>Месяц отчёта — приходит параметром перехода, здесь не переключается.</summary>
+    /// <summary>
+    /// Месяц отчёта — приходит параметром перехода, здесь не переключается.
+    /// </summary>
     public ReportMonth Month { get; private set; }
 
-    /// <summary>Название группы — заголовок экрана.</summary>
+    /// <summary>
+    /// Название группы — заголовок экрана.
+    /// </summary>
     [ObservableProperty]
     public partial string Name { get; private set; } = string.Empty;
 
-    /// <summary>Подпись под заголовком: «август 2026 · 37% расходов».</summary>
+    /// <summary>
+    /// Подпись под заголовком: «август 2026 · 37% расходов».
+    /// </summary>
     [ObservableProperty]
     public partial string Caption { get; private set; } = string.Empty;
 
-    /// <summary>Сумма группы за месяц со знаком.</summary>
+    /// <summary>
+    /// Сумма группы за месяц со знаком.
+    /// </summary>
     [ObservableProperty]
     public partial string Total { get; private set; } = string.Empty;
 
-    /// <summary>Итог — расходный: красится тем же цветом, что строки под ним.</summary>
+    /// <summary>
+    /// Итог — расходный: красится тем же цветом, что строки под ним.
+    /// </summary>
     [ObservableProperty]
     public partial bool IsTotalExpense { get; private set; }
 
-    /// <summary>Группа за месяц пуста: операции переехали или удалены после перехода сюда.</summary>
+    /// <summary>
+    /// Группа за месяц пуста: операции переехали или удалены после перехода сюда.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasItems))]
     public partial bool IsEmpty { get; private set; }
 
-    /// <summary>Идёт чтение.</summary>
+    /// <summary>
+    /// Идёт чтение.
+    /// </summary>
     [ObservableProperty]
     public partial bool IsBusy { get; private set; }
 
@@ -67,7 +86,9 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
     [NotifyPropertyChangedFor(nameof(HasItems))]
     public partial bool IsLoaded { get; private set; }
 
-    /// <summary>Есть что показать: список и итог видны.</summary>
+    /// <summary>
+    /// Есть что показать: список и итог видны.
+    /// </summary>
     public bool HasItems => IsLoaded && !IsEmpty;
 
     /// <summary>
