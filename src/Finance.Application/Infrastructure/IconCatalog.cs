@@ -44,10 +44,10 @@ public sealed class IconCatalog
     private static IconCatalog Parse()
     {
         using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(ResourceName)
-                              ?? throw new InvalidOperationException($"Ресурс {ResourceName} не вшит в сборку");
+                              ?? throw new InvalidOperationException(Faults.ResourceMissing(ResourceName));
 
         IconSet set = JsonSerializer.Deserialize<IconSet>(stream, IconSet.Options)
-                      ?? throw new InvalidOperationException("Набор значков пуст");
+                      ?? throw new InvalidOperationException(Faults.IconSetEmpty());
 
         return new IconCatalog(set.Fallback, set.Icons.ToFrozenSet(StringComparer.Ordinal))
         {

@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -112,8 +113,8 @@ public sealed partial class ReportViewModel : ScreenViewModel
     /// Заголовок пустого состояния — свой для каждого вида.
     /// </summary>
     public string EmptyTitle => Kind is CategoryKind.Expense
-        ? "В этом месяце трат не было"
-        : "В этом месяце доходов не было";
+        ? UiTexts.ReportEmptyExpense
+        : UiTexts.ReportEmptyIncome;
 
     /// <summary>
     /// Подпись пустого состояния. Когда операции месяца есть, но в суммы не вошли,
@@ -121,13 +122,7 @@ public sealed partial class ReportViewModel : ScreenViewModel
     /// принял бы пустой отчёт за поломку.
     /// </summary>
     [ObservableProperty]
-    public partial string EmptyHint { get; private set; } = MonthHint;
-
-    private const string MonthHint = "Выберите другой месяц стрелками вверху.";
-
-    private const string UncountedHint =
-        "В отчёт входят только рублёвые счета без признака «скрыть из расчётов». " +
-        "Операции по остальным счетам видны в ленте.";
+    public partial string EmptyHint { get; private set; } = UiTexts.ReportEmptyOtherMonth;
 
     /// <summary>
     /// Выбранный вид — номером в переключателе.
@@ -171,7 +166,7 @@ public sealed partial class ReportViewModel : ScreenViewModel
             }
 
             _all = all;
-            EmptyHint = hasUncounted ? UncountedHint : MonthHint;
+            EmptyHint = hasUncounted ? UiTexts.ReportEmptyCurrency : UiTexts.ReportEmptyOtherMonth;
 
             Rebuild();
 

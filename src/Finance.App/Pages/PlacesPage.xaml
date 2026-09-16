@@ -9,16 +9,17 @@
     x:Class="Finance.App.Pages.PlacesPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:catalog="clr-namespace:Finance.Application.Features.Places.Catalog;assembly=Finance.Application"
     xmlns:queries="clr-namespace:Finance.Application.Infrastructure.Queries;assembly=Finance.Application"
     x:DataType="catalog:PlacesViewModel"
-    Title="Места">
+    Title="{x:Static texts:UiTexts.PlacesTitle}">
 
     <Grid RowDefinitions="Auto,*">
 
-        <SearchBar Grid.Row="0" Text="{Binding Filter}" Placeholder="Поиск по названию" />
+        <SearchBar Grid.Row="0" Text="{Binding Filter}" Placeholder="{x:Static texts:UiTexts.CommonSearchByName}" />
 
         <!-- Тот же признак занятости гасит и ожидание первого чтения, и жест обновления -->
         <RefreshView Grid.Row="1" IsRefreshing="{Binding IsBusy}" Command="{Binding LoadCommand}">
@@ -56,10 +57,10 @@
                     <ContentView>
                         <VerticalStackLayout>
                             <Label Padding="16,24" IsVisible="{Binding IsEmpty}"
-                                   Text="Мест пока нет. Они заводятся из формы операции и накапливаются сами — заходить сюда стоит, когда захочется навести порядок."
+                                   Text="{x:Static texts:UiTexts.PlacesEmpty}"
                                    Style="{StaticResource SecondaryLabel}" />
                             <Label Padding="16,24" IsVisible="{Binding IsFilteredOut}"
-                                   Text="Ни одно место не подходит под набранные буквы."
+                                   Text="{x:Static texts:UiTexts.PlacesNotFound}"
                                    Style="{StaticResource SecondaryLabel}" />
                         </VerticalStackLayout>
                     </ContentView>

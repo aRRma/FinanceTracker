@@ -8,18 +8,19 @@
     x:Class="Finance.App.Pages.MorePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:more="clr-namespace:Finance.Application.Features.More;assembly=Finance.Application"
     x:DataType="more:MoreViewModel"
-    Title="Ещё">
+    Title="{x:Static texts:UiTexts.MoreTitle}">
 
     <!-- Container: .NET 10 пускает страницу под системные полосы, а ScrollView
          из всех областей понимает только эту -->
     <ScrollView SafeAreaEdges="Container">
         <VerticalStackLayout Padding="16,12" Spacing="16">
 
-            <Label Text="Справочники" Style="{StaticResource SectionLabel}" />
+            <Label Text="{x:Static texts:UiTexts.MoreCatalogs}" Style="{StaticResource SectionLabel}" />
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout>
                     <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
@@ -29,7 +30,7 @@
                         </Grid.GestureRecognizers>
 
                         <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="wallet" />
-                        <Label Grid.Column="1" Grid.Row="0" Text="Счета" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="{x:Static texts:UiTexts.AccountsTitle}" VerticalOptions="Center" />
                         <Label Grid.Column="1" Grid.Row="1" Text="{Binding AccountsCaption}"
                                Style="{StaticResource SecondaryLabel}" />
                         <controls:Icon Grid.Column="2" Grid.RowSpan="2" Key="chevron-right"
@@ -45,7 +46,7 @@
                         </Grid.GestureRecognizers>
 
                         <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="map-pin" />
-                        <Label Grid.Column="1" Grid.Row="0" Text="Места" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="{x:Static texts:UiTexts.PlacesTitle}" VerticalOptions="Center" />
                         <Label Grid.Column="1" Grid.Row="1" Text="{Binding PlacesCaption}"
                                Style="{StaticResource SecondaryLabel}" />
                         <controls:Icon Grid.Column="2" Grid.RowSpan="2" Key="chevron-right"
@@ -61,7 +62,7 @@
                         </Grid.GestureRecognizers>
 
                         <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="tag" />
-                        <Label Grid.Column="1" Grid.Row="0" Text="Категории" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="{x:Static texts:UiTexts.CategoriesTitle}" VerticalOptions="Center" />
                         <Label Grid.Column="1" Grid.Row="1" Text="{Binding CategoriesCaption}"
                                Style="{StaticResource SecondaryLabel}" />
                         <controls:Icon Grid.Column="2" Grid.RowSpan="2" Key="chevron-right"
@@ -70,7 +71,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="Настройки" Style="{StaticResource SectionLabel}" />
+            <Label Text="{x:Static texts:UiTexts.MoreSettings}" Style="{StaticResource SectionLabel}" />
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout>
                     <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
@@ -80,7 +81,7 @@
                         </Grid.GestureRecognizers>
 
                         <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="sun" />
-                        <Label Grid.Column="1" Grid.Row="0" Text="Оформление" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="{x:Static texts:UiTexts.AppearanceTitle}" VerticalOptions="Center" />
                         <Label Grid.Column="1" Grid.Row="1" Text="{Binding ThemeCaption}"
                                Style="{StaticResource SecondaryLabel}" />
                         <controls:Icon Grid.Column="2" Grid.RowSpan="2" Key="chevron-right"
@@ -96,7 +97,7 @@
                         </Grid.GestureRecognizers>
 
                         <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="world" />
-                        <Label Grid.Column="1" Grid.Row="0" Text="Часовой пояс" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="{x:Static texts:UiTexts.TimeZoneTitle}" VerticalOptions="Center" />
                         <Label Grid.Column="1" Grid.Row="1" Text="{Binding TimeZoneCaption}"
                                Style="{StaticResource SecondaryLabel}" />
                         <controls:Icon Grid.Column="2" Grid.RowSpan="2" Key="chevron-right"
@@ -112,7 +113,7 @@
                         </Grid.GestureRecognizers>
 
                         <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="info-circle" />
-                        <Label Grid.Column="1" Grid.Row="0" Text="О программе" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="{x:Static texts:UiTexts.AboutTitle}" VerticalOptions="Center" />
                         <Label Grid.Column="1" Grid.Row="1" Text="{Binding AboutCaption}"
                                Style="{StaticResource SecondaryLabel}" />
                         <controls:Icon Grid.Column="2" Grid.RowSpan="2" Key="chevron-right"

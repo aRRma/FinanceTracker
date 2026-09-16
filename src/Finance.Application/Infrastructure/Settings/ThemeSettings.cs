@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 namespace Finance.Application.Infrastructure.Settings;
 
 /// <summary>
@@ -28,9 +29,9 @@ public static class ThemeSettings
         /// </summary>
         public string Caption => theme switch
         {
-            Theme.Light => "Светлая",
-            Theme.Dark => "Тёмная",
-            _ => "Как в системе"
+            Theme.Light => UiTexts.ThemeLight,
+            Theme.Dark => UiTexts.ThemeDark,
+            _ => UiTexts.ThemeSystem
         };
     }
 

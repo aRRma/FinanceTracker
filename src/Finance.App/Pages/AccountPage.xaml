@@ -8,6 +8,7 @@
     x:Class="Finance.App.Pages.AccountPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:card="clr-namespace:Finance.Application.Features.Accounts.Card;assembly=Finance.Application"
     x:DataType="card:AccountViewModel"
@@ -20,30 +21,30 @@
 
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="14,10" Spacing="10">
-                    <Label Text="Название" Style="{StaticResource CaptionLabel}" />
-                    <Entry Text="{Binding Name}" Placeholder="Карта основная" />
+                    <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
+                    <Entry Text="{Binding Name}" Placeholder="{x:Static texts:UiTexts.AccountNamePlaceholder}" />
 
                     <BoxView Style="{StaticResource Divider}" />
 
-                    <Label Text="Тип" Style="{StaticResource CaptionLabel}" />
+                    <Label Text="{x:Static texts:UiTexts.AccountTypeLabel}" Style="{StaticResource CaptionLabel}" />
                     <Picker ItemsSource="{Binding TypeNames}" SelectedIndex="{Binding TypeIndex}" />
 
                     <BoxView Style="{StaticResource Divider}" />
 
-                    <Label Text="Валюта" Style="{StaticResource CaptionLabel}" />
+                    <Label Text="{x:Static texts:UiTexts.AccountCurrencyLabel}" Style="{StaticResource CaptionLabel}" />
                     <Picker ItemsSource="{Binding CurrencyNames}" SelectedIndex="{Binding CurrencyIndex}"
                             IsEnabled="{Binding CurrencyEditable}" />
-                    <Label Text="Валюта не меняется: по счёту уже есть операции"
+                    <Label Text="{x:Static texts:UiTexts.AccountCurrencyLocked}"
                            Style="{StaticResource CaptionLabel}" IsVisible="{Binding CurrencyLocked}" />
 
                     <BoxView Style="{StaticResource Divider}" />
 
-                    <Label Text="Начальный остаток" Style="{StaticResource CaptionLabel}" />
+                    <Label Text="{x:Static texts:UiTexts.AccountOpeningBalanceLabel}" Style="{StaticResource CaptionLabel}" />
                     <Entry Text="{Binding OpeningBalance}" Keyboard="Numeric" />
 
                     <BoxView Style="{StaticResource Divider}" />
 
-                    <Label Text="Дата открытия" Style="{StaticResource CaptionLabel}" />
+                    <Label Text="{x:Static texts:UiTexts.AccountOpenedOnLabel}" Style="{StaticResource CaptionLabel}" />
                     <DatePicker Date="{Binding OpenedOnDate}" MaximumDate="{Binding LatestOpeningDate}" />
                     <Label Text="{Binding OpenedOnHint}" Style="{StaticResource CaptionLabel}"
                            IsVisible="{Binding HasOpenedOnHint}" />
@@ -53,19 +54,19 @@
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="14,10" Spacing="10">
                     <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
-                        <Label Grid.Column="0" Text="Скрыть из расчётов" VerticalOptions="Center" />
+                        <Label Grid.Column="0" Text="{x:Static texts:UiTexts.AccountExcludeLabel}" VerticalOptions="Center" />
                         <Switch Grid.Column="1" IsToggled="{Binding ExcludedFromTotals}" />
                     </Grid>
-                    <Label Text="Счёт не входит ни в «доступно к тратам», ни в итоги дня, ни в отчёт"
+                    <Label Text="{x:Static texts:UiTexts.AccountExcludeHint}"
                            Style="{StaticResource CaptionLabel}" />
 
                     <BoxView Style="{StaticResource Divider}" />
 
                     <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
-                        <Label Grid.Column="0" Text="Счёт закрыт" VerticalOptions="Center" />
+                        <Label Grid.Column="0" Text="{x:Static texts:UiTexts.AccountClosedLabel}" VerticalOptions="Center" />
                         <Switch Grid.Column="1" IsToggled="{Binding IsClosed}" />
                     </Grid>
-                    <Label Text="Закрытый счёт не показывается на главном экране и не предлагается в выборе. Лента и отчёт не меняются"
+                    <Label Text="{x:Static texts:UiTexts.AccountClosedHint}"
                            Style="{StaticResource CaptionLabel}" />
                 </VerticalStackLayout>
             </Border>
@@ -74,7 +75,7 @@
                 <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
             </Border>
 
-            <Button Text="Сохранить" Clicked="OnSave" IsEnabled="{Binding CanSave}"
+            <Button Text="{x:Static texts:UiTexts.CommonSave}" Clicked="OnSave" IsEnabled="{Binding CanSave}"
                     Style="{StaticResource SaveButton}" AutomationId="SaveAccount" />
 
         </VerticalStackLayout>

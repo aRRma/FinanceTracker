@@ -1,3 +1,4 @@
+using Finance.Domain.Errors;
 using Finance.Domain.Rules;
 using Finance.Domain.Values;
 
@@ -32,7 +33,7 @@ public sealed class Place : Entity
     /// Заводит место. Уникальность имени проверяется отдельно: она требует справочника целиком.
     /// </summary>
     public static Place Create(string name, DateTimeOffset nowUtc) =>
-        new(Keys.New(), Names.Normalize(name, "место"),
+        new(Keys.New(), Names.Normalize(name, RuleText.SubjectPlace),
             createdAtUtc: nowUtc, updatedAtUtc: nowUtc,
             deletedAtUtc: null, syncedAtUtc: null, externalId: null);
 
@@ -54,5 +55,5 @@ public sealed class Place : Entity
     /// <summary>
     /// Переименовывает место. Операции при этом не правятся — они ссылаются на ключ.
     /// </summary>
-    public void Rename(string name) => Name = Names.Normalize(name, "место");
+    public void Rename(string name) => Name = Names.Normalize(name, RuleText.SubjectPlace);
 }

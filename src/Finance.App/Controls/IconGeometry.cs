@@ -33,7 +33,7 @@ internal static class IconGeometry
     private static FrozenDictionary<string, PathF> Load()
     {
         using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(ResourceName)
-                              ?? throw new InvalidOperationException($"Ресурс {ResourceName} не вшит в сборку");
+                              ?? throw new InvalidOperationException(AppFaults.ResourceMissing(ResourceName));
 
         // Разбор по документу, а не сериализатором: обрезка кода в релизе
         // вырезает то, до чего сериализатор добирается отражением
@@ -44,7 +44,7 @@ internal static class IconGeometry
         foreach (JsonProperty icon in document.RootElement.GetProperty("icons").EnumerateObject())
         {
             string data = icon.Value.GetString()
-                          ?? throw new InvalidOperationException($"У значка «{icon.Name}» нет контура");
+                          ?? throw new InvalidOperationException(AppFaults.IconPathMissing(icon.Name));
 
             paths[icon.Name] = PathBuilder.Build(data);
         }

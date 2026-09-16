@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using Finance.Application.Features.Settings.TimeZones;
 using Finance.Application.Infrastructure;
 
@@ -48,7 +49,7 @@ public partial class TimeZonePage : DataPage
             // Зона пришла из системного списка и пропасть из него не может,
             // но список читается один раз на заход: за это время систему могли
             // обновить, и молчаливый отказ выглядел бы как несработавшее касание
-            await DisplayAlertAsync("Зона недоступна", error.Message, "Закрыть");
+            await DisplayAlertAsync(UiTexts.TimeZoneUnavailableTitle, error.Message, UiTexts.CommonClose);
         }
     }
 }

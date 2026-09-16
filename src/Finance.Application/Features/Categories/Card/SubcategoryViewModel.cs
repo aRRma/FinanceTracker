@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -121,12 +122,12 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Подпись вида: он наследуется от группы и на этом экране заперт.
     /// </summary>
-    public string KindCaption => _kind is CategoryKind.Expense ? "Расход" : "Доход";
+    public string KindCaption => _kind is CategoryKind.Expense ? UiTexts.KindExpense : UiTexts.KindIncome;
 
     /// <summary>
     /// Заголовок экрана.
     /// </summary>
-    public string Title => Key is null ? "Новая подкатегория" : "Подкатегория";
+    public string Title => Key is null ? UiTexts.SubcategoryTitleNew : UiTexts.SubcategoryTitleExisting;
 
     /// <summary>
     /// Удалять есть что и есть чем: подкатегория существует и не защищена.
@@ -221,7 +222,7 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
 
         if (Group is not { } target)
         {
-            Error = "Группа не выбрана";
+            Error = UiTexts.SubcategoryGroupNotChosen;
             OnPropertyChanged(nameof(HasError));
 
             return false;
@@ -273,22 +274,26 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
     {
         if (Key is not { } key || await _deletion.ReadAsync(key, cancellationToken) is not { } deletion)
         {
-            return "Отменить удаление будет нельзя.";
+            return UiTexts.SubcategoryDeleteIrreversible;
         }
 
         if (deletion.TransactionCount is 0)
         {
-            return "Операций в ней нет. Отменить удаление будет нельзя.";
+            return UiTexts.SubcategoryDeleteEmpty;
         }
 
         string operations = Plural.Of(
             deletion.TransactionCount,
-            "операция перейдёт",
-            "операции перейдут",
-            "операций перейдут");
+            UiTexts.SubcategoryMovingOne,
+            UiTexts.SubcategoryMovingFew,
+            UiTexts.SubcategoryMovingMany);
 
-        return $"{operations} в «{deletion.GroupName} · {deletion.ReceiverName}». "
-               + "Суммы и даты не изменятся, балансы останутся прежними.";
+        return string.Format(
+            UiCulture.Current,
+            UiTexts.SubcategoryDeletePrompt,
+            operations,
+            deletion.GroupName,
+            deletion.ReceiverName);
     }
 
     /// <summary>

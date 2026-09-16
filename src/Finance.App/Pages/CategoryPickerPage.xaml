@@ -2,7 +2,8 @@
 <!--
     Экран B-03: выбор подкатегории. Группы свёрнуты: подкатегорий шесть десятков,
     и сплошной список читать дольше, чем открыть нужную группу. Поиск раскрывает
-    группы сам — набравшему название группы уже не нужны.
+    группы сам — набравшему название группы уже не нужны. Над списком — панель
+    частых подкатегорий: до привычной иначе разворот группы и прокрутка.
 
     Список плоский, а не с группировкой: группировка в MAUI прячет заголовок
     вместе с содержимым, а свёрнутой группе заголовок как раз и нужен. Шапка
@@ -12,6 +13,7 @@
     x:Class="Finance.App.Pages.CategoryPickerPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:pick="clr-namespace:Finance.Application.Features.Transactions.Pick;assembly=Finance.Application"
@@ -19,11 +21,54 @@
     Title="{Binding Title}"
     Shell.TabBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,Auto,*">
 
-        <SearchBar Grid.Row="0" Text="{Binding Filter}" Placeholder="Поиск по названию" />
+        <SearchBar Grid.Row="0" Text="{Binding Filter}" Placeholder="{x:Static texts:UiTexts.CommonSearchByName}" />
 
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Lines}" SelectionMode="None">
+        <!--
+            Панель частых: расход записывают несколько раз в день и почти всегда
+            в одну из немногих подкатегорий. С первой буквой поиска панель уходит —
+            набравший буквы ищет как раз не частое.
+
+            Чипы лежат в своём слое: связанный список наполняет лэйаут целиком
+            и стёр бы положенный рядом заголовок.
+        -->
+        <VerticalStackLayout Grid.Row="1" Padding="16,4,16,8" Spacing="6"
+                             IsVisible="{Binding IsFrequentVisible}">
+            <Label Text="{x:Static texts:UiTexts.PickCategoryFrequent}" Style="{StaticResource SectionLabel}" />
+
+            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Frequent}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="pick:CategoryPickerLine">
+                            <Border Style="{StaticResource Chip}" Padding="10,6">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="Style" Value="{StaticResource ChipSelected}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnLineTapped" />
+                                </Border.GestureRecognizers>
+
+                                <HorizontalStackLayout Spacing="6">
+                                    <controls:Icon Key="{Binding Icon}" />
+                                    <Label Text="{Binding Name}" Style="{StaticResource ChipLabel}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="Style" Value="{StaticResource ChipSelectedLabel}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </HorizontalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </HorizontalStackLayout>
+            </ScrollView>
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Lines}" SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="pick:CategoryPickerLine">
                     <Grid Padding="16,10" ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12"
@@ -62,7 +107,7 @@
                                        AutomationId="Chevron" Style="{StaticResource MutedIcon}" />
 
                         <controls:Icon Grid.Column="4" Key="check" IsVisible="{Binding IsSelected}"
-                                       SemanticProperties.Description="Выбрано"
+                                       SemanticProperties.Description="{x:Static texts:UiTexts.CommonSelected}"
                                        Style="{StaticResource AccentIcon}" />
                     </Grid>
                 </DataTemplate>
@@ -73,7 +118,7 @@
             <CollectionView.EmptyView>
                 <ContentView>
                     <Label Padding="16,24" IsVisible="{Binding IsEmpty}"
-                           Text="Ни одна категория не подходит под набранные буквы."
+                           Text="{x:Static texts:UiTexts.PickCategoryEmpty}"
                            Style="{StaticResource SecondaryLabel}" />
                 </ContentView>
             </CollectionView.EmptyView>

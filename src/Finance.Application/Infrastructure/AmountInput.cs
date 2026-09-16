@@ -49,7 +49,7 @@ public static class AmountInput
             _ when char.IsAsciiDigit(key) => AppendDigit(expression, key),
             _ when key == Separator => AppendSeparator(expression),
             _ when Operators.Contains(key) => AppendOperator(expression, key),
-            _ => throw new ArgumentOutOfRangeException(nameof(key), key, "Такой клавиши на клавиатуре суммы нет")
+            _ => throw new ArgumentOutOfRangeException(nameof(key), key, Faults.KeypadKeyUnknown())
         };
     }
 

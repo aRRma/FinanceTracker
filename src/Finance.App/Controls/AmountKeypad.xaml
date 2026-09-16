@@ -16,6 +16,7 @@
     x:Class="Finance.App.Controls.AmountKeypad"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:controls="clr-namespace:Finance.App.Controls">
 
     <Grid RowDefinitions="Auto,Auto"
@@ -52,7 +53,7 @@
                 <!-- Стирание значком, а не знаком: «⌫» в системном шрифте набирается не везде.
                      Описание обязательно: у клавиши нет подписи, и вслух она молчит -->
                 <Border Grid.Row="3" Grid.Column="2" Style="{StaticResource KeypadCell}"
-                        SemanticProperties.Description="Стереть знак" AutomationId="Backspace">
+                        SemanticProperties.Description="{x:Static texts:UiTexts.KeypadEraseHint}" AutomationId="Backspace">
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnBackspace" />
                     </Border.GestureRecognizers>

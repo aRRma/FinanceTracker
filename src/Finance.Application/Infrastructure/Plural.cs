@@ -15,7 +15,7 @@ public static class Plural
     /// <param name="few">Форма при двух-четырёх: «операции перейдут».</param>
     /// <param name="many">Форма при пяти и больше: «операций перейдут».</param>
     public static string Of(int count, string one, string few, string many) =>
-        $"{count} {FormOf(count, one, few, many)}";
+        string.Create(UiCulture.Current, $"{count} {FormOf(count, one, few, many)}");
 
     /// <summary>
     /// Выбирает форму слова без числа.
@@ -30,6 +30,17 @@ public static class Plural
         ArgumentException.ThrowIfNullOrWhiteSpace(few);
         ArgumentException.ThrowIfNullOrWhiteSpace(many);
 
+        // Развилка по языку встанет здесь: у английского форм две, и третий
+        // аргумент ему просто не понадобится. Вызывающие при этом не меняются —
+        // ради этого формы и передаются значениями, а не выводятся из слова
+        return Russian(count, one, few, many);
+    }
+
+    /// <summary>
+    /// Русское правило выбора формы: по последней цифре, кроме одиннадцати и вокруг.
+    /// </summary>
+    private static string Russian(int count, string one, string few, string many)
+    {
         int hundreds = Math.Abs(count) % 100;
         int tens = hundreds % 10;
 

@@ -80,7 +80,7 @@ public sealed class DeleteSubcategoryHandler : IDeleteSubcategoryHandler
             .AsNoTracking()
             .FirstOrDefaultAsync(row => row.Key == parentKey, cancellationToken)
             .ConfigureAwait(false)
-            ?? throw new InvalidOperationException($"Группа {parentKey} удаляемой категории «{deleted.Name}» не найдена");
+            ?? throw new InvalidOperationException(Faults.GroupOfDeletedNotFound(parentKey, deleted.Name));
 
         List<CategoryRow> siblingRows = await context.Categories
             .AsNoTracking()

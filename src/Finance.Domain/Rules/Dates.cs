@@ -22,16 +22,18 @@ public static class Dates
     /// <param name="today">Локальная дата пользователя, не дата в UTC.</param>
     /// <param name="invariant">Правило, о нарушении которого сообщить.</param>
     /// <param name="what">Что проверяется — попадёт в текст ошибки.</param>
-    public static void EnsureInRange(DateOnly value, DateOnly today, Invariant invariant, string what)
+    public static void EnsureInRange(DateOnly value, DateOnly today, Invariant invariant, RuleText what)
     {
         DomainException.ThrowIf(
             value < Earliest,
             invariant,
-            $"{what} {value:yyyy-MM-dd} раньше {Earliest:yyyy-MM-dd}");
+            RuleText.DateTooEarly,
+            what, value, Earliest);
 
         DomainException.ThrowIf(
             value > today,
             invariant,
-            $"{what} {value:yyyy-MM-dd} в будущем: сегодня {today:yyyy-MM-dd}");
+            RuleText.DateInFuture,
+            what, value, today);
     }
 }

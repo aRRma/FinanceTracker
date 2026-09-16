@@ -43,14 +43,15 @@ public static class CategoryRules
         DomainException.ThrowIf(
             deleted.IsProtected,
             Invariant.ProtectedCategoryStays,
-            $"Категория «{deleted.Name}» не удаляется: она приёмник группы или служебная");
+            RuleText.ProtectedCategoryNotDeleted,
+            deleted.Name);
 
         EnsureBelongsToGroup(deleted, group, nameof(deleted));
 
         return FindReceiver(group, subcategories)
                ?? throw new DomainException(
                    Invariant.GroupHasReceiver,
-                   $"У служебной группы «{group.Name}» приёмника нет: удалять в ней нечего");
+                   RuleTexts.Format(RuleText.ServiceGroupHasNoReceiver, group.Name));
     }
 
     /// <summary>
@@ -74,12 +75,14 @@ public static class CategoryRules
         DomainException.ThrowIf(
             subcategory.IsGroup,
             Invariant.CategoryLevelFixed,
-            $"Группа «{subcategory.Name}» никуда не переносится: уровней всего два");
+            RuleText.GroupNotMoved,
+            subcategory.Name);
 
         DomainException.ThrowIf(
             subcategory.IsProtected,
             Invariant.ProtectedCategoryStays,
-            $"Категория «{subcategory.Name}» не переносится: она приёмник группы или служебная");
+            RuleText.ProtectedCategoryNotMoved,
+            subcategory.Name);
 
         EnsureIsGroup(currentGroup, nameof(currentGroup));
         EnsureIsGroup(newGroup, nameof(newGroup));
@@ -91,16 +94,26 @@ public static class CategoryRules
         DomainException.ThrowIf(
             newGroup.Role is CategoryRole.Service,
             Invariant.ServiceGroupClosedToMoves,
-            $"«{subcategory.Name}» нельзя перенести в служебную группу «{newGroup.Name}»");
+            RuleText.ServiceGroupClosedToMoves,
+            subcategory.Name, newGroup.Name);
 
-        // Вид подкатегория не хранит — она его наследует, поэтому сравниваются группы
-        DomainException.ThrowIf(
-            currentGroup.Kind != newGroup.Kind,
-            Invariant.MoveKeepsKind,
-            $"«{subcategory.Name}» нельзя перенести из «{currentGroup.Name}» ({currentGroup.Kind}) " +
-            $"в «{newGroup.Name}» ({newGroup.Kind}): вид не совпадает");
+        // Вид подкатегория не хранит — она его наследует, поэтому сравниваются группы.
+        // Подстановок пять, перегрузки ThrowIf на столько нет: текст собирается
+        // внутри ветки, то есть по-прежнему только при нарушении
+        if (currentGroup.Kind != newGroup.Kind)
+        {
+            throw new DomainException(
+                Invariant.MoveKeepsKind,
+                RuleTexts.Format(
+                    RuleText.MoveKeepsKind,
+                    subcategory.Name, currentGroup.Name, currentGroup.Kind, newGroup.Name, newGroup.Kind));
+        }
 
-        NameUniqueness.Ensure(subcategory.Name, namesInNewGroup, $"подкатегория группы «{newGroup.Name}»");
+        NameUniqueness.Ensure(
+            subcategory.Name,
+            namesInNewGroup,
+            RuleText.SubjectSubcategoryOfGroup,
+            newGroup.Name);
     }
 
     /// <summary>
@@ -114,7 +127,7 @@ public static class CategoryRules
 
         if (!category.IsGroup)
         {
-            throw new ArgumentException($"«{category.Name}» не группа", parameterName);
+            throw new ArgumentException(DomainFaults.NotAGroup(category.Name), parameterName);
         }
     }
 
@@ -148,7 +161,8 @@ public static class CategoryRules
             DomainException.ThrowIf(
                 subcategories.Count != 1 || receivers != 0,
                 Invariant.GroupHasReceiver,
-                $"У служебной группы «{group.Name}» обязана быть ровно одна служебная подкатегория");
+                RuleText.ServiceGroupHasOneSubcategory,
+                group.Name);
 
             return null;
         }
@@ -156,7 +170,8 @@ public static class CategoryRules
         DomainException.ThrowIf(
             receivers != 1,
             Invariant.GroupHasReceiver,
-            $"У группы «{group.Name}» обязан быть ровно один приёмник «Прочее», найдено {receivers}");
+            RuleText.GroupHasOneReceiver,
+            group.Name, receivers);
 
         return receiver;
     }
@@ -166,7 +181,7 @@ public static class CategoryRules
         if (subcategory.ParentKey != group.Key)
         {
             throw new ArgumentException(
-                $"«{subcategory.Name}» не принадлежит группе «{group.Name}»",
+                DomainFaults.NotInGroup(subcategory.Name, group.Name),
                 parameterName);
         }
     }

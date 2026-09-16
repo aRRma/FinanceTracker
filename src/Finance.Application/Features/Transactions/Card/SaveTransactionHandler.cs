@@ -136,7 +136,7 @@ public sealed class SaveTransactionHandler : ISaveTransactionHandler
         TransactionRow row = await context.Transactions
             .FirstOrDefaultAsync(existing => existing.Key == key, cancellationToken)
             .ConfigureAwait(false)
-            ?? throw new InvalidOperationException($"Операция {key} не найдена");
+            ?? throw new InvalidOperationException(Faults.TransactionNotFound(key));
 
         // Два экземпляра из одной строки: один правится, другой остаётся снимком
         // «как было» — по нему домен отличает уже задействованный закрытый счёт
@@ -185,7 +185,7 @@ public sealed class SaveTransactionHandler : ISaveTransactionHandler
         }
 
         throw new ArgumentException(
-            $"Перевод из {source.Currency} в {target.Currency} без суммы зачисления",
+            Faults.TransferAmountMissing(source.Currency, target.Currency),
             nameof(command));
     }
 
@@ -206,7 +206,7 @@ public sealed class SaveTransactionHandler : ISaveTransactionHandler
             .AsNoTracking()
             .FirstOrDefaultAsync(category => category.Key == key, cancellationToken)
             .ConfigureAwait(false)
-            ?? throw new InvalidOperationException($"Категория {key} не найдена");
+            ?? throw new InvalidOperationException(Faults.CategoryNotFound(key));
 
         Category category = row.ToDomain();
 
@@ -221,7 +221,7 @@ public sealed class SaveTransactionHandler : ISaveTransactionHandler
             .AsNoTracking()
             .FirstOrDefaultAsync(group => group.Key == parentKey, cancellationToken)
             .ConfigureAwait(false)
-            ?? throw new InvalidOperationException($"Группа {parentKey} подкатегории {key} не найдена");
+            ?? throw new InvalidOperationException(Faults.GroupOfSubcategoryNotFound(parentKey, key));
 
         return (category, parent.ToDomain());
     }

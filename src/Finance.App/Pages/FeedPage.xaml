@@ -8,11 +8,12 @@
     x:Class="Finance.App.Pages.FeedPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:feed="clr-namespace:Finance.Application.Features.Feed;assembly=Finance.Application"
     x:DataType="feed:FeedViewModel"
-    Title="Операции">
+    Title="{x:Static texts:UiTexts.FeedTitle}">
 
     <Grid>
         <!-- Пустое состояние — внутри списка: соседом в той же ячейке оно оказалось бы
@@ -21,16 +22,16 @@
             <controls:FeedList.Empty>
                 <VerticalStackLayout Padding="32" Spacing="12" IsVisible="{Binding IsEmpty}"
                                      VerticalOptions="Center" HorizontalOptions="Center">
-                    <Label Text="Операций пока нет" HorizontalTextAlignment="Center"
+                    <Label Text="{x:Static texts:UiTexts.FeedEmptyTitle}" HorizontalTextAlignment="Center"
                            Style="{StaticResource TitleLabel}" />
-                    <Label Text="Первая запись появится здесь сразу после сохранения."
+                    <Label Text="{x:Static texts:UiTexts.FeedEmptyHint}"
                            HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
                 </VerticalStackLayout>
             </controls:FeedList.Empty>
         </controls:FeedList>
 
         <Button Text="+" Clicked="OnAdd" Style="{StaticResource FloatingButton}"
-                SemanticProperties.Description="Записать операцию" AutomationId="AddTransaction" />
+                SemanticProperties.Description="{x:Static texts:UiTexts.FeedAddTransactionHint}" AutomationId="AddTransaction" />
     </Grid>
 
 </pages:DataPage>

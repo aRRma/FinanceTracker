@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
@@ -19,8 +18,6 @@ public sealed partial class FeedViewModel : ScreenViewModel
     /// Строк на страницу: экран с запасом на пару прокруток.
     /// </summary>
     private const int PageSize = 50;
-
-    private static readonly CultureInfo Russian = CultureInfo.GetCultureInfo("ru-RU");
 
     private readonly IFeedQuery _feed;
     private readonly IAccountsQuery _accounts;
@@ -274,7 +271,7 @@ public sealed partial class FeedViewModel : ScreenViewModel
         AccountBalance = account.Balance.Display;
         IsAccountBalanceNegative = account.Balance.IsNegative;
         OpeningBalance = account.OpeningBalance.Display;
-        OpenedOn = account.OpenedOn.ToString("d MMMM yyyy", Russian);
+        OpenedOn = DateText.DayWithYear(account.OpenedOn);
     }
 
     /// <inheritdoc />

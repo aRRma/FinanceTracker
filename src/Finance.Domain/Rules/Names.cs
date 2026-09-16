@@ -13,13 +13,18 @@ public static class Names
     /// пробелом, выглядит в списке точно так же, как уже существующее, и проверка
     /// уникальности его пропустит.
     /// </summary>
+    /// <param name="name">Имя, пришедшее от пользователя.</param>
+    /// <param name="what">Что именно именуется — попадёт в текст ошибки.</param>
+    /// <param name="qualifier">Уточнение подписи, например название группы подкатегории.</param>
     /// <exception cref="DomainException">Имя пусто или состоит из одних пробелов.</exception>
-    public static string Normalize(string? name, string what)
+    public static string Normalize(string? name, RuleText what, string? qualifier = null)
     {
         // if, а не ThrowIf: анализ потока должен увидеть, что дальше name не null
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new DomainException(Invariant.NameTrimmedAndNotEmpty, $"Имя ({what}) не может быть пустым");
+            throw new DomainException(
+                Invariant.NameTrimmedAndNotEmpty,
+                RuleTexts.Format(RuleText.NameEmpty, RuleTexts.Of(what, qualifier)));
         }
 
         return name.Trim();

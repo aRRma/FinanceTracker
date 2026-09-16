@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using System.Diagnostics;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Domain.Errors;
@@ -51,7 +52,7 @@ internal static class Guarded
         {
             if (Shell.Current?.CurrentPage is { } page)
             {
-                await page.DisplayAlertAsync("Не удалось выполнить действие", Explain(error), "Закрыть");
+                await page.DisplayAlertAsync(UiTexts.ErrorActionFailedTitle, Explain(error), UiTexts.CommonClose);
             }
         }
         catch (Exception failure) when (failure is not OperationCanceledException)
@@ -69,6 +70,6 @@ internal static class Guarded
     private static string Explain(Exception error) => error switch
     {
         DomainException or DatabaseMigrationException => error.Message,
-        _ => "Что-то пошло не так. Попробуйте ещё раз; подробности — в журнале устройства."
+        _ => UiTexts.ErrorUnexpected
     };
 }

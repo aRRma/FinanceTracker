@@ -21,11 +21,12 @@ public static class NameUniqueness
     /// <param name="name">Проверяемое имя, до приведения.</param>
     /// <param name="takenNames">Имена соседей по области поиска, без удалённых.</param>
     /// <param name="what">Что именно проверяется — попадёт в текст ошибки.</param>
-    public static void Ensure(string name, IEnumerable<string> takenNames, string what)
+    /// <param name="qualifier">Уточнение подписи, например название группы подкатегории.</param>
+    public static void Ensure(string name, IEnumerable<string> takenNames, RuleText what, string? qualifier = null)
     {
         ArgumentNullException.ThrowIfNull(takenNames);
 
-        string normalized = Names.Normalize(name, what);
+        string normalized = Names.Normalize(name, what, qualifier);
 
         // Сообщение строится после цикла: иначе на справочник из N мест собиралось бы
         // N текстов, чтобы бросить не больше одного
@@ -33,7 +34,9 @@ public static class NameUniqueness
         {
             if (Names.AreSame(taken, normalized))
             {
-                throw new DomainException(Invariant.NameUnique, $"Имя «{normalized}» уже занято ({what})");
+                throw new DomainException(
+                    Invariant.NameUnique,
+                    RuleTexts.Format(RuleText.NameTaken, normalized, RuleTexts.Of(what, qualifier)));
             }
         }
     }
@@ -46,14 +49,16 @@ public static class NameUniqueness
     /// <param name="neighbours">Соседи по области поиска, ключ и имя.</param>
     /// <param name="self">Ключ переименовываемой записи.</param>
     /// <param name="what">Что именно проверяется — попадёт в текст ошибки.</param>
+    /// <param name="qualifier">Уточнение подписи, например название группы подкатегории.</param>
     public static void EnsureForRename(
         string name,
         IEnumerable<(Guid Key, string Name)> neighbours,
         Guid self,
-        string what)
+        RuleText what,
+        string? qualifier = null)
     {
         ArgumentNullException.ThrowIfNull(neighbours);
 
-        Ensure(name, neighbours.Where(n => n.Key != self).Select(static n => n.Name), what);
+        Ensure(name, neighbours.Where(n => n.Key != self).Select(static n => n.Name), what, qualifier);
     }
 }

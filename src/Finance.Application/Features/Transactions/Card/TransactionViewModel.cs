@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -31,8 +32,6 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     private readonly IAccountsQuery _accounts;
     private readonly IClock _clock;
     private readonly TransactionPicks _picks;
-
-    private static readonly CultureInfo Russian = CultureInfo.GetCultureInfo("ru-RU");
 
     private IReadOnlyList<AccountOption> _allAccounts = [];
     private IReadOnlyList<CategoryOption> _allCategories = [];
@@ -90,12 +89,12 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Заголовок экрана.
     /// </summary>
-    public string Title => IsExisting ? "Операция" : "Новая операция";
+    public string Title => IsExisting ? UiTexts.TransactionTitleExisting : UiTexts.TransactionTitleNew;
 
     /// <summary>
     /// Подписи видов для переключателя, в порядке <see cref="KindIndex"/>.
     /// </summary>
-    public static IReadOnlyList<string> KindNames { get; } = ["Расход", "Доход", "Перевод"];
+    public static IReadOnlyList<string> KindNames { get; } = [UiTexts.KindExpense, UiTexts.KindIncome, UiTexts.KindTransfer];
 
     /// <summary>
     /// Вид операции. По умолчанию расход — он записывается чаще всего.
@@ -130,7 +129,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Подпись счёта списания: у перевода «Откуда», у остальных просто «Счёт».
     /// </summary>
-    public string SourceLabel => IsTransfer ? "Откуда" : "Счёт";
+    public string SourceLabel => IsTransfer ? UiTexts.TransactionSourceTransfer : UiTexts.TransactionSourceSimple;
 
     /// <summary>
     /// Вид категорий, подходящих операции: расходной — расходные. Тем же видом
@@ -277,24 +276,24 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Счёт списания в строке-поле: название, пока не выбран — приглашение выбрать.
     /// </summary>
-    public string SourceAccountCaption => SourceAccount?.Name ?? "Выбрать";
+    public string SourceAccountCaption => SourceAccount?.Name ?? UiTexts.CommonChoose;
 
     /// <summary>
     /// Счёт зачисления в строке-поле.
     /// </summary>
-    public string TargetAccountCaption => TargetAccount?.Name ?? "Выбрать";
+    public string TargetAccountCaption => TargetAccount?.Name ?? UiTexts.CommonChoose;
 
     /// <summary>
     /// Подкатегория в строке-поле: группа и название, как в ленте.
     /// </summary>
     public string CategoryCaption => Category is { } category
         ? $"{category.GroupName} · {category.Name}"
-        : "Выбрать";
+        : UiTexts.CommonChoose;
 
     /// <summary>
     /// Место в строке-поле. Место необязательно, и пустое так и подписано.
     /// </summary>
-    public string PlaceCaption => PlaceName.Length > 0 ? PlaceName : "Необязательно";
+    public string PlaceCaption => PlaceName.Length > 0 ? PlaceName : UiTexts.CommonOptional;
 
     /// <summary>
     /// Категория выбрана: иначе строка показывает приглашение приглушённо.
@@ -320,10 +319,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// Дата операции словами: «Сегодня», «Вчера», иначе «15 сентября» — с годом, если год не этот.
     /// </summary>
     public string OccurredOnCaption =>
-        IsToday ? "Сегодня"
-        : IsYesterday ? "Вчера"
-        : OccurredOn.Year == _clock.Today.Year ? OccurredOn.ToString("d MMMM", Russian)
-        : OccurredOn.ToString("d MMMM yyyy", Russian);
+        IsToday ? UiTexts.TransactionToday
+        : IsYesterday ? UiTexts.TransactionYesterday
+        : DateText.DayWithYearIfOther(OccurredOn, _clock.Today);
 
     /// <summary>
     /// Выбрана сегодняшняя дата — её чип подсвечен.
@@ -526,14 +524,14 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
         if (SourceAccount is not { } source)
         {
-            Error = "Выберите счёт";
+            Error = UiTexts.TransactionChooseAccount;
 
             return false;
         }
 
         if (!AmountExpression.TryEvaluate(Amount, out decimal amount))
         {
-            Error = "Сумма введена не полностью";
+            Error = UiTexts.TransactionAmountIncomplete;
 
             return false;
         }
@@ -544,7 +542,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         {
             if (!AmountExpression.TryEvaluate(TargetAmount, out decimal evaluated))
             {
-                Error = "Сумма зачисления введена не полностью";
+                Error = UiTexts.TransactionTargetAmountIncomplete;
 
                 return false;
             }
@@ -554,14 +552,14 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
         if (IsTransfer && TargetAccount is null)
         {
-            Error = "Выберите счёт зачисления";
+            Error = UiTexts.TransactionChooseTargetAccount;
 
             return false;
         }
 
         if (IsNotTransfer && Category is null)
         {
-            Error = "Выберите категорию";
+            Error = UiTexts.TransactionChooseCategory;
 
             return false;
         }
@@ -615,7 +613,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     {
         if (Key is null)
         {
-            return "Отменить удаление будет нельзя.";
+            return UiTexts.TransactionDeleteIrreversible;
         }
 
         IReadOnlyList<AccountListItem> accounts = await _accounts.ReadAsync(cancellationToken);
@@ -626,7 +624,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
         if (card is null)
         {
-            return "Отменить удаление будет нельзя.";
+            return UiTexts.TransactionDeleteIrreversible;
         }
 
         List<string> consequences = [];
@@ -643,7 +641,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
             // и подпись разошлась бы с числом рядом с ней
             string name = accounts.First(account => account.Key == card.SourceAccountKey).Name;
 
-            consequences.Add($"Баланс «{name}» станет {after.Display}.");
+            consequences.Add(string.Format(UiCulture.Current, UiTexts.TransactionBalanceAfter, name, after.Display));
         }
 
         if (card.TargetAccountKey is { } targetKey && card.TargetAmount is { } targetAmount
@@ -652,10 +650,10 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
             Money after = Money.Restore(targetBalance.Amount - targetAmount, targetBalance.Currency);
             string name = accounts.First(account => account.Key == targetKey).Name;
 
-            consequences.Add($"Баланс «{name}» станет {after.Display}.");
+            consequences.Add(string.Format(UiCulture.Current, UiTexts.TransactionBalanceAfter, name, after.Display));
         }
 
-        consequences.Add("Отменить удаление будет нельзя.");
+        consequences.Add(UiTexts.TransactionDeleteIrreversible);
 
         return string.Join(' ', consequences);
     }
@@ -705,7 +703,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
         if (key.Length is not 1)
         {
-            throw new ArgumentException("Клавиша суммы называется одним знаком", nameof(key));
+            throw new ArgumentException(Faults.KeypadKeyIsOneSign(), nameof(key));
         }
 
         Edit(expression => AmountInput.Append(expression, key[0]));

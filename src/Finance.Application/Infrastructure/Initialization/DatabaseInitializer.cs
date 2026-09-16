@@ -1,3 +1,4 @@
+using Finance.Application.Infrastructure;
 using System.Globalization;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
@@ -132,8 +133,7 @@ public sealed class DatabaseInitializer
 
         if (derived != id)
         {
-            throw new InvalidOperationException(
-                $"Идентификатор категории «{key}» в стартовом наборе — {id}, а выводится {derived}");
+            throw new InvalidOperationException(Faults.PresetIdMismatch(key, id, derived));
         }
     }
 }

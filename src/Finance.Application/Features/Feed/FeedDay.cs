@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Globalization;
 using Finance.Application.Infrastructure;
 using Finance.Domain.Values;
 
@@ -12,8 +11,6 @@ namespace Finance.Application.Features.Feed;
 /// </summary>
 public sealed class FeedDay : ObservableCollection<FeedRowItem>
 {
-    private static readonly CultureInfo Russian = CultureInfo.GetCultureInfo("ru-RU");
-
     /// <summary>
     /// Создаёт день ленты.
     /// </summary>
@@ -52,7 +49,5 @@ public sealed class FeedDay : ObservableCollection<FeedRowItem>
     /// Год пишется только чужой: в ленте за этот год он был бы шумом в каждой шапке.
     /// </summary>
     private static string Format(DateOnly date, DateOnly today) =>
-        date.Year == today.Year
-            ? date.ToString("d MMMM", Russian)
-            : date.ToString("d MMMM yyyy", Russian);
+        DateText.DayWithYearIfOther(date, today);
 }

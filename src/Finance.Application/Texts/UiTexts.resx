@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Текст интерфейса. Один файл на всё приложение: одни и те же слова показывают
+    и разметка, и модель представления, и разойдись они по файлам — «Расход»
+    на переключателе перестал бы совпадать с «Расходом» в подписи строки.
+
+    Подстановки позиционные ({0}, {1}), а не интерполяция: при переводе порядок
+    слов в предложении меняется, и переставить местами нужно уметь без правки кода.
+    Счётные формы лежат тройками с окончаниями One, Few и Many — их собирает Plural.
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <!-- Общее: слова, которые встречаются больше чем в одном слайсе -->
+  <data name="CommonSave" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="CommonSaving" xml:space="preserve">
+    <value>Сохраняю…</value>
+  </data>
+  <data name="CommonDelete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="CommonCancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="CommonClose" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="CommonChoose" xml:space="preserve">
+    <value>Выбрать</value>
+  </data>
+  <data name="CommonOptional" xml:space="preserve">
+    <value>Необязательно</value>
+  </data>
+  <data name="CommonSelected" xml:space="preserve">
+    <value>Выбрано</value>
+  </data>
+  <data name="CommonName" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="CommonKind" xml:space="preserve">
+    <value>Вид</value>
+  </data>
+  <data name="CommonSearchByName" xml:space="preserve">
+    <value>Поиск по названию</value>
+  </data>
+  <!-- Виды операций и категорий -->
+  <data name="KindExpense" xml:space="preserve">
+    <value>Расход</value>
+  </data>
+  <data name="KindIncome" xml:space="preserve">
+    <value>Доход</value>
+  </data>
+  <data name="KindTransfer" xml:space="preserve">
+    <value>Перевод</value>
+  </data>
+  <data name="KindExpensePlural" xml:space="preserve">
+    <value>Расходы</value>
+  </data>
+  <data name="KindIncomePlural" xml:space="preserve">
+    <value>Доходы</value>
+  </data>
+  <data name="KindExpenseGenitive" xml:space="preserve">
+    <value>расходов</value>
+  </data>
+  <data name="KindIncomeGenitive" xml:space="preserve">
+    <value>доходов</value>
+  </data>
+  <!-- Типы счёта и валюты -->
+  <data name="AccountTypeCard" xml:space="preserve">
+    <value>Карта</value>
+  </data>
+  <data name="AccountTypeCash" xml:space="preserve">
+    <value>Наличные</value>
+  </data>
+  <data name="CurrencyRubles" xml:space="preserve">
+    <value>Рубли</value>
+  </data>
+  <data name="CurrencyDollars" xml:space="preserve">
+    <value>Доллары</value>
+  </data>
+  <data name="CurrencyEuros" xml:space="preserve">
+    <value>Евро</value>
+  </data>
+  <data name="CurrencyRubleOption" xml:space="preserve">
+    <value>Рубль ₽</value>
+  </data>
+  <data name="CurrencyDollarOption" xml:space="preserve">
+    <value>Доллар $</value>
+  </data>
+  <data name="CurrencyEuroOption" xml:space="preserve">
+    <value>Евро €</value>
+  </data>
+  <!-- Справочник счетов -->
+  <data name="AccountsTitle" xml:space="preserve">
+    <value>Счета</value>
+  </data>
+  <data name="AccountsSpendable" xml:space="preserve">
+    <value>Доступно к тратам</value>
+  </data>
+  <data name="AccountsSavings" xml:space="preserve">
+    <value>Накопления</value>
+  </data>
+  <data name="AccountsClosed" xml:space="preserve">
+    <value>Закрытые</value>
+  </data>
+  <data name="AccountsDragHint" xml:space="preserve">
+    <value>Перетащить</value>
+  </data>
+  <data name="AccountsClosedHint" xml:space="preserve">
+    <value>Счёт закрыт</value>
+  </data>
+  <!-- Карточка счёта -->
+  <data name="AccountTitleNew" xml:space="preserve">
+    <value>Новый счёт</value>
+  </data>
+  <data name="AccountTitleExisting" xml:space="preserve">
+    <value>Счёт</value>
+  </data>
+  <data name="AccountNamePlaceholder" xml:space="preserve">
+    <value>Карта основная</value>
+  </data>
+  <data name="AccountTypeLabel" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="AccountCurrencyLabel" xml:space="preserve">
+    <value>Валюта</value>
+  </data>
+  <data name="AccountCurrencyLocked" xml:space="preserve">
+    <value>Валюта не меняется: по счёту уже есть операции</value>
+  </data>
+  <data name="AccountOpeningBalanceLabel" xml:space="preserve">
+    <value>Начальный остаток</value>
+  </data>
+  <data name="AccountOpeningIncomplete" xml:space="preserve">
+    <value>Начальный остаток введён не полностью</value>
+  </data>
+  <data name="AccountOpenedOnLabel" xml:space="preserve">
+    <value>Дата открытия</value>
+  </data>
+  <data name="AccountOpenedOnLimit" xml:space="preserve">
+    <value>Не позже {0:dd.MM.yyyy} — этим днём есть операция</value>
+  </data>
+  <data name="AccountExcludeLabel" xml:space="preserve">
+    <value>Скрыть из расчётов</value>
+  </data>
+  <data name="AccountExcludeHint" xml:space="preserve">
+    <value>Счёт не входит ни в «доступно к тратам», ни в итоги дня, ни в отчёт</value>
+  </data>
+  <data name="AccountClosedLabel" xml:space="preserve">
+    <value>Счёт закрыт</value>
+  </data>
+  <data name="AccountClosedHint" xml:space="preserve">
+    <value>Закрытый счёт не показывается на главном экране и не предлагается в выборе. Лента и отчёт не меняются</value>
+  </data>
+  <data name="AccountCloseConfirmTitle" xml:space="preserve">
+    <value>Закрыть счёт?</value>
+  </data>
+  <data name="AccountClosingWarning" xml:space="preserve">
+    <value>На счёте {0}. После закрытия они не войдут в «доступно к тратам», а перевести их будет некуда — закрытый счёт в выборе не предлагается.</value>
+  </data>
+  <!-- Балансы -->
+  <data name="BalancesTitle" xml:space="preserve">
+    <value>Балансы</value>
+  </data>
+  <data name="BalancesAvailable" xml:space="preserve">
+    <value>Доступно</value>
+  </data>
+  <data name="BalancesSavings" xml:space="preserve">
+    <value>Накопления</value>
+  </data>
+  <data name="BalancesExcluded" xml:space="preserve">
+    <value>Скрыты из расчётов</value>
+  </data>
+  <data name="BalancesAddAccount" xml:space="preserve">
+    <value>Добавить счёт</value>
+  </data>
+  <data name="BalancesEmptyTitle" xml:space="preserve">
+    <value>Заведите первый счёт</value>
+  </data>
+  <data name="BalancesEmptyHint" xml:space="preserve">
+    <value>Категории уже созданы — останется записать первую операцию.</value>
+  </data>
+  <data name="BalancesCreateAccount" xml:space="preserve">
+    <value>Создать счёт</value>
+  </data>
+  <data name="BalancesAddTransaction" xml:space="preserve">
+    <value>+  Операция</value>
+  </data>
+  <data name="BalancesAddTransactionHint" xml:space="preserve">
+    <value>Записать операцию</value>
+  </data>
+  <!-- Лента операций и лента счёта -->
+  <data name="FeedTitle" xml:space="preserve">
+    <value>Операции</value>
+  </data>
+  <data name="FeedEmptyTitle" xml:space="preserve">
+    <value>Операций пока нет</value>
+  </data>
+  <data name="FeedEmptyHint" xml:space="preserve">
+    <value>Первая запись появится здесь сразу после сохранения.</value>
+  </data>
+  <data name="FeedAddTransactionHint" xml:space="preserve">
+    <value>Записать операцию</value>
+  </data>
+  <data name="FeedBalance" xml:space="preserve">
+    <value>Баланс</value>
+  </data>
+  <data name="FeedOpeningBalance" xml:space="preserve">
+    <value>Начальный остаток</value>
+  </data>
+  <data name="FeedAddTransaction" xml:space="preserve">
+    <value>Добавить операцию</value>
+  </data>
+  <data name="FeedAddForAccountHint" xml:space="preserve">
+    <value>Записать операцию по этому счёту</value>
+  </data>
+  <!-- Форма операции -->
+  <data name="TransactionTitleNew" xml:space="preserve">
+    <value>Новая операция</value>
+  </data>
+  <data name="TransactionTitleExisting" xml:space="preserve">
+    <value>Операция</value>
+  </data>
+  <data name="TransactionSourceTransfer" xml:space="preserve">
+    <value>Откуда</value>
+  </data>
+  <data name="TransactionSourceSimple" xml:space="preserve">
+    <value>Счёт</value>
+  </data>
+  <data name="TransactionTarget" xml:space="preserve">
+    <value>Куда</value>
+  </data>
+  <data name="TransactionAmount" xml:space="preserve">
+    <value>Сумма</value>
+  </data>
+  <data name="TransactionTargetAmount" xml:space="preserve">
+    <value>Зачисление</value>
+  </data>
+  <data name="TransactionTransferHint" xml:space="preserve">
+    <value>Перевод не попадает ни в доходы, ни в расходы</value>
+  </data>
+  <data name="TransactionCategory" xml:space="preserve">
+    <value>Категория</value>
+  </data>
+  <data name="TransactionPlace" xml:space="preserve">
+    <value>Место</value>
+  </data>
+  <data name="TransactionToday" xml:space="preserve">
+    <value>Сегодня</value>
+  </data>
+  <data name="TransactionYesterday" xml:space="preserve">
+    <value>Вчера</value>
+  </data>
+  <data name="TransactionCalendarHint" xml:space="preserve">
+    <value>Выбрать дату в календаре</value>
+  </data>
+  <data name="TransactionNotePlaceholder" xml:space="preserve">
+    <value>Заметка — необязательно</value>
+  </data>
+  <data name="TransactionChooseAccount" xml:space="preserve">
+    <value>Выберите счёт</value>
+  </data>
+  <data name="TransactionAmountIncomplete" xml:space="preserve">
+    <value>Сумма введена не полностью</value>
+  </data>
+  <data name="TransactionTargetAmountIncomplete" xml:space="preserve">
+    <value>Сумма зачисления введена не полностью</value>
+  </data>
+  <data name="TransactionChooseTargetAccount" xml:space="preserve">
+    <value>Выберите счёт зачисления</value>
+  </data>
+  <data name="TransactionChooseCategory" xml:space="preserve">
+    <value>Выберите категорию</value>
+  </data>
+  <data name="TransactionDeleteConfirmTitle" xml:space="preserve">
+    <value>Удалить операцию?</value>
+  </data>
+  <data name="TransactionDeleteIrreversible" xml:space="preserve">
+    <value>Отменить удаление будет нельзя.</value>
+  </data>
+  <data name="TransactionBalanceAfter" xml:space="preserve">
+    <value>Баланс «{0}» станет {1}.</value>
+  </data>
+  <!-- Экраны выбора -->
+  <data name="PickAccountTitle" xml:space="preserve">
+    <value>Счёт</value>
+  </data>
+  <data name="PickAccountTarget" xml:space="preserve">
+    <value>Счёт зачисления</value>
+  </data>
+  <data name="PickAccountSource" xml:space="preserve">
+    <value>Счёт списания</value>
+  </data>
+  <data name="PickAccountSavings" xml:space="preserve">
+    <value>Накопления</value>
+  </data>
+  <data name="PickAccountCurrencyHint" xml:space="preserve">
+    <value>Валюта суммы изменится вместе со счётом.</value>
+  </data>
+  <data name="PickCategoryTitle" xml:space="preserve">
+    <value>Категория</value>
+  </data>
+  <data name="PickCategoryExpense" xml:space="preserve">
+    <value>Категория расхода</value>
+  </data>
+  <data name="PickCategoryIncome" xml:space="preserve">
+    <value>Категория дохода</value>
+  </data>
+  <data name="PickCategoryEmpty" xml:space="preserve">
+    <value>Ни одна категория не подходит под набранные буквы.</value>
+  </data>
+  <data name="PickCategoryFrequent" xml:space="preserve">
+    <value>Частые</value>
+  </data>
+  <data name="PickPlaceTitle" xml:space="preserve">
+    <value>Место</value>
+  </data>
+  <data name="PickPlaceNone" xml:space="preserve">
+    <value>Без места</value>
+  </data>
+  <data name="PickPlaceCreate" xml:space="preserve">
+    <value>Создать «{0}»</value>
+  </data>
+  <data name="PickPlaceEmpty" xml:space="preserve">
+    <value>Мест пока нет. Наберите название — оно заведётся вместе с операцией.</value>
+  </data>
+  <!-- Справочник категорий -->
+  <data name="CategoriesTitle" xml:space="preserve">
+    <value>Категории</value>
+  </data>
+  <data name="CategoriesExpandHint" xml:space="preserve">
+    <value>Развернуть группу</value>
+  </data>
+  <data name="CategoriesEmpty" xml:space="preserve">
+    <value>Ничего не нашлось. Заведите группу кнопкой «+» — подкатегория «Прочее» создастся сама.</value>
+  </data>
+  <data name="CategoryOther" xml:space="preserve">
+    <value>Прочее</value>
+  </data>
+  <!-- Карточка группы -->
+  <data name="GroupTitleNew" xml:space="preserve">
+    <value>Новая группа</value>
+  </data>
+  <data name="GroupTitleExisting" xml:space="preserve">
+    <value>Группа</value>
+  </data>
+  <data name="GroupCaptionExpense" xml:space="preserve">
+    <value>Группа расходов</value>
+  </data>
+  <data name="GroupCaptionIncome" xml:space="preserve">
+    <value>Группа доходов</value>
+  </data>
+  <data name="GroupNamePlaceholder" xml:space="preserve">
+    <value>Еда</value>
+  </data>
+  <data name="GroupKindHint" xml:space="preserve">
+    <value>Вид задаётся при создании и не меняется: его наследуют все подкатегории</value>
+  </data>
+  <data name="GroupWillBeCreated" xml:space="preserve">
+    <value>Будет создано</value>
+  </data>
+  <data name="GroupCreatedAutomatically" xml:space="preserve">
+    <value>Создаётся автоматически</value>
+  </data>
+  <data name="GroupSubcategories" xml:space="preserve">
+    <value>Подкатегории</value>
+  </data>
+  <data name="GroupAddSubcategory" xml:space="preserve">
+    <value>Добавить подкатегорию</value>
+  </data>
+  <!-- Карточка подкатегории -->
+  <data name="SubcategoryTitleNew" xml:space="preserve">
+    <value>Новая подкатегория</value>
+  </data>
+  <data name="SubcategoryTitleExisting" xml:space="preserve">
+    <value>Подкатегория</value>
+  </data>
+  <data name="SubcategoryNamePlaceholder" xml:space="preserve">
+    <value>Продукты</value>
+  </data>
+  <data name="SubcategoryGroupLabel" xml:space="preserve">
+    <value>Группа</value>
+  </data>
+  <data name="SubcategoryGroupNotChosen" xml:space="preserve">
+    <value>Группа не выбрана</value>
+  </data>
+  <data name="SubcategoryChooseGroup" xml:space="preserve">
+    <value>Выбрать группу</value>
+  </data>
+  <data name="SubcategoryKindHint" xml:space="preserve">
+    <value>Вид наследуется от группы и не меняется</value>
+  </data>
+  <data name="SubcategoryDelete" xml:space="preserve">
+    <value>Удалить подкатегорию</value>
+  </data>
+  <data name="SubcategoryDeleteConfirmTitle" xml:space="preserve">
+    <value>Удалить «{0}»?</value>
+  </data>
+  <data name="SubcategoryDeleteIrreversible" xml:space="preserve">
+    <value>Отменить удаление будет нельзя.</value>
+  </data>
+  <data name="SubcategoryDeleteEmpty" xml:space="preserve">
+    <value>Операций в ней нет. Отменить удаление будет нельзя.</value>
+  </data>
+  <data name="SubcategoryMovingOne" xml:space="preserve">
+    <value>операция перейдёт</value>
+  </data>
+  <data name="SubcategoryMovingFew" xml:space="preserve">
+    <value>операции перейдут</value>
+  </data>
+  <data name="SubcategoryMovingMany" xml:space="preserve">
+    <value>операций перейдут</value>
+  </data>
+  <data name="SubcategoryDeletePrompt" xml:space="preserve">
+    <value>{0} в «{1} · {2}». Суммы и даты не изменятся, балансы останутся прежними.</value>
+  </data>
+  <!-- Справочник мест и карточка места -->
+  <data name="PlacesTitle" xml:space="preserve">
+    <value>Места</value>
+  </data>
+  <data name="PlacesEmpty" xml:space="preserve">
+    <value>Мест пока нет. Они заводятся из формы операции и накапливаются сами — заходить сюда стоит, когда захочется навести порядок.</value>
+  </data>
+  <data name="PlacesNotFound" xml:space="preserve">
+    <value>Ни одно место не подходит под набранные буквы.</value>
+  </data>
+  <data name="PlaceTitle" xml:space="preserve">
+    <value>Место</value>
+  </data>
+  <data name="PlaceNamePlaceholder" xml:space="preserve">
+    <value>Пятёрочка</value>
+  </data>
+  <data name="PlaceDelete" xml:space="preserve">
+    <value>Удалить место</value>
+  </data>
+  <data name="PlaceUnused" xml:space="preserve">
+    <value>Место ещё не использовано ни в одной операции</value>
+  </data>
+  <data name="PlaceUsageOne" xml:space="preserve">
+    <value>операция</value>
+  </data>
+  <data name="PlaceUsageFew" xml:space="preserve">
+    <value>операции</value>
+  </data>
+  <data name="PlaceUsageMany" xml:space="preserve">
+    <value>операций</value>
+  </data>
+  <data name="PlaceTopCategory" xml:space="preserve">
+    <value>{0} · чаще всего «{1}»</value>
+  </data>
+  <data name="PlaceDeleteConfirmTitle" xml:space="preserve">
+    <value>Удалить «{0}»?</value>
+  </data>
+  <data name="PlaceDeleteEmpty" xml:space="preserve">
+    <value>Операций с этим местом нет. Отменить удаление будет нельзя.</value>
+  </data>
+  <data name="PlaceStayingOne" xml:space="preserve">
+    <value>операция останется</value>
+  </data>
+  <data name="PlaceStayingFew" xml:space="preserve">
+    <value>операции останутся</value>
+  </data>
+  <data name="PlaceStayingMany" xml:space="preserve">
+    <value>операций останутся</value>
+  </data>
+  <data name="PlaceDeletePrompt" xml:space="preserve">
+    <value>{0} без места. Суммы, даты и балансы не изменятся.</value>
+  </data>
+  <!-- Отчёт -->
+  <data name="ReportTitle" xml:space="preserve">
+    <value>Отчёт</value>
+  </data>
+  <data name="ReportPreviousMonth" xml:space="preserve">
+    <value>Предыдущий месяц</value>
+  </data>
+  <data name="ReportNextMonth" xml:space="preserve">
+    <value>Следующий месяц</value>
+  </data>
+  <data name="ReportHint" xml:space="preserve">
+    <value>Переводы между своими счетами в отчёт не входят: деньги не потрачены, а переложены. Счета, скрытые из расчётов, тоже не учитываются.</value>
+  </data>
+  <data name="ReportEmptyExpense" xml:space="preserve">
+    <value>В этом месяце трат не было</value>
+  </data>
+  <data name="ReportEmptyIncome" xml:space="preserve">
+    <value>В этом месяце доходов не было</value>
+  </data>
+  <data name="ReportEmptyOtherMonth" xml:space="preserve">
+    <value>Выберите другой месяц стрелками вверху.</value>
+  </data>
+  <data name="ReportEmptyCurrency" xml:space="preserve">
+    <value>В отчёт входят только рублёвые счета без признака «скрыть из расчётов». Операции по остальным счетам видны в ленте.</value>
+  </data>
+  <data name="ReportGroupEmptyTitle" xml:space="preserve">
+    <value>В этом месяце операций группы нет</value>
+  </data>
+  <data name="ReportGroupEmptyHint" xml:space="preserve">
+    <value>Они переехали или удалены. Вернитесь к отчёту.</value>
+  </data>
+  <data name="ReportSubcategoryHint" xml:space="preserve">
+    <value>Строка открывает ту же карточку операции, что и лента.</value>
+  </data>
+  <data name="ReportSubcategoryEmptyTitle" xml:space="preserve">
+    <value>В этом месяце операций нет</value>
+  </data>
+  <!-- Раздел «Ещё» -->
+  <data name="MoreTitle" xml:space="preserve">
+    <value>Ещё</value>
+  </data>
+  <data name="MoreCatalogs" xml:space="preserve">
+    <value>Справочники</value>
+  </data>
+  <data name="MoreSettings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="MoreAccountsOne" xml:space="preserve">
+    <value>счёт</value>
+  </data>
+  <data name="MoreAccountsFew" xml:space="preserve">
+    <value>счёта</value>
+  </data>
+  <data name="MoreAccountsMany" xml:space="preserve">
+    <value>счетов</value>
+  </data>
+  <data name="MorePlacesOne" xml:space="preserve">
+    <value>место</value>
+  </data>
+  <data name="MorePlacesFew" xml:space="preserve">
+    <value>места</value>
+  </data>
+  <data name="MorePlacesMany" xml:space="preserve">
+    <value>мест</value>
+  </data>
+  <data name="MoreGroupsOne" xml:space="preserve">
+    <value>группа</value>
+  </data>
+  <data name="MoreGroupsFew" xml:space="preserve">
+    <value>группы</value>
+  </data>
+  <data name="MoreGroupsMany" xml:space="preserve">
+    <value>групп</value>
+  </data>
+  <data name="MoreSubcategoriesOne" xml:space="preserve">
+    <value>подкатегория</value>
+  </data>
+  <data name="MoreSubcategoriesFew" xml:space="preserve">
+    <value>подкатегории</value>
+  </data>
+  <data name="MoreSubcategoriesMany" xml:space="preserve">
+    <value>подкатегорий</value>
+  </data>
+  <data name="MoreCategoriesCaption" xml:space="preserve">
+    <value>{0}, {1}</value>
+  </data>
+  <data name="MoreTimeZoneFromSystem" xml:space="preserve">
+    <value>Как в системе · {0}</value>
+  </data>
+  <data name="MoreAbout" xml:space="preserve">
+    <value>Версия {0}, схема {1}</value>
+  </data>
+  <!-- Настройки -->
+  <data name="AppearanceTitle" xml:space="preserve">
+    <value>Оформление</value>
+  </data>
+  <data name="AppearanceTheme" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="AppearanceHint" xml:space="preserve">
+    <value>Настройка хранится только на этом устройстве и никуда не передаётся</value>
+  </data>
+  <data name="AppearanceSystemHint" xml:space="preserve">
+    <value>Следует настройке телефона</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Светлая</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Тёмная</value>
+  </data>
+  <data name="ThemeSystem" xml:space="preserve">
+    <value>Как в системе</value>
+  </data>
+  <data name="TimeZoneTitle" xml:space="preserve">
+    <value>Часовой пояс</value>
+  </data>
+  <data name="TimeZoneSearchPlaceholder" xml:space="preserve">
+    <value>Поиск по названию зоны</value>
+  </data>
+  <data name="TimeZoneHint" xml:space="preserve">
+    <value>Пояс решает, какой день считается сегодняшним. Сами операции он не меняет.</value>
+  </data>
+  <data name="TimeZoneNotFound" xml:space="preserve">
+    <value>Ни одна зона не подходит под набранные буквы.</value>
+  </data>
+  <data name="TimeZoneSystem" xml:space="preserve">
+    <value>Как в системе</value>
+  </data>
+  <data name="TimeZoneUnavailableTitle" xml:space="preserve">
+    <value>Зона недоступна</value>
+  </data>
+  <data name="AboutTitle" xml:space="preserve">
+    <value>О программе</value>
+  </data>
+  <data name="AboutAppName" xml:space="preserve">
+    <value>Личный трекер финансов</value>
+  </data>
+  <data name="AboutVersion" xml:space="preserve">
+    <value>Версия</value>
+  </data>
+  <data name="AboutVersionUnknown" xml:space="preserve">
+    <value>не задана</value>
+  </data>
+  <data name="AboutSchema" xml:space="preserve">
+    <value>Схема базы</value>
+  </data>
+  <data name="AboutPrivacy" xml:space="preserve">
+    <value>Данные хранятся на этом устройстве и никуда не передаются.</value>
+  </data>
+  <data name="AboutIcons" xml:space="preserve">
+    <value>Значки — Tabler Icons, лицензия MIT.</value>
+  </data>
+  <!-- Сбои, которые видит пользователь -->
+  <data name="DatabaseCreateFailed" xml:space="preserve">
+    <value>Не удалось создать базу. Данных ещё не было, терять нечего</value>
+  </data>
+  <data name="DatabaseMigrateFailed" xml:space="preserve">
+    <value>Не удалось обновить схему базы. База возвращена из резервной копии; верните предыдущую версию приложения — данные целы</value>
+  </data>
+  <data name="DatabaseBackupFailed" xml:space="preserve">
+    <value>Не удалось снять резервную копию перед обновлением схемы; схема не тронута, данные целы</value>
+  </data>
+  <data name="ErrorActionFailedTitle" xml:space="preserve">
+    <value>Не удалось выполнить действие</value>
+  </data>
+  <data name="ErrorUnexpected" xml:space="preserve">
+    <value>Что-то пошло не так. Попробуйте ещё раз; подробности — в журнале устройства.</value>
+  </data>
+  <data name="ErrorReloadFailedTitle" xml:space="preserve">
+    <value>Данные не обновились</value>
+  </data>
+  <data name="ErrorDatabaseFailedTitle" xml:space="preserve">
+    <value>База не обновилась</value>
+  </data>
+  <data name="LeaveWithoutSavingTitle" xml:space="preserve">
+    <value>Уйти без сохранения?</value>
+  </data>
+  <data name="LeaveWithoutSavingPrompt" xml:space="preserve">
+    <value>Набранное не сохранится.</value>
+  </data>
+  <data name="LeaveWithoutSavingConfirm" xml:space="preserve">
+    <value>Уйти</value>
+  </data>
+  <data name="LeaveWithoutSavingCancel" xml:space="preserve">
+    <value>Остаться</value>
+  </data>
+  <!-- Клавиатура суммы и выбор значка -->
+  <data name="KeypadEraseHint" xml:space="preserve">
+    <value>Стереть знак</value>
+  </data>
+  <data name="IconLabel" xml:space="preserve">
+    <value>Значок</value>
+  </data>
+</root>

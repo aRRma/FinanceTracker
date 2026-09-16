@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Тексты о нарушенных доменных правилах. Пишутся словами пользователя: называют
+    счёт, сумму или дату, а не имя поля или правила.
+
+    Ключ каждой строки — член перечисления RuleText, и полнота обеих сторон
+    сверяется тестом. Подстановки позиционные ({0}, {1}): при переводе порядок
+    слов меняется, а формат внутри подстановки ({1:yyyy-MM-dd}) — часть
+    предложения, и правится вместе с ним.
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AmountInWholeKopecks" xml:space="preserve">
+    <value>Сумма {0} точнее копейки: {1} знаков после запятой при допустимых {2}</value>
+  </data>
+  <data name="AmountWithinLimit" xml:space="preserve">
+    <value>{0} {1} превышает предел {2}</value>
+  </data>
+  <data name="CurrenciesNeverMixed" xml:space="preserve">
+    <value>Нельзя {0} суммы в разных валютах: {1} и {2}</value>
+  </data>
+  <data name="AmountIsPositive" xml:space="preserve">
+    <value>{0} обязана быть больше нуля, получено {1}</value>
+  </data>
+  <data name="TransferNeedsTargetAccount" xml:space="preserve">
+    <value>У перевода обязан быть счёт зачисления</value>
+  </data>
+  <data name="TargetAccountOnlyInTransfer" xml:space="preserve">
+    <value>Счёт зачисления бывает только у перевода</value>
+  </data>
+  <data name="TransferNeedsTargetAmount" xml:space="preserve">
+    <value>У перевода обязана быть сумма зачисления</value>
+  </data>
+  <data name="TargetAmountOnlyInTransfer" xml:space="preserve">
+    <value>Сумма зачисления бывает только у перевода</value>
+  </data>
+  <data name="TransferAccountsDiffer" xml:space="preserve">
+    <value>Перевод на тот же счёт не имеет смысла: счёт списания и счёт зачисления обязаны различаться</value>
+  </data>
+  <data name="SameCurrencyTransferAmountsEqual" xml:space="preserve">
+    <value>Перевод внутри одной валюты обязан совпадать по суммам: {0} и {1}</value>
+  </data>
+  <data name="CategoryNotInTransfer" xml:space="preserve">
+    <value>У перевода категории не бывает</value>
+  </data>
+  <data name="CategoryRequiredInIncomeAndExpense" xml:space="preserve">
+    <value>Категория обязательна для дохода и расхода</value>
+  </data>
+  <data name="PlaceNotInTransfer" xml:space="preserve">
+    <value>У перевода места не бывает</value>
+  </data>
+  <data name="NoteWithinLimit" xml:space="preserve">
+    <value>Заметка длиной {0} символов превышает предел {1}</value>
+  </data>
+  <data name="DateTooEarly" xml:space="preserve">
+    <value>{0} {1:yyyy-MM-dd} раньше {2:yyyy-MM-dd}</value>
+  </data>
+  <data name="DateInFuture" xml:space="preserve">
+    <value>{0} {1:yyyy-MM-dd} в будущем: сегодня {2:yyyy-MM-dd}</value>
+  </data>
+  <data name="NameEmpty" xml:space="preserve">
+    <value>Имя ({0}) не может быть пустым</value>
+  </data>
+  <data name="NameTaken" xml:space="preserve">
+    <value>Имя «{0}» уже занято ({1})</value>
+  </data>
+  <data name="CurrencyFixedOnceUsed" xml:space="preserve">
+    <value>Валюта счёта «{0}» не меняется: по нему уже есть операции</value>
+  </data>
+  <data name="OpenedOnNotAfterTransactions" xml:space="preserve">
+    <value>Дату открытия счёта «{0}» нельзя сдвинуть на {1:yyyy-MM-dd}: есть операция от {2:yyyy-MM-dd}</value>
+  </data>
+  <data name="ReceiverIsNotGroup" xml:space="preserve">
+    <value>Приёмником «Прочее» бывает только подкатегория, не группа</value>
+  </data>
+  <data name="ProtectedCategoryNotDeleted" xml:space="preserve">
+    <value>Категория «{0}» не удаляется: она приёмник группы или служебная</value>
+  </data>
+  <data name="GroupNotDeleted" xml:space="preserve">
+    <value>Группа «{0}» не удаляется: опустевшая группа остаётся в списке</value>
+  </data>
+  <data name="ProtectedCategoryNotMoved" xml:space="preserve">
+    <value>Категория «{0}» не переносится: она приёмник группы или служебная</value>
+  </data>
+  <data name="GroupNotMoved" xml:space="preserve">
+    <value>Группа «{0}» никуда не переносится: уровней всего два</value>
+  </data>
+  <data name="ServiceGroupClosedToMoves" xml:space="preserve">
+    <value>«{0}» нельзя перенести в служебную группу «{1}»</value>
+  </data>
+  <data name="MoveKeepsKind" xml:space="preserve">
+    <value>«{0}» нельзя перенести из «{1}» ({2}) в «{3}» ({4}): вид не совпадает</value>
+  </data>
+  <data name="ServiceGroupHasOneSubcategory" xml:space="preserve">
+    <value>У служебной группы «{0}» обязана быть ровно одна служебная подкатегория</value>
+  </data>
+  <data name="GroupHasOneReceiver" xml:space="preserve">
+    <value>У группы «{0}» обязан быть ровно один приёмник «Прочее», найдено {1}</value>
+  </data>
+  <data name="ServiceGroupHasNoReceiver" xml:space="preserve">
+    <value>У служебной группы «{0}» приёмника нет: удалять в ней нечего</value>
+  </data>
+  <data name="ClosedAccountNotInNewTransaction" xml:space="preserve">
+    <value>Счёт «{0}» закрыт и в новой операции использован быть не может</value>
+  </data>
+  <data name="TransactionNotBeforeAccountOpened" xml:space="preserve">
+    <value>Дата операции {0:yyyy-MM-dd} раньше открытия счёта «{1}» ({2:yyyy-MM-dd})</value>
+  </data>
+  <data name="CategoryIsSubcategory" xml:space="preserve">
+    <value>«{0}» — группа: в операции указывается подкатегория</value>
+  </data>
+  <data name="CategoryKindMatchesTransaction" xml:space="preserve">
+    <value>Операция вида {0} не относится к группе «{1}» вида {2}</value>
+  </data>
+  <data name="SubjectAccount" xml:space="preserve">
+    <value>счёт</value>
+  </data>
+  <data name="SubjectGroup" xml:space="preserve">
+    <value>группа</value>
+  </data>
+  <data name="SubjectSubcategory" xml:space="preserve">
+    <value>подкатегория</value>
+  </data>
+  <data name="SubjectCategory" xml:space="preserve">
+    <value>категория</value>
+  </data>
+  <data name="SubjectPlace" xml:space="preserve">
+    <value>место</value>
+  </data>
+  <data name="SubjectExpenseGroup" xml:space="preserve">
+    <value>группа расходов</value>
+  </data>
+  <data name="SubjectIncomeGroup" xml:space="preserve">
+    <value>группа доходов</value>
+  </data>
+  <data name="SubjectSubcategoryOfGroup" xml:space="preserve">
+    <value>подкатегория группы «{0}»</value>
+  </data>
+  <data name="SubjectTransactionDate" xml:space="preserve">
+    <value>Дата операции</value>
+  </data>
+  <data name="SubjectAccountOpenedOn" xml:space="preserve">
+    <value>Дата открытия счёта</value>
+  </data>
+  <data name="SubjectTransactionAmount" xml:space="preserve">
+    <value>Сумма операции</value>
+  </data>
+  <data name="SubjectTargetAmount" xml:space="preserve">
+    <value>Сумма зачисления</value>
+  </data>
+  <data name="SubjectOpeningBalance" xml:space="preserve">
+    <value>Начальный остаток</value>
+  </data>
+  <data name="ActionAdd" xml:space="preserve">
+    <value>сложить</value>
+  </data>
+  <data name="ActionSubtract" xml:space="preserve">
+    <value>вычесть</value>
+  </data>
+  <data name="ActionCompare" xml:space="preserve">
+    <value>сравнить</value>
+  </data>
+</root>

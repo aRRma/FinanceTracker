@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -59,7 +60,7 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Подписи видов для переключателя.
     /// </summary>
-    public static IReadOnlyList<string> KindNames { get; } = ["Расход", "Доход"];
+    public static IReadOnlyList<string> KindNames { get; } = [UiTexts.KindExpense, UiTexts.KindIncome];
 
     /// <summary>
     /// Название группы.
@@ -121,12 +122,12 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Подпись вида, когда он заперт.
     /// </summary>
-    public string KindCaption => Kind is CategoryKind.Expense ? "Расход" : "Доход";
+    public string KindCaption => Kind is CategoryKind.Expense ? UiTexts.KindExpense : UiTexts.KindIncome;
 
     /// <summary>
     /// Заголовок экрана.
     /// </summary>
-    public string Title => Key is null ? "Новая группа" : "Группа";
+    public string Title => Key is null ? UiTexts.GroupTitleNew : UiTexts.GroupTitleExisting;
 
     /// <summary>
     /// Показывать превью «Будет создано»: у существующей группы показывать нечего.
@@ -136,12 +137,12 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Подпись превью: чем станет заводимая группа.
     /// </summary>
-    public string PreviewCaption => Kind is CategoryKind.Expense ? "Группа расходов" : "Группа доходов";
+    public string PreviewCaption => Kind is CategoryKind.Expense ? UiTexts.GroupCaptionExpense : UiTexts.GroupCaptionIncome;
 
     /// <summary>
     /// Имя приёмника, который заведётся вместе с группой.
     /// </summary>
-    public static string ReceiverName => "Прочее";
+    public static string ReceiverName => UiTexts.CategoryOther;
 
     /// <summary>
     /// Подкатегорию можно добавить: группа уже существует и не служебная.

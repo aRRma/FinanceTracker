@@ -8,12 +8,13 @@
     x:Class="Finance.App.Pages.CategoriesPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:catalog="clr-namespace:Finance.Application.Features.Categories.Catalog;assembly=Finance.Application"
     xmlns:domain="clr-namespace:Finance.Domain.Enums;assembly=Finance.Domain"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     x:DataType="catalog:CategoriesViewModel"
-    Title="Категории">
+    Title="{x:Static texts:UiTexts.CategoriesTitle}">
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="+" Clicked="OnCreateGroup" AutomationId="CreateGroup" />
@@ -24,11 +25,11 @@
         <Grid Grid.Row="0" Padding="16,12" ColumnDefinitions="*,*" ColumnSpacing="6"
               RadioButtonGroup.GroupName="categoryKind"
               RadioButtonGroup.SelectedValue="{Binding Kind}">
-            <RadioButton Grid.Column="0" Content="Расходы" Value="{x:Static domain:CategoryKind.Expense}" />
-            <RadioButton Grid.Column="1" Content="Доходы" Value="{x:Static domain:CategoryKind.Income}" />
+            <RadioButton Grid.Column="0" Content="{x:Static texts:UiTexts.KindExpensePlural}" Value="{x:Static domain:CategoryKind.Expense}" />
+            <RadioButton Grid.Column="1" Content="{x:Static texts:UiTexts.KindIncomePlural}" Value="{x:Static domain:CategoryKind.Income}" />
         </Grid>
 
-        <SearchBar Grid.Row="1" Text="{Binding Filter}" Placeholder="Поиск по названию" />
+        <SearchBar Grid.Row="1" Text="{Binding Filter}" Placeholder="{x:Static texts:UiTexts.CommonSearchByName}" />
 
         <!-- Тот же признак занятости гасит и ожидание первого чтения, и жест обновления -->
         <RefreshView Grid.Row="2" IsRefreshing="{Binding IsBusy}" Command="{Binding LoadCommand}">
@@ -80,7 +81,7 @@
 
                                 <controls:Icon Key="{Binding ChevronIcon}" Style="{StaticResource MutedIcon}"
                                                AutomationId="Chevron"
-                                               SemanticProperties.Description="Развернуть группу" />
+                                               SemanticProperties.Description="{x:Static texts:UiTexts.CategoriesExpandHint}" />
                             </Grid>
                         </Grid>
                     </DataTemplate>
@@ -91,7 +92,7 @@
                 <CollectionView.EmptyView>
                     <ContentView>
                         <Label Padding="16,24" IsVisible="{Binding IsEmpty}"
-                               Text="Ничего не нашлось. Заведите группу кнопкой «+» — подкатегория «Прочее» создастся сама."
+                               Text="{x:Static texts:UiTexts.CategoriesEmpty}"
                                Style="{StaticResource SecondaryLabel}" />
                     </ContentView>
                 </CollectionView.EmptyView>

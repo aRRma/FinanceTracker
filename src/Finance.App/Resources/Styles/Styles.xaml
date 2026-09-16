@@ -7,6 +7,7 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:controls="clr-namespace:Finance.App.Controls">
 
     <!-- Зона касания: меньше 48 dp попасть пальцем не получается (NFR-25) -->
@@ -257,7 +258,7 @@
     <Style x:Key="SaveButton" TargetType="Button">
         <Style.Triggers>
             <DataTrigger TargetType="Button" Binding="{Binding IsSaving}" Value="True">
-                <Setter Property="Text" Value="Сохраняю…" />
+                <Setter Property="Text" Value="{x:Static texts:UiTexts.CommonSaving}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

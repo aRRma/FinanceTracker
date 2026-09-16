@@ -8,6 +8,7 @@
     x:Class="Finance.App.Pages.ReportSubcategoryPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:report="clr-namespace:Finance.Application.Features.Report;assembly=Finance.Application"
     x:DataType="report:ReportSubcategoryViewModel"
@@ -63,7 +64,7 @@
 
             <CollectionView.Footer>
                 <Label Padding="16,12,16,24"
-                       Text="Строка открывает ту же карточку операции, что и лента."
+                       Text="{x:Static texts:UiTexts.ReportSubcategoryHint}"
                        Style="{StaticResource CaptionLabel}" />
             </CollectionView.Footer>
 
@@ -73,9 +74,9 @@
                 <ContentView>
                     <VerticalStackLayout IsVisible="{Binding IsEmpty}" Padding="32" Spacing="12"
                                          VerticalOptions="Center" HorizontalOptions="Center">
-                        <Label Text="В этом месяце операций нет" HorizontalTextAlignment="Center"
+                        <Label Text="{x:Static texts:UiTexts.ReportSubcategoryEmptyTitle}" HorizontalTextAlignment="Center"
                                Style="{StaticResource TitleLabel}" />
-                        <Label Text="Они переехали или удалены. Вернитесь к отчёту."
+                        <Label Text="{x:Static texts:UiTexts.ReportGroupEmptyHint}"
                                HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
                     </VerticalStackLayout>
                 </ContentView>

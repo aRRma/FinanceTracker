@@ -8,6 +8,7 @@
     x:Class="Finance.App.Pages.AccountFeedPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:feed="clr-namespace:Finance.Application.Features.Feed;assembly=Finance.Application"
@@ -19,7 +20,7 @@
         <!-- Баланс строкой, а не карточкой: в макете он стоит подзаголовком
              у названия счёта, и четверть первого экрана под одно число не уходит -->
         <Grid Grid.Row="0" Padding="16,10" ColumnDefinitions="*,Auto">
-            <Label Grid.Column="0" Text="Баланс" VerticalOptions="Center"
+            <Label Grid.Column="0" Text="{x:Static texts:UiTexts.FeedBalance}" VerticalOptions="Center"
                    Style="{StaticResource SecondaryLabel}" />
             <Label Grid.Column="1" Text="{Binding AccountBalance}" VerticalOptions="Center"
                    FontFamily="OpenSansSemibold" FontSize="17">
@@ -40,7 +41,7 @@
                     <Border Style="{StaticResource Card}">
                         <Grid Padding="14,12" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto"
                               MinimumHeightRequest="{StaticResource TouchTarget}">
-                            <Label Grid.Column="0" Grid.Row="0" Text="Начальный остаток"
+                            <Label Grid.Column="0" Grid.Row="0" Text="{x:Static texts:UiTexts.FeedOpeningBalance}"
                                    Style="{StaticResource SecondaryLabel}" />
                             <Label Grid.Column="0" Grid.Row="1" Text="{Binding OpenedOn}"
                                    Style="{StaticResource CaptionLabel}" />
@@ -50,11 +51,11 @@
                     </Border>
 
                     <VerticalStackLayout Padding="16,24" Spacing="12">
-                        <Label Text="Операций пока нет" HorizontalTextAlignment="Center"
+                        <Label Text="{x:Static texts:UiTexts.FeedEmptyTitle}" HorizontalTextAlignment="Center"
                                Style="{StaticResource TitleLabel}" />
-                        <Label Text="Первая запись появится здесь сразу после сохранения."
+                        <Label Text="{x:Static texts:UiTexts.FeedEmptyHint}"
                                HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
-                        <Button Text="Добавить операцию" Clicked="OnAdd" />
+                        <Button Text="{x:Static texts:UiTexts.FeedAddTransaction}" Clicked="OnAdd" />
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </controls:FeedList.Empty>
@@ -63,7 +64,7 @@
         <!-- Пока лента пуста, добавлять предлагает кнопка в самом пустом состоянии -->
         <Button Grid.Row="1" Text="+" Clicked="OnAdd" IsVisible="{Binding HasItems}"
                 Style="{StaticResource FloatingButton}"
-                SemanticProperties.Description="Записать операцию по этому счёту" />
+                SemanticProperties.Description="{x:Static texts:UiTexts.FeedAddForAccountHint}" />
     </Grid>
 
 </pages:DataPage>

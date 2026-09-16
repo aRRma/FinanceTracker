@@ -2,6 +2,7 @@ using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
 using Finance.Domain.Entities;
+using Finance.Domain.Errors;
 using Finance.Domain.Rules;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,7 +35,7 @@ public sealed class RenamePlaceHandler : IRenamePlaceHandler
                 PlaceRow row = await context.Places
                     .FirstOrDefaultAsync(existing => existing.Key == key, token)
                     .ConfigureAwait(false)
-                    ?? throw new InvalidOperationException($"Место {key} не найдено");
+                    ?? throw new InvalidOperationException(Faults.PlaceNotFound(key));
 
                 // Область поиска — весь справочник: у места нет ни вида, ни группы,
                 // внутри которых имя могло бы повториться
@@ -48,7 +49,7 @@ public sealed class RenamePlaceHandler : IRenamePlaceHandler
                     name,
                     neighbours.Select(static place => (place.Key, place.Name)),
                     key,
-                    "место");
+                    RuleText.SubjectPlace);
 
                 Place place = row.ToDomain();
 

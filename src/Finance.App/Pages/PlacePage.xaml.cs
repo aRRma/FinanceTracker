@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using Finance.Application.Features.Places.Card;
 using Finance.Application.Infrastructure;
 
@@ -55,7 +56,7 @@ public partial class PlacePage : DataPage
     // отменить удаление нельзя, а по числу видно, то ли это место
     private async Task DeleteAsync()
     {
-        if (!await DisplayAlertAsync(_model.DeleteTitle, _model.DeletePrompt, "Удалить", "Отмена"))
+        if (!await DisplayAlertAsync(_model.DeleteTitle, _model.DeletePrompt, UiTexts.CommonDelete, UiTexts.CommonCancel))
         {
             return;
         }

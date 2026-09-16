@@ -1,3 +1,4 @@
+using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -61,7 +62,7 @@ public sealed class CategoriesQuery : ICategoriesQuery
         foreach (var parent in groups)
         {
             CategoryKind kind = parent.Kind
-                                ?? throw new InvalidOperationException($"У группы «{parent.Name}» не задан вид");
+                                ?? throw new InvalidOperationException(Faults.GroupKindMissing(parent.Name));
 
             items.Add(new CategoryListItem
             {
@@ -97,7 +98,7 @@ public sealed class CategoriesQuery : ICategoriesQuery
         if (items.Count != rows.Count)
         {
             throw new InvalidOperationException(
-                $"В справочнике {rows.Count} категорий, а к группам отнесены {items.Count}: есть подкатегория без группы");
+                Faults.CategoriesLost(rows.Count, items.Count));
         }
 
         return items;

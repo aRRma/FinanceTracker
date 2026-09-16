@@ -12,7 +12,7 @@ public sealed class DatabaseLocation(string path)
     /// </summary>
     public string Path { get; } = !string.IsNullOrWhiteSpace(path)
         ? path
-        : throw new ArgumentException("Путь к базе не задан", nameof(path));
+        : throw new ArgumentException(Faults.DatabasePathMissing(), nameof(path));
 
     /// <summary>
     /// Единственная резервная копия — та, что снята перед последней миграцией.

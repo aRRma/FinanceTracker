@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
 using Finance.Domain.Entities;
@@ -109,7 +110,11 @@ public partial class TransactionPage : DataPage
     {
         string consequence = await _model.DeletePromptAsync();
 
-        bool confirmed = await DisplayAlertAsync("Удалить операцию?", consequence, "Удалить", "Отмена");
+        bool confirmed = await DisplayAlertAsync(
+            UiTexts.TransactionDeleteConfirmTitle,
+            consequence,
+            UiTexts.CommonDelete,
+            UiTexts.CommonCancel);
 
         if (confirmed && await _model.DeleteAsync())
         {

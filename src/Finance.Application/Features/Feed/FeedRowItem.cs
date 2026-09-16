@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain.Enums;
@@ -47,7 +48,7 @@ public sealed record FeedRowItem(
         {
             return new FeedRowItem(
                 item.Key,
-                item.Note ?? "Перевод",
+                item.Note ?? UiTexts.KindTransfer,
                 $"{item.AccountName} → {item.Title}",
                 item.Amount.DisplaySigned,
                 item.Amount.IsPositive,
@@ -56,7 +57,7 @@ public sealed record FeedRowItem(
         }
 
         string? detail = item.Kind is TransactionKind.Transfer
-            ? item.Note ?? "Перевод"
+            ? item.Note ?? UiTexts.KindTransfer
             : item.Note ?? item.Place ?? item.Group;
 
         string caption = (detail, showAccount) switch

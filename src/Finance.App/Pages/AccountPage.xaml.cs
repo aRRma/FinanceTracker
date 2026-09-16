@@ -1,3 +1,4 @@
+using Finance.Application.Texts;
 using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Infrastructure;
 
@@ -49,7 +50,7 @@ public partial class AccountPage : DataPage
     private async Task SaveAsync()
     {
         if (_model.ClosingWarning is { } warning
-            && !await DisplayAlertAsync("Закрыть счёт?", warning, "Закрыть", "Отмена"))
+            && !await DisplayAlertAsync(UiTexts.AccountCloseConfirmTitle, warning, UiTexts.CommonClose, UiTexts.CommonCancel))
         {
             return;
         }

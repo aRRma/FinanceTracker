@@ -104,11 +104,11 @@ public sealed class Account : Entity
         DateTimeOffset nowUtc)
     {
         Money balance = CreateOpeningBalance(openingBalance, currency);
-        Dates.EnsureInRange(openedOn, today, Invariant.OpeningDateInRange, "Дата открытия счёта");
+        Dates.EnsureInRange(openedOn, today, Invariant.OpeningDateInRange, RuleText.SubjectAccountOpenedOn);
 
         return new Account(
             Keys.New(),
-            Names.Normalize(name, "счёт"),
+            Names.Normalize(name, RuleText.SubjectAccount),
             type,
             currency,
             balance,
@@ -150,7 +150,7 @@ public sealed class Account : Entity
     /// <summary>
     /// Переименовывает счёт.
     /// </summary>
-    public void Rename(string name) => Name = Names.Normalize(name, "счёт");
+    public void Rename(string name) => Name = Names.Normalize(name, RuleText.SubjectAccount);
 
     /// <summary>
     /// Меняет тип счёта. На расчёты не влияет.
@@ -174,7 +174,8 @@ public sealed class Account : Entity
         DomainException.ThrowIf(
             hasEverHadTransactions,
             Invariant.CurrencyFixedOnceUsed,
-            $"Валюта счёта «{Name}» не меняется: по нему уже есть операции");
+            RuleText.CurrencyFixedOnceUsed,
+            Name);
 
         Currency = currency;
 
@@ -199,13 +200,13 @@ public sealed class Account : Entity
     /// <param name="today">Локальная дата пользователя, не дата в UTC.</param>
     public void ChangeOpenedOn(DateOnly openedOn, DateOnly? earliestTransactionOn, DateOnly today)
     {
-        Dates.EnsureInRange(openedOn, today, Invariant.OpeningDateInRange, "Дата открытия счёта");
+        Dates.EnsureInRange(openedOn, today, Invariant.OpeningDateInRange, RuleText.SubjectAccountOpenedOn);
 
         DomainException.ThrowIf(
             openedOn > OpenedOn && earliestTransactionOn is { } earliest && openedOn > earliest,
             Invariant.OpenedOnNotAfterTransactions,
-            $"Дату открытия счёта «{Name}» нельзя сдвинуть на {openedOn:yyyy-MM-dd}: " +
-            $"есть операция от {earliestTransactionOn:yyyy-MM-dd}");
+            RuleText.OpenedOnNotAfterTransactions,
+            Name, openedOn, earliestTransactionOn);
 
         OpenedOn = openedOn;
     }
@@ -236,7 +237,7 @@ public sealed class Account : Entity
     private static Money CreateOpeningBalance(decimal amount, Currency currency)
     {
         Money balance = Money.Create(amount, currency);
-        balance.EnsureWithinLimit("Начальный остаток");
+        balance.EnsureWithinLimit(RuleText.SubjectOpeningBalance);
 
         return balance;
     }

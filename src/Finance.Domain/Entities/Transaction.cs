@@ -228,11 +228,11 @@ public sealed class Transaction : Entity
 
         bool isTransfer = kind is TransactionKind.Transfer;
 
-        EnsureAmount(amount, "Сумма операции");
+        EnsureAmount(amount, RuleText.SubjectTransactionAmount);
         EnsureTransferShape(isTransfer, sourceAccountKey, targetAccountKey, amount, targetAmount);
         EnsureCategoryAndPlace(isTransfer, categoryKey, placeKey);
 
-        Dates.EnsureInRange(occurredOn, today, Invariant.TransactionDateInRange, "Дата операции");
+        Dates.EnsureInRange(occurredOn, today, Invariant.TransactionDateInRange, RuleText.SubjectTransactionDate);
 
         return CleanNote(note);
     }
@@ -240,12 +240,13 @@ public sealed class Transaction : Entity
     /// <summary>
     /// Сумма строго больше нуля и не превышает предела.
     /// </summary>
-    private static void EnsureAmount(Money amount, string what)
+    private static void EnsureAmount(Money amount, RuleText what)
     {
         DomainException.ThrowIf(
             !amount.IsPositive,
             Invariant.AmountIsPositive,
-            $"{what} обязана быть больше нуля, получено {amount}");
+            RuleText.AmountIsPositive,
+            what, amount);
 
         amount.EnsureWithinLimit(what);
     }
@@ -265,16 +266,12 @@ public sealed class Transaction : Entity
         DomainException.ThrowIf(
             isTransfer != targetAccountKey.HasValue,
             Invariant.TargetOnlyInTransfer,
-            isTransfer
-                ? "У перевода обязан быть счёт зачисления"
-                : "Счёт зачисления бывает только у перевода");
+            isTransfer ? RuleText.TransferNeedsTargetAccount : RuleText.TargetAccountOnlyInTransfer);
 
         DomainException.ThrowIf(
             isTransfer != targetAmount.HasValue,
             Invariant.TargetOnlyInTransfer,
-            isTransfer
-                ? "У перевода обязана быть сумма зачисления"
-                : "Сумма зачисления бывает только у перевода");
+            isTransfer ? RuleText.TransferNeedsTargetAmount : RuleText.TargetAmountOnlyInTransfer);
 
         // Суммы зачисления нет ровно у дохода и расхода — проверено выше
         if (targetAmount is not { } target)
@@ -285,16 +282,17 @@ public sealed class Transaction : Entity
         DomainException.ThrowIf(
             targetAccountKey == sourceAccountKey,
             Invariant.TransferAccountsDiffer,
-            "Перевод на тот же счёт не имеет смысла: счёт списания и счёт зачисления обязаны различаться");
+            RuleText.TransferAccountsDiffer);
 
-        EnsureAmount(target, "Сумма зачисления");
+        EnsureAmount(target, RuleText.SubjectTargetAmount);
 
         // Одна валюта — одна сумма. Курса здесь быть не может, а разные
         // числа означали бы, что деньги по дороге появились или исчезли
         DomainException.ThrowIf(
             target.Currency == amount.Currency && target.Amount != amount.Amount,
             Invariant.SameCurrencyTransferAmountsEqual,
-            $"Перевод внутри одной валюты обязан совпадать по суммам: {amount} и {target}");
+            RuleText.SameCurrencyTransferAmountsEqual,
+            amount, target);
     }
 
     /// <summary>
@@ -306,14 +304,12 @@ public sealed class Transaction : Entity
         DomainException.ThrowIf(
             isTransfer == categoryKey.HasValue,
             Invariant.CategoryOnlyInIncomeAndExpense,
-            isTransfer
-                ? "У перевода категории не бывает"
-                : "Категория обязательна для дохода и расхода");
+            isTransfer ? RuleText.CategoryNotInTransfer : RuleText.CategoryRequiredInIncomeAndExpense);
 
         DomainException.ThrowIf(
             isTransfer && placeKey.HasValue,
             Invariant.PlaceNotInTransfer,
-            "У перевода места не бывает");
+            RuleText.PlaceNotInTransfer);
     }
 
     /// <summary>
@@ -331,7 +327,8 @@ public sealed class Transaction : Entity
         DomainException.ThrowIf(
             trimmed.Length > MaxNoteLength,
             Invariant.NoteWithinLimit,
-            $"Заметка длиной {trimmed.Length} символов превышает предел {MaxNoteLength}");
+            RuleText.NoteWithinLimit,
+            trimmed.Length, MaxNoteLength);
 
         return trimmed;
     }
@@ -343,7 +340,7 @@ public sealed class Transaction : Entity
     {
         if (key == Guid.Empty)
         {
-            throw new ArgumentException("Ключ не может быть пустым: он ни на что не ссылается", parameterName);
+            throw new ArgumentException(DomainFaults.KeyIsEmpty(), parameterName);
         }
     }
 }

@@ -65,7 +65,8 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
         DomainException.ThrowIf(
             amount.Scale > MaxScale,
             Invariant.AmountInWholeKopecks,
-            $"Сумма {amount} точнее копейки: {amount.Scale} знаков после запятой при допустимых {MaxScale}");
+            RuleText.AmountInWholeKopecks,
+            amount, amount.Scale, MaxScale);
 
         return new Money(amount, currency);
     }
@@ -89,11 +90,12 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
     /// Баланс через эту проверку не проходит — предел задан сумме операции.
     /// </summary>
     /// <param name="what">Что проверяется — попадёт в текст ошибки.</param>
-    public void EnsureWithinLimit(string what) =>
+    public void EnsureWithinLimit(RuleText what) =>
         DomainException.ThrowIf(
             Math.Abs(Amount) > Limit,
             Invariant.AmountWithinLimit,
-            $"{what} {this} превышает предел {Limit}");
+            RuleText.AmountWithinLimit,
+            what, this, Limit);
 
     /// <summary>
     /// Складывает суммы одной валюты.
@@ -101,7 +103,7 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
     /// <exception cref="DomainException">Валюты различаются.</exception>
     public static Money operator +(Money left, Money right)
     {
-        EnsureSameCurrency(left, right, "сложить");
+        EnsureSameCurrency(left, right, RuleText.ActionAdd);
         return new Money(left.Amount + right.Amount, left.Currency);
     }
 
@@ -111,7 +113,7 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
     /// <exception cref="DomainException">Валюты различаются.</exception>
     public static Money operator -(Money left, Money right)
     {
-        EnsureSameCurrency(left, right, "вычесть");
+        EnsureSameCurrency(left, right, RuleText.ActionSubtract);
         return new Money(left.Amount - right.Amount, left.Currency);
     }
 
@@ -156,7 +158,7 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
     /// <exception cref="DomainException">Валюты различаются.</exception>
     public int CompareTo(Money other)
     {
-        EnsureSameCurrency(this, other, "сравнить");
+        EnsureSameCurrency(this, other, RuleText.ActionCompare);
         return Amount.CompareTo(other.Amount);
     }
 
@@ -181,9 +183,10 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
     /// Валюты обязаны совпадать. Разные валюты — не «особый случай, который бывает»,
     /// а ошибка в коде: сложение рублей с долларами не имеет смысла ни при каком курсе.
     /// </summary>
-    private static void EnsureSameCurrency(Money left, Money right, string action) =>
+    private static void EnsureSameCurrency(Money left, Money right, RuleText action) =>
         DomainException.ThrowIf(
             left.Currency != right.Currency,
             Invariant.CurrenciesNeverMixed,
-            $"Нельзя {action} суммы в разных валютах: {left.Currency} и {right.Currency}");
+            RuleText.CurrenciesNeverMixed,
+            action, left.Currency, right.Currency);
 }

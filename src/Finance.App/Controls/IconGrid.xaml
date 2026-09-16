@@ -12,6 +12,7 @@
     x:Class="Finance.App.Controls.IconGrid"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:card="clr-namespace:Finance.Application.Features.Categories.Card;assembly=Finance.Application"
     x:DataType="card:IconPicker">
@@ -23,7 +24,7 @@
                 <TapGestureRecognizer Command="{Binding ToggleCommand}" />
             </Grid.GestureRecognizers>
 
-            <Label Grid.Column="0" Text="Значок" VerticalOptions="Center" />
+            <Label Grid.Column="0" Text="{x:Static texts:UiTexts.IconLabel}" VerticalOptions="Center" />
             <controls:Icon Grid.Column="1" Key="{Binding Selected}" Style="{StaticResource AccentIcon}" />
         </Grid>
 

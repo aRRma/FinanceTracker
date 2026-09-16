@@ -8,18 +8,19 @@
     x:Class="Finance.App.Pages.TimeZonePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:zones="clr-namespace:Finance.Application.Features.Settings.TimeZones;assembly=Finance.Application"
     x:DataType="zones:TimeZoneViewModel"
-    Title="Часовой пояс">
+    Title="{x:Static texts:UiTexts.TimeZoneTitle}">
 
     <Grid RowDefinitions="Auto,Auto,*">
 
-        <SearchBar Grid.Row="0" Text="{Binding Filter}" Placeholder="Поиск по названию зоны" />
+        <SearchBar Grid.Row="0" Text="{Binding Filter}" Placeholder="{x:Static texts:UiTexts.TimeZoneSearchPlaceholder}" />
 
         <Label Grid.Row="1" Padding="16,8"
-               Text="Пояс решает, какой день считается сегодняшним. Сами операции он не меняет."
+               Text="{x:Static texts:UiTexts.TimeZoneHint}"
                Style="{StaticResource SecondaryLabel}" />
 
         <CollectionView Grid.Row="2" ItemsSource="{Binding Zones}" SelectionMode="None">
@@ -43,7 +44,7 @@
                         <Label Grid.Column="1" Margin="8,0" Text="{Binding Offset}" VerticalOptions="Center"
                                Style="{StaticResource SecondaryLabel}" />
                         <controls:Icon Grid.Column="2" Key="check" IsVisible="{Binding IsSelected}"
-                                       SemanticProperties.Description="Выбрано"
+                                       SemanticProperties.Description="{x:Static texts:UiTexts.CommonSelected}"
                                        Style="{StaticResource AccentIcon}" />
                     </Grid>
                 </DataTemplate>
@@ -54,7 +55,7 @@
             <CollectionView.EmptyView>
                 <ContentView>
                     <Label Padding="16,24" IsVisible="{Binding IsFilteredOut}"
-                           Text="Ни одна зона не подходит под набранные буквы."
+                           Text="{x:Static texts:UiTexts.TimeZoneNotFound}"
                            Style="{StaticResource SecondaryLabel}" />
                 </ContentView>
             </CollectionView.EmptyView>
