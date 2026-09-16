@@ -68,6 +68,41 @@ public sealed class AmountInputTests
         Assert.Equal(expected, AmountInput.Backspace(expression));
 
     /// <summary>
+    /// «=» сворачивает выражение в число, и набор с него продолжается: итог
+    /// возвращается в поле теми же знаками, какими его набирают — без разделителей
+    /// разрядов и без хвоста нулей.
+    /// </summary>
+    [Theory]
+    [InlineData("1250+340", "1590")]
+    [InlineData("1250×1000", "1250000")]
+    [InlineData("10÷4", "2,5")]
+    [InlineData("10÷3", "3,33")]
+    [InlineData("1250", "1250")]
+    [InlineData("12,50", "12,5")]
+    public void Равно_сворачивает_выражение_в_число(string expression, string expected) =>
+        Assert.Equal(expected, AmountInput.Collapse(expression));
+
+    /// <summary>Считать нечего — выражение остаётся как набрано, а не обнуляется.</summary>
+    [Theory]
+    [InlineData("")]
+    [InlineData("12+")]
+    [InlineData("12÷0")]
+    public void Незаконченное_выражение_не_сворачивается(string expression) =>
+        Assert.Equal(expression, AmountInput.Collapse(expression));
+
+    /// <summary>
+    /// Незакрытое действие видно по самому выражению: по нему экран и решает,
+    /// показывать ли итог.
+    /// </summary>
+    [Theory]
+    [InlineData("1250", false)]
+    [InlineData("12,50", false)]
+    [InlineData("1250+340", true)]
+    [InlineData("1250+", true)]
+    public void Незакрытое_действие_видно_в_выражении(string expression, bool expected) =>
+        Assert.Equal(expected, AmountInput.HasOperation(expression));
+
+    /// <summary>
     /// Набранное с клавиатуры вычисляется тем же разборщиком, что и введённое
     /// с внешней: знаки действий у них разные, и разойтись им нельзя.
     /// </summary>

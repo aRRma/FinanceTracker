@@ -4,8 +4,8 @@ using Finance.Application.Infrastructure;
 namespace Finance.App.Controls;
 
 /// <summary>
-/// Клавиатура суммы: цифры, четыре действия, стирание и сохранение. Что делает
-/// нажатая клавиша, решает модель представления — контрол только называет знак.
+/// Клавиатура суммы: цифры, четыре действия, стирание и «=». Что делает нажатая
+/// клавиша, решает модель представления — контрол только называет знак.
 /// </summary>
 public partial class AmountKeypad : ContentView
 {
@@ -17,13 +17,9 @@ public partial class AmountKeypad : ContentView
     public static readonly BindableProperty BackspaceCommandProperty =
         BindableProperty.Create(nameof(BackspaceCommand), typeof(ICommand), typeof(AmountKeypad));
 
-    /// <summary>Сохранять есть что: иначе клавиша сохранения гаснет.</summary>
-    public static readonly BindableProperty CanSaveProperty =
-        BindableProperty.Create(nameof(CanSave), typeof(bool), typeof(AmountKeypad), defaultValue: false);
-
-    /// <summary>Клавиши на виду. Прячутся отдельно от клавиши сохранения.</summary>
-    public static readonly BindableProperty AreKeysVisibleProperty =
-        BindableProperty.Create(nameof(AreKeysVisible), typeof(bool), typeof(AmountKeypad), defaultValue: true);
+    /// <summary>Команда клавиши «=»: свернуть набранное выражение в итог.</summary>
+    public static readonly BindableProperty EqualsCommandProperty =
+        BindableProperty.Create(nameof(EqualsCommand), typeof(ICommand), typeof(AmountKeypad));
 
     /// <summary>Создаёт клавиатуру.</summary>
     public AmountKeypad()
@@ -36,12 +32,6 @@ public partial class AmountKeypad : ContentView
     /// нажатия: разойдись подпись со знаком — клавиша молча перестала бы приниматься.
     /// </summary>
     public static string Separator { get; } = AmountInput.Separator.ToString();
-
-    /// <summary>
-    /// Нажата клавиша сохранения. Событием, а не командой: сохранение закрывает
-    /// экран, а навигация живёт на странице, не в модели представления.
-    /// </summary>
-    public event EventHandler? Saved;
 
     /// <summary>Команда нажатия клавиши.</summary>
     public ICommand? KeyCommand
@@ -57,21 +47,11 @@ public partial class AmountKeypad : ContentView
         set => SetValue(BackspaceCommandProperty, value);
     }
 
-    /// <summary>Сохранять есть что.</summary>
-    public bool CanSave
+    /// <summary>Команда клавиши «=».</summary>
+    public ICommand? EqualsCommand
     {
-        get => (bool)GetValue(CanSaveProperty);
-        set => SetValue(CanSaveProperty, value);
-    }
-
-    /// <summary>
-    /// Клавиши на виду. Скрывается только сетка клавиш: спрятать контрол целиком
-    /// значило бы унести с экрана и сохранение — записанную операцию нечем было бы закончить.
-    /// </summary>
-    public bool AreKeysVisible
-    {
-        get => (bool)GetValue(AreKeysVisibleProperty);
-        set => SetValue(AreKeysVisibleProperty, value);
+        get => (ICommand?)GetValue(EqualsCommandProperty);
+        set => SetValue(EqualsCommandProperty, value);
     }
 
     /// <summary>
@@ -86,13 +66,15 @@ public partial class AmountKeypad : ContentView
         }
     }
 
-    private void OnBackspace(object? sender, TappedEventArgs e)
+    private void OnBackspace(object? sender, TappedEventArgs e) => Run(BackspaceCommand);
+
+    private void OnEquals(object? sender, EventArgs e) => Run(EqualsCommand);
+
+    private static void Run(ICommand? command)
     {
-        if (BackspaceCommand is { } command && command.CanExecute(null))
+        if (command is not null && command.CanExecute(null))
         {
             command.Execute(null);
         }
     }
-
-    private void OnSave(object? sender, EventArgs e) => Saved?.Invoke(this, EventArgs.Empty);
 }

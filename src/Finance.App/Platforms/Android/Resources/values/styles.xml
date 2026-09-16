@@ -6,9 +6,15 @@
     которую MainActivity красит цветом шапки по теме приложения. Ресурсом
     values-night это не задать: выбранная в настройках тема ночной режим
     платформы не переключает.
+
+    Родитель обязан быть из MaterialComponents. С ThemeOverlay.AppCompat.* нижняя
+    навигация Shell не находит нужных ей атрибутов оформления текста и падает при
+    создании — «requires that you specify a valid TextAppearance attribute», —
+    а приложение закрывается на старте, ещё до первой страницы. Сборка при этом
+    чистая, и ни один тест этого не поймает.
 -->
 <resources>
-    <style name="MauiAppBarLayout" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+    <style name="MauiAppBarLayout" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
         <item name="android:background">@android:color/transparent</item>
         <!-- Прозрачный контейнер всё равно бросает тень по своим границам, и по бокам
              строки состояния оставалась серая кромка; тени у шапки нет вовсе -->

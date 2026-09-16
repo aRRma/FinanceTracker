@@ -59,6 +59,37 @@ public static class AmountInput
         return expression.Length is 0 ? expression : expression[..^1];
     }
 
+    /// <summary>
+    /// Свёрнуто ли выражение до числа. Пока действие не закрыто, итога у набранного
+    /// нет: он появляется по клавише «=», а не сам собой.
+    /// </summary>
+    /// <param name="expression">Набранное выражение.</param>
+    /// <returns><c>true</c>, если в выражении есть знак действия.</returns>
+    public static bool HasOperation(string expression)
+    {
+        ArgumentNullException.ThrowIfNull(expression);
+
+        return expression.AsSpan().ContainsAny(Operators);
+    }
+
+    /// <summary>
+    /// Сворачивает выражение в его итог — это и делает клавиша «=». Незаконченное
+    /// выражение остаётся как набрано: нажатию, которому нечего считать, лучше
+    /// ничего не менять, чем ругаться.
+    /// </summary>
+    /// <param name="expression">Набранное выражение.</param>
+    /// <returns>Итог числом или само выражение, если оно не вычислимо.</returns>
+    public static string Collapse(string expression)
+    {
+        ArgumentNullException.ThrowIfNull(expression);
+
+        // Разряды не разделяются и хвост нулей не пишется: итог возвращается
+        // в то же поле, и набирать его дальше придётся теми же клавишами
+        return AmountExpression.TryEvaluate(expression, out decimal total)
+            ? total.ToString("0.##", CultureInfo.CurrentCulture)
+            : expression;
+    }
+
     /// <summary>Цифра: до предела разрядов, но ведущий ноль заменяется, а не наращивается.</summary>
     private static string AppendDigit(string expression, char key)
     {
