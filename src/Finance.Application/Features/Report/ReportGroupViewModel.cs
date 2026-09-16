@@ -91,10 +91,17 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
 
         try
         {
+            // Оба чтения независимы и идут разом: у каждого свой контекст,
+            // а последовательно экран ждал бы сумму двух обращений к базе
+            Task<IReadOnlyList<ReportTotal>> groupsTask = _report.ReadGroupsAsync(month, cancellationToken);
+            Task<IReadOnlyList<ReportTotal>> rowsTask = _report.ReadSubcategoriesAsync(groupKey, month, cancellationToken);
+
             // ConfigureAwait(false) здесь недопустим: дальше наполняются
             // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-            IReadOnlyList<ReportTotal> groups = await _report.ReadGroupsAsync(month, cancellationToken);
-            IReadOnlyList<ReportTotal> rows = await _report.ReadSubcategoriesAsync(groupKey, month, cancellationToken);
+            await Task.WhenAll(groupsTask, rowsTask);
+
+            IReadOnlyList<ReportTotal> groups = await groupsTask;
+            IReadOnlyList<ReportTotal> rows = await rowsTask;
 
             if (generation != _generation)
             {

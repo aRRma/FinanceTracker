@@ -71,11 +71,21 @@ public sealed partial class MoreViewModel : ScreenViewModel
     [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
+        // Четыре чтения независимы и идут разом: у каждого запроса свой контекст,
+        // а последовательно экран ждал бы сумму четырёх обращений к базе
+        Task<IReadOnlyList<AccountListItem>> accountsTask = _accounts.ReadAsync(cancellationToken);
+        Task<IReadOnlyList<PlaceListItem>> placesTask = _places.ReadAsync(cancellationToken);
+        Task<IReadOnlyList<CategoryListItem>> categoriesTask = _categories.ReadAsync(cancellationToken);
+        Task<SettingsSummary> settingsTask = _settings.ReadAsync(cancellationToken);
+
         // ConfigureAwait(false) здесь недопустим: следом меняются привязанные
         // свойства, а их правка вне потока интерфейса роняет разметку
-        IReadOnlyList<AccountListItem> accounts = await _accounts.ReadAsync(cancellationToken);
-        IReadOnlyList<PlaceListItem> places = await _places.ReadAsync(cancellationToken);
-        IReadOnlyList<CategoryListItem> categories = await _categories.ReadAsync(cancellationToken);
+        await Task.WhenAll(accountsTask, placesTask, categoriesTask, settingsTask);
+
+        IReadOnlyList<AccountListItem> accounts = await accountsTask;
+        IReadOnlyList<PlaceListItem> places = await placesTask;
+        IReadOnlyList<CategoryListItem> categories = await categoriesTask;
+        SettingsSummary settings = await settingsTask;
 
         AccountsCaption = Plural.Of(accounts.Count, "счёт", "счёта", "счетов");
         PlacesCaption = Plural.Of(places.Count, "место", "места", "мест");
@@ -85,8 +95,6 @@ public sealed partial class MoreViewModel : ScreenViewModel
         CategoriesCaption =
             $"{Plural.Of(groups, "группа", "группы", "групп")}, "
             + Plural.Of(categories.Count - groups, "подкатегория", "подкатегории", "подкатегорий");
-
-        SettingsSummary settings = await _settings.ReadAsync(cancellationToken);
 
         ThemeCaption = settings.Theme.Caption;
 

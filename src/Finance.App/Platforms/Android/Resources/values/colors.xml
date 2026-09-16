@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Цвета системного окружения: строка состояния и заставка до появления первой
-    страницы. Повторяют акцент из Resources/Styles/Colors.xaml — иначе на запуске
-    мелькнёт чужой цвет, а тёмная тема получит светлую полосу сверху.
+    Цвета системного окружения. Заставку красит MauiSplashScreen в проекте.
+
+    colorPrimary остаётся акцентом: им подписаны кнопки системных диалогов
+    (календарь даты), и белый здесь спрятал бы «ОК» на белом. Строку состояния
+    красит MainActivity подложкой окна: контейнер шапки в styles.xml прозрачный.
 -->
 <resources>
     <color name="colorPrimary">#0F5C4C</color>
-    <color name="colorPrimaryDark">#0B4438</color>
+    <color name="colorPrimaryDark">#FFFFFF</color>
     <color name="colorAccent">#0F5C4C</color>
 </resources>

@@ -23,11 +23,11 @@
 
     <!-- Фон карточек, списков и нижней навигации -->
     <Color x:Key="CardLight">#FFFFFF</Color>
-    <Color x:Key="CardDark">#181C1F</Color>
+    <Color x:Key="CardDark">#1C2124</Color>
 
     <!-- Утопленные блоки: шапка даты, поле суммы, клавиши -->
     <Color x:Key="SunkLight">#F4F6F7</Color>
-    <Color x:Key="SunkDark">#1F2427</Color>
+    <Color x:Key="SunkDark">#252B2F</Color>
 
     <!-- Текст: основной, вторичный, третичный -->
     <Color x:Key="InkLight">#16191C</Color>
@@ -39,11 +39,11 @@
 
     <!-- Разделитель строк и граница карточки -->
     <Color x:Key="LineLight">#E3E6E9</Color>
-    <Color x:Key="LineDark">#282E32</Color>
+    <Color x:Key="LineDark">#2F373C</Color>
 
     <!-- Акцент и его фон -->
     <Color x:Key="AccentLight">#0F5C4C</Color>
-    <Color x:Key="AccentDark">#3E9A80</Color>
+    <Color x:Key="AccentDark">#48A78E</Color>
     <Color x:Key="AccentBackgroundLight">#E2EFEB</Color>
     <Color x:Key="AccentBackgroundDark">#1B342D</Color>
 

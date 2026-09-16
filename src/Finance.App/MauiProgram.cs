@@ -28,6 +28,9 @@ public static class MauiProgram
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+
+                // Суммы — моноширинным: цифры одной ширины, и столбец сумм не пляшет
+                fonts.AddFont("CascadiaMono.ttf", "Mono");
             });
 
         // Путь к папке данных знает только платформа: прикладной слой собирается

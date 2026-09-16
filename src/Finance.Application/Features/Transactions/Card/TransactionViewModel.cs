@@ -28,6 +28,8 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     private readonly IClock _clock;
     private readonly TransactionPicks _picks;
 
+    private static readonly CultureInfo Russian = CultureInfo.GetCultureInfo("ru-RU");
+
     private IReadOnlyList<AccountOption> _allAccounts = [];
     private IReadOnlyList<CategoryOption> _allCategories = [];
 
@@ -146,13 +148,17 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <summary>Набирается сумма зачисления.</summary>
     public bool IsTargetAmountActive => ActiveAmount is AmountField.Target;
 
-    /// <summary>Набранное выражение для показа. Пустое поле показывает ноль, а не пустоту.</summary>
-    public string AmountDisplay => Amount.Length is 0 ? "0" : Amount;
+    /// <summary>Набранное выражение для показа над итогом. Пустое поле — пустая строка: ноль показывает итог.</summary>
+    public string AmountDisplay => Amount;
 
     /// <summary>Набранная сумма зачисления для показа.</summary>
-    public string TargetAmountDisplay => TargetAmount.Length is 0 ? "0" : TargetAmount;
+    public string TargetAmountDisplay => TargetAmount;
 
-    /// <summary>Вычисленный итог выражения в валюте счёта списания. Пусто — выражение не закончено.</summary>
+    /// <summary>
+    /// Вычисленный итог выражения в валюте счёта списания. Пустое поле показывает
+    /// ноль в валюте: главная цифра формы не должна пропадать. Пусто — выражение
+    /// не закончено.
+    /// </summary>
     public string AmountPreview => Preview(Amount, SourceAccount?.Currency);
 
     /// <summary>Вычисленный итог суммы зачисления в валюте счёта зачисления.</summary>
@@ -236,7 +242,23 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <summary>Дата операции.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(OccurredOnDate))]
+    [NotifyPropertyChangedFor(nameof(OccurredOnCaption))]
+    [NotifyPropertyChangedFor(nameof(IsToday))]
+    [NotifyPropertyChangedFor(nameof(IsYesterday))]
     public partial DateOnly OccurredOn { get; set; }
+
+    /// <summary>Дата операции словами: «Сегодня», «Вчера», иначе «15 сентября» — с годом, если год не этот.</summary>
+    public string OccurredOnCaption =>
+        IsToday ? "Сегодня"
+        : IsYesterday ? "Вчера"
+        : OccurredOn.Year == _clock.Today.Year ? OccurredOn.ToString("d MMMM", Russian)
+        : OccurredOn.ToString("d MMMM yyyy", Russian);
+
+    /// <summary>Выбрана сегодняшняя дата — её чип подсвечен.</summary>
+    public bool IsToday => OccurredOn == _clock.Today;
+
+    /// <summary>Выбрана вчерашняя дата.</summary>
+    public bool IsYesterday => OccurredOn == _clock.Today.AddDays(-1);
 
     /// <summary>Заметка.</summary>
     [ObservableProperty]
@@ -789,7 +811,8 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     }
 
     private static string Preview(string expression, Currency? currency) =>
-        currency is { } known && AmountExpression.TryEvaluate(expression, out decimal value)
-            ? Money.Restore(value, known).Display
-            : string.Empty;
+        currency is not { } known ? string.Empty
+        : expression.Length is 0 ? Money.Restore(0m, known).Display
+        : AmountExpression.TryEvaluate(expression, out decimal value) ? Money.Restore(value, known).Display
+        : string.Empty;
 }

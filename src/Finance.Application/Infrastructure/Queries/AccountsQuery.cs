@@ -1,4 +1,5 @@
 using Finance.Application.Infrastructure.Storage;
+using Finance.Application.Infrastructure.Storage.Rows;
 using Finance.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,24 +26,9 @@ public sealed class AccountsQuery : IAccountsQuery
             .CreateDbContextAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        // Проекция на стороне базы: доменный счёт здесь не нужен, а строка целиком
-        // тянула бы за собой поля обмена, которых на экране нет
-        var accounts = await context.Accounts
-            .AsNoTracking()
-            .OrderBy(row => row.SortOrder)
-            .ThenBy(row => row.Name)
-            .Select(row => new
-            {
-                row.Key,
-                row.Name,
-                row.Type,
-                row.Currency,
-                row.OpeningBalance,
-                row.OpenedOn,
-                row.ExcludedFromTotals,
-                row.IsClosed,
-                row.SortOrder
-            })
+        List<Row> accounts = await Project(context.Accounts.AsNoTracking()
+                .OrderBy(row => row.SortOrder)
+                .ThenBy(row => row.Name))
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
@@ -52,27 +38,77 @@ public sealed class AccountsQuery : IAccountsQuery
 
         List<AccountListItem> items = new(accounts.Count);
 
-        foreach (var account in accounts)
+        foreach (Row account in accounts)
         {
-            decimal balance = account.OpeningBalance + movements.GetValueOrDefault(account.Key);
-
-            items.Add(new AccountListItem
-            {
-                Key = account.Key,
-                Name = account.Name,
-                Type = account.Type,
-
-                // Restore, а не Create: число уже прошло проверку при вводе,
-                // а баланс ещё и не обязан укладываться в предел суммы операции
-                Balance = Money.Restore(balance, account.Currency),
-                OpeningBalance = Money.Restore(account.OpeningBalance, account.Currency),
-                OpenedOn = account.OpenedOn,
-                ExcludedFromTotals = account.ExcludedFromTotals,
-                IsClosed = account.IsClosed,
-                SortOrder = account.SortOrder
-            });
+            items.Add(ToItem(account, movements.GetValueOrDefault(account.Key)));
         }
 
         return items;
     }
+
+    /// <inheritdoc />
+    public async Task<AccountListItem?> ReadOneAsync(Guid key, CancellationToken cancellationToken = default)
+    {
+        await using FinanceDbContext context = await _contexts
+            .CreateDbContextAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        Row? account = await Project(context.Accounts.AsNoTracking().Where(row => row.Key == key))
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        if (account is null)
+        {
+            return null;
+        }
+
+        decimal movement = await AccountBalances
+            .ReadMovementAsync(context, key, cancellationToken)
+            .ConfigureAwait(false);
+
+        return ToItem(account, movement);
+    }
+
+    // Проекция на стороне базы: доменный счёт здесь не нужен, а строка целиком
+    // тянула бы за собой поля обмена, которых на экране нет
+    private static IQueryable<Row> Project(IQueryable<AccountRow> accounts) =>
+        accounts.Select(row => new Row(
+            row.Key,
+            row.Name,
+            row.Type,
+            row.Currency,
+            row.OpeningBalance,
+            row.OpenedOn,
+            row.ExcludedFromTotals,
+            row.IsClosed,
+            row.SortOrder));
+
+    private static AccountListItem ToItem(Row account, decimal movement) =>
+        new()
+        {
+            Key = account.Key,
+            Name = account.Name,
+            Type = account.Type,
+
+            // Restore, а не Create: число уже прошло проверку при вводе,
+            // а баланс ещё и не обязан укладываться в предел суммы операции
+            Balance = Money.Restore(account.OpeningBalance + movement, account.Currency),
+            OpeningBalance = Money.Restore(account.OpeningBalance, account.Currency),
+            OpenedOn = account.OpenedOn,
+            ExcludedFromTotals = account.ExcludedFromTotals,
+            IsClosed = account.IsClosed,
+            SortOrder = account.SortOrder
+        };
+
+    // Плоская строка чтения: одна проекция на оба запроса, полный список и один счёт
+    private sealed record Row(
+        Guid Key,
+        string Name,
+        AccountType Type,
+        Currency Currency,
+        decimal OpeningBalance,
+        DateOnly OpenedOn,
+        bool ExcludedFromTotals,
+        bool IsClosed,
+        int SortOrder);
 }

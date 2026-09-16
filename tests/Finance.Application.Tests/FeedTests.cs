@@ -225,6 +225,45 @@ public sealed class FeedTests
     }
 
     /// <summary>
+    /// Шапка ленты счёта читает один счёт своим запросом, а не весь список.
+    /// Баланс обязан сойтись с балансом из списка с обеих сторон перевода:
+    /// расход и списание уменьшают, доход и зачисление прибавляют.
+    /// </summary>
+    [Fact]
+    public async Task Баланс_одного_счёта_сходится_со_списком()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+        Guid card = await given.AccountAsync("Карта", 500m);
+
+        await given.SaveAsync(given.Expense(cash, 100m));
+        await given.SaveAsync(given.Income(cash, 30m));
+        await given.SaveAsync(given.Transfer(cash, card, 200m));
+        await given.SaveAsync(given.Transfer(card, cash, 50m));
+
+        IAccountsQuery accounts = given.Database.Resolve<IAccountsQuery>();
+
+        AccountListItem? one = await accounts.ReadOneAsync(cash);
+
+        Assert.NotNull(one);
+        Assert.Equal(Money.Create(780m, Currency.RUB), one.Balance);
+        Assert.Equal(await given.BalanceAsync(cash), one.Balance);
+        Assert.Equal("Наличные", one.Name);
+        Assert.Null(await accounts.ReadOneAsync(Guid.CreateVersion7()));
+
+        FeedViewModel model = new(
+            given.Database.Resolve<IFeedQuery>(),
+            accounts,
+            given.Database.Resolve<IClock>(),
+            given.Database.Resolve<IChangeNotifier>());
+
+        await model.LoadAsync(cash);
+
+        Assert.Equal(one.Balance.Display, model.AccountBalance);
+    }
+
+    /// <summary>
     /// Цвет суммы в строке: доход зелёным, расход красным, списание перевода —
     /// обычным текстом. Перевод тоже уходит минусом, но тратой не является,
     /// и красный на нём читался бы как ещё один расход.

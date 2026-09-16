@@ -70,4 +70,43 @@ internal static class AccountBalances
 
         return movements;
     }
+
+    /// <summary>
+    /// Движение по одному счёту: сколько ушло и пришло. Две выборки по ключу счёта
+    /// через его индексы, а не сводка по всем счетам: шапке ленты нужен один баланс,
+    /// а сводка растёт вместе со всей историей операций.
+    /// </summary>
+    /// <param name="context">Контекст базы.</param>
+    /// <param name="accountKey">Ключ счёта.</param>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    public static async Task<decimal> ReadMovementAsync(
+        FinanceDbContext context,
+        Guid accountKey,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        var outgoing = await context.Transactions
+            .AsNoTracking()
+            .Where(row => row.SourceAccountKey == accountKey)
+            .GroupBy(row => row.Kind)
+            .Select(group => new { Kind = group.Key, Total = group.Sum(row => row.Amount) })
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        decimal incoming = await context.Transactions
+            .AsNoTracking()
+            .Where(row => row.TargetAccountKey == accountKey)
+            .SumAsync(row => row.TargetAmount!.Value, cancellationToken)
+            .ConfigureAwait(false);
+
+        decimal movement = incoming;
+
+        foreach (var side in outgoing)
+        {
+            movement += side.Kind is TransactionKind.Income ? side.Total : -side.Total;
+        }
+
+        return movement;
+    }
 }

@@ -91,13 +91,18 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
 
         try
         {
+            // Название — из справочника: он читается целиком и весь помещается
+            // в памяти, и заводить ради одного поля четвёртый запрос незачем.
+            // Оба чтения независимы и идут разом: у каждого свой контекст
+            Task<IReadOnlyList<ReportTransaction>> itemsTask = _report.ReadTransactionsAsync(subcategoryKey, month, cancellationToken);
+            Task<IReadOnlyList<CategoryListItem>> categoriesTask = _categories.ReadAsync(cancellationToken);
+
             // ConfigureAwait(false) здесь недопустим: дальше наполняются
             // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-            IReadOnlyList<ReportTransaction> items = await _report.ReadTransactionsAsync(subcategoryKey, month, cancellationToken);
+            await Task.WhenAll(itemsTask, categoriesTask);
 
-            // Название — из справочника: он читается целиком и весь помещается
-            // в памяти, и заводить ради одного поля четвёртый запрос незачем
-            IReadOnlyList<CategoryListItem> categories = await _categories.ReadAsync(cancellationToken);
+            IReadOnlyList<ReportTransaction> items = await itemsTask;
+            IReadOnlyList<CategoryListItem> categories = await categoriesTask;
 
             if (generation != _generation)
             {
