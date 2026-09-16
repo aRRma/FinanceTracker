@@ -96,19 +96,19 @@
     <!-- Крупная сумма: «доступно к тратам», итог отчёта. Только числам: заголовок,
          набранный этим кеглем, кричит громче главной цифры экрана -->
     <Style x:Key="TotalLabel" TargetType="Label">
-        <Setter Property="FontFamily" Value="Mono" />
-        <Setter Property="FontSize" Value="26" />
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="28" />
     </Style>
 
-    <!-- Сумма в строке списка. Моноширинным: цифры одной ширины, и правый столбец
-         сумм не пляшет от строки к строке, как с пропорциональным шрифтом -->
+    <!-- Сумма в строке списка. Свой стиль, чтобы шрифт и кегль сумм менялись
+         в одном месте; цветные варианты ниже наследуют его -->
     <Style x:Key="AmountLabel" TargetType="Label">
-        <Setter Property="FontFamily" Value="Mono" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontFamily" Value="OpenSansRegular" />
+        <Setter Property="FontSize" Value="15" />
     </Style>
 
     <!-- Сумма смысловым цветом. Отдельные стили, а не подмена на PositiveLabel:
-         триггер меняет стиль целиком и потерял бы моноширинный шрифт -->
+         триггер меняет стиль целиком и потерял бы кегль и шрифт суммы -->
     <Style x:Key="AmountPositiveLabel" TargetType="Label" BasedOn="{StaticResource AmountLabel}">
         <Setter Property="TextColor"
                 Value="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
@@ -119,23 +119,24 @@
                 Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
     </Style>
 
-    <!-- Итог дня в шапке ленты: тот же тон, что заголовок раздела, но моноширинным -->
+    <!-- Итог дня в шапке ленты: тот же тон, что заголовок раздела -->
     <Style x:Key="AmountSectionLabel" TargetType="Label" BasedOn="{StaticResource AmountLabel}">
         <Setter Property="TextColor"
                 Value="{AppThemeBinding Light={StaticResource Ink3Light}, Dark={StaticResource Ink3Dark}}" />
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
         <Setter Property="FontSize" Value="12" />
     </Style>
 
     <!-- Главная цифра формы операции: вычисленный итог по центру -->
     <Style x:Key="AmountHero" TargetType="Label">
-        <Setter Property="FontFamily" Value="Mono" />
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
         <Setter Property="FontSize" Value="34" />
         <Setter Property="HorizontalTextAlignment" Value="Center" />
     </Style>
 
     <!-- Набранное выражение над итогом -->
     <Style x:Key="AmountExpression" TargetType="Label">
-        <Setter Property="FontFamily" Value="Mono" />
+        <Setter Property="FontFamily" Value="OpenSansRegular" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="HorizontalTextAlignment" Value="Center" />
         <Setter Property="TextColor"
