@@ -54,9 +54,16 @@ public sealed partial class PlacePickerViewModel : ObservableObject
     public partial bool CanClear { get; private set; }
 
     /// <summary>Набрано название, которого в справочнике нет, — его предлагается завести.</summary>
-    public bool CanCreate =>
-        Filter.Trim().Length > 0
-        && !_all.Any(place => string.Equals(place.Name, Filter.Trim(), StringComparison.CurrentCultureIgnoreCase));
+    public bool CanCreate
+    {
+        get
+        {
+            string name = Filter.Trim();
+
+            return name.Length > 0
+                && !_all.Any(place => string.Equals(place.Name, name, StringComparison.CurrentCultureIgnoreCase));
+        }
+    }
 
     /// <summary>Подпись строки заведения нового места.</summary>
     public string CreateCaption => $"Создать «{Filter.Trim()}»";

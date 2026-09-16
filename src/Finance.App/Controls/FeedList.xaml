@@ -29,9 +29,12 @@
 
             <CollectionView.GroupHeaderTemplate>
                 <DataTemplate x:DataType="feed:FeedDay">
-                    <Grid Padding="16,16,16,6" ColumnDefinitions="*,Auto">
+                    <!-- Шапка дня утоплена в фон: две серые подписи на фоне страницы
+                         не отделяли один день от другого -->
+                    <Grid Padding="16,8,16,6" ColumnDefinitions="*,Auto"
+                          BackgroundColor="{AppThemeBinding Light={StaticResource SunkLight}, Dark={StaticResource SunkDark}}">
                         <Label Grid.Column="0" Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
-                        <Label Grid.Column="1" Text="{Binding Total}" Style="{StaticResource SectionLabel}">
+                        <Label Grid.Column="1" Text="{Binding Total}" Style="{StaticResource AmountSectionLabel}">
                             <Label.Triggers>
                                 <!-- День в плюсе — смысловым цветом, как доход в строке; цвет, а не стиль:
                                      стиль шапки со своим шрифтом обязан остаться -->
@@ -47,27 +50,30 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="feed:FeedRowItem">
-                    <Grid Padding="16,10" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" RowDefinitions="Auto,Auto"
-                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                    <Grid Padding="16,10,16,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}"
+                          BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnRowTapped" />
                         </Grid.GestureRecognizers>
 
                         <controls:Icon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Key="{Binding Icon}" />
-                        <Label Grid.Column="1" Grid.Row="0" Text="{Binding Title}" />
-                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}"
+                        <Label Grid.Column="1" Grid.Row="0" Text="{Binding Title}" LineBreakMode="TailTruncation" />
+                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}" LineBreakMode="TailTruncation"
                                Style="{StaticResource SecondaryLabel}" />
+                        <!-- Разделитель — под строкой, от текста до правого края -->
+                        <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource Divider}" Margin="0,10,0,0" />
                         <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Amount}"
-                               VerticalOptions="Center">
+                               VerticalOptions="Center" Style="{StaticResource AmountLabel}">
                             <Label.Triggers>
                                 <!-- Доход и зачисление зелёным, расход красным. Списание
                                      перевода тоже отрицательно, но остаётся обычным текстом:
                                      деньги переложены, а не потрачены -->
                                 <DataTrigger TargetType="Label" Binding="{Binding IsPositive}" Value="True">
-                                    <Setter Property="Style" Value="{StaticResource PositiveLabel}" />
+                                    <Setter Property="Style" Value="{StaticResource AmountPositiveLabel}" />
                                 </DataTrigger>
                                 <DataTrigger TargetType="Label" Binding="{Binding IsExpense}" Value="True">
-                                    <Setter Property="Style" Value="{StaticResource NegativeLabel}" />
+                                    <Setter Property="Style" Value="{StaticResource AmountNegativeLabel}" />
                                 </DataTrigger>
                             </Label.Triggers>
                         </Label>

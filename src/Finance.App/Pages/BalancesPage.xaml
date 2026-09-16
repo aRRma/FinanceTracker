@@ -39,12 +39,12 @@
                 </Label>
 
                 <Label Grid.Column="2" Text="{Binding Balance}"
-                       VerticalOptions="Center">
+                       VerticalOptions="Center" Style="{StaticResource AmountLabel}">
                     <Label.Triggers>
                         <!-- Минус на счёте — смысловым цветом: обычным текстом его
                              не отличить от обычного остатка (NFR-25) -->
                         <DataTrigger TargetType="Label" Binding="{Binding IsNegative}" Value="True">
-                            <Setter Property="Style" Value="{StaticResource NegativeLabel}" />
+                            <Setter Property="Style" Value="{StaticResource AmountNegativeLabel}" />
                         </DataTrigger>
                     </Label.Triggers>
                 </Label>
@@ -64,10 +64,14 @@
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="balances:CurrencySection">
                                 <VerticalStackLayout Spacing="8">
-                                    <Label Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
-
-                                    <Label Text="Доступно" Style="{StaticResource CaptionLabel}" />
-                                    <Label Text="{Binding Available}" Style="{StaticResource TotalLabel}">
+                                    <!-- Валюта и «доступно» в одну строку, число под ними справа:
+                                         три подписи столбиком читались как три разных заголовка -->
+                                    <Grid ColumnDefinitions="*,Auto" Padding="2,0">
+                                        <Label Grid.Column="0" Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
+                                        <Label Grid.Column="1" Text="Доступно" Style="{StaticResource SectionLabel}" />
+                                    </Grid>
+                                    <Label Text="{Binding Available}" Style="{StaticResource TotalLabel}"
+                                           HorizontalTextAlignment="End" Padding="2,0">
                                         <Label.Triggers>
                                             <DataTrigger TargetType="Label" Binding="{Binding IsAvailableNegative}" Value="True">
                                                 <Setter Property="TextColor"
@@ -132,9 +136,11 @@
             <Button Text="Создать счёт" Clicked="OnCreateAccount" AutomationId="CreateFirstAccount" />
         </VerticalStackLayout>
 
-        <!-- Пока счетов нет, записывать операцию некуда — кнопки нет -->
-        <Button Text="+" Clicked="OnAddTransaction" IsVisible="{Binding HasAccounts}"
-                Style="{StaticResource FloatingButton}"
+        <!-- Пока счетов нет, записывать операцию некуда — кнопки нет. С подписью,
+             а не одним знаком: строка «Добавить счёт» рядом тоже начинается с плюса,
+             и два одинаковых плюса на экране не различить -->
+        <Button Text="+  Операция" Clicked="OnAddTransaction" IsVisible="{Binding HasAccounts}"
+                Style="{StaticResource ExtendedFloatingButton}"
                 SemanticProperties.Description="Записать операцию" AutomationId="AddTransaction" />
     </Grid>
 

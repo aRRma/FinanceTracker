@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Контейнер шапки MAUI красится ?attr/colorPrimary и в .NET 10 уходит под строку
+    состояния: она показывает его фон. Стиль с тем же именем в приложении побеждает
+    библиотечный; фон прозрачный, и под строкой состояния видна подложка окна,
+    которую MainActivity красит цветом шапки по теме приложения. Ресурсом
+    values-night это не задать: выбранная в настройках тема ночной режим
+    платформы не переключает.
+-->
+<resources>
+    <style name="MauiAppBarLayout" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:background">@android:color/transparent</item>
+        <!-- Прозрачный контейнер всё равно бросает тень по своим границам, и по бокам
+             строки состояния оставалась серая кромка; тени у шапки нет вовсе -->
+        <item name="android:outlineProvider">none</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+</resources>

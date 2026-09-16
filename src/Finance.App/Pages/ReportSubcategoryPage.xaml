@@ -46,13 +46,14 @@
                         <Label Grid.Column="0" Grid.Row="1" Text="{Binding Caption}"
                                Style="{StaticResource SecondaryLabel}" />
                         <Label Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Amount}"
-                               VerticalOptions="Center">
+                               VerticalOptions="Center"
+                               Style="{StaticResource AmountLabel}">
                             <Label.Triggers>
                                 <DataTrigger TargetType="Label" Binding="{Binding IsPositive}" Value="True">
-                                    <Setter Property="Style" Value="{StaticResource PositiveLabel}" />
+                                    <Setter Property="Style" Value="{StaticResource AmountPositiveLabel}" />
                                 </DataTrigger>
                                 <DataTrigger TargetType="Label" Binding="{Binding IsExpense}" Value="True">
-                                    <Setter Property="Style" Value="{StaticResource NegativeLabel}" />
+                                    <Setter Property="Style" Value="{StaticResource AmountNegativeLabel}" />
                                 </DataTrigger>
                             </Label.Triggers>
                         </Label>

@@ -15,7 +15,8 @@
     xmlns:card="clr-namespace:Finance.Application.Features.Transactions.Card;assembly=Finance.Application"
     xmlns:domain="clr-namespace:Finance.Domain;assembly=Finance.Domain"
     x:DataType="card:TransactionViewModel"
-    Title="{Binding Title}">
+    Title="{Binding Title}"
+    Shell.TabBarIsVisible="False">
 
     <!--
         Клавиатура прижата к низу, а в .NET 10 страница по умолчанию идёт от края
@@ -54,10 +55,13 @@
                         <TapGestureRecognizer Command="{Binding ActivateSourceAmountCommand}" />
                     </Border.GestureRecognizers>
 
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Сумма" Style="{StaticResource CaptionLabel}" />
-                        <Label Text="{Binding AmountDisplay}" Style="{StaticResource SecondaryLabel}" />
-                        <Label Text="{Binding AmountPreview}" Style="{StaticResource TotalLabel}" />
+                    <!-- Итог — главная цифра экрана, по центру и крупно; набранное
+                         выражение над ним мелким. Пока ничего не набрано, итог показывает
+                         ноль в валюте: пустая рамка читалась как поломка -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Сумма" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding AmountDisplay}" Style="{StaticResource AmountExpression}" />
+                        <Label Text="{Binding AmountPreview}" Style="{StaticResource AmountHero}" />
                     </VerticalStackLayout>
                 </Border>
 
@@ -72,10 +76,10 @@
                         <TapGestureRecognizer Command="{Binding ActivateTargetAmountCommand}" />
                     </Border.GestureRecognizers>
 
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Зачисление" Style="{StaticResource CaptionLabel}" />
-                        <Label Text="{Binding TargetAmountDisplay}" Style="{StaticResource SecondaryLabel}" />
-                        <Label Text="{Binding TargetAmountPreview}" Style="{StaticResource TotalLabel}" />
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Зачисление" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding TargetAmountDisplay}" Style="{StaticResource AmountExpression}" />
+                        <Label Text="{Binding TargetAmountPreview}" Style="{StaticResource AmountHero}" />
                     </VerticalStackLayout>
                 </Border>
 
@@ -170,21 +174,77 @@
                 </Border>
 
                 <Border Style="{StaticResource Card}">
-                    <VerticalStackLayout Padding="14,10" Spacing="10">
-                        <Label Text="Дата" Style="{StaticResource CaptionLabel}" />
-                        <!-- Будущие дни и дни раньше открытия счёта календарь не предлагает -->
-                        <DatePicker Date="{Binding OccurredOnDate}"
+                    <VerticalStackLayout>
+                        <!--
+                            Дата — строкой в ряд с остальными полями: подпись, чипы
+                            «Сегодня» и «Вчера», третий чип открывает календарь.
+                            Системный календарь с подчёркиванием в форме не показывается:
+                            он чужой для остального оформления, а «Сегодня / Вчера»
+                            под ним уезжали под клавиатуру.
+                        -->
+                        <Grid Padding="14,8" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"
+                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <controls:Icon Grid.Column="0" Key="calendar" Style="{StaticResource MutedIcon}" />
+                            <Label Grid.Column="1" Text="{Binding OccurredOnCaption}" VerticalOptions="Center" />
+                            <HorizontalStackLayout Grid.Column="2" Spacing="6">
+                                <Border Style="{StaticResource Chip}" AutomationId="DateToday">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsToday}" Value="True">
+                                            <Setter Property="Style" Value="{StaticResource ChipSelected}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetTodayCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="Сегодня" Style="{StaticResource ChipLabel}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsToday}" Value="True">
+                                                <Setter Property="Style" Value="{StaticResource ChipSelectedLabel}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+                                <Border Style="{StaticResource Chip}" AutomationId="DateYesterday">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsYesterday}" Value="True">
+                                            <Setter Property="Style" Value="{StaticResource ChipSelected}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetYesterdayCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="Вчера" Style="{StaticResource ChipLabel}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsYesterday}" Value="True">
+                                                <Setter Property="Style" Value="{StaticResource ChipSelectedLabel}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+                                <Border Style="{StaticResource Chip}" AutomationId="DateOther"
+                                        SemanticProperties.Description="Выбрать дату в календаре">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnPickDate" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="…" Style="{StaticResource ChipLabel}" />
+                                </Border>
+                            </HorizontalStackLayout>
+                        </Grid>
+
+                        <!-- Календарь живёт на экране невидимым: открыть системный диалог
+                             можно только через сам контрол, и убрать его из дерева нельзя.
+                             Будущие дни и дни раньше открытия счёта он не предлагает -->
+                        <DatePicker x:Name="Calendar" Date="{Binding OccurredOnDate}"
                                     MinimumDate="{Binding EarliestDate}"
-                                    MaximumDate="{Binding LatestDate}" />
-                        <HorizontalStackLayout Spacing="8">
-                            <Button Text="Сегодня" Command="{Binding SetTodayCommand}" Style="{StaticResource GhostButton}" />
-                            <Button Text="Вчера" Command="{Binding SetYesterdayCommand}" Style="{StaticResource GhostButton}" />
-                        </HorizontalStackLayout>
+                                    MaximumDate="{Binding LatestDate}"
+                                    Opacity="0" HeightRequest="1" MinimumHeightRequest="1" InputTransparent="True" />
 
                         <BoxView Style="{StaticResource Divider}" />
-                        <Label Text="Заметка" Style="{StaticResource CaptionLabel}" />
-                        <Entry Text="{Binding Note}" Placeholder="Необязательно"
-                               Focused="OnTextFocused" Unfocused="OnTextUnfocused" />
+                        <Grid Padding="14,4,14,4" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <controls:Icon Grid.Column="0" Key="pencil" Style="{StaticResource MutedIcon}" />
+                            <Entry Grid.Column="1" Text="{Binding Note}" Placeholder="Заметка — необязательно"
+                                   Focused="OnTextFocused" Unfocused="OnTextUnfocused" />
+                        </Grid>
                     </VerticalStackLayout>
                 </Border>
 

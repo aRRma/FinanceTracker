@@ -16,7 +16,8 @@
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:pick="clr-namespace:Finance.Application.Features.Transactions.Pick;assembly=Finance.Application"
     x:DataType="pick:CategoryPickerViewModel"
-    Title="{Binding Title}">
+    Title="{Binding Title}"
+    Shell.TabBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,*">
 

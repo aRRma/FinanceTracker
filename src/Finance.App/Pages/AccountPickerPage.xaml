@@ -12,7 +12,8 @@
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:pick="clr-namespace:Finance.Application.Features.Transactions.Pick;assembly=Finance.Application"
     x:DataType="pick:AccountPickerViewModel"
-    Title="{Binding Title}">
+    Title="{Binding Title}"
+    Shell.TabBarIsVisible="False">
 
     <Grid RowDefinitions="*,Auto">
 
@@ -47,10 +48,11 @@
                                IsVisible="{Binding HasCaption}" Style="{StaticResource SecondaryLabel}" />
 
                         <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Balance}"
-                               VerticalOptions="Center">
+                               VerticalOptions="Center"
+                               Style="{StaticResource AmountLabel}">
                             <Label.Triggers>
                                 <DataTrigger TargetType="Label" Binding="{Binding IsNegative}" Value="True">
-                                    <Setter Property="Style" Value="{StaticResource NegativeLabel}" />
+                                    <Setter Property="Style" Value="{StaticResource AmountNegativeLabel}" />
                                 </DataTrigger>
                             </Label.Triggers>
                         </Label>

@@ -1,5 +1,6 @@
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
+using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain;
 
@@ -46,7 +47,10 @@ public sealed class TransactionKeypadTests
         await model.LoadAsync(key: null);
 
         Assert.False(model.CanSave);
-        Assert.Equal("0", model.AmountDisplay);
+
+        // Пока ничего не набрано, выражение пусто, а итог показывает ноль в валюте счёта
+        Assert.Equal(string.Empty, model.AmountDisplay);
+        Assert.Equal(Money.Restore(0m, Currency.RUB).Display, model.AmountPreview);
 
         model.PressKeyCommand.Execute("0");
 

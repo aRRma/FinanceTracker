@@ -229,9 +229,9 @@ public sealed partial class FeedViewModel : ScreenViewModel
     /// <summary>Шапка ленты счёта: название, баланс, начальный остаток с датой открытия.</summary>
     private async Task ReadAccountAsync(Guid key, CancellationToken cancellationToken)
     {
-        IReadOnlyList<AccountListItem> accounts = await _accounts.ReadAsync(cancellationToken);
-
-        AccountListItem? account = accounts.FirstOrDefault(candidate => candidate.Key == key);
+        // Один счёт, а не весь список: полный список считал бы балансы всех счетов
+        // ради одной шапки, и лента счёта дорожала бы вместе со всей историей
+        AccountListItem? account = await _accounts.ReadOneAsync(key, cancellationToken);
 
         if (account is null)
         {

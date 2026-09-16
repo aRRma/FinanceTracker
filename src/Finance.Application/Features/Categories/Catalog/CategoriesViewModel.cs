@@ -172,9 +172,13 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
         string filter = Filter.Trim();
         bool searching = filter.Length > 0;
 
+        // Дети раскладываются по группам одним проходом: пересборку дёргают на каждую
+        // букву, и проход по всему справочнику на каждую группу здесь лишний
+        ILookup<Guid?, CategoryListItem> byParent = _all.ToLookup(static item => item.ParentKey);
+
         foreach (CategoryListItem group in _all.Where(item => item.IsGroup && item.Kind == Kind))
         {
-            CategoryListItem[] children = [.. _all.Where(item => item.ParentKey == group.Key)];
+            CategoryListItem[] children = [.. byParent[group.Key]];
 
             // Совпало название группы — показывается вся группа: искали её
             bool groupMatches = searching && Matches(group.Name, filter);
