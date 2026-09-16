@@ -2,7 +2,7 @@ using System.Globalization;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Infrastructure.Initialization;
@@ -16,7 +16,9 @@ public sealed class DatabaseInitializer
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
     private readonly ILocalSettings _settings;
 
-    /// <summary>Создаёт инициализацию базы.</summary>
+    /// <summary>
+    /// Создаёт инициализацию базы.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     /// <param name="settings">Локальные настройки: в них хранится номер применённой версии набора.</param>
     public DatabaseInitializer(IDbContextFactory<FinanceDbContext> contexts, ILocalSettings settings)

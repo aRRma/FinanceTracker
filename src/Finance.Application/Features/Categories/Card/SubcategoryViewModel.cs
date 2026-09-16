@@ -3,7 +3,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
 
 namespace Finance.Application.Features.Categories.Card;
 
@@ -24,7 +25,9 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
     private CategoryKind _kind = CategoryKind.Expense;
     private bool _isProtected;
 
-    /// <summary>Создаёт модель представления карточки подкатегории.</summary>
+    /// <summary>
+    /// Создаёт модель представления карточки подкатегории.
+    /// </summary>
     /// <param name="categories">Список категорий: из него берутся группы для переноса.</param>
     /// <param name="handler">Сохранение категории.</param>
     /// <param name="deletion">Последствия удаления для диалога.</param>
@@ -51,24 +54,36 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
         Icon = new IconPicker(icons);
     }
 
-    /// <summary>Ключ правимой подкатегории. Пусто — заводится новая.</summary>
+    /// <summary>
+    /// Ключ правимой подкатегории. Пусто — заводится новая.
+    /// </summary>
     public Guid? Key { get; private set; }
 
-    /// <summary>Выбор значка подкатегории.</summary>
+    /// <summary>
+    /// Выбор значка подкатегории.
+    /// </summary>
     public IconPicker Icon { get; }
 
-    /// <summary>Группы, в которые подкатегорию можно перенести: того же вида и не служебные.</summary>
+    /// <summary>
+    /// Группы, в которые подкатегорию можно перенести: того же вида и не служебные.
+    /// </summary>
     public ObservableCollection<CategoryGroupOption> Groups { get; } = [];
 
-    /// <summary>Название подкатегории.</summary>
+    /// <summary>
+    /// Название подкатегории.
+    /// </summary>
     [ObservableProperty]
     public partial string Name { get; set; } = string.Empty;
 
-    /// <summary>Выбранная группа. Смена — это перенос.</summary>
+    /// <summary>
+    /// Выбранная группа. Смена — это перенос.
+    /// </summary>
     [ObservableProperty]
     public partial CategoryGroupOption? Group { get; set; }
 
-    /// <summary>Текст нарушенного правила. Пусто — сохранять можно.</summary>
+    /// <summary>
+    /// Текст нарушенного правила. Пусто — сохранять можно.
+    /// </summary>
     [ObservableProperty]
     public partial string? Error { get; private set; }
 
@@ -89,20 +104,28 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
     /// </summary>
     public bool IsIdle => !IsSaving;
 
-    /// <summary>Сохранять можно: предыдущее действие не идёт.</summary>
+    /// <summary>
+    /// Сохранять можно: предыдущее действие не идёт.
+    /// </summary>
     public bool CanSave => IsIdle;
 
-    /// <summary>Выбранная группа — номером в списке.</summary>
+    /// <summary>
+    /// Выбранная группа — номером в списке.
+    /// </summary>
     public int GroupIndex
     {
         get => Group is null ? -1 : Groups.IndexOf(Group);
         set => Group = value >= 0 && value < Groups.Count ? Groups[value] : null;
     }
 
-    /// <summary>Подпись вида: он наследуется от группы и на этом экране заперт.</summary>
+    /// <summary>
+    /// Подпись вида: он наследуется от группы и на этом экране заперт.
+    /// </summary>
     public string KindCaption => _kind is CategoryKind.Expense ? "Расход" : "Доход";
 
-    /// <summary>Заголовок экрана.</summary>
+    /// <summary>
+    /// Заголовок экрана.
+    /// </summary>
     public string Title => Key is null ? "Новая подкатегория" : "Подкатегория";
 
     /// <summary>
@@ -111,7 +134,9 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
     /// </summary>
     public bool CanDelete => Key is not null && !_isProtected;
 
-    /// <summary>Правило нарушено — сообщение показывается рядом с формой.</summary>
+    /// <summary>
+    /// Правило нарушено — сообщение показывается рядом с формой.
+    /// </summary>
     public bool HasError => !string.IsNullOrEmpty(Error);
 
     /// <inheritdoc />
@@ -266,7 +291,9 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
                + "Суммы и даты не изменятся, балансы останутся прежними.";
     }
 
-    /// <summary>Удаляет подкатегорию вместе с переездом её операций.</summary>
+    /// <summary>
+    /// Удаляет подкатегорию вместе с переездом её операций.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <returns><c>true</c>, если подкатегория удалена и экран можно закрыть.</returns>
     [RelayCommand]
@@ -306,7 +333,9 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
         }
     }
 
-    /// <summary>Переносить можно только в группы того же вида и не в служебные.</summary>
+    /// <summary>
+    /// Переносить можно только в группы того же вида и не в служебные.
+    /// </summary>
     private void FillGroups(IReadOnlyList<CategoryListItem> categories, CategoryListItem parent)
     {
         Groups.Clear();

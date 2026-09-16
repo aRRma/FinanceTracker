@@ -8,7 +8,9 @@ namespace Finance.App.Controls;
 /// </summary>
 public partial class IconGrid : ContentView
 {
-    /// <summary>Создаёт контрол.</summary>
+    /// <summary>
+    /// Создаёт контрол.
+    /// </summary>
     public IconGrid()
     {
         InitializeComponent();

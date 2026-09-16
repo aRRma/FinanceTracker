@@ -18,9 +18,13 @@ public interface IScreenModel
     /// </summary>
     event Action<Exception>? ReloadFailed;
 
-    /// <summary>Экран появился: подписаться на изменения.</summary>
+    /// <summary>
+    /// Экран появился: подписаться на изменения.
+    /// </summary>
     void Activate();
 
-    /// <summary>Экран ушёл: отписаться.</summary>
+    /// <summary>
+    /// Экран ушёл: отписаться.
+    /// </summary>
     void Deactivate();
 }

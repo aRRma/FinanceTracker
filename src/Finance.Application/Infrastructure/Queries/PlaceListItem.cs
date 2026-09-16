@@ -7,13 +7,19 @@ namespace Finance.Application.Infrastructure.Queries;
 /// </summary>
 public sealed record PlaceListItem
 {
-    /// <summary>Ключ места.</summary>
+    /// <summary>
+    /// Ключ места.
+    /// </summary>
     public required Guid Key { get; init; }
 
-    /// <summary>Название места.</summary>
+    /// <summary>
+    /// Название места.
+    /// </summary>
     public required string Name { get; init; }
 
-    /// <summary>Сколько операций ссылается на место.</summary>
+    /// <summary>
+    /// Сколько операций ссылается на место.
+    /// </summary>
     public required int TransactionCount { get; init; }
 
     /// <summary>
@@ -22,6 +28,8 @@ public sealed record PlaceListItem
     /// </summary>
     public required string? TopCategoryName { get; init; }
 
-    /// <summary>Подкатегорию есть чем подписать — строке справочника нужна вторая строка.</summary>
+    /// <summary>
+    /// Подкатегорию есть чем подписать — строке справочника нужна вторая строка.
+    /// </summary>
     public bool HasTopCategory => TopCategoryName is not null;
 }

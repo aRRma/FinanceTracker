@@ -2,15 +2,20 @@ using Finance.Application.Features.Feed;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Лента: порядок, стороны перевода, итоги дня, страницы.</summary>
+/// <summary>
+/// Лента: порядок, стороны перевода, итоги дня, страницы.
+/// </summary>
 public sealed class FeedTests
 {
-    /// <summary>Порядок — от новых к старым по дате, внутри дня — по моменту записи.</summary>
+    /// <summary>
+    /// Порядок — от новых к старым по дате, внутри дня — по моменту записи.
+    /// </summary>
     [Fact]
     public async Task Лента_идёт_от_новых_к_старым()
     {
@@ -86,7 +91,9 @@ public sealed class FeedTests
         Assert.Equal(Money.Restore(81_750m, Currency.RUB), page.DayTotals[given.Today]);
     }
 
-    /// <summary>Итог дня ленты счёта — в его валюте, обе стороны переводов.</summary>
+    /// <summary>
+    /// Итог дня ленты счёта — в его валюте, обе стороны переводов.
+    /// </summary>
     [Fact]
     public async Task Итог_дня_ленты_счёта_включает_зачисления()
     {
@@ -104,7 +111,9 @@ public sealed class FeedTests
         Assert.Equal(Money.Restore(200m, Currency.RUB), page.DayTotals[given.Today]);
     }
 
-    /// <summary>Удалённая операция из ленты исчезает.</summary>
+    /// <summary>
+    /// Удалённая операция из ленты исчезает.
+    /// </summary>
     [Fact]
     public async Task Удалённая_операция_в_ленту_не_попадает()
     {
@@ -118,7 +127,9 @@ public sealed class FeedTests
         Assert.Empty((await given.FeedAsync()).Items);
     }
 
-    /// <summary>Страницы: лишняя строка говорит, что есть ещё, и в страницу не попадает.</summary>
+    /// <summary>
+    /// Страницы: лишняя строка говорит, что есть ещё, и в страницу не попадает.
+    /// </summary>
     [Fact]
     public async Task Лента_читается_страницами()
     {
@@ -168,7 +179,9 @@ public sealed class FeedTests
         Assert.Equal(expected, second.DayTotals[given.Today]);
     }
 
-    /// <summary>Место, удалённое из справочника, в строке не показывается — операция как без места.</summary>
+    /// <summary>
+    /// Место, удалённое из справочника, в строке не показывается — операция как без места.
+    /// </summary>
     [Fact]
     public async Task Строка_несёт_название_места_и_группы()
     {
@@ -299,7 +312,9 @@ public sealed class FeedTests
         Assert.False(expense.IsPositive);
     }
 
-    /// <summary>Пустая лента счёта: модель говорит об этом и несёт начальный остаток для строки-заглушки.</summary>
+    /// <summary>
+    /// Пустая лента счёта: модель говорит об этом и несёт начальный остаток для строки-заглушки.
+    /// </summary>
     [Fact]
     public async Task Пустая_лента_счёта_несёт_начальный_остаток()
     {
@@ -380,7 +395,9 @@ public sealed class FeedTests
         Assert.DoesNotContain("TEMP B-TREE", plan, StringComparison.Ordinal);
     }
 
-    /// <summary>Урезает страницу до заданного размера: модель просит полсотни, а тесту нужно две.</summary>
+    /// <summary>
+    /// Урезает страницу до заданного размера: модель просит полсотни, а тесту нужно две.
+    /// </summary>
     private sealed class PagedFeed(IFeedQuery inner, int pageSize) : IFeedQuery
     {
         public Task<FeedPage> ReadAsync(Guid? accountKey, int skip, int take, CancellationToken cancellationToken = default) =>

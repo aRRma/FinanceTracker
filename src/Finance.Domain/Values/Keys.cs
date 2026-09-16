@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Finance.Domain;
+namespace Finance.Domain.Values;
 
 /// <summary>
 /// Ключи сущностей. Их генерирует клиент, а не база: записи создаются офлайн,

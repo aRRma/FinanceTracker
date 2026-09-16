@@ -3,15 +3,21 @@ using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Операции: запись, правка, удаление, места из формы и подстановка счёта.</summary>
+/// <summary>
+/// Операции: запись, правка, удаление, места из формы и подстановка счёта.
+/// </summary>
 public sealed class TransactionsTests
 {
-    /// <summary>Расход, доход и перевод меняют балансы обоих счетов, как положено виду.</summary>
+    /// <summary>
+    /// Расход, доход и перевод меняют балансы обоих счетов, как положено виду.
+    /// </summary>
     [Fact]
     public async Task Записанные_операции_меняют_балансы()
     {
@@ -28,7 +34,9 @@ public sealed class TransactionsTests
         Assert.Equal(300m, (await given.BalanceAsync(card)).Amount);
     }
 
-    /// <summary>Сумма пишется в валюте счёта списания: команда валюты не несёт.</summary>
+    /// <summary>
+    /// Сумма пишется в валюте счёта списания: команда валюты не несёт.
+    /// </summary>
     [Fact]
     public async Task Сумма_берёт_валюту_счёта()
     {
@@ -41,7 +49,9 @@ public sealed class TransactionsTests
         Assert.Equal(Money.Create(60m, Currency.EUR), await given.BalanceAsync(euro));
     }
 
-    /// <summary>Перевод между валютами несёт две суммы, каждая в валюте своей стороны.</summary>
+    /// <summary>
+    /// Перевод между валютами несёт две суммы, каждая в валюте своей стороны.
+    /// </summary>
     [Fact]
     public async Task Перевод_между_валютами_зачисляет_вторую_сумму()
     {
@@ -56,7 +66,9 @@ public sealed class TransactionsTests
         Assert.Equal(Money.Create(9_000m, Currency.RUB), await given.BalanceAsync(rub));
     }
 
-    /// <summary>Перевод между валютами без суммы зачисления — ошибка формы, а не ввода.</summary>
+    /// <summary>
+    /// Перевод между валютами без суммы зачисления — ошибка формы, а не ввода.
+    /// </summary>
     [Fact]
     public async Task Перевод_между_валютами_без_суммы_зачисления_отвергается()
     {
@@ -68,7 +80,9 @@ public sealed class TransactionsTests
         await Assert.ThrowsAsync<ArgumentException>(() => given.SaveAsync(given.Transfer(euro, rub, 100m)));
     }
 
-    /// <summary>Категория не того вида — доменное правило, показанное пользователю.</summary>
+    /// <summary>
+    /// Категория не того вида — доменное правило, показанное пользователю.
+    /// </summary>
     [Fact]
     public async Task Расход_с_доходной_категорией_отвергается()
     {
@@ -82,7 +96,9 @@ public sealed class TransactionsTests
         Assert.Equal(Invariant.CategoryKindMatchesTransaction, error.Invariant);
     }
 
-    /// <summary>Дата раньше открытия счёта отвергается — обработчик подал домену счёт.</summary>
+    /// <summary>
+    /// Дата раньше открытия счёта отвергается — обработчик подал домену счёт.
+    /// </summary>
     [Fact]
     public async Task Дата_раньше_открытия_счёта_отвергается()
     {
@@ -120,7 +136,9 @@ public sealed class TransactionsTests
         Assert.Equal(850m, (await given.BalanceAsync(cash)).Amount);
     }
 
-    /// <summary>Правка меняет вид целиком: расход становится переводом, категория исчезает, второй счёт появляется.</summary>
+    /// <summary>
+    /// Правка меняет вид целиком: расход становится переводом, категория исчезает, второй счёт появляется.
+    /// </summary>
     [Fact]
     public async Task Правка_меняет_вид_операции()
     {
@@ -142,7 +160,9 @@ public sealed class TransactionsTests
         Assert.Equal(200m, (await given.BalanceAsync(card)).Amount);
     }
 
-    /// <summary>Удаление мягкое: строка остаётся с надгробием, из балансов и карточки исчезает.</summary>
+    /// <summary>
+    /// Удаление мягкое: строка остаётся с надгробием, из балансов и карточки исчезает.
+    /// </summary>
     [Fact]
     public async Task Удаление_оставляет_надгробие()
     {
@@ -163,7 +183,9 @@ public sealed class TransactionsTests
         Assert.NotNull(row.DeletedAtUtc);
     }
 
-    /// <summary>Повторное удаление — не ошибка: экран мог не успеть обновиться.</summary>
+    /// <summary>
+    /// Повторное удаление — не ошибка: экран мог не успеть обновиться.
+    /// </summary>
     [Fact]
     public async Task Повторное_удаление_не_падает()
     {
@@ -198,7 +220,9 @@ public sealed class TransactionsTests
         Assert.Equal(2, place.TransactionCount);
     }
 
-    /// <summary>Счёт списания запоминается и подставляется в следующую операцию.</summary>
+    /// <summary>
+    /// Счёт списания запоминается и подставляется в следующую операцию.
+    /// </summary>
     [Fact]
     public async Task Последний_счёт_запоминается()
     {
@@ -215,7 +239,9 @@ public sealed class TransactionsTests
         Assert.Equal(card.ToString(), await given.Database.Resolve<ILocalSettings>().GetAsync(SettingName.LastAccountKey));
     }
 
-    /// <summary>Подстановка — для новых операций: правка старой записи последний счёт не трогает.</summary>
+    /// <summary>
+    /// Подстановка — для новых операций: правка старой записи последний счёт не трогает.
+    /// </summary>
     [Fact]
     public async Task Правка_операции_не_меняет_последний_счёт()
     {
@@ -262,7 +288,9 @@ public sealed class TransactionsTests
         Assert.Equal(Money.Create(100m, Currency.EUR), await given.BalanceAsync(euro));
     }
 
-    /// <summary>Неудавшееся сохранение не запоминает счёт: подстановка ссылалась бы на операцию, которой нет.</summary>
+    /// <summary>
+    /// Неудавшееся сохранение не запоминает счёт: подстановка ссылалась бы на операцию, которой нет.
+    /// </summary>
     [Fact]
     public async Task Отвергнутая_операция_не_меняет_последний_счёт()
     {
@@ -280,7 +308,9 @@ public sealed class TransactionsTests
         Assert.Equal(cash, form.LastAccountKey);
     }
 
-    /// <summary>Форма отдаёт подкатегории с видом группы: перевод без категории, расход — только расходные.</summary>
+    /// <summary>
+    /// Форма отдаёт подкатегории с видом группы: перевод без категории, расход — только расходные.
+    /// </summary>
     [Fact]
     public async Task Форма_отдаёт_подкатегории_обоих_видов()
     {

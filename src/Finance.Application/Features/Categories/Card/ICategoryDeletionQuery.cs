@@ -1,6 +1,8 @@
 namespace Finance.Application.Features.Categories.Card;
 
-/// <summary>Что сказать в диалоге перед удалением подкатегории.</summary>
+/// <summary>
+/// Что сказать в диалоге перед удалением подкатегории.
+/// </summary>
 public interface ICategoryDeletionQuery
 {
     /// <summary>

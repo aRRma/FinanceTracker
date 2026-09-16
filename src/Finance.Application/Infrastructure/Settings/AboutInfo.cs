@@ -7,6 +7,8 @@ namespace Finance.Application.Infrastructure.Settings;
 /// <param name="version">Версия приложения из манифеста.</param>
 public sealed class AboutInfo(string? version = null)
 {
-    /// <summary>Версия приложения. Незаданной она бывает только вне устройства — в тестах.</summary>
+    /// <summary>
+    /// Версия приложения. Незаданной она бывает только вне устройства — в тестах.
+    /// </summary>
     public string Version { get; } = string.IsNullOrWhiteSpace(version) ? "не задана" : version;
 }

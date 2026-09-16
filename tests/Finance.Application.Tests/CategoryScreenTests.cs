@@ -2,14 +2,18 @@ using Finance.Application.Features.Categories.Card;
 using Finance.Application.Features.Categories.Catalog;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Экраны справочника категорий: список, карточка группы и карточка подкатегории.</summary>
+/// <summary>
+/// Экраны справочника категорий: список, карточка группы и карточка подкатегории.
+/// </summary>
 public sealed class CategoryScreenTests
 {
-    /// <summary>Список показывает подкатегории под своей группой, а не вперемешку.</summary>
+    /// <summary>
+    /// Список показывает подкатегории под своей группой, а не вперемешку.
+    /// </summary>
     [Fact]
     public async Task Справочник_показывает_подкатегории_под_своей_группой()
     {
@@ -101,7 +105,9 @@ public sealed class CategoryScreenTests
         Assert.Equal(1, categories.Reads);
     }
 
-    /// <summary>Экран перечитывается сам, когда категории правят с другого экрана.</summary>
+    /// <summary>
+    /// Экран перечитывается сам, когда категории правят с другого экрана.
+    /// </summary>
     [Fact]
     public async Task Справочник_перечитывается_по_изменению_категорий()
     {
@@ -127,7 +133,9 @@ public sealed class CategoryScreenTests
         }
     }
 
-    /// <summary>У новой группы вид выбирается, у существующей заперт: его наследуют подкатегории.</summary>
+    /// <summary>
+    /// У новой группы вид выбирается, у существующей заперт: его наследуют подкатегории.
+    /// </summary>
     [Fact]
     public async Task Вид_группы_запирается_после_создания()
     {
@@ -148,7 +156,9 @@ public sealed class CategoryScreenTests
         Assert.Equal("Доход", model.KindCaption);
     }
 
-    /// <summary>Занятое имя показывается текстом рядом с формой, а не роняет экран.</summary>
+    /// <summary>
+    /// Занятое имя показывается текстом рядом с формой, а не роняет экран.
+    /// </summary>
     [Fact]
     public async Task Занятое_имя_группы_показывается_ошибкой_на_экране()
     {
@@ -164,7 +174,9 @@ public sealed class CategoryScreenTests
         Assert.Contains("занято", model.Error, StringComparison.OrdinalIgnoreCase);
     }
 
-    /// <summary>Карточка группы показывает её подкатегории, включая «Прочее» без перехода.</summary>
+    /// <summary>
+    /// Карточка группы показывает её подкатегории, включая «Прочее» без перехода.
+    /// </summary>
     [Fact]
     public async Task Карточка_группы_показывает_подкатегории()
     {
@@ -182,7 +194,9 @@ public sealed class CategoryScreenTests
         Assert.True(model.CanAddSubcategory);
     }
 
-    /// <summary>Значок новой подкатегории подставляется от группы: свой — уточнение, а не обязанность.</summary>
+    /// <summary>
+    /// Значок новой подкатегории подставляется от группы: свой — уточнение, а не обязанность.
+    /// </summary>
     [Fact]
     public async Task Значок_подкатегории_наследуется_от_группы()
     {
@@ -203,7 +217,9 @@ public sealed class CategoryScreenTests
         Assert.False(model.CanDelete);
     }
 
-    /// <summary>Переносить предлагается только в группы того же вида и не в служебные.</summary>
+    /// <summary>
+    /// Переносить предлагается только в группы того же вида и не в служебные.
+    /// </summary>
     [Fact]
     public async Task В_списке_групп_только_группы_того_же_вида()
     {
@@ -229,7 +245,9 @@ public sealed class CategoryScreenTests
         Assert.True(model.CanDelete);
     }
 
-    /// <summary>Диалог называет число операций и приёмник: подтверждать вслепую нечего.</summary>
+    /// <summary>
+    /// Диалог называет число операций и приёмник: подтверждать вслепую нечего.
+    /// </summary>
     [Fact]
     public async Task Диалог_удаления_называет_число_операций_и_приёмник()
     {
@@ -249,7 +267,9 @@ public sealed class CategoryScreenTests
         Assert.Contains("балансы останутся прежними", prompt, StringComparison.Ordinal);
     }
 
-    /// <summary>Пустая подкатегория удаляется без обещаний о переезде: переезжать нечему.</summary>
+    /// <summary>
+    /// Пустая подкатегория удаляется без обещаний о переезде: переезжать нечему.
+    /// </summary>
     [Fact]
     public async Task Диалог_удаления_молчит_о_переезде_когда_операций_нет()
     {
@@ -267,7 +287,9 @@ public sealed class CategoryScreenTests
         Assert.DoesNotContain(await database.Resolve<ICategoriesQuery>().ReadAsync(), item => item.Key == products);
     }
 
-    /// <summary>Смена группы в списке — это перенос: сохранение переставляет подкатегорию.</summary>
+    /// <summary>
+    /// Смена группы в списке — это перенос: сохранение переставляет подкатегорию.
+    /// </summary>
     [Fact]
     public async Task Смена_группы_на_карточке_переносит_подкатегорию()
     {
@@ -316,7 +338,9 @@ public sealed class CategoryScreenTests
     private static Task<Guid> SaveAsync(TestDatabase database, SaveCategoryCommand command) =>
         database.Resolve<ISaveCategoryHandler>().HandleAsync(command);
 
-    /// <summary>Считает походы в базу: утверждение «список не перечитывается» иначе не проверить.</summary>
+    /// <summary>
+    /// Считает походы в базу: утверждение «список не перечитывается» иначе не проверить.
+    /// </summary>
     private sealed class CountingCategories : ICategoriesQuery
     {
         private readonly ICategoriesQuery _inner;

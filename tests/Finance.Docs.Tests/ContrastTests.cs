@@ -11,7 +11,9 @@ namespace Finance.Docs.Tests;
 /// </summary>
 public sealed partial class ContrastTests
 {
-    /// <summary>Порог обычного текста по WCAG AA. Крупного текста в приложении нет.</summary>
+    /// <summary>
+    /// Порог обычного текста по WCAG AA. Крупного текста в приложении нет.
+    /// </summary>
     private const double Minimum = 4.5;
 
     private static readonly Lazy<IReadOnlyDictionary<string, Colour>> Palette = new(Read);
@@ -76,7 +78,9 @@ public sealed partial class ContrastTests
         return data;
     }
 
-    /// <summary>Пара «текст на фоне» различима по WCAG AA.</summary>
+    /// <summary>
+    /// Пара «текст на фоне» различима по WCAG AA.
+    /// </summary>
     /// <param name="foreground">Токен текста без суффикса темы.</param>
     /// <param name="background">Токен фона без суффикса темы.</param>
     /// <param name="theme">Суффикс темы: <c>Light</c> или <c>Dark</c>.</param>
@@ -109,7 +113,9 @@ public sealed partial class ContrastTests
         Assert.True(Ratio("Ink2Light", "CardLight") > Ratio("Ink3Light", "CardLight"));
     }
 
-    /// <summary>Цвет палитры: <c>&lt;Color x:Key="Имя"&gt;#RRGGBB&lt;/Color&gt;</c>.</summary>
+    /// <summary>
+    /// Цвет палитры: <c>&lt;Color x:Key="Имя"&gt;#RRGGBB&lt;/Color&gt;</c>.
+    /// </summary>
     [GeneratedRegex("""<Color\s+x:Key="(?<key>\w+)"\s*>#(?<value>[0-9A-Fa-f]{6})</Color>""")]
     private static partial Regex Token();
 
@@ -151,10 +157,14 @@ public sealed partial class ContrastTests
                 StringComparer.Ordinal);
     }
 
-    /// <summary>Цвет палитры по каналам.</summary>
+    /// <summary>
+    /// Цвет палитры по каналам.
+    /// </summary>
     private readonly record struct Colour(byte Red, byte Green, byte Blue)
     {
-        /// <summary>Разбирает шесть шестнадцатеричных знаков без решётки.</summary>
+        /// <summary>
+        /// Разбирает шесть шестнадцатеричных знаков без решётки.
+        /// </summary>
         public static Colour Parse(ReadOnlySpan<char> value) =>
             new(
                 byte.Parse(value[..2], NumberStyles.HexNumber, CultureInfo.InvariantCulture),

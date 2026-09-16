@@ -1,5 +1,8 @@
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Rules;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Infrastructure.Storage;
 
@@ -12,7 +15,9 @@ internal static class TransactionMapping
 {
     extension(TransactionRow row)
     {
-        /// <summary>Собирает доменную операцию из строки.</summary>
+        /// <summary>
+        /// Собирает доменную операцию из строки.
+        /// </summary>
         /// <param name="sourceCurrency">Валюта счёта списания — валюта суммы операции.</param>
         /// <param name="targetCurrency">Валюта счёта зачисления — валюта суммы зачисления, у перевода.</param>
         public Transaction ToDomain(Currency sourceCurrency, Currency? targetCurrency)
@@ -50,7 +55,9 @@ internal static class TransactionMapping
 
     extension(Transaction transaction)
     {
-        /// <summary>Заводит новую строку по операции.</summary>
+        /// <summary>
+        /// Заводит новую строку по операции.
+        /// </summary>
         public TransactionRow ToRow() =>
             new()
             {
@@ -71,7 +78,9 @@ internal static class TransactionMapping
                 Note = transaction.Note
             };
 
-        /// <summary>Переносит изменения операции в отслеживаемую строку.</summary>
+        /// <summary>
+        /// Переносит изменения операции в отслеживаемую строку.
+        /// </summary>
         public void CopyTo(TransactionRow row)
         {
             ArgumentNullException.ThrowIfNull(row);

@@ -1,15 +1,19 @@
 using Finance.Application.Infrastructure.Storage;
-using Finance.Domain;
+using Finance.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Infrastructure.Queries;
 
-/// <summary>Чтение справочника категорий целиком.</summary>
+/// <summary>
+/// Чтение справочника категорий целиком.
+/// </summary>
 public sealed class CategoriesQuery : ICategoriesQuery
 {
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
 
-    /// <summary>Создаёт запрос.</summary>
+    /// <summary>
+    /// Создаёт запрос.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     public CategoriesQuery(IDbContextFactory<FinanceDbContext> contexts)
     {

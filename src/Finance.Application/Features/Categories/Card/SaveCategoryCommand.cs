@@ -1,4 +1,4 @@
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Features.Categories.Card;
 
@@ -10,7 +10,9 @@ namespace Finance.Application.Features.Categories.Card;
 /// </summary>
 public sealed record SaveCategoryCommand
 {
-    /// <summary>Ключ категории. Пуст — категория заводится.</summary>
+    /// <summary>
+    /// Ключ категории. Пуст — категория заводится.
+    /// </summary>
     public Guid? Key { get; init; }
 
     /// <summary>
@@ -19,10 +21,14 @@ public sealed record SaveCategoryCommand
     /// </summary>
     public Guid? ParentKey { get; init; }
 
-    /// <summary>Название категории.</summary>
+    /// <summary>
+    /// Название категории.
+    /// </summary>
     public required string Name { get; init; }
 
-    /// <summary>Ключ значка. У новой подкатегории форма подставляет значок группы.</summary>
+    /// <summary>
+    /// Ключ значка. У новой подкатегории форма подставляет значок группы.
+    /// </summary>
     public required string Icon { get; init; }
 
     /// <summary>

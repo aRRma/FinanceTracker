@@ -1,4 +1,4 @@
-using Finance.Domain;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Infrastructure.Queries;
 
@@ -15,6 +15,8 @@ public sealed record FeedPage(
     IReadOnlyDictionary<DateOnly, Money> DayTotals,
     bool HasMore)
 {
-    /// <summary>Пустая страница: операций нет.</summary>
+    /// <summary>
+    /// Пустая страница: операций нет.
+    /// </summary>
     public static FeedPage Empty { get; } = new([], new Dictionary<DateOnly, Money>(), HasMore: false);
 }

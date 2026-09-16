@@ -1,14 +1,18 @@
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Entities;
 
 namespace Finance.Application.Infrastructure.Storage;
 
-/// <summary>Перекладывание категории между строкой базы и доменным типом.</summary>
+/// <summary>
+/// Перекладывание категории между строкой базы и доменным типом.
+/// </summary>
 internal static class CategoryMapping
 {
     extension(CategoryRow row)
     {
-        /// <summary>Собирает доменную категорию из строки.</summary>
+        /// <summary>
+        /// Собирает доменную категорию из строки.
+        /// </summary>
         public Category ToDomain() =>
             Category.Restore(
                 row.Key,
@@ -27,7 +31,9 @@ internal static class CategoryMapping
 
     extension(Category category)
     {
-        /// <summary>Заводит новую строку по категории.</summary>
+        /// <summary>
+        /// Заводит новую строку по категории.
+        /// </summary>
         public CategoryRow ToRow() =>
             new()
             {
@@ -45,7 +51,9 @@ internal static class CategoryMapping
                 ExcludeFromReports = category.ExcludeFromReports
             };
 
-        /// <summary>Переносит изменения категории в отслеживаемую строку.</summary>
+        /// <summary>
+        /// Переносит изменения категории в отслеживаемую строку.
+        /// </summary>
         public void CopyTo(CategoryRow row)
         {
             ArgumentNullException.ThrowIfNull(row);

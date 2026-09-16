@@ -10,7 +10,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:catalog="clr-namespace:Finance.Application.Features.Categories.Catalog;assembly=Finance.Application"
-    xmlns:domain="clr-namespace:Finance.Domain;assembly=Finance.Domain"
+    xmlns:domain="clr-namespace:Finance.Domain.Enums;assembly=Finance.Domain"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     x:DataType="catalog:CategoriesViewModel"
     Title="Категории">

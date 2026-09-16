@@ -7,10 +7,14 @@ namespace Finance.Application.Infrastructure;
 /// </summary>
 public interface IChangeNotifier
 {
-    /// <summary>Данные изменились. Доставка в поток интерфейса — забота подписчика.</summary>
+    /// <summary>
+    /// Данные изменились. Доставка в поток интерфейса — забота подписчика.
+    /// </summary>
     event Action<DataChange>? Changed;
 
-    /// <summary>Сообщает об изменении. Вызывается единой точкой выполнения команд.</summary>
+    /// <summary>
+    /// Сообщает об изменении. Вызывается единой точкой выполнения команд.
+    /// </summary>
     /// <param name="change">Что именно изменилось.</param>
     void Publish(DataChange change);
 }

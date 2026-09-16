@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Finance.Application.Infrastructure.Storage;
 
-/// <summary>Локальные настройки устройства. Полей обмена у них нет намеренно.</summary>
+/// <summary>
+/// Локальные настройки устройства. Полей обмена у них нет намеренно.
+/// </summary>
 internal sealed class SettingConfiguration : IEntityTypeConfiguration<SettingRow>
 {
     public void Configure(EntityTypeBuilder<SettingRow> builder)

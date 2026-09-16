@@ -17,7 +17,9 @@ public sealed partial class AboutViewModel : ObservableObject
 {
     private readonly ISettingsSummaryQuery _summary;
 
-    /// <summary>Создаёт модель представления экрана «О программе».</summary>
+    /// <summary>
+    /// Создаёт модель представления экрана «О программе».
+    /// </summary>
     /// <param name="summary">Состояние настроек.</param>
     public AboutViewModel(ISettingsSummaryQuery summary)
     {
@@ -26,15 +28,21 @@ public sealed partial class AboutViewModel : ObservableObject
         _summary = summary;
     }
 
-    /// <summary>Версия приложения.</summary>
+    /// <summary>
+    /// Версия приложения.
+    /// </summary>
     [ObservableProperty]
     public partial string Version { get; private set; } = string.Empty;
 
-    /// <summary>Номер схемы базы — число накатанных миграций.</summary>
+    /// <summary>
+    /// Номер схемы базы — число накатанных миграций.
+    /// </summary>
     [ObservableProperty]
     public partial string Schema { get; private set; } = string.Empty;
 
-    /// <summary>Читает сведения о программе.</summary>
+    /// <summary>
+    /// Читает сведения о программе.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)

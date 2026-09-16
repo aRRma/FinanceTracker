@@ -7,7 +7,9 @@ namespace Finance.Application.Infrastructure.Storage;
 /// <param name="path">Полный путь к файлу базы.</param>
 public sealed class DatabaseLocation(string path)
 {
-    /// <summary>Файл базы.</summary>
+    /// <summary>
+    /// Файл базы.
+    /// </summary>
     public string Path { get; } = !string.IsNullOrWhiteSpace(path)
         ? path
         : throw new ArgumentException("Путь к базе не задан", nameof(path));
@@ -18,6 +20,8 @@ public sealed class DatabaseLocation(string path)
     /// </summary>
     public string BackupPath => Path + ".backup";
 
-    /// <summary>Строка подключения к базе.</summary>
+    /// <summary>
+    /// Строка подключения к базе.
+    /// </summary>
     public string ConnectionString => $"Data Source={Path};Default Timeout=30";
 }

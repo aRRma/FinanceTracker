@@ -18,7 +18,9 @@ public sealed class SettingsTests
     private const string FarEast = "Pacific/Kiritimati";
     private const string FarWest = "Pacific/Midway";
 
-    /// <summary>Выбранная тема и сохраняется, и доходит до платформы: экран перекрашивается сразу.</summary>
+    /// <summary>
+    /// Выбранная тема и сохраняется, и доходит до платформы: экран перекрашивается сразу.
+    /// </summary>
     [Fact]
     public async Task Выбранная_тема_сохраняется_и_применяется()
     {
@@ -59,7 +61,9 @@ public sealed class SettingsTests
     public void Незнакомая_запись_темы_читается_как_системная() =>
         Assert.Equal(Theme.System, Theme.Parse("сиреневая"));
 
-    /// <summary>Выбранный пояс меняет «сегодня» — именно ради этого настройка и заведена.</summary>
+    /// <summary>
+    /// Выбранный пояс меняет «сегодня» — именно ради этого настройка и заведена.
+    /// </summary>
     [Fact]
     public async Task Выбранный_пояс_меняет_сегодняшнюю_дату()
     {
@@ -117,7 +121,9 @@ public sealed class SettingsTests
         Assert.Equal(FarEast, await database.Resolve<ILocalSettings>().GetAsync(SettingName.TimeZoneId));
     }
 
-    /// <summary>Убирать нечего — не ошибка: настройка уже в том состоянии, которого от неё хотят.</summary>
+    /// <summary>
+    /// Убирать нечего — не ошибка: настройка уже в том состоянии, которого от неё хотят.
+    /// </summary>
     [Fact]
     public async Task Удаление_незаданной_настройки_проходит_молча()
     {
@@ -144,7 +150,9 @@ public sealed class SettingsTests
         Assert.True(summary.TimeZoneFromSystem);
     }
 
-    /// <summary>Экран оформления показывает три состояния, и выбранное отмечено ровно одно.</summary>
+    /// <summary>
+    /// Экран оформления показывает три состояния, и выбранное отмечено ровно одно.
+    /// </summary>
     [Fact]
     public async Task Экран_оформления_показывает_три_состояния()
     {

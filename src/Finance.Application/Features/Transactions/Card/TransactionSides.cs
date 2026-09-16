@@ -1,6 +1,7 @@
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Features.Transactions.Card;
@@ -12,7 +13,9 @@ namespace Finance.Application.Features.Transactions.Card;
 /// </summary>
 internal static class TransactionSides
 {
-    /// <summary>Читает счёт по ключу. Отсутствие — ошибка вызывающего, а не ввод пользователя.</summary>
+    /// <summary>
+    /// Читает счёт по ключу. Отсутствие — ошибка вызывающего, а не ввод пользователя.
+    /// </summary>
     /// <param name="context">Контекст базы.</param>
     /// <param name="key">Ключ счёта.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
@@ -52,7 +55,9 @@ internal static class TransactionSides
         return (source.Currency, targetCurrency);
     }
 
-    /// <summary>Собирает доменную операцию из строки, дочитав валюты её счетов.</summary>
+    /// <summary>
+    /// Собирает доменную операцию из строки, дочитав валюты её счетов.
+    /// </summary>
     /// <param name="context">Контекст базы.</param>
     /// <param name="row">Строка операции.</param>
     /// <param name="cancellationToken">Признак отмены.</param>

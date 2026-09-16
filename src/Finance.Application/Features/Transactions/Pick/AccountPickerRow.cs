@@ -1,6 +1,8 @@
 namespace Finance.Application.Features.Transactions.Pick;
 
-/// <summary>Счёт в списке выбора: значок, название, баланс и отметка выбранного.</summary>
+/// <summary>
+/// Счёт в списке выбора: значок, название, баланс и отметка выбранного.
+/// </summary>
 /// <param name="Key">Ключ счёта.</param>
 /// <param name="Icon">Ключ значка: наличные, карта или накопления.</param>
 /// <param name="Name">Наименование.</param>
@@ -17,6 +19,8 @@ public sealed record AccountPickerRow(
     bool IsNegative,
     bool IsSelected)
 {
-    /// <summary>Подпись под названием есть — строка двухстрочная.</summary>
+    /// <summary>
+    /// Подпись под названием есть — строка двухстрочная.
+    /// </summary>
     public bool HasCaption => Caption.Length > 0;
 }

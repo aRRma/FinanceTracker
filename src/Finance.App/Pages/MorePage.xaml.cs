@@ -3,12 +3,16 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экран A-04: справочники и настройки.</summary>
+/// <summary>
+/// Экран A-04: справочники и настройки.
+/// </summary>
 public partial class MorePage : DataPage
 {
     private readonly MoreViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления раздела «Ещё».</param>
     /// <param name="startup">Подготовка приложения.</param>
     public MorePage(MoreViewModel model, FinanceStartup startup)

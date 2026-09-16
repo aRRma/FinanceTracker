@@ -1,4 +1,4 @@
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.App;
 
@@ -16,7 +16,9 @@ internal static class ShortcutLaunch
 
     private static TransactionKind? _pending;
 
-    /// <summary>Открыть форму операции этого вида — сейчас или как только станет чем.</summary>
+    /// <summary>
+    /// Открыть форму операции этого вида — сейчас или как только станет чем.
+    /// </summary>
     /// <param name="kind">Вид операции с ярлыка.</param>
     public static void Request(TransactionKind kind)
     {
@@ -54,7 +56,9 @@ internal static class ShortcutLaunch
         }
     }
 
-    /// <summary>Разбирает вид из дополнения к намерению.</summary>
+    /// <summary>
+    /// Разбирает вид из дополнения к намерению.
+    /// </summary>
     /// <param name="value">Значение дополнения <c>kind</c>.</param>
     /// <returns>Вид операции или <c>null</c>, если значение чужое.</returns>
     public static TransactionKind? Parse(string? value) =>

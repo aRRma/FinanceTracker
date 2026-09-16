@@ -3,12 +3,16 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экран D-03: справочник категорий.</summary>
+/// <summary>
+/// Экран D-03: справочник категорий.
+/// </summary>
 public partial class CategoriesPage : DataPage
 {
     private readonly CategoriesViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления справочника категорий.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public CategoriesPage(CategoriesViewModel model, FinanceStartup startup)

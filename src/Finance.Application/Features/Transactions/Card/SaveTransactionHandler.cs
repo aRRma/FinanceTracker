@@ -2,7 +2,10 @@ using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Rules;
+using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Features.Transactions.Card;
@@ -17,7 +20,9 @@ public sealed class SaveTransactionHandler : ISaveTransactionHandler
     private readonly UnitOfWork _unitOfWork;
     private readonly IClock _clock;
 
-    /// <summary>Создаёт обработчик.</summary>
+    /// <summary>
+    /// Создаёт обработчик.
+    /// </summary>
     /// <param name="unitOfWork">Граница транзакции.</param>
     /// <param name="clock">Часы: «сегодня» пользователя и момент записи.</param>
     public SaveTransactionHandler(UnitOfWork unitOfWork, IClock clock)
@@ -184,7 +189,9 @@ public sealed class SaveTransactionHandler : ISaveTransactionHandler
             nameof(command));
     }
 
-    /// <summary>Подкатегория вместе с группой: вид хранится на группе, и проверка без неё невозможна.</summary>
+    /// <summary>
+    /// Подкатегория вместе с группой: вид хранится на группе, и проверка без неё невозможна.
+    /// </summary>
     private static async Task<(Category? Category, Category? Group)> CategoryAsync(
         FinanceDbContext context,
         Guid? categoryKey,

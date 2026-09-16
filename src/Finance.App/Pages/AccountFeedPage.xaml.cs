@@ -3,13 +3,17 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экран A-03: лента одного счёта.</summary>
+/// <summary>
+/// Экран A-03: лента одного счёта.
+/// </summary>
 [QueryProperty(nameof(Key), "key")]
 public partial class AccountFeedPage : DataPage
 {
     private readonly FeedViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления ленты.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public AccountFeedPage(FeedViewModel model, FinanceStartup startup)
@@ -23,7 +27,9 @@ public partial class AccountFeedPage : DataPage
         BindingContext = model;
     }
 
-    /// <summary>Ключ счёта из маршрута. Строкой, а не <see cref="Guid"/>: в маршруте он и есть строка.</summary>
+    /// <summary>
+    /// Ключ счёта из маршрута. Строкой, а не <see cref="Guid"/>: в маршруте он и есть строка.
+    /// </summary>
     public string? Key { get; set; }
 
     /// <inheritdoc />

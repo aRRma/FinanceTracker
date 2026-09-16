@@ -1,9 +1,13 @@
 namespace Finance.App;
 
-/// <summary>Приложение: ресурсы темы и корневое окно.</summary>
+/// <summary>
+/// Приложение: ресурсы темы и корневое окно.
+/// </summary>
 public partial class App : ControlsApplication
 {
-    /// <summary>Создаёт приложение.</summary>
+    /// <summary>
+    /// Создаёт приложение.
+    /// </summary>
     public App()
     {
         InitializeComponent();

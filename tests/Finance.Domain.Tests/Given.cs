@@ -1,15 +1,27 @@
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
+
 namespace Finance.Domain.Tests;
 
-/// <summary>Заготовки для тестов: типовые счёт, категория и операция без повторения параметров.</summary>
+/// <summary>
+/// Заготовки для тестов: типовые счёт, категория и операция без повторения параметров.
+/// </summary>
 internal static class Given
 {
-    /// <summary>Локальная дата пользователя в тестах. Фиксирована: тест, зависящий от часов, ломается однажды ночью.</summary>
+    /// <summary>
+    /// Локальная дата пользователя в тестах. Фиксирована: тест, зависящий от часов, ломается однажды ночью.
+    /// </summary>
     public static readonly DateOnly Today = new(2026, 9, 12);
 
-    /// <summary>Момент записи в тестах.</summary>
+    /// <summary>
+    /// Момент записи в тестах.
+    /// </summary>
     public static readonly DateTimeOffset NowUtc = new(2026, 9, 12, 10, 0, 0, TimeSpan.Zero);
 
-    /// <summary>Давняя дата открытия счёта — чтобы не мешала проверкам даты операции.</summary>
+    /// <summary>
+    /// Давняя дата открытия счёта — чтобы не мешала проверкам даты операции.
+    /// </summary>
     public static readonly DateOnly LongAgo = new(2020, 1, 1);
 
     public static Account Account(
@@ -19,7 +31,7 @@ internal static class Given
         decimal openingBalance = 0m,
         bool closed = false)
     {
-        Account account = Domain.Account.Create(
+        Account account = Entities.Account.Create(
             name, AccountType.Card, currency, openingBalance, openedOn ?? LongAgo,
             excludedFromTotals: false, sortOrder: 0, Today, NowUtc);
 
@@ -53,7 +65,9 @@ internal static class Given
     public static decimal Amount(string value) =>
         decimal.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
 
-    /// <summary>Расход на переданный счёт и категорию, со значениями по умолчанию для всего остального.</summary>
+    /// <summary>
+    /// Расход на переданный счёт и категорию, со значениями по умолчанию для всего остального.
+    /// </summary>
     public static Transaction Expense(Account account, Category category, decimal amount = 100m) =>
         Transaction.Create(
             TransactionKind.Expense, account.Key, Money.Create(amount, account.Currency),
@@ -71,7 +85,9 @@ internal static class Given
             transaction.OccurredOn, transaction.Note, transaction.CreatedAtUtc, transaction.UpdatedAtUtc,
             transaction.DeletedAtUtc, transaction.SyncedAtUtc, transaction.ExternalId);
 
-    /// <summary>Перевод между двумя счетами. Сумма зачисления есть всегда, даже в одной валюте.</summary>
+    /// <summary>
+    /// Перевод между двумя счетами. Сумма зачисления есть всегда, даже в одной валюте.
+    /// </summary>
     public static Transaction Transfer(
         Account source,
         Account target,

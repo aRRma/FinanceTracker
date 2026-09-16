@@ -1,5 +1,5 @@
-using System.Text.RegularExpressions;
-using Finance.Domain;
+﻿using System.Text.RegularExpressions;
+using Finance.Domain.Errors;
 
 namespace Finance.Docs.Tests;
 
@@ -20,7 +20,11 @@ public sealed partial class InvariantCoverageTests
 
     private static readonly string DomainRequirements = Path.Combine(Requirements, "02-domain.md");
 
-    private static readonly IReadOnlySet<string> Declared = Enum.GetNames<Invariant>().ToHashSet(StringComparer.Ordinal);
+    // Unknown — значение неинициализированной переменной, а не правило: строки в
+    // требованиях и теста с пометкой у него быть не может, и обе сверки его пропускают
+    private static readonly IReadOnlySet<string> Declared = Enum.GetNames<Invariant>()
+        .Where(static name => name != nameof(Invariant.Unknown))
+        .ToHashSet(StringComparer.Ordinal);
 
     [Fact]
     public void Каждое_правило_из_требований_названо_в_коде()
@@ -82,15 +86,21 @@ public sealed partial class InvariantCoverageTests
         Assert.NotEmpty(CoveredByTests());
     }
 
-    /// <summary>Строка правила в таблице требований; аннулированные зачёркнуты и пропускаются.</summary>
+    /// <summary>
+    /// Строка правила в таблице требований; аннулированные зачёркнуты и пропускаются.
+    /// </summary>
     [GeneratedRegex(@"^\|\s*(?<annulled>~~)?(?<id>INV-\d{2})(?<text>.*)$", RegexOptions.Multiline)]
     private static partial Regex RuleRowPattern();
 
-    /// <summary>Упоминание правила в документе: <c>`Invariant.NameUnique`</c>.</summary>
+    /// <summary>
+    /// Упоминание правила в документе: <c>`Invariant.NameUnique`</c>.
+    /// </summary>
     [GeneratedRegex(@"`Invariant\.(?<name>\w+)`")]
     private static partial Regex MentionPattern();
 
-    /// <summary>Пометка теста: <c>[Trait("Инвариант", nameof(Invariant.NameUnique))]</c>.</summary>
+    /// <summary>
+    /// Пометка теста: <c>[Trait("Инвариант", nameof(Invariant.NameUnique))]</c>.
+    /// </summary>
     [GeneratedRegex("""Trait\("Инвариант",\s*nameof\(Invariant\.(?<name>\w+)\)\)""")]
     private static partial Regex TraitPattern();
 

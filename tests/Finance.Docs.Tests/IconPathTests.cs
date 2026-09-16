@@ -14,7 +14,9 @@ public sealed class IconPathTests
 
     private static readonly Lazy<IReadOnlyDictionary<string, string>> LoadedPaths = new(LoadPaths);
 
-    /// <summary>У каждого ключа набора есть контур.</summary>
+    /// <summary>
+    /// У каждого ключа набора есть контур.
+    /// </summary>
     [Fact]
     public void У_каждого_значка_набора_есть_контур()
     {
@@ -52,7 +54,9 @@ public sealed class IconPathTests
         Assert.Empty(broken);
     }
 
-    /// <summary>Значок перевода нужен ленте, хотя в наборе для категорий его нет.</summary>
+    /// <summary>
+    /// Значок перевода нужен ленте, хотя в наборе для категорий его нет.
+    /// </summary>
     [Fact]
     public void Контур_перевода_есть() => Assert.True(LoadedPaths.Value.ContainsKey("swap"));
 

@@ -1,6 +1,10 @@
-namespace Finance.Domain;
+using Finance.Domain.Errors;
 
-/// <summary>Границы календарных дат, общие для операции и счёта.</summary>
+namespace Finance.Domain.Rules;
+
+/// <summary>
+/// Границы календарных дат, общие для операции и счёта.
+/// </summary>
 public static class Dates
 {
     /// <summary>

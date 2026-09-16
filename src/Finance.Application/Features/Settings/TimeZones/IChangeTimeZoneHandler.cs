@@ -1,6 +1,8 @@
 namespace Finance.Application.Features.Settings.TimeZones;
 
-/// <summary>Выбор часового пояса. Модель представления зовёт его напрямую.</summary>
+/// <summary>
+/// Выбор часового пояса. Модель представления зовёт его напрямую.
+/// </summary>
 public interface IChangeTimeZoneHandler
 {
     /// <summary>

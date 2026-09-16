@@ -3,13 +3,17 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экран D-02: карточка счёта — заведение и правка.</summary>
+/// <summary>
+/// Экран D-02: карточка счёта — заведение и правка.
+/// </summary>
 [QueryProperty(nameof(Key), "key")]
 public partial class AccountPage : DataPage
 {
     private readonly AccountViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления карточки счёта.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public AccountPage(AccountViewModel model, FinanceStartup startup)

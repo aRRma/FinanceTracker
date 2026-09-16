@@ -17,7 +17,9 @@ public sealed partial class PlacesViewModel : ScreenViewModel
 
     private IReadOnlyList<PlaceListItem> _all = [];
 
-    /// <summary>Создаёт модель представления справочника мест.</summary>
+    /// <summary>
+    /// Создаёт модель представления справочника мест.
+    /// </summary>
     /// <param name="places">Справочник мест со счётчиками.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
     public PlacesViewModel(IPlacesQuery places, IChangeNotifier changes)
@@ -28,10 +30,14 @@ public sealed partial class PlacesViewModel : ScreenViewModel
         _places = places;
     }
 
-    /// <summary>Места, прошедшие отбор.</summary>
+    /// <summary>
+    /// Места, прошедшие отбор.
+    /// </summary>
     public ObservableCollection<PlaceListItem> Places { get; } = [];
 
-    /// <summary>Набранные буквы названия. Пусто — показывается весь справочник.</summary>
+    /// <summary>
+    /// Набранные буквы названия. Пусто — показывается весь справочник.
+    /// </summary>
     [ObservableProperty]
     public partial string Filter { get; set; } = string.Empty;
 
@@ -51,13 +57,19 @@ public sealed partial class PlacesViewModel : ScreenViewModel
     [NotifyPropertyChangedFor(nameof(IsEmpty))]
     public partial bool IsLoaded { get; private set; }
 
-    /// <summary>Справочник пуст вовсе — не отобран до пустоты, а не наполнен ни разу.</summary>
+    /// <summary>
+    /// Справочник пуст вовсе — не отобран до пустоты, а не наполнен ни разу.
+    /// </summary>
     public bool IsEmpty => IsLoaded && _all.Count is 0;
 
-    /// <summary>Отбор не нашёл ни одного места.</summary>
+    /// <summary>
+    /// Отбор не нашёл ни одного места.
+    /// </summary>
     public bool IsFilteredOut => _all.Count > 0 && Places.Count is 0;
 
-    /// <summary>Перечитывает справочник.</summary>
+    /// <summary>
+    /// Перечитывает справочник.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)

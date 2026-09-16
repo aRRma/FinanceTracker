@@ -12,19 +12,29 @@ namespace Finance.Application.Features.Transactions.Pick;
 /// </summary>
 public sealed class TransactionPicks
 {
-    /// <summary>Выбранный счёт списания.</summary>
+    /// <summary>
+    /// Выбранный счёт списания.
+    /// </summary>
     public Guid? Account { get; set; }
 
-    /// <summary>Выбранный счёт зачисления — у перевода.</summary>
+    /// <summary>
+    /// Выбранный счёт зачисления — у перевода.
+    /// </summary>
     public Guid? TargetAccount { get; set; }
 
-    /// <summary>Выбранная подкатегория.</summary>
+    /// <summary>
+    /// Выбранная подкатегория.
+    /// </summary>
     public Guid? Category { get; set; }
 
-    /// <summary>Выбранное или набранное место. Пустая строка — «без места».</summary>
+    /// <summary>
+    /// Выбранное или набранное место. Пустая строка — «без места».
+    /// </summary>
     public string? PlaceName { get; set; }
 
-    /// <summary>Забирает выбор: всё, что положил экран, достаётся ровно один раз.</summary>
+    /// <summary>
+    /// Забирает выбор: всё, что положил экран, достаётся ровно один раз.
+    /// </summary>
     public void Clear()
     {
         Account = null;

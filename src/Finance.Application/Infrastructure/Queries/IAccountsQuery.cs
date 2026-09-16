@@ -1,6 +1,8 @@
 namespace Finance.Application.Infrastructure.Queries;
 
-/// <summary>Список счетов с балансами. Модель представления зовёт его напрямую.</summary>
+/// <summary>
+/// Список счетов с балансами. Модель представления зовёт его напрямую.
+/// </summary>
 public interface IAccountsQuery
 {
     /// <summary>

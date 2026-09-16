@@ -1,4 +1,6 @@
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Infrastructure.Queries;
 
@@ -9,13 +11,19 @@ namespace Finance.Application.Infrastructure.Queries;
 /// </summary>
 public sealed record FeedItem
 {
-    /// <summary>Ключ операции — по нему открывается карточка.</summary>
+    /// <summary>
+    /// Ключ операции — по нему открывается карточка.
+    /// </summary>
     public required Guid Key { get; init; }
 
-    /// <summary>Вид операции.</summary>
+    /// <summary>
+    /// Вид операции.
+    /// </summary>
     public required TransactionKind Kind { get; init; }
 
-    /// <summary>Дата операции — по ней лента режется на дни.</summary>
+    /// <summary>
+    /// Дата операции — по ней лента режется на дни.
+    /// </summary>
     public required DateOnly OccurredOn { get; init; }
 
     /// <summary>
@@ -24,10 +32,14 @@ public sealed record FeedItem
     /// </summary>
     public required Money Amount { get; init; }
 
-    /// <summary>Ключ счёта, со стороны которого показана строка.</summary>
+    /// <summary>
+    /// Ключ счёта, со стороны которого показана строка.
+    /// </summary>
     public required Guid AccountKey { get; init; }
 
-    /// <summary>Название счёта, со стороны которого показана строка.</summary>
+    /// <summary>
+    /// Название счёта, со стороны которого показана строка.
+    /// </summary>
     public required string AccountName { get; init; }
 
     /// <summary>
@@ -36,15 +48,23 @@ public sealed record FeedItem
     /// </summary>
     public required string Title { get; init; }
 
-    /// <summary>Группа подкатегории. У перевода пусто.</summary>
+    /// <summary>
+    /// Группа подкатегории. У перевода пусто.
+    /// </summary>
     public string? Group { get; init; }
 
-    /// <summary>Место. Пусто, если не указано или удалено из справочника.</summary>
+    /// <summary>
+    /// Место. Пусто, если не указано или удалено из справочника.
+    /// </summary>
     public string? Place { get; init; }
 
-    /// <summary>Заметка.</summary>
+    /// <summary>
+    /// Заметка.
+    /// </summary>
     public string? Note { get; init; }
 
-    /// <summary>Ключ значка подкатегории. У перевода пусто — у него свой значок.</summary>
+    /// <summary>
+    /// Ключ значка подкатегории. У перевода пусто — у него свой значок.
+    /// </summary>
     public string? Icon { get; init; }
 }

@@ -1,6 +1,9 @@
 using System.Text.Json;
 using Finance.Application.Infrastructure.Initialization;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Rules;
+using Finance.Domain.Values;
 
 namespace Finance.Docs.Tests;
 
@@ -71,7 +74,9 @@ public sealed class PresetTests
             embedded.All().Select(category => category.Id));
     }
 
-    /// <summary>Значки берутся только из набора, зашитого в приложение.</summary>
+    /// <summary>
+    /// Значки берутся только из набора, зашитого в приложение.
+    /// </summary>
     [Fact]
     public void Значки_берутся_из_набора()
     {
@@ -83,7 +88,9 @@ public sealed class PresetTests
         Assert.Empty(outside);
     }
 
-    /// <summary>Метка времени набора заведомо давняя, иначе она затрёт переименования при переустановке.</summary>
+    /// <summary>
+    /// Метка времени набора заведомо давняя, иначе она затрёт переименования при переустановке.
+    /// </summary>
     [Fact]
     public void Метка_времени_набора_заведомо_давняя()
     {
@@ -92,7 +99,9 @@ public sealed class PresetTests
             $"seededAtUtc = {Set.SeededAtUtc:O}");
     }
 
-    /// <summary>Ключи уникальны: из них выводятся идентификаторы, дубль означал бы две категории с одним ключом.</summary>
+    /// <summary>
+    /// Ключи уникальны: из них выводятся идентификаторы, дубль означал бы две категории с одним ключом.
+    /// </summary>
     [Fact]
     public void Текстовые_ключи_уникальны()
     {
@@ -105,7 +114,9 @@ public sealed class PresetTests
         Assert.Empty(duplicates);
     }
 
-    /// <summary>Ключ подкатегории начинается с ключа своей группы — иначе набор нельзя прочитать глазами.</summary>
+    /// <summary>
+    /// Ключ подкатегории начинается с ключа своей группы — иначе набор нельзя прочитать глазами.
+    /// </summary>
     [Fact]
     public void Ключ_подкатегории_начинается_с_ключа_группы()
     {
@@ -137,7 +148,9 @@ public sealed class PresetTests
         });
     }
 
-    /// <summary>Служебные группы в наборе есть — иначе проверка выше прошла бы, ничего не проверив.</summary>
+    /// <summary>
+    /// Служебные группы в наборе есть — иначе проверка выше прошла бы, ничего не проверив.
+    /// </summary>
     [Fact]
     public void Служебные_группы_в_наборе_присутствуют()
     {

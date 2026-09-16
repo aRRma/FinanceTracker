@@ -1,10 +1,12 @@
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Features.Accounts.Catalog;
 
-/// <summary>Строка справочника счетов: значок, название, подпись, баланс и признаки.</summary>
+/// <summary>
+/// Строка справочника счетов: значок, название, подпись, баланс и признаки.
+/// </summary>
 /// <param name="Key">Ключ счёта.</param>
 /// <param name="Icon">Ключ значка: наличные, карта или накопления.</param>
 /// <param name="Name">Наименование счёта.</param>
@@ -21,10 +23,14 @@ public sealed record AccountRowItem(
     bool IsNegative,
     bool IsClosed)
 {
-    /// <summary>Счёт действующий: его строку перетаскивают, и у неё есть ручка.</summary>
+    /// <summary>
+    /// Счёт действующий: его строку перетаскивают, и у неё есть ручка.
+    /// </summary>
     public bool IsOpen => !IsClosed;
 
-    /// <summary>Собирает строку справочника из строки списка счетов.</summary>
+    /// <summary>
+    /// Собирает строку справочника из строки списка счетов.
+    /// </summary>
     /// <param name="account">Счёт с уже посчитанным балансом.</param>
     public static AccountRowItem From(AccountListItem account)
     {

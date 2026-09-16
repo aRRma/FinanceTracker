@@ -17,6 +17,8 @@ public sealed record CurrencySection(
     IReadOnlyList<AccountTile> Spendable,
     IReadOnlyList<AccountTile> Savings)
 {
-    /// <summary>В разделе есть накопления — заголовок «Накопления» показывать стоит.</summary>
+    /// <summary>
+    /// В разделе есть накопления — заголовок «Накопления» показывать стоит.
+    /// </summary>
     public bool HasSavings => Savings.Count > 0;
 }

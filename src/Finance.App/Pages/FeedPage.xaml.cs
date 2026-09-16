@@ -3,12 +3,16 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экран A-02: общая лента операций по всем счетам.</summary>
+/// <summary>
+/// Экран A-02: общая лента операций по всем счетам.
+/// </summary>
 public partial class FeedPage : DataPage
 {
     private readonly FeedViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления ленты.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public FeedPage(FeedViewModel model, FinanceStartup startup)

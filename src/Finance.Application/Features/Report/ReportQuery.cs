@@ -1,7 +1,9 @@
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Features.Report;
@@ -15,7 +17,9 @@ public sealed class ReportQuery : IReportQuery
 {
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
 
-    /// <summary>Создаёт запрос.</summary>
+    /// <summary>
+    /// Создаёт запрос.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     public ReportQuery(IDbContextFactory<FinanceDbContext> contexts)
     {
@@ -227,7 +231,9 @@ public sealed class ReportQuery : IReportQuery
         return totals;
     }
 
-    /// <summary>Что база отдаёт на операцию третьего уровня.</summary>
+    /// <summary>
+    /// Что база отдаёт на операцию третьего уровня.
+    /// </summary>
     internal sealed class Line
     {
         public required Guid Key { get; init; }
@@ -245,7 +251,9 @@ public sealed class ReportQuery : IReportQuery
         public string? Note { get; init; }
     }
 
-    /// <summary>Что база отдаёт на строку уровня. Сумма — голый <c>decimal</c>: <c>Money</c> в SQL не собрать.</summary>
+    /// <summary>
+    /// Что база отдаёт на строку уровня. Сумма — голый <c>decimal</c>: <c>Money</c> в SQL не собрать.
+    /// </summary>
     internal sealed class Bucket
     {
         public required Guid Key { get; init; }

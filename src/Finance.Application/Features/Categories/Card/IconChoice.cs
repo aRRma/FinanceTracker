@@ -9,7 +9,9 @@ namespace Finance.Application.Features.Categories.Card;
 /// </summary>
 public sealed partial class IconChoice : ObservableObject
 {
-    /// <summary>Создаёт строку сетки.</summary>
+    /// <summary>
+    /// Создаёт строку сетки.
+    /// </summary>
     /// <param name="key">Ключ значка из набора.</param>
     public IconChoice(string key)
     {
@@ -18,10 +20,14 @@ public sealed partial class IconChoice : ObservableObject
         Key = key;
     }
 
-    /// <summary>Ключ значка.</summary>
+    /// <summary>
+    /// Ключ значка.
+    /// </summary>
     public string Key { get; }
 
-    /// <summary>Значок выбран — в сетке он помечен цветом действия.</summary>
+    /// <summary>
+    /// Значок выбран — в сетке он помечен цветом действия.
+    /// </summary>
     [ObservableProperty]
     public partial bool IsSelected { get; set; }
 }

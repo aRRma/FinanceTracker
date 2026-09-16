@@ -1,17 +1,21 @@
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Features.Accounts.Catalog;
 
-/// <summary>Сохраняет порядок счетов, заданный перетаскиванием.</summary>
+/// <summary>
+/// Сохраняет порядок счетов, заданный перетаскиванием.
+/// </summary>
 public sealed class ReorderAccountsHandler : IReorderAccountsHandler
 {
     private readonly UnitOfWork _unitOfWork;
 
-    /// <summary>Создаёт обработчик.</summary>
+    /// <summary>
+    /// Создаёт обработчик.
+    /// </summary>
     /// <param name="unitOfWork">Граница транзакции.</param>
     public ReorderAccountsHandler(UnitOfWork unitOfWork)
     {

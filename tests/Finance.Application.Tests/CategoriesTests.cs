@@ -4,12 +4,15 @@ using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Справочник категорий: заведение, переименование, перенос и порядок показа.</summary>
+/// <summary>
+/// Справочник категорий: заведение, переименование, перенос и порядок показа.
+/// </summary>
 public sealed class CategoriesTests
 {
     /// <summary>
@@ -32,7 +35,9 @@ public sealed class CategoriesTests
         Assert.True(receiver.IsProtected);
     }
 
-    /// <summary>Подкатегория наследует вид группы: своего у неё нет и в списке она с видом группы.</summary>
+    /// <summary>
+    /// Подкатегория наследует вид группы: своего у неё нет и в списке она с видом группы.
+    /// </summary>
     [Fact]
     public async Task Подкатегория_показывается_с_видом_своей_группы()
     {
@@ -47,7 +52,9 @@ public sealed class CategoriesTests
         Assert.False(item.IsGroup);
     }
 
-    /// <summary>Имя группы занято: сравнение не различает регистр и не считает окружающие пробелы.</summary>
+    /// <summary>
+    /// Имя группы занято: сравнение не различает регистр и не считает окружающие пробелы.
+    /// </summary>
     [Fact]
     public async Task Занятое_имя_группы_блокирует_сохранение()
     {
@@ -78,7 +85,9 @@ public sealed class CategoriesTests
         Assert.Equal(2, groups.Count);
     }
 
-    /// <summary>Имя подкатегории занято внутри своей группы.</summary>
+    /// <summary>
+    /// Имя подкатегории занято внутри своей группы.
+    /// </summary>
     [Fact]
     public async Task Занятое_имя_подкатегории_блокирует_сохранение()
     {
@@ -93,7 +102,9 @@ public sealed class CategoriesTests
         Assert.Equal(Invariant.NameUnique, failure.Invariant);
     }
 
-    /// <summary>Область уникальности подкатегории — её группа, а не весь справочник.</summary>
+    /// <summary>
+    /// Область уникальности подкатегории — её группа, а не весь справочник.
+    /// </summary>
     [Fact]
     public async Task Одноимённые_подкатегории_в_разных_группах_допустимы()
     {
@@ -110,7 +121,9 @@ public sealed class CategoriesTests
         Assert.Equal(2, categories.Count(item => item.Name == "Аренда"));
     }
 
-    /// <summary>Перенос меняет группу, но не трогает ключ: операции ссылаются именно на него.</summary>
+    /// <summary>
+    /// Перенос меняет группу, но не трогает ключ: операции ссылаются именно на него.
+    /// </summary>
     [Fact]
     public async Task Подкатегория_переносится_в_группу_того_же_вида()
     {
@@ -133,7 +146,9 @@ public sealed class CategoriesTests
         Assert.Equal(car, moved.ParentKey);
     }
 
-    /// <summary>Вид наследуется от группы, поэтому перенос в чужой вид перевернул бы знак операций.</summary>
+    /// <summary>
+    /// Вид наследуется от группы, поэтому перенос в чужой вид перевернул бы знак операций.
+    /// </summary>
     [Fact]
     public async Task Перенос_в_группу_другого_вида_отвергается()
     {
@@ -155,7 +170,9 @@ public sealed class CategoriesTests
         Assert.Equal(Invariant.MoveKeepsKind, failure.Invariant);
     }
 
-    /// <summary>Служебная группа замкнута: переехавшая в неё категория пропала бы из отчёта молча.</summary>
+    /// <summary>
+    /// Служебная группа замкнута: переехавшая в неё категория пропала бы из отчёта молча.
+    /// </summary>
     [Fact]
     public async Task Перенос_в_служебную_группу_отвергается()
     {
@@ -195,7 +212,9 @@ public sealed class CategoriesTests
         Assert.Equal(Invariant.GroupHasReceiver, failure.Invariant);
     }
 
-    /// <summary>Правка одного регистра сохраняется: уникальность его не различает, а пользователь видит.</summary>
+    /// <summary>
+    /// Правка одного регистра сохраняется: уникальность его не различает, а пользователь видит.
+    /// </summary>
     [Fact]
     public async Task Переименование_в_другом_регистре_сохраняется()
     {
@@ -233,7 +252,9 @@ public sealed class CategoriesTests
         Assert.Equal(["Еда", "Кафе", "Продукты", "Прочее"], order);
     }
 
-    /// <summary>Служебные группы уходят в конец списка: их правят реже всего.</summary>
+    /// <summary>
+    /// Служебные группы уходят в конец списка: их правят реже всего.
+    /// </summary>
     [Fact]
     public async Task Служебные_группы_показываются_последними()
     {
@@ -326,7 +347,9 @@ public sealed class CategoriesTests
         Assert.Equal(fixture.ExpenseCategory, row.CategoryKey);
     }
 
-    /// <summary>Без приёмника группе некуда девать операции удаляемых подкатегорий.</summary>
+    /// <summary>
+    /// Без приёмника группе некуда девать операции удаляемых подкатегорий.
+    /// </summary>
     [Fact]
     public async Task Прочее_не_удаляется()
     {
@@ -342,7 +365,9 @@ public sealed class CategoriesTests
         Assert.Equal(Invariant.ProtectedCategoryStays, failure.Invariant);
     }
 
-    /// <summary>Опустевшая группа остаётся в списке: удаления групп в приложении нет.</summary>
+    /// <summary>
+    /// Опустевшая группа остаётся в списке: удаления групп в приложении нет.
+    /// </summary>
     [Fact]
     public async Task Группа_не_удаляется()
     {
@@ -356,7 +381,9 @@ public sealed class CategoriesTests
         Assert.Equal(Invariant.GroupNotDeleted, failure.Invariant);
     }
 
-    /// <summary>Диалог называет группу и приёмник: по ним видно, куда именно уедут операции.</summary>
+    /// <summary>
+    /// Диалог называет группу и приёмник: по ним видно, куда именно уедут операции.
+    /// </summary>
     [Fact]
     public async Task Диалог_называет_группу_и_приёмник()
     {
@@ -374,7 +401,9 @@ public sealed class CategoriesTests
         Assert.Equal(0, deletion.TransactionCount);
     }
 
-    /// <summary>Счётчик считает то же, что переедет: мягко удалённые операции не переезжают.</summary>
+    /// <summary>
+    /// Счётчик считает то же, что переедет: мягко удалённые операции не переезжают.
+    /// </summary>
     [Fact]
     public async Task Счётчик_операций_для_диалога_считает_только_неудалённые()
     {
@@ -391,7 +420,9 @@ public sealed class CategoriesTests
         Assert.Equal(1, deletion.TransactionCount);
     }
 
-    /// <summary>У приёмника и группы удалять нечего — диалогу об этом и сказать нечего.</summary>
+    /// <summary>
+    /// У приёмника и группы удалять нечего — диалогу об этом и сказать нечего.
+    /// </summary>
     [Fact]
     public async Task Диалог_не_читается_для_группы_и_приёмника()
     {
@@ -407,7 +438,9 @@ public sealed class CategoriesTests
         Assert.Null(await query.ReadAsync(Guid.CreateVersion7()));
     }
 
-    /// <summary>Переименование не трогает операции: они ссылаются на ключ, а не на имя.</summary>
+    /// <summary>
+    /// Переименование не трогает операции: они ссылаются на ключ, а не на имя.
+    /// </summary>
     [Fact]
     public async Task Переименование_подкатегории_не_трогает_операции()
     {

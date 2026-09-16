@@ -16,7 +16,9 @@ public sealed partial class DataNumberTests
 
     private static readonly Lazy<IReadOnlyList<string>> LoadedIcons = new(LoadIcons);
 
-    /// <summary>Числа документации сходятся с данными.</summary>
+    /// <summary>
+    /// Числа документации сходятся с данными.
+    /// </summary>
     [Fact]
     public void Числа_в_документации_совпадают_с_данными()
     {
@@ -68,7 +70,9 @@ public sealed partial class DataNumberTests
         Assert.Empty(stale);
     }
 
-    /// <summary>Ключи значков уникальны: дубль означал бы, что один из них недостижим.</summary>
+    /// <summary>
+    /// Ключи значков уникальны: дубль означал бы, что один из них недостижим.
+    /// </summary>
     [Fact]
     public void Ключи_значков_не_повторяются()
     {
@@ -97,7 +101,9 @@ public sealed partial class DataNumberTests
         Assert.False(Groups().IsMatch("ADR-13 групп"), "хвост идентификатора не число документации");
     }
 
-    /// <summary>Разметку HTML перед сверкой чисел убираем: в атрибутах полно своих цифр.</summary>
+    /// <summary>
+    /// Разметку HTML перед сверкой чисел убираем: в атрибутах полно своих цифр.
+    /// </summary>
     [GeneratedRegex("<[^>]+>")]
     private static partial Regex Tags();
 

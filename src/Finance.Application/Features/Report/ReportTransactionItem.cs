@@ -3,7 +3,9 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.Application.Features.Report;
 
-/// <summary>Строка третьего уровня: место, дата со счётом, сумма со знаком.</summary>
+/// <summary>
+/// Строка третьего уровня: место, дата со счётом, сумма со знаком.
+/// </summary>
 /// <param name="Key">Ключ операции — по нему открывается карточка.</param>
 /// <param name="Title">Место; без места — заметка; без той и другой — подкатегория.</param>
 /// <param name="Caption">Подпись: «28 августа · Карта основная».</param>

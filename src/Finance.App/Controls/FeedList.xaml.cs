@@ -2,14 +2,20 @@ using Finance.Application.Features.Feed;
 
 namespace Finance.App.Controls;
 
-/// <summary>Список ленты: общий для вкладки операций и ленты счёта.</summary>
+/// <summary>
+/// Список ленты: общий для вкладки операций и ленты счёта.
+/// </summary>
 public partial class FeedList : ContentView
 {
-    /// <summary>Чем заполнена пустая лента.</summary>
+    /// <summary>
+    /// Чем заполнена пустая лента.
+    /// </summary>
     public static readonly BindableProperty EmptyProperty =
         BindableProperty.Create(nameof(Empty), typeof(View), typeof(FeedList));
 
-    /// <summary>Создаёт список.</summary>
+    /// <summary>
+    /// Создаёт список.
+    /// </summary>
     public FeedList()
     {
         InitializeComponent();

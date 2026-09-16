@@ -6,14 +6,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Features.Transactions.Card;
 
-/// <summary>Чтение списков выбора для формы операции.</summary>
+/// <summary>
+/// Чтение списков выбора для формы операции.
+/// </summary>
 public sealed class TransactionFormQuery : ITransactionFormQuery
 {
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
     private readonly IAccountsQuery _accounts;
     private readonly ILocalSettings _settings;
 
-    /// <summary>Создаёт запрос.</summary>
+    /// <summary>
+    /// Создаёт запрос.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     /// <param name="accounts">Список счетов с балансами — балансы показаны в выборе счёта.</param>
     /// <param name="settings">Локальные настройки: последний использованный счёт.</param>

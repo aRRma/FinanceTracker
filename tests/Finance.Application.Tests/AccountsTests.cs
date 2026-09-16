@@ -3,17 +3,24 @@ using Finance.Application.Features.Accounts.Catalog;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Счета: заведение, правка, закрытие, порядок и баланс в списке.</summary>
+/// <summary>
+/// Счета: заведение, правка, закрытие, порядок и баланс в списке.
+/// </summary>
 public sealed class AccountsTests
 {
     private static readonly DateOnly OpenedOn = new(2026, 1, 1);
 
-    /// <summary>Заведённый счёт виден в списке со своим начальным остатком.</summary>
+    /// <summary>
+    /// Заведённый счёт виден в списке со своим начальным остатком.
+    /// </summary>
     [Fact]
     public async Task Заведённый_счёт_виден_в_списке()
     {
@@ -50,7 +57,9 @@ public sealed class AccountsTests
         Assert.Equal(300m, Balance(accounts, card).Amount);
     }
 
-    /// <summary>Удалённая операция в баланс не входит: она исчезла с экранов.</summary>
+    /// <summary>
+    /// Удалённая операция в баланс не входит: она исчезла с экранов.
+    /// </summary>
     [Fact]
     public async Task Удалённая_операция_в_баланс_не_входит()
     {
@@ -67,7 +76,9 @@ public sealed class AccountsTests
         Assert.Equal(1000m, Balance(accounts, cash).Amount);
     }
 
-    /// <summary>Имя счёта занято — сохранение блокируется, регистр и пробелы не спасают.</summary>
+    /// <summary>
+    /// Имя счёта занято — сохранение блокируется, регистр и пробелы не спасают.
+    /// </summary>
     [Fact]
     public async Task Занятое_имя_счёта_блокирует_сохранение()
     {
@@ -107,7 +118,9 @@ public sealed class AccountsTests
         Assert.True(await model.SaveAsync());
     }
 
-    /// <summary>Переименование в собственное имя проходит: сам с собой счёт не конфликтует.</summary>
+    /// <summary>
+    /// Переименование в собственное имя проходит: сам с собой счёт не конфликтует.
+    /// </summary>
     [Fact]
     public async Task Счёт_не_конфликтует_сам_с_собой()
     {
@@ -141,7 +154,9 @@ public sealed class AccountsTests
         Assert.Equal("Наличные", accounts.Single(account => account.Key == key).Name);
     }
 
-    /// <summary>Отрицательный начальный остаток допустим: долг по карте тоже остаток.</summary>
+    /// <summary>
+    /// Отрицательный начальный остаток допустим: долг по карте тоже остаток.
+    /// </summary>
     [Fact]
     public async Task Отрицательный_начальный_остаток_сохраняется()
     {
@@ -202,7 +217,9 @@ public sealed class AccountsTests
         Assert.Equal(Today, card.EarliestTransactionOn);
     }
 
-    /// <summary>Закрытие обратимо, и ненулевой баланс ему не мешает.</summary>
+    /// <summary>
+    /// Закрытие обратимо, и ненулевой баланс ему не мешает.
+    /// </summary>
     [Fact]
     public async Task Счёт_закрывается_и_открывается_обратно()
     {
@@ -246,7 +263,9 @@ public sealed class AccountsTests
         Assert.Null(model.ClosingWarning);
     }
 
-    /// <summary>Порядок задаётся перетаскиванием и сохраняется целым списком.</summary>
+    /// <summary>
+    /// Порядок задаётся перетаскиванием и сохраняется целым списком.
+    /// </summary>
     [Fact]
     public async Task Порядок_счетов_сохраняется()
     {
@@ -263,7 +282,9 @@ public sealed class AccountsTests
         Assert.Equal([third, first, second], accounts.Select(account => account.Key));
     }
 
-    /// <summary>Карточка несуществующего счёта — пусто, а не исключение.</summary>
+    /// <summary>
+    /// Карточка несуществующего счёта — пусто, а не исключение.
+    /// </summary>
     [Fact]
     public async Task Карточка_несуществующего_счёта_пуста()
     {

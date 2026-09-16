@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Finance.Application.Infrastructure.Storage;
 
-/// <summary>Справочник мест.</summary>
+/// <summary>
+/// Справочник мест.
+/// </summary>
 internal sealed class PlaceConfiguration : IEntityTypeConfiguration<PlaceRow>
 {
     public void Configure(EntityTypeBuilder<PlaceRow> builder)

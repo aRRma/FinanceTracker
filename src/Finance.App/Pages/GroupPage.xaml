@@ -11,7 +11,7 @@
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:card="clr-namespace:Finance.Application.Features.Categories.Card;assembly=Finance.Application"
     xmlns:catalog="clr-namespace:Finance.Application.Features.Categories.Catalog;assembly=Finance.Application"
-    xmlns:domain="clr-namespace:Finance.Domain;assembly=Finance.Domain"
+    xmlns:domain="clr-namespace:Finance.Domain.Enums;assembly=Finance.Domain"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     x:DataType="card:GroupViewModel"
     Title="{Binding Title}">

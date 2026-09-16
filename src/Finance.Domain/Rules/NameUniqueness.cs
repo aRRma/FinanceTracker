@@ -1,4 +1,6 @@
-namespace Finance.Domain;
+using Finance.Domain.Errors;
+
+namespace Finance.Domain.Rules;
 
 /// <summary>
 /// Проверка уникальности имён. Отдельный тип, потому что уникальность —

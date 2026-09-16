@@ -3,12 +3,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Infrastructure.Queries;
 
-/// <summary>Чтение справочника мест вместе со счётчиками использования.</summary>
+/// <summary>
+/// Чтение справочника мест вместе со счётчиками использования.
+/// </summary>
 public sealed class PlacesQuery : IPlacesQuery
 {
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
 
-    /// <summary>Создаёт запрос.</summary>
+    /// <summary>
+    /// Создаёт запрос.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     public PlacesQuery(IDbContextFactory<FinanceDbContext> contexts)
     {

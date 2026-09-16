@@ -1,6 +1,8 @@
 namespace Finance.Docs.Tests;
 
-/// <summary>Корень репозитория и файлы, которые проверяют тесты этого проекта.</summary>
+/// <summary>
+/// Корень репозитория и файлы, которые проверяют тесты этого проекта.
+/// </summary>
 internal static class Repository
 {
     /// <summary>

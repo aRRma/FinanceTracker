@@ -8,7 +8,9 @@ namespace Finance.Application.Features.Transactions.Pick;
 /// </summary>
 public sealed class AccountPickerSection : ObservableCollection<AccountPickerRow>
 {
-    /// <summary>Создаёт раздел валюты.</summary>
+    /// <summary>
+    /// Создаёт раздел валюты.
+    /// </summary>
     /// <param name="title">Заголовок раздела — название валюты.</param>
     /// <param name="rows">Счета этой валюты в порядке показа.</param>
     public AccountPickerSection(string title, IEnumerable<AccountPickerRow> rows)
@@ -19,6 +21,8 @@ public sealed class AccountPickerSection : ObservableCollection<AccountPickerRow
         Title = title;
     }
 
-    /// <summary>Заголовок раздела.</summary>
+    /// <summary>
+    /// Заголовок раздела.
+    /// </summary>
     public string Title { get; }
 }

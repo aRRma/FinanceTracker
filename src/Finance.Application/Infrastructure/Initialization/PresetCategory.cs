@@ -1,8 +1,10 @@
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Infrastructure.Initialization;
 
-/// <summary>Категория набора любого уровня — для проверок, одинаковых для групп и подкатегорий.</summary>
+/// <summary>
+/// Категория набора любого уровня — для проверок, одинаковых для групп и подкатегорий.
+/// </summary>
 /// <param name="Key">Устойчивый текстовый ключ.</param>
 /// <param name="Id">Идентификатор, выведенный из ключа.</param>
 /// <param name="Icon">Ключ значка.</param>

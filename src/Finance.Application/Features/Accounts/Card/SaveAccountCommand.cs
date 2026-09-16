@@ -1,4 +1,4 @@
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.Application.Features.Accounts.Card;
 
@@ -8,27 +8,43 @@ namespace Finance.Application.Features.Accounts.Card;
 /// </summary>
 public sealed record SaveAccountCommand
 {
-    /// <summary>Ключ правимого счёта. Пусто — заводится новый.</summary>
+    /// <summary>
+    /// Ключ правимого счёта. Пусто — заводится новый.
+    /// </summary>
     public Guid? Key { get; init; }
 
-    /// <summary>Наименование счёта.</summary>
+    /// <summary>
+    /// Наименование счёта.
+    /// </summary>
     public required string Name { get; init; }
 
-    /// <summary>Наличные или карта.</summary>
+    /// <summary>
+    /// Наличные или карта.
+    /// </summary>
     public required AccountType Type { get; init; }
 
-    /// <summary>Валюта. После первой операции по счёту не меняется.</summary>
+    /// <summary>
+    /// Валюта. После первой операции по счёту не меняется.
+    /// </summary>
     public required Currency Currency { get; init; }
 
-    /// <summary>Начальный остаток. Бывает отрицательным: долг по карте тоже остаток.</summary>
+    /// <summary>
+    /// Начальный остаток. Бывает отрицательным: долг по карте тоже остаток.
+    /// </summary>
     public required decimal OpeningBalance { get; init; }
 
-    /// <summary>Дата, с которой действует начальный остаток.</summary>
+    /// <summary>
+    /// Дата, с которой действует начальный остаток.
+    /// </summary>
     public required DateOnly OpenedOn { get; init; }
 
-    /// <summary>«Скрыть из расчётов».</summary>
+    /// <summary>
+    /// «Скрыть из расчётов».
+    /// </summary>
     public required bool ExcludedFromTotals { get; init; }
 
-    /// <summary>«Счёт закрыт». Обратимо, ненулевой баланс закрытию не мешает.</summary>
+    /// <summary>
+    /// «Счёт закрыт». Обратимо, ненулевой баланс закрытию не мешает.
+    /// </summary>
     public required bool IsClosed { get; init; }
 }

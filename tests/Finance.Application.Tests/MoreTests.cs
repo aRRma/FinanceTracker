@@ -7,7 +7,9 @@ using Finance.Application.Infrastructure.Settings;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Раздел «Ещё»: подписи справочников считают их содержимое.</summary>
+/// <summary>
+/// Раздел «Ещё»: подписи справочников считают их содержимое.
+/// </summary>
 public sealed class MoreTests
 {
     /// <summary>
@@ -71,7 +73,9 @@ public sealed class MoreTests
         Assert.Equal("Тёмная", model.ThemeCaption);
     }
 
-    /// <summary>Записанная операция заводит место, и подпись раздела считает его сразу.</summary>
+    /// <summary>
+    /// Записанная операция заводит место, и подпись раздела считает его сразу.
+    /// </summary>
     [Fact]
     public async Task Подпись_мест_растёт_после_первой_операции()
     {

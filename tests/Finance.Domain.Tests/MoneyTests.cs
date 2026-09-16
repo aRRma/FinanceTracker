@@ -1,6 +1,12 @@
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Values;
+
 namespace Finance.Domain.Tests;
 
-/// <summary>Тип денег: валюта внутри типа, точность — копейка.</summary>
+/// <summary>
+/// Тип денег: валюта внутри типа, точность — копейка.
+/// </summary>
 public sealed class MoneyTests
 {
     [Theory]

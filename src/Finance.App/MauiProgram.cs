@@ -8,13 +8,19 @@ using Microsoft.Maui.Handlers;
 
 namespace Finance.App;
 
-/// <summary>Сборка приложения: службы прикладного слоя, шрифты, журналирование.</summary>
+/// <summary>
+/// Сборка приложения: службы прикладного слоя, шрифты, журналирование.
+/// </summary>
 public static class MauiProgram
 {
-    /// <summary>Имя файла базы в папке данных приложения.</summary>
+    /// <summary>
+    /// Имя файла базы в папке данных приложения.
+    /// </summary>
     private const string DatabaseFileName = "finance.db";
 
-    /// <summary>Собирает приложение.</summary>
+    /// <summary>
+    /// Собирает приложение.
+    /// </summary>
     public static MauiApp CreateMauiApp()
     {
         MauiAppBuilder builder = MauiApp.CreateBuilder();

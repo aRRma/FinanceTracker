@@ -13,10 +13,14 @@ internal static partial class Screens
             .Select(static match => match.Value)
             .ToHashSet(StringComparer.Ordinal));
 
-    /// <summary>Нарисованные экраны: A-01, B-03 и так далее.</summary>
+    /// <summary>
+    /// Нарисованные экраны: A-01, B-03 и так далее.
+    /// </summary>
     public static IReadOnlySet<string> InMockups => Drawn.Value;
 
-    /// <summary>Обозначение экрана: буква группы и номер.</summary>
+    /// <summary>
+    /// Обозначение экрана: буква группы и номер.
+    /// </summary>
     [GeneratedRegex("""\b[ABCDE]-\d{2}\b""")]
     public static partial Regex Reference();
 }

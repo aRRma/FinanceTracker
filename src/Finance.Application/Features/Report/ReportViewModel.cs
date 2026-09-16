@@ -2,7 +2,8 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Features.Report;
 
@@ -25,7 +26,9 @@ public sealed partial class ReportViewModel : ScreenViewModel
     // нажатия «назад» показали бы группы одного месяца под шапкой другого
     private int _generation;
 
-    /// <summary>Создаёт модель представления отчёта.</summary>
+    /// <summary>
+    /// Создаёт модель представления отчёта.
+    /// </summary>
     /// <param name="report">Суммы отчёта.</param>
     /// <param name="clock">Часы приложения: от них зависит, какой месяц текущий.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
@@ -40,30 +43,42 @@ public sealed partial class ReportViewModel : ScreenViewModel
         Month = ReportMonth.Current(clock);
     }
 
-    /// <summary>Группы выбранного вида, по убыванию суммы.</summary>
+    /// <summary>
+    /// Группы выбранного вида, по убыванию суммы.
+    /// </summary>
     public ObservableCollection<ReportRowItem> Rows { get; } = [];
 
-    /// <summary>Показанный месяц.</summary>
+    /// <summary>
+    /// Показанный месяц.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(MonthTitle))]
     [NotifyPropertyChangedFor(nameof(CanGoForward))]
     [NotifyCanExecuteChangedFor(nameof(NextMonthCommand))]
     public partial ReportMonth Month { get; private set; }
 
-    /// <summary>Какой вид показан.</summary>
+    /// <summary>
+    /// Какой вид показан.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EmptyTitle))]
     [NotifyPropertyChangedFor(nameof(IsTotalExpense))]
     public partial CategoryKind Kind { get; set; } = CategoryKind.Expense;
 
-    /// <summary>Итог месяца со знаком: «−84 260,00 ₽».</summary>
+    /// <summary>
+    /// Итог месяца со знаком: «−84 260,00 ₽».
+    /// </summary>
     [ObservableProperty]
     public partial string Total { get; private set; } = string.Empty;
 
-    /// <summary>Итог — расходный: красится тем же цветом, что строки под ним.</summary>
+    /// <summary>
+    /// Итог — расходный: красится тем же цветом, что строки под ним.
+    /// </summary>
     public bool IsTotalExpense => Kind is CategoryKind.Expense;
 
-    /// <summary>Операций этого вида за месяц нет — показывается пустое состояние.</summary>
+    /// <summary>
+    /// Операций этого вида за месяц нет — показывается пустое состояние.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasItems))]
     public partial bool IsEmpty { get; private set; }
@@ -83,13 +98,19 @@ public sealed partial class ReportViewModel : ScreenViewModel
     [NotifyPropertyChangedFor(nameof(HasItems))]
     public partial bool IsLoaded { get; private set; }
 
-    /// <summary>Есть что показать: список и итог видны.</summary>
+    /// <summary>
+    /// Есть что показать: список и итог видны.
+    /// </summary>
     public bool HasItems => IsLoaded && !IsEmpty;
 
-    /// <summary>Шапка переключателя месяцев: «Август 2026».</summary>
+    /// <summary>
+    /// Шапка переключателя месяцев: «Август 2026».
+    /// </summary>
     public string MonthTitle => Month.Title;
 
-    /// <summary>Заголовок пустого состояния — свой для каждого вида.</summary>
+    /// <summary>
+    /// Заголовок пустого состояния — свой для каждого вида.
+    /// </summary>
     public string EmptyTitle => Kind is CategoryKind.Expense
         ? "В этом месяце трат не было"
         : "В этом месяце доходов не было";
@@ -108,7 +129,9 @@ public sealed partial class ReportViewModel : ScreenViewModel
         "В отчёт входят только рублёвые счета без признака «скрыть из расчётов». " +
         "Операции по остальным счетам видны в ленте.";
 
-    /// <summary>Выбранный вид — номером в переключателе.</summary>
+    /// <summary>
+    /// Выбранный вид — номером в переключателе.
+    /// </summary>
     public int KindIndex
     {
         get => Array.IndexOf(KindOrder, Kind);
@@ -122,7 +145,9 @@ public sealed partial class ReportViewModel : ScreenViewModel
     /// </summary>
     public bool CanGoForward => Month.First < ReportMonth.Current(_clock).First;
 
-    /// <summary>Перечитывает отчёт за показанный месяц.</summary>
+    /// <summary>
+    /// Перечитывает отчёт за показанный месяц.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
@@ -164,7 +189,9 @@ public sealed partial class ReportViewModel : ScreenViewModel
         }
     }
 
-    /// <summary>Предыдущий месяц.</summary>
+    /// <summary>
+    /// Предыдущий месяц.
+    /// </summary>
     [RelayCommand]
     private Task PreviousMonthAsync()
     {
@@ -173,7 +200,9 @@ public sealed partial class ReportViewModel : ScreenViewModel
         return LoadAsync();
     }
 
-    /// <summary>Следующий месяц. На текущем команда недоступна — операций в будущем не бывает.</summary>
+    /// <summary>
+    /// Следующий месяц. На текущем команда недоступна — операций в будущем не бывает.
+    /// </summary>
     [RelayCommand(CanExecute = nameof(CanGoForward))]
     private Task NextMonthAsync()
     {

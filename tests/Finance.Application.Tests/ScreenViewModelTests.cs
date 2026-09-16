@@ -2,10 +2,14 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Экран, перечитывающий себя по изменению данных: подписка и сбой чтения.</summary>
+/// <summary>
+/// Экран, перечитывающий себя по изменению данных: подписка и сбой чтения.
+/// </summary>
 public sealed class ScreenViewModelTests
 {
-    /// <summary>Перечитывается только то, что устарело от этого изменения.</summary>
+    /// <summary>
+    /// Перечитывается только то, что устарело от этого изменения.
+    /// </summary>
     [Fact]
     public void Изменение_вне_наблюдаемых_экран_не_будит()
     {
@@ -38,7 +42,9 @@ public sealed class ScreenViewModelTests
         Assert.Equal("база занята", reported?.Message);
     }
 
-    /// <summary>Ушедший экран изменений больше не слушает: иначе подписки копились бы с каждым заходом.</summary>
+    /// <summary>
+    /// Ушедший экран изменений больше не слушает: иначе подписки копились бы с каждым заходом.
+    /// </summary>
     [Fact]
     public void Ушедший_экран_не_перечитывается()
     {
@@ -52,7 +58,9 @@ public sealed class ScreenViewModelTests
         Assert.Equal(0, screen.Reloads);
     }
 
-    /// <summary>Заготовка экрана: считает перечитывания и по требованию роняет чтение.</summary>
+    /// <summary>
+    /// Заготовка экрана: считает перечитывания и по требованию роняет чтение.
+    /// </summary>
     private sealed class Screen(IChangeNotifier changes, DataChange watched) : ScreenViewModel(changes)
     {
         public int Reloads { get; private set; }

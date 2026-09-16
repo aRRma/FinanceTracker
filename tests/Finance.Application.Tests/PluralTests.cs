@@ -2,7 +2,9 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Склонение счётных форм: подписи справочников и диалог удаления пишутся по-русски.</summary>
+/// <summary>
+/// Склонение счётных форм: подписи справочников и диалог удаления пишутся по-русски.
+/// </summary>
 public sealed class PluralTests
 {
     /// <summary>
@@ -26,12 +28,16 @@ public sealed class PluralTests
     public void Число_склоняет_слово_по_русским_правилам(int count, string expected) =>
         Assert.Equal(expected, Plural.Of(count, "операция", "операции", "операций"));
 
-    /// <summary>Форма без числа: подпись «Категории» собирает две формы в одну строку.</summary>
+    /// <summary>
+    /// Форма без числа: подпись «Категории» собирает две формы в одну строку.
+    /// </summary>
     [Fact]
     public void Форма_берётся_и_без_числа() =>
         Assert.Equal("группы", Plural.FormOf(3, "группа", "группы", "групп"));
 
-    /// <summary>Пустая форма — ошибка вызывающего кода, а не пустая подпись на экране.</summary>
+    /// <summary>
+    /// Пустая форма — ошибка вызывающего кода, а не пустая подпись на экране.
+    /// </summary>
     [Fact]
     public void Пустая_форма_отвергается() =>
         Assert.Throws<ArgumentException>(() => Plural.Of(1, "группа", " ", "групп"));

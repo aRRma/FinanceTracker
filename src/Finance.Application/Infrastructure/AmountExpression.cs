@@ -11,10 +11,14 @@ namespace Finance.Application.Infrastructure;
 /// </summary>
 public static class AmountExpression
 {
-    /// <summary>Знаки действий. С клавиатуры формы приходят типографские, с внешней — обычные.</summary>
+    /// <summary>
+    /// Знаки действий. С клавиатуры формы приходят типографские, с внешней — обычные.
+    /// </summary>
     private static readonly SearchValues<char> Operators = SearchValues.Create("+-*/×÷−");
 
-    /// <summary>Разбор числа с запятой — так его набирают на клавиатуре формы.</summary>
+    /// <summary>
+    /// Разбор числа с запятой — так его набирают на клавиатуре формы.
+    /// </summary>
     private static readonly NumberFormatInfo CommaSeparator = new() { NumberDecimalSeparator = "," };
 
     private const int Scale = 2;
@@ -84,7 +88,9 @@ public static class AmountExpression
         }
     }
 
-    /// <summary>Применяет действие. Деление на ноль и переполнение — не исключение, а незаконченный ввод.</summary>
+    /// <summary>
+    /// Применяет действие. Деление на ноль и переполнение — не исключение, а незаконченный ввод.
+    /// </summary>
     private static bool TryApply(char operation, decimal left, decimal right, out decimal value)
     {
         try

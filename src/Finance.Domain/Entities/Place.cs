@@ -1,4 +1,7 @@
-namespace Finance.Domain;
+using Finance.Domain.Rules;
+using Finance.Domain.Values;
+
+namespace Finance.Domain.Entities;
 
 /// <summary>
 /// Место операции: магазин, работодатель, банк, клиника. Справочник, а не свободная
@@ -20,10 +23,14 @@ public sealed class Place : Entity
         Name = name;
     }
 
-    /// <summary>Название места. Хранится обрезанным.</summary>
+    /// <summary>
+    /// Название места. Хранится обрезанным.
+    /// </summary>
     public string Name { get; private set; }
 
-    /// <summary>Заводит место. Уникальность имени проверяется отдельно: она требует справочника целиком.</summary>
+    /// <summary>
+    /// Заводит место. Уникальность имени проверяется отдельно: она требует справочника целиком.
+    /// </summary>
     public static Place Create(string name, DateTimeOffset nowUtc) =>
         new(Keys.New(), Names.Normalize(name, "место"),
             createdAtUtc: nowUtc, updatedAtUtc: nowUtc,
@@ -44,6 +51,8 @@ public sealed class Place : Entity
         string? externalId) =>
         new(key, name, createdAtUtc, updatedAtUtc, deletedAtUtc, syncedAtUtc, externalId);
 
-    /// <summary>Переименовывает место. Операции при этом не правятся — они ссылаются на ключ.</summary>
+    /// <summary>
+    /// Переименовывает место. Операции при этом не правятся — они ссылаются на ключ.
+    /// </summary>
     public void Rename(string name) => Name = Names.Normalize(name, "место");
 }

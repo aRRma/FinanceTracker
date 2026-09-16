@@ -25,10 +25,14 @@ namespace Finance.App;
 [MetaData("android.app.shortcuts", Resource = "@xml/shortcuts")]
 public class MainActivity : MauiAppCompatActivity
 {
-    /// <summary>Действие намерения ярлыка. Совпадает с описанием ярлыков в ресурсах.</summary>
+    /// <summary>
+    /// Действие намерения ярлыка. Совпадает с описанием ярлыков в ресурсах.
+    /// </summary>
     private const string AddTransaction = "ru.finance.tracker.action.ADD_TRANSACTION";
 
-    /// <summary>Холодный старт: приложения не было, ярлык поднял его с нуля.</summary>
+    /// <summary>
+    /// Холодный старт: приложения не было, ярлык поднял его с нуля.
+    /// </summary>
     /// <param name="savedInstanceState">Состояние, сохранённое платформой.</param>
     protected override void OnCreate(Bundle? savedInstanceState)
     {

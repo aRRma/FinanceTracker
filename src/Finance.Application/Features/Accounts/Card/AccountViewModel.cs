@@ -2,7 +2,9 @@ using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Features.Accounts.Card;
 
@@ -26,7 +28,9 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     // когда экран покидают, не сохранив. У новой формы снимок — её пустое начало
     private (string, AccountType, Currency, string, DateOnly, bool, bool) _saved;
 
-    /// <summary>Создаёт модель представления карточки счёта.</summary>
+    /// <summary>
+    /// Создаёт модель представления карточки счёта.
+    /// </summary>
     /// <param name="query">Чтение счёта для правки.</param>
     /// <param name="handler">Сохранение счёта.</param>
     /// <param name="clock">Часы: «сегодня» пользователя.</param>
@@ -43,18 +47,26 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
         OpenedOn = clock.Today;
     }
 
-    /// <summary>Ключ правимого счёта. Пусто — заводится новый.</summary>
+    /// <summary>
+    /// Ключ правимого счёта. Пусто — заводится новый.
+    /// </summary>
     public Guid? Key { get; private set; }
 
-    /// <summary>Наименование счёта.</summary>
+    /// <summary>
+    /// Наименование счёта.
+    /// </summary>
     [ObservableProperty]
     public partial string Name { get; set; } = string.Empty;
 
-    /// <summary>Наличные или карта.</summary>
+    /// <summary>
+    /// Наличные или карта.
+    /// </summary>
     [ObservableProperty]
     public partial AccountType Type { get; set; } = AccountType.Card;
 
-    /// <summary>Валюта счёта.</summary>
+    /// <summary>
+    /// Валюта счёта.
+    /// </summary>
     [ObservableProperty]
     public partial Currency Currency { get; set; } = Currency.RUB;
 
@@ -62,79 +74,113 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
 
     private static readonly Currency[] CurrencyOrder = [Currency.RUB, Currency.USD, Currency.EUR];
 
-    /// <summary>Подписи типов счёта для списка выбора.</summary>
+    /// <summary>
+    /// Подписи типов счёта для списка выбора.
+    /// </summary>
     public IReadOnlyList<string> TypeNames => TypeCaptions;
 
     private static readonly string[] TypeCaptions = ["Карта", "Наличные"];
 
-    /// <summary>Подписи валют для списка выбора.</summary>
+    /// <summary>
+    /// Подписи валют для списка выбора.
+    /// </summary>
     public IReadOnlyList<string> CurrencyNames => CurrencyCaptions;
 
     private static readonly string[] CurrencyCaptions = ["Рубль ₽", "Доллар $", "Евро €"];
 
-    /// <summary>Выбранный тип счёта — номером в списке: список показывает подписи, а не имена членов.</summary>
+    /// <summary>
+    /// Выбранный тип счёта — номером в списке: список показывает подписи, а не имена членов.
+    /// </summary>
     public int TypeIndex
     {
         get => Array.IndexOf(TypeOrder, Type);
         set => Type = TypeOrder[Math.Clamp(value, 0, TypeOrder.Length - 1)];
     }
 
-    /// <summary>Выбранная валюта — номером в списке.</summary>
+    /// <summary>
+    /// Выбранная валюта — номером в списке.
+    /// </summary>
     public int CurrencyIndex
     {
         get => Array.IndexOf(CurrencyOrder, Currency);
         set => Currency = CurrencyOrder[Math.Clamp(value, 0, CurrencyOrder.Length - 1)];
     }
 
-    /// <summary>Валюту менять можно: операций по счёту ещё не было.</summary>
+    /// <summary>
+    /// Валюту менять можно: операций по счёту ещё не было.
+    /// </summary>
     public bool CurrencyEditable => !CurrencyLocked;
 
-    /// <summary>Дата открытия в том виде, в каком её принимает календарь.</summary>
+    /// <summary>
+    /// Дата открытия в том виде, в каком её принимает календарь.
+    /// </summary>
     public DateTime OpenedOnDate
     {
         get => OpenedOn.ToDateTime(TimeOnly.MinValue);
         set => OpenedOn = DateOnly.FromDateTime(value);
     }
 
-    /// <summary>Позднее сегодняшнего дня календарь не пускает: операций в будущем нет.</summary>
+    /// <summary>
+    /// Позднее сегодняшнего дня календарь не пускает: операций в будущем нет.
+    /// </summary>
     public DateTime LatestOpeningDate => _clock.Today.ToDateTime(TimeOnly.MinValue);
 
-    /// <summary>Пояснение, почему дату открытия дальше не сдвинуть.</summary>
+    /// <summary>
+    /// Пояснение, почему дату открытия дальше не сдвинуть.
+    /// </summary>
     public string? OpenedOnHint => EarliestTransactionOn is { } earliest
         ? $"Не позже {earliest:dd.MM.yyyy} — этим днём есть операция"
         : null;
 
-    /// <summary>Пояснение к дате открытия есть — его стоит показать.</summary>
+    /// <summary>
+    /// Пояснение к дате открытия есть — его стоит показать.
+    /// </summary>
     public bool HasOpenedOnHint => OpenedOnHint is not null;
 
-    /// <summary>Правило нарушено — сообщение показывается рядом с формой.</summary>
+    /// <summary>
+    /// Правило нарушено — сообщение показывается рядом с формой.
+    /// </summary>
     public bool HasError => !string.IsNullOrEmpty(Error);
 
-    /// <summary>Начальный остаток, как он набран в поле.</summary>
+    /// <summary>
+    /// Начальный остаток, как он набран в поле.
+    /// </summary>
     [ObservableProperty]
     public partial string OpeningBalance { get; set; } = "0";
 
-    /// <summary>Дата открытия.</summary>
+    /// <summary>
+    /// Дата открытия.
+    /// </summary>
     [ObservableProperty]
     public partial DateOnly OpenedOn { get; set; }
 
-    /// <summary>«Скрыть из расчётов».</summary>
+    /// <summary>
+    /// «Скрыть из расчётов».
+    /// </summary>
     [ObservableProperty]
     public partial bool ExcludedFromTotals { get; set; }
 
-    /// <summary>«Счёт закрыт».</summary>
+    /// <summary>
+    /// «Счёт закрыт».
+    /// </summary>
     [ObservableProperty]
     public partial bool IsClosed { get; set; }
 
-    /// <summary>Валюту менять нельзя: по счёту уже была операция.</summary>
+    /// <summary>
+    /// Валюту менять нельзя: по счёту уже была операция.
+    /// </summary>
     [ObservableProperty]
     public partial bool CurrencyLocked { get; private set; }
 
-    /// <summary>Дальше этой даты открытие не сдвигается — раньше неё есть операция.</summary>
+    /// <summary>
+    /// Дальше этой даты открытие не сдвигается — раньше неё есть операция.
+    /// </summary>
     [ObservableProperty]
     public partial DateOnly? EarliestTransactionOn { get; private set; }
 
-    /// <summary>Текст нарушенного правила. Пусто — сохранять можно.</summary>
+    /// <summary>
+    /// Текст нарушенного правила. Пусто — сохранять можно.
+    /// </summary>
     [ObservableProperty]
     public partial string? Error { get; private set; }
 
@@ -147,7 +193,9 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial bool IsSaving { get; private set; }
 
-    /// <summary>Сохранять можно: предыдущее сохранение не идёт.</summary>
+    /// <summary>
+    /// Сохранять можно: предыдущее сохранение не идёт.
+    /// </summary>
     public bool CanSave => !IsSaving;
 
     /// <inheritdoc />
@@ -161,7 +209,9 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     private (string Name, AccountType Type, Currency Currency, string OpeningBalance, DateOnly OpenedOn, bool Excluded, bool Closed) Snapshot() =>
         (Name, Type, Currency, OpeningBalance, OpenedOn, ExcludedFromTotals, IsClosed);
 
-    /// <summary>Заголовок экрана.</summary>
+    /// <summary>
+    /// Заголовок экрана.
+    /// </summary>
     public string Title => Key is null ? "Новый счёт" : "Счёт";
 
     /// <summary>
@@ -175,7 +225,9 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
               "а перевести их будет некуда — закрытый счёт в выборе не предлагается."
             : null;
 
-    /// <summary>Загружает счёт для правки. Пустой ключ оставляет форму пустой.</summary>
+    /// <summary>
+    /// Загружает счёт для правки. Пустой ключ оставляет форму пустой.
+    /// </summary>
     /// <param name="key">Ключ счёта или <c>null</c> для нового.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]

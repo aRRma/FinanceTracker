@@ -8,10 +8,14 @@ namespace Finance.Application.Infrastructure.Queries;
 /// </summary>
 public sealed record SettingsSummary
 {
-    /// <summary>Выбранная тема оформления.</summary>
+    /// <summary>
+    /// Выбранная тема оформления.
+    /// </summary>
     public required Theme Theme { get; init; }
 
-    /// <summary>Часовой пояс, по которому приложение считает «сегодня».</summary>
+    /// <summary>
+    /// Часовой пояс, по которому приложение считает «сегодня».
+    /// </summary>
     public required string TimeZoneId { get; init; }
 
     /// <summary>
@@ -20,7 +24,9 @@ public sealed record SettingsSummary
     /// </summary>
     public required bool TimeZoneFromSystem { get; init; }
 
-    /// <summary>Версия приложения из манифеста.</summary>
+    /// <summary>
+    /// Версия приложения из манифеста.
+    /// </summary>
     public required string Version { get; init; }
 
     /// <summary>

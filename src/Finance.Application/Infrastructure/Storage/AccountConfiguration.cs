@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Finance.Application.Infrastructure.Storage;
 
-/// <summary>Таблица счетов.</summary>
+/// <summary>
+/// Таблица счетов.
+/// </summary>
 internal sealed class AccountConfiguration : IEntityTypeConfiguration<AccountRow>
 {
     public void Configure(EntityTypeBuilder<AccountRow> builder)

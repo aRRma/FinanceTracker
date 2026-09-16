@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Finance.Application.Infrastructure.Storage;
 
-/// <summary>Таблица категорий: оба уровня в одной таблице, уровень задаёт <c>parent_key</c>.</summary>
+/// <summary>
+/// Таблица категорий: оба уровня в одной таблице, уровень задаёт <c>parent_key</c>.
+/// </summary>
 internal sealed class CategoryConfiguration : IEntityTypeConfiguration<CategoryRow>
 {
     public void Configure(EntityTypeBuilder<CategoryRow> builder)

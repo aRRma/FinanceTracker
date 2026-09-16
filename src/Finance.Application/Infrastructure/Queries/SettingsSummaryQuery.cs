@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Infrastructure.Queries;
 
-/// <summary>Читает состояние настроек: тему, часовой пояс, версию и номер схемы.</summary>
+/// <summary>
+/// Читает состояние настроек: тему, часовой пояс, версию и номер схемы.
+/// </summary>
 public sealed class SettingsSummaryQuery : ISettingsSummaryQuery
 {
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
@@ -12,7 +14,9 @@ public sealed class SettingsSummaryQuery : ISettingsSummaryQuery
     private readonly IClock _clock;
     private readonly AboutInfo _about;
 
-    /// <summary>Создаёт запрос.</summary>
+    /// <summary>
+    /// Создаёт запрос.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     /// <param name="settings">Локальные настройки устройства.</param>
     /// <param name="clock">Часы приложения: у них действующий пояс.</param>

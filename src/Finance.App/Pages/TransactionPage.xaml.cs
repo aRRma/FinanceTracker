@@ -1,10 +1,13 @@
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экраны B-01…B-06 и C-07: форма операции — запись, правка, удаление.</summary>
+/// <summary>
+/// Экраны B-01…B-06 и C-07: форма операции — запись, правка, удаление.
+/// </summary>
 [QueryProperty(nameof(Key), "key")]
 [QueryProperty(nameof(Account), "account")]
 [QueryProperty(nameof(Kind), "kind")]
@@ -12,7 +15,9 @@ public partial class TransactionPage : DataPage
 {
     private readonly TransactionViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления формы операции.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public TransactionPage(TransactionViewModel model, FinanceStartup startup)
@@ -26,13 +31,19 @@ public partial class TransactionPage : DataPage
         BindingContext = model;
     }
 
-    /// <summary>Ключ правимой операции из маршрута. Пусто — записывается новая.</summary>
+    /// <summary>
+    /// Ключ правимой операции из маршрута. Пусто — записывается новая.
+    /// </summary>
     public string? Key { get; set; }
 
-    /// <summary>Счёт для подстановки в новую операцию — с чьей ленты пришли.</summary>
+    /// <summary>
+    /// Счёт для подстановки в новую операцию — с чьей ленты пришли.
+    /// </summary>
     public string? Account { get; set; }
 
-    /// <summary>Вид новой операции: им приходят с ярлыка на значке приложения.</summary>
+    /// <summary>
+    /// Вид новой операции: им приходят с ярлыка на значке приложения.
+    /// </summary>
     public string? Kind { get; set; }
 
     /// <inheritdoc />

@@ -6,10 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Инициализация базы: стартовый набор пишется один раз и своим временем.</summary>
+/// <summary>
+/// Инициализация базы: стартовый набор пишется один раз и своим временем.
+/// </summary>
 public sealed class DatabaseInitializerTests
 {
-    /// <summary>Набор записан целиком и обоими уровнями.</summary>
+    /// <summary>
+    /// Набор записан целиком и обоими уровнями.
+    /// </summary>
     [Fact]
     public async Task Стартовый_набор_записывается_при_первом_запуске()
     {
@@ -75,7 +79,9 @@ public sealed class DatabaseInitializerTests
             .Select(row => row.Name).SingleAsync());
     }
 
-    /// <summary>Номер применённой версии сохранён: по нему и решается, применять ли набор.</summary>
+    /// <summary>
+    /// Номер применённой версии сохранён: по нему и решается, применять ли набор.
+    /// </summary>
     [Fact]
     public async Task Номер_версии_набора_сохраняется()
     {
@@ -107,7 +113,9 @@ public sealed class DatabaseInitializerTests
         Assert.Single(await context.Settings.Where(row => row.Name == SettingName.PresetVersion).ToListAsync());
     }
 
-    /// <summary>Справочник мест при первом запуске пуст и наполняется по мере ввода операций.</summary>
+    /// <summary>
+    /// Справочник мест при первом запуске пуст и наполняется по мере ввода операций.
+    /// </summary>
     [Fact]
     public async Task Справочник_мест_после_инициализации_пуст()
     {

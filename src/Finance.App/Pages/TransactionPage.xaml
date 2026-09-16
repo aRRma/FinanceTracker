@@ -13,7 +13,7 @@
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:card="clr-namespace:Finance.Application.Features.Transactions.Card;assembly=Finance.Application"
-    xmlns:domain="clr-namespace:Finance.Domain;assembly=Finance.Domain"
+    xmlns:domain="clr-namespace:Finance.Domain.Enums;assembly=Finance.Domain"
     x:DataType="card:TransactionViewModel"
     Title="{Binding Title}"
     Shell.TabBarIsVisible="False">

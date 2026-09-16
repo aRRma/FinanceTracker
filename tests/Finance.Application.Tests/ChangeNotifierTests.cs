@@ -2,7 +2,9 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Оповещение об изменении данных доходит до подписчиков тем путём, который задала платформа.</summary>
+/// <summary>
+/// Оповещение об изменении данных доходит до подписчиков тем путём, который задала платформа.
+/// </summary>
 public sealed class ChangeNotifierTests
 {
     /// <summary>
@@ -26,7 +28,9 @@ public sealed class ChangeNotifierTests
         Assert.Equal(["доставка", "подписчик:Accounts"], trace);
     }
 
-    /// <summary>Пустое изменение не будит подписчиков: перечитывать им нечего.</summary>
+    /// <summary>
+    /// Пустое изменение не будит подписчиков: перечитывать им нечего.
+    /// </summary>
     [Fact]
     public void Пустое_изменение_не_публикуется()
     {

@@ -7,12 +7,18 @@ namespace Finance.Application.Infrastructure;
 /// </summary>
 public interface IClock
 {
-    /// <summary>Текущий момент в UTC. Всё, что попадает в метки <c>_at_utc</c>.</summary>
+    /// <summary>
+    /// Текущий момент в UTC. Всё, что попадает в метки <c>_at_utc</c>.
+    /// </summary>
     DateTimeOffset NowUtc { get; }
 
-    /// <summary>Сегодняшняя календарная дата пользователя — в его зоне, а не в UTC.</summary>
+    /// <summary>
+    /// Сегодняшняя календарная дата пользователя — в его зоне, а не в UTC.
+    /// </summary>
     DateOnly Today { get; }
 
-    /// <summary>Часовой пояс пользователя. Отображение моментов времени идёт через него.</summary>
+    /// <summary>
+    /// Часовой пояс пользователя. Отображение моментов времени идёт через него.
+    /// </summary>
     TimeZoneInfo TimeZone { get; }
 }

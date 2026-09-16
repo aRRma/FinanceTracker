@@ -1,6 +1,6 @@
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain;
+using Finance.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Infrastructure.Queries;
@@ -12,7 +12,9 @@ namespace Finance.Application.Infrastructure.Queries;
 /// </summary>
 internal static class CountedAccounts
 {
-    /// <summary>Выборка счетов, попадающих в суммы.</summary>
+    /// <summary>
+    /// Выборка счетов, попадающих в суммы.
+    /// </summary>
     /// <param name="context">Контекст базы.</param>
     public static IQueryable<AccountRow> Of(FinanceDbContext context)
     {

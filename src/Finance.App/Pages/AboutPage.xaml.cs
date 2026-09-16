@@ -3,12 +3,16 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экран D-09: «О программе».</summary>
+/// <summary>
+/// Экран D-09: «О программе».
+/// </summary>
 public partial class AboutPage : DataPage
 {
     private readonly AboutViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления экрана «О программе».</param>
     /// <param name="startup">Подготовка приложения.</param>
     public AboutPage(AboutViewModel model, FinanceStartup startup)

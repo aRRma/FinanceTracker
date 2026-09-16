@@ -3,10 +3,14 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Поле суммы: четыре действия, слева направо, результат до копеек.</summary>
+/// <summary>
+/// Поле суммы: четыре действия, слева направо, результат до копеек.
+/// </summary>
 public sealed class AmountExpressionTests
 {
-    /// <summary>Обычное число проходит насквозь — выражение это частный случай.</summary>
+    /// <summary>
+    /// Обычное число проходит насквозь — выражение это частный случай.
+    /// </summary>
     [Theory]
     [InlineData("1250", "1250")]
     [InlineData("1250,50", "1250.50")]
@@ -18,7 +22,9 @@ public sealed class AmountExpressionTests
         Assert.Equal(Parse(expected), result);
     }
 
-    /// <summary>Четыре действия считаются.</summary>
+    /// <summary>
+    /// Четыре действия считаются.
+    /// </summary>
     [Theory]
     [InlineData("1250 + 340", "1590")]
     [InlineData("1250-340", "910")]
@@ -41,7 +47,9 @@ public sealed class AmountExpressionTests
         Assert.Equal(3180m, result);
     }
 
-    /// <summary>Знаки с клавиатуры формы — типографские, и они тоже понимаются.</summary>
+    /// <summary>
+    /// Знаки с клавиатуры формы — типографские, и они тоже понимаются.
+    /// </summary>
     [Theory]
     [InlineData("100 × 3", "300")]
     [InlineData("100 ÷ 4", "25")]
@@ -52,7 +60,9 @@ public sealed class AmountExpressionTests
         Assert.Equal(Parse(expected), result);
     }
 
-    /// <summary>Результат округляется до копеек: точнее копейки домен сумму не примет.</summary>
+    /// <summary>
+    /// Результат округляется до копеек: точнее копейки домен сумму не примет.
+    /// </summary>
     [Theory]
     [InlineData("100/3", "33.33")]
     [InlineData("10/4", "2.50")]

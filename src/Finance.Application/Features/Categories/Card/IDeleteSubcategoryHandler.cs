@@ -1,8 +1,10 @@
-using Finance.Domain;
+using Finance.Domain.Errors;
 
 namespace Finance.Application.Features.Categories.Card;
 
-/// <summary>Удаление подкатегории вместе с переездом её операций. Модель представления зовёт его напрямую.</summary>
+/// <summary>
+/// Удаление подкатегории вместе с переездом её операций. Модель представления зовёт его напрямую.
+/// </summary>
 public interface IDeleteSubcategoryHandler
 {
     /// <summary>

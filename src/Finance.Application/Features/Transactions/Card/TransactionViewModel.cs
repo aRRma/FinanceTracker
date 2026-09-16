@@ -5,7 +5,11 @@ using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
+using Finance.Domain.Rules;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Features.Transactions.Card;
 
@@ -35,7 +39,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
     private Snapshot _saved;
 
-    /// <summary>Создаёт модель представления формы операции.</summary>
+    /// <summary>
+    /// Создаёт модель представления формы операции.
+    /// </summary>
     /// <param name="form">Списки выбора формы.</param>
     /// <param name="card">Чтение операции для правки.</param>
     /// <param name="save">Запись и правка операции.</param>
@@ -71,19 +77,29 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         OccurredOn = clock.Today;
     }
 
-    /// <summary>Ключ правимой операции. Пусто — записывается новая.</summary>
+    /// <summary>
+    /// Ключ правимой операции. Пусто — записывается новая.
+    /// </summary>
     public Guid? Key { get; private set; }
 
-    /// <summary>Правится существующая операция — её можно удалить.</summary>
+    /// <summary>
+    /// Правится существующая операция — её можно удалить.
+    /// </summary>
     public bool IsExisting => Key is not null;
 
-    /// <summary>Заголовок экрана.</summary>
+    /// <summary>
+    /// Заголовок экрана.
+    /// </summary>
     public string Title => IsExisting ? "Операция" : "Новая операция";
 
-    /// <summary>Подписи видов для переключателя, в порядке <see cref="KindIndex"/>.</summary>
+    /// <summary>
+    /// Подписи видов для переключателя, в порядке <see cref="KindIndex"/>.
+    /// </summary>
     public static IReadOnlyList<string> KindNames { get; } = ["Расход", "Доход", "Перевод"];
 
-    /// <summary>Вид операции. По умолчанию расход — он записывается чаще всего.</summary>
+    /// <summary>
+    /// Вид операции. По умолчанию расход — он записывается чаще всего.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(KindIndex))]
     [NotifyPropertyChangedFor(nameof(IsTransfer))]
@@ -92,20 +108,28 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial TransactionKind Kind { get; set; } = TransactionKind.Expense;
 
-    /// <summary>Вид номером в переключателе.</summary>
+    /// <summary>
+    /// Вид номером в переключателе.
+    /// </summary>
     public int KindIndex
     {
         get => Array.IndexOf(KindOrder, Kind);
         set => Kind = KindOrder[Math.Clamp(value, 0, KindOrder.Length - 1)];
     }
 
-    /// <summary>Перевод: второй счёт есть, категории и места нет.</summary>
+    /// <summary>
+    /// Перевод: второй счёт есть, категории и места нет.
+    /// </summary>
     public bool IsTransfer => Kind is TransactionKind.Transfer;
 
-    /// <summary>Доход или расход: категория обязательна, место по желанию.</summary>
+    /// <summary>
+    /// Доход или расход: категория обязательна, место по желанию.
+    /// </summary>
     public bool IsNotTransfer => !IsTransfer;
 
-    /// <summary>Подпись счёта списания: у перевода «Откуда», у остальных просто «Счёт».</summary>
+    /// <summary>
+    /// Подпись счёта списания: у перевода «Откуда», у остальных просто «Счёт».
+    /// </summary>
     public string SourceLabel => IsTransfer ? "Откуда" : "Счёт";
 
     /// <summary>
@@ -114,21 +138,27 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// </summary>
     public CategoryKind CategoryKind => Kind is TransactionKind.Income ? CategoryKind.Income : CategoryKind.Expense;
 
-    /// <summary>Сумма, как набрана: выражение из четырёх действий или число.</summary>
+    /// <summary>
+    /// Сумма, как набрана: выражение из четырёх действий или число.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(AmountPreview))]
     [NotifyPropertyChangedFor(nameof(AmountDisplay))]
     [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial string Amount { get; set; } = string.Empty;
 
-    /// <summary>Сумма зачисления — у перевода между валютами.</summary>
+    /// <summary>
+    /// Сумма зачисления — у перевода между валютами.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TargetAmountPreview))]
     [NotifyPropertyChangedFor(nameof(TargetAmountDisplay))]
     [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial string TargetAmount { get; set; } = string.Empty;
 
-    /// <summary>Какое поле суммы набирается: клавиатура в форме одна на оба.</summary>
+    /// <summary>
+    /// Какое поле суммы набирается: клавиатура в форме одна на оба.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsSourceAmountActive))]
     [NotifyPropertyChangedFor(nameof(IsTargetAmountActive))]
@@ -142,16 +172,24 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     [ObservableProperty]
     public partial bool AreKeysVisible { get; set; } = true;
 
-    /// <summary>Набирается сумма списания — её поле подсвечено.</summary>
+    /// <summary>
+    /// Набирается сумма списания — её поле подсвечено.
+    /// </summary>
     public bool IsSourceAmountActive => ActiveAmount is AmountField.Source;
 
-    /// <summary>Набирается сумма зачисления.</summary>
+    /// <summary>
+    /// Набирается сумма зачисления.
+    /// </summary>
     public bool IsTargetAmountActive => ActiveAmount is AmountField.Target;
 
-    /// <summary>Набранное выражение для показа над итогом. Пустое поле — пустая строка: ноль показывает итог.</summary>
+    /// <summary>
+    /// Набранное выражение для показа над итогом. Пустое поле — пустая строка: ноль показывает итог.
+    /// </summary>
     public string AmountDisplay => Amount;
 
-    /// <summary>Набранная сумма зачисления для показа.</summary>
+    /// <summary>
+    /// Набранная сумма зачисления для показа.
+    /// </summary>
     public string TargetAmountDisplay => TargetAmount;
 
     /// <summary>
@@ -163,7 +201,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// </summary>
     public string AmountPreview => Preview(Amount, SourceAccount?.Currency);
 
-    /// <summary>Итог суммы зачисления в валюте счёта зачисления — по тем же правилам.</summary>
+    /// <summary>
+    /// Итог суммы зачисления в валюте счёта зачисления — по тем же правилам.
+    /// </summary>
     public string TargetAmountPreview => Preview(TargetAmount, TargetAccount?.Currency);
 
     /// <summary>
@@ -179,7 +219,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         && (!NeedsTargetAmount
             || (AmountExpression.TryEvaluate(TargetAmount, out decimal target) && target > 0m));
 
-    /// <summary>Счета, которые форма предлагает: открытые и те, что уже в этой операции.</summary>
+    /// <summary>
+    /// Счета, которые форма предлагает: открытые и те, что уже в этой операции.
+    /// </summary>
     public ObservableCollection<AccountOption> Accounts { get; } = [];
 
     /// <summary>
@@ -189,10 +231,14 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// </summary>
     public ObservableCollection<AccountOption> TargetAccounts { get; } = [];
 
-    /// <summary>Подкатегории вида операции.</summary>
+    /// <summary>
+    /// Подкатегории вида операции.
+    /// </summary>
     public ObservableCollection<CategoryOption> Categories { get; } = [];
 
-    /// <summary>Счёт списания.</summary>
+    /// <summary>
+    /// Счёт списания.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(AmountPreview))]
     [NotifyPropertyChangedFor(nameof(NeedsTargetAmount))]
@@ -201,7 +247,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     [NotifyPropertyChangedFor(nameof(SourceAccountCaption))]
     public partial AccountOption? SourceAccount { get; set; }
 
-    /// <summary>Счёт зачисления — у перевода.</summary>
+    /// <summary>
+    /// Счёт зачисления — у перевода.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TargetAmountPreview))]
     [NotifyPropertyChangedFor(nameof(NeedsTargetAmount))]
@@ -210,39 +258,57 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     [NotifyPropertyChangedFor(nameof(TargetAccountCaption))]
     public partial AccountOption? TargetAccount { get; set; }
 
-    /// <summary>Подкатегория — у дохода и расхода.</summary>
+    /// <summary>
+    /// Подкатегория — у дохода и расхода.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CategoryCaption))]
     [NotifyPropertyChangedFor(nameof(HasCategory))]
     public partial CategoryOption? Category { get; set; }
 
-    /// <summary>Место, как набрано. Совпавшее с существующим подставит его, новое заведётся при сохранении.</summary>
+    /// <summary>
+    /// Место, как набрано. Совпавшее с существующим подставит его, новое заведётся при сохранении.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(PlaceCaption))]
     [NotifyPropertyChangedFor(nameof(HasPlace))]
     public partial string PlaceName { get; set; } = string.Empty;
 
-    /// <summary>Счёт списания в строке-поле: название, пока не выбран — приглашение выбрать.</summary>
+    /// <summary>
+    /// Счёт списания в строке-поле: название, пока не выбран — приглашение выбрать.
+    /// </summary>
     public string SourceAccountCaption => SourceAccount?.Name ?? "Выбрать";
 
-    /// <summary>Счёт зачисления в строке-поле.</summary>
+    /// <summary>
+    /// Счёт зачисления в строке-поле.
+    /// </summary>
     public string TargetAccountCaption => TargetAccount?.Name ?? "Выбрать";
 
-    /// <summary>Подкатегория в строке-поле: группа и название, как в ленте.</summary>
+    /// <summary>
+    /// Подкатегория в строке-поле: группа и название, как в ленте.
+    /// </summary>
     public string CategoryCaption => Category is { } category
         ? $"{category.GroupName} · {category.Name}"
         : "Выбрать";
 
-    /// <summary>Место в строке-поле. Место необязательно, и пустое так и подписано.</summary>
+    /// <summary>
+    /// Место в строке-поле. Место необязательно, и пустое так и подписано.
+    /// </summary>
     public string PlaceCaption => PlaceName.Length > 0 ? PlaceName : "Необязательно";
 
-    /// <summary>Категория выбрана: иначе строка показывает приглашение приглушённо.</summary>
+    /// <summary>
+    /// Категория выбрана: иначе строка показывает приглашение приглушённо.
+    /// </summary>
     public bool HasCategory => Category is not null;
 
-    /// <summary>Место указано.</summary>
+    /// <summary>
+    /// Место указано.
+    /// </summary>
     public bool HasPlace => PlaceName.Length > 0;
 
-    /// <summary>Дата операции.</summary>
+    /// <summary>
+    /// Дата операции.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(OccurredOnDate))]
     [NotifyPropertyChangedFor(nameof(OccurredOnCaption))]
@@ -250,29 +316,41 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     [NotifyPropertyChangedFor(nameof(IsYesterday))]
     public partial DateOnly OccurredOn { get; set; }
 
-    /// <summary>Дата операции словами: «Сегодня», «Вчера», иначе «15 сентября» — с годом, если год не этот.</summary>
+    /// <summary>
+    /// Дата операции словами: «Сегодня», «Вчера», иначе «15 сентября» — с годом, если год не этот.
+    /// </summary>
     public string OccurredOnCaption =>
         IsToday ? "Сегодня"
         : IsYesterday ? "Вчера"
         : OccurredOn.Year == _clock.Today.Year ? OccurredOn.ToString("d MMMM", Russian)
         : OccurredOn.ToString("d MMMM yyyy", Russian);
 
-    /// <summary>Выбрана сегодняшняя дата — её чип подсвечен.</summary>
+    /// <summary>
+    /// Выбрана сегодняшняя дата — её чип подсвечен.
+    /// </summary>
     public bool IsToday => OccurredOn == _clock.Today;
 
-    /// <summary>Выбрана вчерашняя дата.</summary>
+    /// <summary>
+    /// Выбрана вчерашняя дата.
+    /// </summary>
     public bool IsYesterday => OccurredOn == _clock.Today.AddDays(-1);
 
-    /// <summary>Заметка.</summary>
+    /// <summary>
+    /// Заметка.
+    /// </summary>
     [ObservableProperty]
     public partial string Note { get; set; } = string.Empty;
 
-    /// <summary>Текст нарушенного правила. Пусто — сохранять можно.</summary>
+    /// <summary>
+    /// Текст нарушенного правила. Пусто — сохранять можно.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasError))]
     public partial string? Error { get; private set; }
 
-    /// <summary>Правило нарушено — сообщение показывается рядом с формой.</summary>
+    /// <summary>
+    /// Правило нарушено — сообщение показывается рядом с формой.
+    /// </summary>
     public bool HasError => !string.IsNullOrEmpty(Error);
 
     /// <inheritdoc />
@@ -294,7 +372,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         OccurredOn,
         Note);
 
-    /// <summary>Состояние формы, с которым сверяется уход с экрана.</summary>
+    /// <summary>
+    /// Состояние формы, с которым сверяется уход с экрана.
+    /// </summary>
     private readonly record struct Snapshot(
         TransactionKind Kind,
         Guid? SourceAccount,
@@ -322,14 +402,18 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     public bool NeedsTargetAmount =>
         IsTransfer && SourceAccount is { } source && TargetAccount is { } target && source.Currency != target.Currency;
 
-    /// <summary>Дата операции в том виде, в каком её принимает календарь.</summary>
+    /// <summary>
+    /// Дата операции в том виде, в каком её принимает календарь.
+    /// </summary>
     public DateTime OccurredOnDate
     {
         get => OccurredOn.ToDateTime(TimeOnly.MinValue);
         set => OccurredOn = DateOnly.FromDateTime(value);
     }
 
-    /// <summary>Раньше открытия счёта календарь не пускает; у перевода — позднейшего из двух.</summary>
+    /// <summary>
+    /// Раньше открытия счёта календарь не пускает; у перевода — позднейшего из двух.
+    /// </summary>
     public DateTime EarliestDate
     {
         get
@@ -350,7 +434,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         }
     }
 
-    /// <summary>Позже сегодняшнего дня календарь не пускает: операций в будущем нет.</summary>
+    /// <summary>
+    /// Позже сегодняшнего дня календарь не пускает: операций в будущем нет.
+    /// </summary>
     public DateTime LatestDate => _clock.Today.ToDateTime(TimeOnly.MinValue);
 
     /// <summary>
@@ -574,7 +660,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         return string.Join(' ', consequences);
     }
 
-    /// <summary>Удаляет операцию. Подтверждение уже получено экраном.</summary>
+    /// <summary>
+    /// Удаляет операцию. Подтверждение уже получено экраном.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <returns><c>true</c>, если операция удалена и экран можно закрыть.</returns>
     [RelayCommand]
@@ -605,7 +693,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         }
     }
 
-    /// <summary>Нажата клавиша суммы: цифра, запятая или знак действия.</summary>
+    /// <summary>
+    /// Нажата клавиша суммы: цифра, запятая или знак действия.
+    /// </summary>
     /// <param name="key">Знак на клавише.</param>
     /// <exception cref="ArgumentException">Клавиша названа не одним знаком.</exception>
     [RelayCommand]
@@ -621,7 +711,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         Edit(expression => AmountInput.Append(expression, key[0]));
     }
 
-    /// <summary>Стирает последний набранный знак.</summary>
+    /// <summary>
+    /// Стирает последний набранный знак.
+    /// </summary>
     [RelayCommand]
     public void Backspace() => Edit(AmountInput.Backspace);
 
@@ -632,7 +724,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     [RelayCommand]
     public void Evaluate() => Edit(AmountInput.Collapse);
 
-    /// <summary>Переводит клавиатуру на сумму списания.</summary>
+    /// <summary>
+    /// Переводит клавиатуру на сумму списания.
+    /// </summary>
     [RelayCommand]
     public void ActivateSourceAmount()
     {
@@ -640,7 +734,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         AreKeysVisible = true;
     }
 
-    /// <summary>Переводит клавиатуру на сумму зачисления.</summary>
+    /// <summary>
+    /// Переводит клавиатуру на сумму зачисления.
+    /// </summary>
     [RelayCommand]
     public void ActivateTargetAmount()
     {
@@ -655,7 +751,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         AreKeysVisible = true;
     }
 
-    /// <summary>Правит то поле суммы, которое набирается сейчас.</summary>
+    /// <summary>
+    /// Правит то поле суммы, которое набирается сейчас.
+    /// </summary>
     private void Edit(Func<string, string> change)
     {
         if (ActiveAmount is AmountField.Target && NeedsTargetAmount)
@@ -668,11 +766,15 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         }
     }
 
-    /// <summary>Быстрый выбор: сегодня.</summary>
+    /// <summary>
+    /// Быстрый выбор: сегодня.
+    /// </summary>
     [RelayCommand]
     public void SetToday() => OccurredOn = _clock.Today;
 
-    /// <summary>Быстрый выбор: вчера — вчерашняя покупка записывается чаще прочих задним числом.</summary>
+    /// <summary>
+    /// Быстрый выбор: вчера — вчерашняя покупка записывается чаще прочих задним числом.
+    /// </summary>
     [RelayCommand]
     public void SetYesterday() => OccurredOn = _clock.Today.AddDays(-1);
 
@@ -734,7 +836,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         OnPropertyChanged(nameof(EarliestDate));
     }
 
-    /// <summary>Счета к выбору: открытые, плюс закрытые, на которых уже стоит правимая операция.</summary>
+    /// <summary>
+    /// Счета к выбору: открытые, плюс закрытые, на которых уже стоит правимая операция.
+    /// </summary>
     private void FillAccounts(TransactionCard? card)
     {
         Accounts.Clear();
@@ -753,7 +857,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         FillTargetAccounts();
     }
 
-    /// <summary>Счета зачисления: всё, кроме выбранного счёта списания.</summary>
+    /// <summary>
+    /// Счета зачисления: всё, кроме выбранного счёта списания.
+    /// </summary>
     private void FillTargetAccounts()
     {
         TargetAccounts.Clear();
@@ -781,7 +887,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         FillTargetAccounts();
     }
 
-    /// <summary>Подкатегории вида операции. У перевода список пуст — категории у него нет.</summary>
+    /// <summary>
+    /// Подкатегории вида операции. У перевода список пуст — категории у него нет.
+    /// </summary>
     private void FillCategories()
     {
         CategoryOption? chosen = Category;

@@ -3,11 +3,15 @@ using Finance.Application.Features.Balances;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Главный экран: разделы по валютам, подытог и признаки состояния.</summary>
+/// <summary>
+/// Главный экран: разделы по валютам, подытог и признаки состояния.
+/// </summary>
 public sealed class BalancesTests
 {
     private static readonly DateOnly OpenedOn = new(2026, 1, 1);
@@ -82,7 +86,9 @@ public sealed class BalancesTests
         Assert.False(model.HasAccounts);
     }
 
-    /// <summary>Пока счета в плюсе, ни строка, ни подытог смысловым цветом не красятся.</summary>
+    /// <summary>
+    /// Пока счета в плюсе, ни строка, ни подытог смысловым цветом не красятся.
+    /// </summary>
     [Fact]
     public async Task Положительный_баланс_не_помечен()
     {

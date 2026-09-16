@@ -17,7 +17,9 @@ public sealed partial class MoreViewModel : ScreenViewModel
     private readonly ICategoriesQuery _categories;
     private readonly ISettingsSummaryQuery _settings;
 
-    /// <summary>Создаёт модель представления раздела «Ещё».</summary>
+    /// <summary>
+    /// Создаёт модель представления раздела «Ещё».
+    /// </summary>
     /// <param name="accounts">Список счетов.</param>
     /// <param name="places">Справочник мест.</param>
     /// <param name="categories">Список категорий.</param>
@@ -42,31 +44,45 @@ public sealed partial class MoreViewModel : ScreenViewModel
         _settings = settings;
     }
 
-    /// <summary>Сколько заведено счетов.</summary>
+    /// <summary>
+    /// Сколько заведено счетов.
+    /// </summary>
     [ObservableProperty]
     public partial string AccountsCaption { get; private set; } = string.Empty;
 
-    /// <summary>Сколько накопилось мест.</summary>
+    /// <summary>
+    /// Сколько накопилось мест.
+    /// </summary>
     [ObservableProperty]
     public partial string PlacesCaption { get; private set; } = string.Empty;
 
-    /// <summary>Сколько заведено групп и подкатегорий.</summary>
+    /// <summary>
+    /// Сколько заведено групп и подкатегорий.
+    /// </summary>
     [ObservableProperty]
     public partial string CategoriesCaption { get; private set; } = string.Empty;
 
-    /// <summary>Выбранная тема оформления.</summary>
+    /// <summary>
+    /// Выбранная тема оформления.
+    /// </summary>
     [ObservableProperty]
     public partial string ThemeCaption { get; private set; } = string.Empty;
 
-    /// <summary>Действующий часовой пояс.</summary>
+    /// <summary>
+    /// Действующий часовой пояс.
+    /// </summary>
     [ObservableProperty]
     public partial string TimeZoneCaption { get; private set; } = string.Empty;
 
-    /// <summary>Версия приложения и номер схемы базы.</summary>
+    /// <summary>
+    /// Версия приложения и номер схемы базы.
+    /// </summary>
     [ObservableProperty]
     public partial string AboutCaption { get; private set; } = string.Empty;
 
-    /// <summary>Перечитывает подписи.</summary>
+    /// <summary>
+    /// Перечитывает подписи.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)

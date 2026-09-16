@@ -1,6 +1,6 @@
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
-using Finance.Domain;
+using Finance.Domain.Enums;
 
 namespace Finance.App.Pages;
 
@@ -14,7 +14,9 @@ public partial class CategoryPickerPage : DataPage
 {
     private readonly CategoryPickerViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления выбора подкатегории.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public CategoryPickerPage(CategoryPickerViewModel model, FinanceStartup startup)
@@ -28,10 +30,14 @@ public partial class CategoryPickerPage : DataPage
         BindingContext = model;
     }
 
-    /// <summary>Вид категорий: он задан видом операции.</summary>
+    /// <summary>
+    /// Вид категорий: он задан видом операции.
+    /// </summary>
     public string? Kind { get; set; }
 
-    /// <summary>Подкатегория, стоящая в форме сейчас.</summary>
+    /// <summary>
+    /// Подкатегория, стоящая в форме сейчас.
+    /// </summary>
     public string? Selected { get; set; }
 
     /// <inheritdoc />

@@ -1,6 +1,8 @@
 using System.Globalization;
+using Finance.Domain.Enums;
+using Finance.Domain.Errors;
 
-namespace Finance.Domain;
+namespace Finance.Domain.Values;
 
 /// <summary>
 /// Денежная сумма: число с фиксированной точностью и валюта внутри одного типа.
@@ -14,7 +16,9 @@ namespace Finance.Domain;
 /// </remarks>
 public readonly struct Money : IEquatable<Money>, IComparable<Money>
 {
-    /// <summary>Копейки — предел точности: всё, что мельче, в этой предметной области не существует.</summary>
+    /// <summary>
+    /// Копейки — предел точности: всё, что мельче, в этой предметной области не существует.
+    /// </summary>
     private const int MaxScale = 2;
 
     /// <summary>
@@ -29,16 +33,24 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
         Currency = currency;
     }
 
-    /// <summary>Число без валюты. Знак допустим: баланс бывает отрицательным.</summary>
+    /// <summary>
+    /// Число без валюты. Знак допустим: баланс бывает отрицательным.
+    /// </summary>
     public decimal Amount { get; }
 
-    /// <summary>Валюта суммы.</summary>
+    /// <summary>
+    /// Валюта суммы.
+    /// </summary>
     public Currency Currency { get; }
 
-    /// <summary>Сумма положительна.</summary>
+    /// <summary>
+    /// Сумма положительна.
+    /// </summary>
     public bool IsPositive => Amount > 0m;
 
-    /// <summary>Сумма отрицательна.</summary>
+    /// <summary>
+    /// Сумма отрицательна.
+    /// </summary>
     public bool IsNegative => Amount < 0m;
 
     /// <summary>
@@ -66,7 +78,9 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
     /// </summary>
     public static Money Restore(decimal amount, Currency currency) => new(amount, currency);
 
-    /// <summary>Нулевая сумма в указанной валюте. Точка отсчёта для накопления итогов.</summary>
+    /// <summary>
+    /// Нулевая сумма в указанной валюте. Точка отсчёта для накопления итогов.
+    /// </summary>
     public static Money Zero(Currency currency) => new(0m, currency);
 
     /// <summary>
@@ -81,7 +95,9 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
             Invariant.AmountWithinLimit,
             $"{what} {this} превышает предел {Limit}");
 
-    /// <summary>Складывает суммы одной валюты.</summary>
+    /// <summary>
+    /// Складывает суммы одной валюты.
+    /// </summary>
     /// <exception cref="DomainException">Валюты различаются.</exception>
     public static Money operator +(Money left, Money right)
     {
@@ -89,7 +105,9 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
         return new Money(left.Amount + right.Amount, left.Currency);
     }
 
-    /// <summary>Вычитает суммы одной валюты.</summary>
+    /// <summary>
+    /// Вычитает суммы одной валюты.
+    /// </summary>
     /// <exception cref="DomainException">Валюты различаются.</exception>
     public static Money operator -(Money left, Money right)
     {
@@ -97,28 +115,44 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
         return new Money(left.Amount - right.Amount, left.Currency);
     }
 
-    /// <summary>Меняет знак суммы. Валюта сохраняется.</summary>
+    /// <summary>
+    /// Меняет знак суммы. Валюта сохраняется.
+    /// </summary>
     public static Money operator -(Money value) => new(-value.Amount, value.Currency);
 
-    /// <summary>Суммы равны, если совпали и число, и валюта.</summary>
+    /// <summary>
+    /// Суммы равны, если совпали и число, и валюта.
+    /// </summary>
     public static bool operator ==(Money left, Money right) => left.Equals(right);
 
-    /// <summary>Суммы различаются числом или валютой.</summary>
+    /// <summary>
+    /// Суммы различаются числом или валютой.
+    /// </summary>
     public static bool operator !=(Money left, Money right) => !left.Equals(right);
 
-    /// <summary>Левая сумма меньше правой.</summary>
+    /// <summary>
+    /// Левая сумма меньше правой.
+    /// </summary>
     public static bool operator <(Money left, Money right) => left.CompareTo(right) < 0;
 
-    /// <summary>Левая сумма больше правой.</summary>
+    /// <summary>
+    /// Левая сумма больше правой.
+    /// </summary>
     public static bool operator >(Money left, Money right) => left.CompareTo(right) > 0;
 
-    /// <summary>Левая сумма не больше правой.</summary>
+    /// <summary>
+    /// Левая сумма не больше правой.
+    /// </summary>
     public static bool operator <=(Money left, Money right) => left.CompareTo(right) <= 0;
 
-    /// <summary>Левая сумма не меньше правой.</summary>
+    /// <summary>
+    /// Левая сумма не меньше правой.
+    /// </summary>
     public static bool operator >=(Money left, Money right) => left.CompareTo(right) >= 0;
 
-    /// <summary>Сравнивает суммы одной валюты.</summary>
+    /// <summary>
+    /// Сравнивает суммы одной валюты.
+    /// </summary>
     /// <exception cref="DomainException">Валюты различаются.</exception>
     public int CompareTo(Money other)
     {
@@ -126,7 +160,9 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
         return Amount.CompareTo(other.Amount);
     }
 
-    /// <summary>Суммы равны, если совпали и число, и валюта.</summary>
+    /// <summary>
+    /// Суммы равны, если совпали и число, и валюта.
+    /// </summary>
     public bool Equals(Money other) => Currency == other.Currency && Amount == other.Amount;
 
     /// <inheritdoc />
@@ -135,7 +171,9 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
     /// <inheritdoc />
     public override int GetHashCode() => HashCode.Combine(Amount, Currency);
 
-    /// <summary>Представление для журналов и сообщений об ошибках, не для интерфейса.</summary>
+    /// <summary>
+    /// Представление для журналов и сообщений об ошибках, не для интерфейса.
+    /// </summary>
     public override string ToString() =>
         string.Create(CultureInfo.InvariantCulture, $"{Amount:0.00} {Currency}");
 

@@ -7,12 +7,16 @@ namespace Finance.Application.Infrastructure.Settings;
 /// </summary>
 public interface ILocalSettings
 {
-    /// <summary>Читает настройку. Незаданная настройка — <c>null</c>, а не пустая строка.</summary>
+    /// <summary>
+    /// Читает настройку. Незаданная настройка — <c>null</c>, а не пустая строка.
+    /// </summary>
     /// <param name="name">Имя из <see cref="SettingName"/>.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     Task<string?> GetAsync(string name, CancellationToken cancellationToken = default);
 
-    /// <summary>Записывает настройку, перекрывая прежнее значение.</summary>
+    /// <summary>
+    /// Записывает настройку, перекрывая прежнее значение.
+    /// </summary>
     /// <param name="name">Имя из <see cref="SettingName"/>.</param>
     /// <param name="value">Новое значение.</param>
     /// <param name="cancellationToken">Признак отмены.</param>

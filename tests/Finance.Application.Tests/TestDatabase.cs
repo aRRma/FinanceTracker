@@ -28,7 +28,9 @@ internal sealed class TestDatabase : IAsyncDisposable
 
     public T Resolve<T>() where T : notnull => _services.GetRequiredService<T>();
 
-    /// <summary>Создаёт пустую базу с накатанной схемой.</summary>
+    /// <summary>
+    /// Создаёт пустую базу с накатанной схемой.
+    /// </summary>
     /// <param name="applyTheme">Чем подменяется переключение оформления: платформы в тестах нет.</param>
     /// <param name="applicationVersion">Версия приложения для экрана «О программе».</param>
     public static async Task<TestDatabase> CreateAsync(

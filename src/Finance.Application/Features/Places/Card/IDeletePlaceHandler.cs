@@ -1,6 +1,8 @@
 namespace Finance.Application.Features.Places.Card;
 
-/// <summary>Удаление места. Модель представления зовёт его напрямую.</summary>
+/// <summary>
+/// Удаление места. Модель представления зовёт его напрямую.
+/// </summary>
 public interface IDeletePlaceHandler
 {
     /// <summary>

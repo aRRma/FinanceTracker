@@ -11,7 +11,7 @@
     xmlns:pages="clr-namespace:Finance.App.Pages"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:report="clr-namespace:Finance.Application.Features.Report;assembly=Finance.Application"
-    xmlns:domain="clr-namespace:Finance.Domain;assembly=Finance.Domain"
+    xmlns:domain="clr-namespace:Finance.Domain.Enums;assembly=Finance.Domain"
     x:DataType="report:ReportViewModel"
     Title="Отчёт">
 

@@ -26,13 +26,19 @@ public sealed class IconCatalog
         _keys = keys;
     }
 
-    /// <summary>Запасной значок. Им рисуется неизвестный ключ — ошибкой это не считается.</summary>
+    /// <summary>
+    /// Запасной значок. Им рисуется неизвестный ключ — ошибкой это не считается.
+    /// </summary>
     public string Fallback { get; }
 
-    /// <summary>Все ключи набора в порядке файла — так они и показываются при выборе.</summary>
+    /// <summary>
+    /// Все ключи набора в порядке файла — так они и показываются при выборе.
+    /// </summary>
     public IReadOnlyList<string> Keys { get; private init; } = [];
 
-    /// <summary>Набор значков, вшитый в сборку. Читается при первом обращении, дальше общий.</summary>
+    /// <summary>
+    /// Набор значков, вшитый в сборку. Читается при первом обращении, дальше общий.
+    /// </summary>
     public static IconCatalog Embedded() => Shared.Value;
 
     private static IconCatalog Parse()
@@ -57,7 +63,9 @@ public sealed class IconCatalog
     public string Resolve(string? key) =>
         key is not null && _keys.Contains(key) ? key : Fallback;
 
-    /// <summary>Разбор <c>icons.json</c>.</summary>
+    /// <summary>
+    /// Разбор <c>icons.json</c>.
+    /// </summary>
     /// <param name="Fallback">Запасной значок.</param>
     /// <param name="Icons">Ключи набора.</param>
     private sealed record IconSet(string Fallback, IReadOnlyList<string> Icons)

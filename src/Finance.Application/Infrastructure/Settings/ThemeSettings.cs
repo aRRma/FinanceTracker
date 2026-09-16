@@ -13,7 +13,9 @@ public static class ThemeSettings
 
     extension(Theme theme)
     {
-        /// <summary>Как тема записывается в настройки.</summary>
+        /// <summary>
+        /// Как тема записывается в настройки.
+        /// </summary>
         public string Stored => theme switch
         {
             Theme.Light => LightValue,
@@ -21,7 +23,9 @@ public static class ThemeSettings
             _ => SystemValue
         };
 
-        /// <summary>Название темы для экрана — им же подписана строка раздела «Ещё».</summary>
+        /// <summary>
+        /// Название темы для экрана — им же подписана строка раздела «Ещё».
+        /// </summary>
         public string Caption => theme switch
         {
             Theme.Light => "Светлая",

@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace Finance.Domain;
+namespace Finance.Domain.Errors;
 
 /// <summary>
 /// Нарушение доменного правила. Отдельный тип, чтобы обработчик верхнего уровня
@@ -20,7 +20,9 @@ public sealed class DomainException(Invariant invariant, string message) : Excep
     /// </summary>
     public Invariant Invariant { get; } = invariant;
 
-    /// <summary>Бросает нарушение правила, если условие выполнено.</summary>
+    /// <summary>
+    /// Бросает нарушение правила, если условие выполнено.
+    /// </summary>
     /// <param name="broken">Нарушено ли правило.</param>
     /// <param name="invariant">Проверяемое правило.</param>
     /// <param name="message">Текст сообщения.</param>

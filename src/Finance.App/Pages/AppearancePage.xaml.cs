@@ -3,12 +3,16 @@ using Finance.Application.Infrastructure;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экран D-06: выбор темы оформления.</summary>
+/// <summary>
+/// Экран D-06: выбор темы оформления.
+/// </summary>
 public partial class AppearancePage : DataPage
 {
     private readonly AppearanceViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления экрана оформления.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public AppearancePage(AppearanceViewModel model, FinanceStartup startup)

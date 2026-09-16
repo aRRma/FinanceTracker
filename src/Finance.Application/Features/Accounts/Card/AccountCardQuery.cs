@@ -1,16 +1,21 @@
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Features.Accounts.Card;
 
-/// <summary>Чтение счёта для карточки правки.</summary>
+/// <summary>
+/// Чтение счёта для карточки правки.
+/// </summary>
 public sealed class AccountCardQuery : IAccountCardQuery
 {
     private readonly IDbContextFactory<FinanceDbContext> _contexts;
 
-    /// <summary>Создаёт запрос.</summary>
+    /// <summary>
+    /// Создаёт запрос.
+    /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     public AccountCardQuery(IDbContextFactory<FinanceDbContext> contexts)
     {

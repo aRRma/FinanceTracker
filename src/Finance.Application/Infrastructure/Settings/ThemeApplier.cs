@@ -10,7 +10,9 @@ public sealed class ThemeApplier
     private readonly Action<Theme>? _apply;
     private readonly Action<Action> _dispatch;
 
-    /// <summary>Создаёт применение темы.</summary>
+    /// <summary>
+    /// Создаёт применение темы.
+    /// </summary>
     /// <param name="apply">Как платформа переключает оформление. Пусто — переключать нечего, так работают тесты.</param>
     /// <param name="dispatch">Как выполнить действие в потоке интерфейса. Пусто — выполняется на месте.</param>
     public ThemeApplier(Action<Theme>? apply = null, Action<Action>? dispatch = null)

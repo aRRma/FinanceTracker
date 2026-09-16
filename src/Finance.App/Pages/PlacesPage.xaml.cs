@@ -4,12 +4,16 @@ using Finance.Application.Infrastructure.Queries;
 
 namespace Finance.App.Pages;
 
-/// <summary>Экран D-05: справочник мест.</summary>
+/// <summary>
+/// Экран D-05: справочник мест.
+/// </summary>
 public partial class PlacesPage : DataPage
 {
     private readonly PlacesViewModel _model;
 
-    /// <summary>Создаёт экран.</summary>
+    /// <summary>
+    /// Создаёт экран.
+    /// </summary>
     /// <param name="model">Модель представления справочника мест.</param>
     /// <param name="startup">Подготовка приложения.</param>
     public PlacesPage(PlacesViewModel model, FinanceStartup startup)

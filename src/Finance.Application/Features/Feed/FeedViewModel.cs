@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Features.Feed;
 
@@ -15,7 +15,9 @@ namespace Finance.Application.Features.Feed;
 /// </summary>
 public sealed partial class FeedViewModel : ScreenViewModel
 {
-    /// <summary>Строк на страницу: экран с запасом на пару прокруток.</summary>
+    /// <summary>
+    /// Строк на страницу: экран с запасом на пару прокруток.
+    /// </summary>
     private const int PageSize = 50;
 
     private static readonly CultureInfo Russian = CultureInfo.GetCultureInfo("ru-RU");
@@ -30,7 +32,9 @@ public sealed partial class FeedViewModel : ScreenViewModel
     // за время запроса была перечитана заново и её строки уже не к месту
     private int _generation;
 
-    /// <summary>Создаёт модель представления ленты.</summary>
+    /// <summary>
+    /// Создаёт модель представления ленты.
+    /// </summary>
     /// <param name="feed">Чтение ленты.</param>
     /// <param name="accounts">Счета с балансами — для шапки ленты счёта.</param>
     /// <param name="clock">Часы: «сегодня» пользователя для шапок дней.</param>
@@ -47,36 +51,54 @@ public sealed partial class FeedViewModel : ScreenViewModel
         _clock = clock;
     }
 
-    /// <summary>Счёт, чья лента показана. Пусто — общая лента.</summary>
+    /// <summary>
+    /// Счёт, чья лента показана. Пусто — общая лента.
+    /// </summary>
     public Guid? AccountKey { get; private set; }
 
-    /// <summary>Показана лента одного счёта, а не общая.</summary>
+    /// <summary>
+    /// Показана лента одного счёта, а не общая.
+    /// </summary>
     public bool IsAccountFeed => AccountKey is not null;
 
-    /// <summary>Дни ленты от новых к старым.</summary>
+    /// <summary>
+    /// Дни ленты от новых к старым.
+    /// </summary>
     public ObservableCollection<FeedDay> Days { get; } = [];
 
-    /// <summary>Название счёта — заголовок ленты счёта.</summary>
+    /// <summary>
+    /// Название счёта — заголовок ленты счёта.
+    /// </summary>
     [ObservableProperty]
     public partial string AccountName { get; private set; } = string.Empty;
 
-    /// <summary>Баланс счёта — подзаголовок ленты счёта.</summary>
+    /// <summary>
+    /// Баланс счёта — подзаголовок ленты счёта.
+    /// </summary>
     [ObservableProperty]
     public partial string AccountBalance { get; private set; } = string.Empty;
 
-    /// <summary>Баланс счёта отрицателен: в шапке ленты его показывают смысловым цветом.</summary>
+    /// <summary>
+    /// Баланс счёта отрицателен: в шапке ленты его показывают смысловым цветом.
+    /// </summary>
     [ObservableProperty]
     public partial bool IsAccountBalanceNegative { get; private set; }
 
-    /// <summary>Начальный остаток — строка пустой ленты счёта, иначе непонятно, откуда взялся баланс.</summary>
+    /// <summary>
+    /// Начальный остаток — строка пустой ленты счёта, иначе непонятно, откуда взялся баланс.
+    /// </summary>
     [ObservableProperty]
     public partial string OpeningBalance { get; private set; } = string.Empty;
 
-    /// <summary>Дата открытия — подпись начального остатка.</summary>
+    /// <summary>
+    /// Дата открытия — подпись начального остатка.
+    /// </summary>
     [ObservableProperty]
     public partial string OpenedOn { get; private set; } = string.Empty;
 
-    /// <summary>Операций нет — показывается пустое состояние.</summary>
+    /// <summary>
+    /// Операций нет — показывается пустое состояние.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasItems))]
     public partial bool IsEmpty { get; private set; }
@@ -89,10 +111,14 @@ public sealed partial class FeedViewModel : ScreenViewModel
     [NotifyPropertyChangedFor(nameof(HasItems))]
     public partial bool IsLoaded { get; private set; }
 
-    /// <summary>Операции есть — показывается список.</summary>
+    /// <summary>
+    /// Операции есть — показывается список.
+    /// </summary>
     public bool HasItems => IsLoaded && !IsEmpty;
 
-    /// <summary>За последней строкой есть ещё: прокрутка к концу дочитает следующую страницу.</summary>
+    /// <summary>
+    /// За последней строкой есть ещё: прокрутка к концу дочитает следующую страницу.
+    /// </summary>
     [ObservableProperty]
     public partial bool HasMore { get; private set; }
 
@@ -113,7 +139,9 @@ public sealed partial class FeedViewModel : ScreenViewModel
     public Task RefreshAsync(CancellationToken cancellationToken = default) =>
         LoadAsync(AccountKey, cancellationToken);
 
-    /// <summary>Перечитывает ленту с начала.</summary>
+    /// <summary>
+    /// Перечитывает ленту с начала.
+    /// </summary>
     /// <param name="accountKey">Счёт, чью ленту читать; пусто — общая лента.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     public async Task LoadAsync(Guid? accountKey, CancellationToken cancellationToken = default)
@@ -160,7 +188,9 @@ public sealed partial class FeedViewModel : ScreenViewModel
         }
     }
 
-    /// <summary>Дочитывает следующую страницу в конец ленты.</summary>
+    /// <summary>
+    /// Дочитывает следующую страницу в конец ленты.
+    /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     [RelayCommand]
     public async Task LoadMoreAsync(CancellationToken cancellationToken = default)
@@ -226,7 +256,9 @@ public sealed partial class FeedViewModel : ScreenViewModel
         HasMore = page.HasMore;
     }
 
-    /// <summary>Шапка ленты счёта: название, баланс, начальный остаток с датой открытия.</summary>
+    /// <summary>
+    /// Шапка ленты счёта: название, баланс, начальный остаток с датой открытия.
+    /// </summary>
     private async Task ReadAccountAsync(Guid key, CancellationToken cancellationToken)
     {
         // Один счёт, а не весь список: полный список считал бы балансы всех счетов

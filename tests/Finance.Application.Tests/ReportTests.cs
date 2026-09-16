@@ -4,15 +4,20 @@ using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
-using Finance.Domain;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finance.Application.Tests;
 
-/// <summary>Отчёт за месяц: что входит в суммы, порядок, доли, границы месяца, экран.</summary>
+/// <summary>
+/// Отчёт за месяц: что входит в суммы, порядок, доли, границы месяца, экран.
+/// </summary>
 public sealed partial class ReportTests
 {
-    /// <summary>Перевод — не расход и не доход: ни строки, ни суммы ни в одном виде.</summary>
+    /// <summary>
+    /// Перевод — не расход и не доход: ни строки, ни суммы ни в одном виде.
+    /// </summary>
     [Fact]
     public async Task Перевод_в_отчёт_не_входит()
     {
@@ -26,7 +31,9 @@ public sealed partial class ReportTests
         Assert.Empty(await given.ReportAsync());
     }
 
-    /// <summary>Расход по скрытому из расчётов счёту не меняет ни сумму группы, ни итог; по обычному — меняет.</summary>
+    /// <summary>
+    /// Расход по скрытому из расчётов счёту не меняет ни сумму группы, ни итог; по обычному — меняет.
+    /// </summary>
     [Fact]
     public async Task Счёт_скрытый_из_расчётов_в_отчёт_не_входит()
     {
@@ -43,7 +50,9 @@ public sealed partial class ReportTests
         Assert.Equal(Money.Restore(300m, Currency.RUB), group.Total);
     }
 
-    /// <summary>Валютная операция в отчёт не входит вовсе — в отличие от ленты, где она видна.</summary>
+    /// <summary>
+    /// Валютная операция в отчёт не входит вовсе — в отличие от ленты, где она видна.
+    /// </summary>
     [Fact]
     public async Task Счёт_в_чужой_валюте_в_отчёт_не_входит()
     {
@@ -57,7 +66,9 @@ public sealed partial class ReportTests
         Assert.Single((await given.FeedAsync()).Items);
     }
 
-    /// <summary>Служебная «Разница» из стартового набора помечена «вне отчётов» и в суммы не попадает.</summary>
+    /// <summary>
+    /// Служебная «Разница» из стартового набора помечена «вне отчётов» и в суммы не попадает.
+    /// </summary>
     [Fact]
     public async Task Подкатегория_вне_отчётов_в_суммы_не_входит()
     {
@@ -74,7 +85,9 @@ public sealed partial class ReportTests
         Assert.Equal(Money.Restore(250m, Currency.RUB), group.Total);
     }
 
-    /// <summary>Флаг, поставленный группе, а не подкатегории, убирает из отчёта все её подкатегории целиком.</summary>
+    /// <summary>
+    /// Флаг, поставленный группе, а не подкатегории, убирает из отчёта все её подкатегории целиком.
+    /// </summary>
     [Fact]
     public async Task Группа_вне_отчётов_в_суммы_не_входит()
     {
@@ -95,7 +108,9 @@ public sealed partial class ReportTests
         Assert.Equal(Money.Restore(250m, Currency.RUB), group.Total);
     }
 
-    /// <summary>Мягко удалённая операция уходит из сумм.</summary>
+    /// <summary>
+    /// Мягко удалённая операция уходит из сумм.
+    /// </summary>
     [Fact]
     public async Task Удалённая_операция_в_отчёт_не_попадает()
     {
@@ -113,7 +128,9 @@ public sealed partial class ReportTests
         Assert.Equal(Money.Restore(250m, Currency.RUB), group.Total);
     }
 
-    /// <summary>Порядок задаёт база: от большей суммы к меньшей.</summary>
+    /// <summary>
+    /// Порядок задаёт база: от большей суммы к меньшей.
+    /// </summary>
     [Fact]
     public async Task Группы_идут_по_убыванию_суммы()
     {
@@ -133,7 +150,9 @@ public sealed partial class ReportTests
         Assert.Equal(["Большая", "Средняя", "Малая"], groups.Select(group => group.Name));
     }
 
-    /// <summary>Точное значение в рублях: сумма поверх конвертера копеек считает то, что ожидается.</summary>
+    /// <summary>
+    /// Точное значение в рублях: сумма поверх конвертера копеек считает то, что ожидается.
+    /// </summary>
     [Fact]
     public async Task Итог_месяца_равен_сумме_групп()
     {
@@ -152,7 +171,9 @@ public sealed partial class ReportTests
         Assert.Equal(2, model.Rows.Count);
     }
 
-    /// <summary>Доля группы — от итога месяца по выбранному виду, целыми процентами.</summary>
+    /// <summary>
+    /// Доля группы — от итога месяца по выбранному виду, целыми процентами.
+    /// </summary>
     [Fact]
     public async Task Доли_групп_считаются_от_итога_месяца()
     {
@@ -170,7 +191,9 @@ public sealed partial class ReportTests
         Assert.Equal(0.75d, model.Rows[0].Fraction, precision: 6);
     }
 
-    /// <summary>Доход не попадает в список расходов и наоборот; итог у каждого вида свой.</summary>
+    /// <summary>
+    /// Доход не попадает в список расходов и наоборот; итог у каждого вида свой.
+    /// </summary>
     [Fact]
     public async Task Расходы_и_доходы_разведены_по_видам()
     {
@@ -201,7 +224,9 @@ public sealed partial class ReportTests
         Assert.False(model.Rows[0].IsExpense);
     }
 
-    /// <summary>Обе граничные даты прошедшего месяца входят в его сумму.</summary>
+    /// <summary>
+    /// Обе граничные даты прошедшего месяца входят в его сумму.
+    /// </summary>
     [Fact]
     public async Task Операции_первого_и_последнего_числа_в_месяц_входят()
     {
@@ -219,7 +244,9 @@ public sealed partial class ReportTests
         Assert.Equal(month, ReportMonth.Of(month.Last));
     }
 
-    /// <summary>Последнее число предыдущего и первое число следующего в суммы не попадают.</summary>
+    /// <summary>
+    /// Последнее число предыдущего и первое число следующего в суммы не попадают.
+    /// </summary>
     [Fact]
     public async Task Операции_соседних_месяцев_в_месяц_не_входят()
     {
@@ -234,7 +261,9 @@ public sealed partial class ReportTests
         Assert.Empty(await given.ReportAsync(month));
     }
 
-    /// <summary>Последний день високосного февраля — ещё февраль, а первое марта — уже нет.</summary>
+    /// <summary>
+    /// Последний день високосного февраля — ещё февраль, а первое марта — уже нет.
+    /// </summary>
     [Fact]
     public async Task Двадцать_девятое_февраля_входит_в_февраль()
     {
@@ -253,7 +282,9 @@ public sealed partial class ReportTests
         Assert.Equal(Money.Restore(1m, Currency.RUB), group.Total);
     }
 
-    /// <summary>По умолчанию — месяц сегодняшней даты пользователя и расходы.</summary>
+    /// <summary>
+    /// По умолчанию — месяц сегодняшней даты пользователя и расходы.
+    /// </summary>
     [Fact]
     public async Task Отчёт_открывается_на_текущем_месяце_с_расходами()
     {
@@ -266,7 +297,9 @@ public sealed partial class ReportTests
         Assert.Equal(0, model.KindIndex);
     }
 
-    /// <summary>Вперёд с текущего месяца идти некуда; после шага назад — можно, и ровно на один шаг.</summary>
+    /// <summary>
+    /// Вперёд с текущего месяца идти некуда; после шага назад — можно, и ровно на один шаг.
+    /// </summary>
     [Fact]
     public async Task Стрелка_вперёд_гаснет_на_текущем_месяце()
     {
@@ -288,7 +321,9 @@ public sealed partial class ReportTests
         Assert.Equal(ReportMonth.Of(given.Today), model.Month);
     }
 
-    /// <summary>Пустое состояние считается после отбора по виду: доходы есть, а расходов нет.</summary>
+    /// <summary>
+    /// Пустое состояние считается после отбора по виду: доходы есть, а расходов нет.
+    /// </summary>
     [Fact]
     public async Task Месяц_без_операций_показывает_пустое_состояние()
     {
@@ -332,7 +367,9 @@ public sealed partial class ReportTests
         Assert.Contains("рублёвые счета", after.EmptyHint, StringComparison.Ordinal);
     }
 
-    /// <summary>Переключатель видов пересобирает список из прочитанного: обращение к базе одно.</summary>
+    /// <summary>
+    /// Переключатель видов пересобирает список из прочитанного: обращение к базе одно.
+    /// </summary>
     [Fact]
     public async Task Переключение_вида_не_ходит_в_базу()
     {
@@ -348,7 +385,9 @@ public sealed partial class ReportTests
         Assert.Equal(1, report.Reads);
     }
 
-    /// <summary>Подкатегории чужой группы в список не попадают; сумма уровня равна строке группы с первого уровня.</summary>
+    /// <summary>
+    /// Подкатегории чужой группы в список не попадают; сумма уровня равна строке группы с первого уровня.
+    /// </summary>
     [Fact]
     public async Task Второй_уровень_показывает_подкатегории_своей_группы()
     {
@@ -371,7 +410,9 @@ public sealed partial class ReportTests
         Assert.Equal(group.Total, rows.Aggregate(Money.Zero(Currency.RUB), (sum, row) => sum + row.Total));
     }
 
-    /// <summary>Доля подкатегории — от суммы группы, а не от месяца; шапка несёт долю группы в месяце.</summary>
+    /// <summary>
+    /// Доля подкатегории — от суммы группы, а не от месяца; шапка несёт долю группы в месяце.
+    /// </summary>
     [Fact]
     public async Task Доли_подкатегорий_считаются_внутри_группы()
     {
@@ -398,7 +439,9 @@ public sealed partial class ReportTests
         Assert.False(model.IsEmpty);
     }
 
-    /// <summary>Строки не сгруппированы по дням; порядок — дата, момент записи, ключ; валютная операция отсутствует.</summary>
+    /// <summary>
+    /// Строки не сгруппированы по дням; порядок — дата, момент записи, ключ; валютная операция отсутствует.
+    /// </summary>
     [Fact]
     public async Task Третий_уровень_идёт_плоским_списком_от_новых_к_старым()
     {
@@ -422,7 +465,9 @@ public sealed partial class ReportTests
         Assert.Equal("Карта", items[^1].AccountName);
     }
 
-    /// <summary>Шапка несёт склонённое число операций и итог со знаком; строка — ключ операции для карточки.</summary>
+    /// <summary>
+    /// Шапка несёт склонённое число операций и итог со знаком; строка — ключ операции для карточки.
+    /// </summary>
     [Fact]
     public async Task Шапка_третьего_уровня_считает_операции_и_сумму()
     {
@@ -454,7 +499,9 @@ public sealed partial class ReportTests
         Assert.Equal(model.Name, model.Rows.Single(item => item.Key != saved).Title);
     }
 
-    /// <summary>Третий уровень идёт по индексу подкатегории — тому, что заведён под отчёт.</summary>
+    /// <summary>
+    /// Третий уровень идёт по индексу подкатегории — тому, что заведён под отчёт.
+    /// </summary>
     [Fact]
     public async Task Операции_подкатегории_идут_по_своему_индексу()
     {
@@ -468,7 +515,9 @@ public sealed partial class ReportTests
         Assert.Contains("ix_transactions_category_occurred_on", plan, StringComparison.Ordinal);
     }
 
-    /// <summary>Сложение, уехавшее в память, на маленьких данных ничем себя не выдаст — сверяется сам SQL.</summary>
+    /// <summary>
+    /// Сложение, уехавшее в память, на маленьких данных ничем себя не выдаст — сверяется сам SQL.
+    /// </summary>
     [Fact]
     public async Task Суммы_месяца_считает_база()
     {
@@ -525,7 +574,9 @@ public sealed partial class ReportTests
         return await given.SubcategoryAsync(group, name);
     }
 
-    /// <summary>Служебная подкатегория «Разница» нужного вида — та, что помечена «вне отчётов» в стартовом наборе.</summary>
+    /// <summary>
+    /// Служебная подкатегория «Разница» нужного вида — та, что помечена «вне отчётов» в стартовом наборе.
+    /// </summary>
     private static async Task<Guid> ServiceSubcategoryAsync(TransactionFixture given, CategoryKind kind)
     {
         IReadOnlyList<CategoryListItem> categories = await given.Database.Resolve<ICategoriesQuery>().ReadAsync();
@@ -572,7 +623,9 @@ public sealed partial class ReportTests
         Assert.False(model.IsBusy);
     }
 
-    /// <summary>Задерживает чтение групп по сигналу теста, чтобы подстроить гонку.</summary>
+    /// <summary>
+    /// Задерживает чтение групп по сигналу теста, чтобы подстроить гонку.
+    /// </summary>
     private sealed class DelayingReport(IReportQuery inner) : IReportQuery
     {
         public TaskCompletionSource? Delay { get; set; }
@@ -597,7 +650,9 @@ public sealed partial class ReportTests
             inner.HasUncountedAsync(month, cancellationToken);
     }
 
-    /// <summary>Считает обращения к базе: пересборка списка в памяти не должна ходить за данными заново.</summary>
+    /// <summary>
+    /// Считает обращения к базе: пересборка списка в памяти не должна ходить за данными заново.
+    /// </summary>
     private sealed class CountingReport(IReportQuery inner) : IReportQuery
     {
         public int Reads { get; private set; }

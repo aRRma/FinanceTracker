@@ -1,6 +1,10 @@
-namespace Finance.Domain;
+using Finance.Domain.Errors;
 
-/// <summary>Имена счетов, категорий и мест: приведение и сравнение.</summary>
+namespace Finance.Domain.Rules;
+
+/// <summary>
+/// Имена счетов, категорий и мест: приведение и сравнение.
+/// </summary>
 public static class Names
 {
     /// <summary>

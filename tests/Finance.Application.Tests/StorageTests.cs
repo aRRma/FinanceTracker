@@ -1,6 +1,8 @@
 using System.Globalization;
 using Finance.Application.Infrastructure.Storage;
-using Finance.Domain;
+using Finance.Domain.Entities;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -62,7 +64,9 @@ public sealed class StorageTests
         Assert.IsType<InvalidOperationException>(error.InnerException);
     }
 
-    /// <summary>Суммы складываются запросом к базе — иначе баланс потребовал бы поднять всю ленту.</summary>
+    /// <summary>
+    /// Суммы складываются запросом к базе — иначе баланс потребовал бы поднять всю ленту.
+    /// </summary>
     [Fact]
     public async Task Суммы_складываются_на_стороне_базы()
     {
@@ -98,7 +102,9 @@ public sealed class StorageTests
             await ScalarAsync<string>(database, "SELECT key FROM accounts"));
     }
 
-    /// <summary>Календарная дата лежит без времени и зоны: иначе граница месяца уедет на сутки.</summary>
+    /// <summary>
+    /// Календарная дата лежит без времени и зоны: иначе граница месяца уедет на сутки.
+    /// </summary>
     [Fact]
     public async Task Дата_операции_хранится_без_времени()
     {
@@ -114,7 +120,9 @@ public sealed class StorageTests
         Assert.Equal("2026-08-25", await ScalarAsync<string>(database, "SELECT occurred_on FROM transactions"));
     }
 
-    /// <summary>Мягко удалённое исчезает с экранов, но остаётся в базе.</summary>
+    /// <summary>
+    /// Мягко удалённое исчезает с экранов, но остаётся в базе.
+    /// </summary>
     [Fact]
     public async Task Мягко_удалённое_не_видно_без_снятия_фильтра()
     {
@@ -184,7 +192,9 @@ public sealed class StorageTests
         return await context.Accounts.Select(row => row.UpdatedAtUtc).SingleAsync();
     }
 
-    /// <summary>Тип колонки по описанию таблицы — то, как SQLite её на самом деле завёл.</summary>
+    /// <summary>
+    /// Тип колонки по описанию таблицы — то, как SQLite её на самом деле завёл.
+    /// </summary>
     private static async Task<string> ColumnTypeAsync(TestDatabase database, string table, string column)
     {
         object? value = await ExecuteScalarAsync(

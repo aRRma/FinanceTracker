@@ -10,7 +10,9 @@ public sealed class ScenarioCoverageTests
 
     private static readonly Lazy<string> Explained = new(static () => File.ReadAllText(Documents.Uncovered));
 
-    /// <summary>Каждый нарисованный экран участвует хотя бы в одном сценарии.</summary>
+    /// <summary>
+    /// Каждый нарисованный экран участвует хотя бы в одном сценарии.
+    /// </summary>
     [Fact]
     public void Каждый_экран_участвует_в_сценарии()
     {

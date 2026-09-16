@@ -30,7 +30,9 @@ internal static class AccountTransactions
             .AnyAsync(cancellationToken);
     }
 
-    /// <summary>Дата самой ранней неудалённой операции по счёту; пусто — операций нет.</summary>
+    /// <summary>
+    /// Дата самой ранней неудалённой операции по счёту; пусто — операций нет.
+    /// </summary>
     /// <param name="context">Контекст базы.</param>
     /// <param name="accountKey">Ключ счёта.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
