@@ -284,10 +284,11 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     public string TargetAccountCaption => TargetAccount?.Name ?? UiTexts.CommonChoose;
 
     /// <summary>
-    /// Подкатегория в строке-поле: группа и название, как в ленте.
+    /// Подкатегория в строке-поле: только выбранное название, без группы —
+    /// строка-поле показывает выбор, а не всю вложенность дерева категорий.
     /// </summary>
     public string CategoryCaption => Category is { } category
-        ? $"{category.GroupName} · {category.Name}"
+        ? category.Name
         : UiTexts.CommonChoose;
 
     /// <summary>
