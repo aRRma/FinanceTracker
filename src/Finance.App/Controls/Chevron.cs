@@ -1,6 +1,4 @@
-using Finance.App.Controls;
-
-namespace Finance.App;
+namespace Finance.App.Controls;
 
 /// <summary>
 /// Поворот шеврона при развороте группы. Список сам плавно раздвигает строки,

@@ -110,7 +110,7 @@
                 -->
                 <Border Style="{StaticResource Card}">
                     <VerticalStackLayout>
-                        <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12"
+                        <Grid Padding="14,12" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12"
                               MinimumHeightRequest="{StaticResource TouchTarget}">
                             <Grid.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnPickAccount" />
@@ -119,14 +119,15 @@
                             <controls:Icon Grid.Column="0" Key="wallet" Style="{StaticResource MutedIcon}" />
                             <Label Grid.Column="1" Text="{Binding SourceLabel}" VerticalOptions="Center"
                                    Style="{StaticResource SecondaryLabel}" />
-                            <Label Grid.Column="2" Text="{Binding SourceAccountCaption}" VerticalOptions="Center" />
+                            <Label Grid.Column="2" Text="{Binding SourceAccountCaption}" VerticalOptions="Center"
+                                   HorizontalTextAlignment="End" LineBreakMode="TailTruncation" />
                             <controls:Icon Grid.Column="3" Key="chevron-right" Style="{StaticResource MutedIcon}" />
                         </Grid>
 
                         <VerticalStackLayout IsVisible="{Binding IsTransfer}">
                             <BoxView Style="{StaticResource Divider}" />
 
-                            <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12"
+                            <Grid Padding="14,12" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12"
                                   MinimumHeightRequest="{StaticResource TouchTarget}">
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnPickTargetAccount" />
@@ -135,7 +136,8 @@
                                 <controls:Icon Grid.Column="0" Key="swap" Style="{StaticResource MutedIcon}" />
                                 <Label Grid.Column="1" Text="{x:Static texts:UiTexts.TransactionTarget}" VerticalOptions="Center"
                                        Style="{StaticResource SecondaryLabel}" />
-                                <Label Grid.Column="2" Text="{Binding TargetAccountCaption}" VerticalOptions="Center" />
+                                <Label Grid.Column="2" Text="{Binding TargetAccountCaption}" VerticalOptions="Center"
+                                       HorizontalTextAlignment="End" LineBreakMode="TailTruncation" />
                                 <controls:Icon Grid.Column="3" Key="chevron-right" Style="{StaticResource MutedIcon}" />
                             </Grid>
 
@@ -146,7 +148,7 @@
                         <VerticalStackLayout IsVisible="{Binding IsNotTransfer}">
                             <BoxView Style="{StaticResource Divider}" />
 
-                            <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12"
+                            <Grid Padding="14,12" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12"
                                   MinimumHeightRequest="{StaticResource TouchTarget}">
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnPickCategory" />
@@ -155,7 +157,8 @@
                                 <controls:Icon Grid.Column="0" Key="tag" Style="{StaticResource MutedIcon}" />
                                 <Label Grid.Column="1" Text="{x:Static texts:UiTexts.TransactionCategory}" VerticalOptions="Center"
                                        Style="{StaticResource SecondaryLabel}" />
-                                <Label Grid.Column="2" Text="{Binding CategoryCaption}" VerticalOptions="Center">
+                                <Label Grid.Column="2" Text="{Binding CategoryCaption}" VerticalOptions="Center"
+                                       HorizontalTextAlignment="End" LineBreakMode="TailTruncation">
                                     <Label.Triggers>
                                         <!-- Невыбранная категория подписана приглушённо: это
                                              приглашение, а не значение поля -->
@@ -170,7 +173,7 @@
 
                             <BoxView Style="{StaticResource Divider}" />
 
-                            <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12"
+                            <Grid Padding="14,12" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12"
                                   MinimumHeightRequest="{StaticResource TouchTarget}">
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnPickPlace" />
@@ -179,7 +182,8 @@
                                 <controls:Icon Grid.Column="0" Key="map-pin" Style="{StaticResource MutedIcon}" />
                                 <Label Grid.Column="1" Text="{x:Static texts:UiTexts.TransactionPlace}" VerticalOptions="Center"
                                        Style="{StaticResource SecondaryLabel}" />
-                                <Label Grid.Column="2" Text="{Binding PlaceCaption}" VerticalOptions="Center">
+                                <Label Grid.Column="2" Text="{Binding PlaceCaption}" VerticalOptions="Center"
+                                       HorizontalTextAlignment="End" LineBreakMode="TailTruncation">
                                     <Label.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding HasPlace}" Value="False">
                                             <Setter Property="Style" Value="{StaticResource CaptionLabel}" />
