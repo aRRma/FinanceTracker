@@ -75,7 +75,7 @@ public sealed partial class ReportTests
         await using TransactionFixture given = await TransactionFixture.CreateAsync();
 
         Guid card = await given.AccountAsync("Карта", 10_000m);
-        Guid adjustment = await ServiceSubcategoryAsync(given, CategoryKind.Expense);
+        Guid adjustment = await ServiceSubcategoryAsync(given);
 
         await given.SaveAsync(given.Expense(card, 100m, category: adjustment));
         await given.SaveAsync(given.Expense(card, 250m));
@@ -701,13 +701,14 @@ public sealed partial class ReportTests
     }
 
     /// <summary>
-    /// Служебная подкатегория «Разница» нужного вида — та, что помечена «вне отчётов» в стартовом наборе.
+    /// Служебная подкатегория «Разница» — та, что помечена «вне отчётов» в стартовом наборе.
+    /// Она одна на оба вида: служебная группа универсальна.
     /// </summary>
-    private static async Task<Guid> ServiceSubcategoryAsync(TransactionFixture given, CategoryKind kind)
+    private static async Task<Guid> ServiceSubcategoryAsync(TransactionFixture given)
     {
         IReadOnlyList<CategoryListItem> categories = await given.Database.Resolve<ICategoriesQuery>().ReadAsync();
 
-        CategoryListItem group = categories.Single(item => item.IsGroup && item.Role is CategoryRole.Service && item.Kind == kind);
+        CategoryListItem group = categories.Single(item => item.IsGroup && item.Role is CategoryRole.Service);
 
         return categories.Single(item => item.ParentKey == group.Key).Key;
     }
