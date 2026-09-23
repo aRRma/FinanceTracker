@@ -156,16 +156,10 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
             }
         }
 
-        // Итог месяца — по виду этой группы: доля расходной группы в доходах бессмысленна
+        // База доли — по виду этой группы: доля расходной группы в доходах бессмысленна
         if (self is not null)
         {
-            foreach (ReportTotal group in groups)
-            {
-                if (group.Kind == self.Kind)
-                {
-                    monthTotal += group.Total;
-                }
-            }
+            monthTotal = ReportRowItem.ShareBase(groups.Where(group => group.Kind == self.Kind));
         }
 
         IsEmpty = self is null || rows.Count is 0;
@@ -178,16 +172,18 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
             return;
         }
 
+        Money shareBase = ReportRowItem.ShareBase(rows);
+
         foreach (ReportTotal row in rows)
         {
-            Rows.Add(ReportRowItem.From(row, self.Total));
+            Rows.Add(ReportRowItem.From(row, shareBase));
         }
 
         ReportRowItem share = ReportRowItem.From(self, monthTotal);
         string ofWhat = self.Kind is CategoryKind.Expense ? UiTexts.KindExpenseGenitive : UiTexts.KindIncomeGenitive;
 
         Name = self.Name;
-        Caption = $"{Month.Caption} · {share.Share} {ofWhat}";
+        Caption = share.HasShare ? $"{Month.Caption} · {share.Share} {ofWhat}" : Month.Caption;
         Total = share.Amount;
         IsTotalExpense = share.IsExpense;
     }
