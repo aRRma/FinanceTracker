@@ -569,24 +569,6 @@
         }
       ],
       "id": "114c99f8-d8bb-5e2b-9a19-8719b19089cf"
-    },
-    {
-      "key": "service_inc",
-      "name": "Служебное",
-      "kind": "income",
-      "icon": "adjustments",
-      "role": "service",
-      "subcategories": [
-        {
-          "key": "service_inc.adjust",
-          "name": "Разница",
-          "icon": "adjustments",
-          "role": "service",
-          "excludeFromReports": true,
-          "id": "5d9d12cd-2f80-5707-90c6-bbe38398ab3b"
-        }
-      ],
-      "id": "2d81b2e3-697d-5466-a02b-e035063a9876"
     }
   ]
 }

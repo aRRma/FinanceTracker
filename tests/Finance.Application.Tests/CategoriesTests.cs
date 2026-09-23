@@ -180,7 +180,7 @@ public sealed class CategoriesTests
 
         IReadOnlyList<CategoryListItem> preset = await ReadAsync(database);
 
-        CategoryListItem service = ServiceGroupOf(preset, CategoryKind.Expense);
+        CategoryListItem service = ServiceGroupOf(preset);
         CategoryListItem taxi = preset.Single(item => item.Name == "Такси");
 
         DomainException failure = await Assert.ThrowsAsync<DomainException>(
@@ -204,7 +204,7 @@ public sealed class CategoriesTests
     {
         await using TestDatabase database = await CreateSeededAsync();
 
-        CategoryListItem service = ServiceGroupOf(await ReadAsync(database), CategoryKind.Expense);
+        CategoryListItem service = ServiceGroupOf(await ReadAsync(database));
 
         DomainException failure = await Assert.ThrowsAsync<DomainException>(
             () => SaveAsync(database, Subcategory(service.Key, "Ещё одна")));
@@ -489,8 +489,8 @@ public sealed class CategoriesTests
         return database;
     }
 
-    private static CategoryListItem ServiceGroupOf(IReadOnlyList<CategoryListItem> categories, CategoryKind kind) =>
-        categories.Single(item => item.IsGroup && item.Role is CategoryRole.Service && item.Kind == kind);
+    private static CategoryListItem ServiceGroupOf(IReadOnlyList<CategoryListItem> categories) =>
+        categories.Single(item => item.IsGroup && item.Role is CategoryRole.Service);
 
     private static SaveCategoryCommand Group(string name, CategoryKind kind) =>
         new() { Name = name, Icon = "basket", Kind = kind };

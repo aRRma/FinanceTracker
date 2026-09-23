@@ -33,9 +33,9 @@ public sealed class PresetTests
     [Fact]
     public void Набор_разобран_целиком()
     {
-        Assert.Equal(13, Set.Groups.Count);
-        Assert.Equal(63, Set.Groups.Sum(group => group.Subcategories.Count));
-        Assert.Equal(76, Set.All().Count());
+        Assert.Equal(12, Set.Groups.Count);
+        Assert.Equal(62, Set.Groups.Sum(group => group.Subcategories.Count));
+        Assert.Equal(74, Set.All().Count());
         Assert.NotEqual(Guid.Empty, Set.Namespace);
         Assert.All(Set.All(), category => Assert.NotEqual(Guid.Empty, category.Id));
     }
@@ -149,12 +149,17 @@ public sealed class PresetTests
     }
 
     /// <summary>
-    /// Служебные группы в наборе есть — иначе проверка выше прошла бы, ничего не проверив.
+    /// Служебная группа в наборе одна и принимает оба вида: недостача пишется расходом,
+    /// излишек доходом, и обоим место в одной статье. Вторая, доходная, существовала
+    /// только пока операция обязана была совпадать по виду с группой, и в выборе
+    /// дохода показывалась второй строкой «Служебное», неотличимой от первой.
     /// </summary>
     [Fact]
-    public void Служебные_группы_в_наборе_присутствуют()
+    public void Служебная_группа_в_наборе_одна()
     {
-        Assert.Equal(2, Set.Groups.Count(group => group.Role == CategoryRole.Service));
+        PresetGroup service = Assert.Single(Set.Groups, group => group.Role == CategoryRole.Service);
+
+        Assert.True(service.AcceptsAnyKind);
     }
 
     /// <summary>
