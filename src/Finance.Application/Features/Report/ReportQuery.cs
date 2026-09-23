@@ -2,7 +2,6 @@ using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain.Entities;
 using Finance.Domain.Enums;
 using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
@@ -157,14 +156,17 @@ public sealed class ReportQuery : IReportQuery
         where category.ParentKey == groupKey
               && !category.ExcludeFromReports
               && !parent.ExcludeFromReports
-        group row.Amount by new { category.Key, category.Name, category.Icon, parent.Kind } into bucket
-        orderby bucket.Sum() descending
+        group row.Amount by new
+        {
+            category.Key, category.Name, category.Icon, GroupKind = parent.Kind, OperationKind = row.Kind
+        } into bucket
         select new Bucket
         {
             Key = bucket.Key.Key,
             Name = bucket.Key.Name,
             Icon = bucket.Key.Icon,
-            Kind = bucket.Key.Kind,
+            Kind = bucket.Key.GroupKind,
+            OperationKind = bucket.Key.OperationKind,
             Total = bucket.Sum()
         };
 
@@ -179,14 +181,17 @@ public sealed class ReportQuery : IReportQuery
         // Флаг «вне отчётов» проверяется на обоих уровнях: он ставится и группе
         // целиком, и одной подкатегории, и проверка одного уровня пропустила бы другой
         where !category.ExcludeFromReports && !parent.ExcludeFromReports
-        group row.Amount by new { parent.Key, parent.Name, parent.Icon, parent.Kind } into bucket
-        orderby bucket.Sum() descending
+        group row.Amount by new
+        {
+            parent.Key, parent.Name, parent.Icon, GroupKind = parent.Kind, OperationKind = row.Kind
+        } into bucket
         select new Bucket
         {
             Key = bucket.Key.Key,
             Name = bucket.Key.Name,
             Icon = bucket.Key.Icon,
-            Kind = bucket.Key.Kind,
+            Kind = bucket.Key.GroupKind,
+            OperationKind = bucket.Key.OperationKind,
             Total = bucket.Sum()
         };
 
@@ -210,26 +215,42 @@ public sealed class ReportQuery : IReportQuery
     }
 
     /// <summary>
+    /// Сводит суммы строки в одну: операции вида группы прибавляются, операции
+    /// обратного вида вычитаются. Так возврат в магазине уменьшает расход статьи,
+    /// а не заводит доход на пустом месте, — у универсальной группы в строке лежат
+    /// оба вида. База отдаёт их порознь, потому что <c>SUM</c> со знаком внутри
+    /// <c>CASE</c> потерял бы конвертер копеек, а порядок строк считается уже
+    /// по сведённому итогу.
+    /// </summary>
+    /// <remarks>
     /// Вид у группы обязан быть заполнен. Пустой — испорченные данные: строка
     /// молча пропала бы из обоих списков, а операции на ней остались.
-    /// </summary>
+    /// </remarks>
     private static List<ReportTotal> ToTotals(List<Bucket> buckets)
     {
-        List<ReportTotal> totals = new(buckets.Count);
+        Dictionary<Guid, ReportTotal> totals = new(buckets.Count);
 
         foreach (Bucket bucket in buckets)
         {
-            totals.Add(new ReportTotal
-            {
-                Key = bucket.Key,
-                Name = bucket.Name,
-                Icon = bucket.Icon,
-                Kind = bucket.Kind ?? throw new InvalidOperationException(Faults.GroupKindMissing(bucket.Name)),
-                Total = Money.Restore(bucket.Total, Currency.RUB)
-            });
+            CategoryKind kind = bucket.Kind
+                                ?? throw new InvalidOperationException(Faults.GroupKindMissing(bucket.Name));
+
+            bool own = (bucket.OperationKind is TransactionKind.Income) == (kind is CategoryKind.Income);
+            Money signed = Money.Restore(own ? bucket.Total : -bucket.Total, Currency.RUB);
+
+            totals[bucket.Key] = totals.TryGetValue(bucket.Key, out ReportTotal? seen)
+                ? seen with { Total = seen.Total + signed }
+                : new ReportTotal
+                {
+                    Key = bucket.Key,
+                    Name = bucket.Name,
+                    Icon = bucket.Icon,
+                    Kind = kind,
+                    Total = signed
+                };
         }
 
-        return totals;
+        return [.. totals.Values.OrderByDescending(total => total.Total.Amount)];
     }
 
     /// <summary>
@@ -264,6 +285,12 @@ public sealed class ReportQuery : IReportQuery
         public required string Icon { get; init; }
 
         public required CategoryKind? Kind { get; init; }
+
+        /// <summary>
+        /// Вид операций этой суммы: у универсальной группы строк две, расходная
+        /// и доходная, и сводятся они со знаком.
+        /// </summary>
+        public required TransactionKind OperationKind { get; init; }
 
         public required decimal Total { get; init; }
     }

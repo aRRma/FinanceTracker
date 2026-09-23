@@ -76,7 +76,8 @@ public enum Invariant
     CategoryIsSubcategory = 10,
 
     /// <summary>
-    /// Вид группы категории совпадает с видом операции.
+    /// Вид группы категории совпадает с видом операции — либо группа универсальна
+    /// и принимает оба вида.
     /// </summary>
     CategoryKindMatchesTransaction = 11,
 
@@ -145,7 +146,7 @@ public enum Invariant
     SubcategoryBelongsToGroup = 23,
 
     /// <summary>
-    /// Вид задаётся у группы, подкатегория его наследует.
+    /// Вид и универсальность задаются у группы, подкатегория их наследует.
     /// </summary>
     KindInheritedFromGroup = 24,
 

@@ -16,6 +16,7 @@ public sealed class Category : Entity
         Guid key,
         Guid? parentKey,
         CategoryKind? kind,
+        bool? acceptsAnyKind,
         string name,
         string icon,
         CategoryRole role,
@@ -29,6 +30,7 @@ public sealed class Category : Entity
     {
         ParentKey = parentKey;
         Kind = kind;
+        AcceptsAnyKind = acceptsAnyKind;
         Name = name;
         Icon = icon;
         Role = role;
@@ -46,6 +48,26 @@ public sealed class Category : Entity
     /// Вид. Задан только у группы; подкатегория наследует его и своего не имеет.
     /// </summary>
     public CategoryKind? Kind { get; }
+
+    /// <summary>
+    /// Группа принимает операции обоих видов, а не только своего.
+    /// Вид при этом остаётся: он говорит, на какой стороне отчёта группа живёт
+    /// и каким знаком входит в её итог — возврат в расходной группе уменьшает
+    /// её расход, а не заводит доход на пустом месте.
+    /// </summary>
+    /// <remarks>
+    /// Задан только у группы, как и вид. Не меняется после заведения: выключение
+    /// осиротило бы уже записанные операции чужого вида — они перестали бы
+    /// проходить проверку, а вычищать их задним числом некому.
+    /// </remarks>
+    public bool? AcceptsAnyKind { get; }
+
+    /// <summary>
+    /// Операция такого вида допустима в этой группе.
+    /// </summary>
+    /// <param name="kind">Вид операции.</param>
+    /// <returns><c>true</c>, если вид совпадает с видом группы или группа универсальна.</returns>
+    public bool Accepts(CategoryKind kind) => AcceptsAnyKind is true || Kind == kind;
 
     /// <summary>
     /// Название категории.
@@ -88,13 +110,21 @@ public sealed class Category : Entity
     /// транзакции: без приёмника группа теряет, куда девать операции удаляемых
     /// подкатегорий.
     /// </summary>
+    /// <param name="name">Название группы.</param>
+    /// <param name="kind">Вид: сторона отчёта, на которой живёт группа.</param>
+    /// <param name="icon">Ключ значка.</param>
+    /// <param name="nowUtc">Текущий момент.</param>
+    /// <param name="role">Роль группы.</param>
+    /// <param name="excludeFromReports">Не показывать в отчёте.</param>
+    /// <param name="acceptsAnyKind">Принимать операции обоих видов, а не только своего.</param>
     public static Category CreateGroup(
         string name,
         CategoryKind kind,
         string icon,
         DateTimeOffset nowUtc,
         CategoryRole role = CategoryRole.Normal,
-        bool excludeFromReports = false)
+        bool excludeFromReports = false,
+        bool acceptsAnyKind = false)
     {
         DomainException.ThrowIf(
             role is CategoryRole.Other,
@@ -102,7 +132,7 @@ public sealed class Category : Entity
             RuleText.ReceiverIsNotGroup);
 
         return new Category(
-            Keys.New(), parentKey: null, kind,
+            Keys.New(), parentKey: null, kind, acceptsAnyKind,
             Names.Normalize(name, RuleText.SubjectGroup), NormalizeIcon(icon),
             role, excludeFromReports,
             createdAtUtc: nowUtc, updatedAtUtc: nowUtc,
@@ -125,7 +155,7 @@ public sealed class Category : Entity
         CategoryRules.EnsureIsGroup(parent, nameof(parent));
 
         return new Category(
-            Keys.New(), parent.Key, kind: null,
+            Keys.New(), parent.Key, kind: null, acceptsAnyKind: null,
             Names.Normalize(name, RuleText.SubjectSubcategory), NormalizeIcon(icon),
             role, excludeFromReports,
             createdAtUtc: nowUtc, updatedAtUtc: nowUtc,
@@ -142,6 +172,7 @@ public sealed class Category : Entity
         Guid key,
         Guid? parentKey,
         CategoryKind? kind,
+        bool? acceptsAnyKind,
         string name,
         string icon,
         CategoryRole role,
@@ -151,7 +182,7 @@ public sealed class Category : Entity
         DateTimeOffset? deletedAtUtc,
         DateTimeOffset? syncedAtUtc,
         string? externalId) =>
-        new(key, parentKey, kind, name, icon, role, excludeFromReports,
+        new(key, parentKey, kind, acceptsAnyKind, name, icon, role, excludeFromReports,
             createdAtUtc, updatedAtUtc, deletedAtUtc, syncedAtUtc, externalId);
 
     /// <summary>

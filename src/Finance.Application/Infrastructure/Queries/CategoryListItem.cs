@@ -25,6 +25,20 @@ public sealed record CategoryListItem
     public required CategoryKind Kind { get; init; }
 
     /// <summary>
+    /// Группа принимает операции обоих видов. У подкатегории подставлен от её
+    /// группы — по тому же правилу, что и вид: экран выбора отбирает строки
+    /// одинаково на обоих уровнях.
+    /// </summary>
+    public required bool AcceptsAnyKind { get; init; }
+
+    /// <summary>
+    /// Операция такого вида допустима в этой категории.
+    /// </summary>
+    /// <param name="kind">Вид операции.</param>
+    /// <returns><c>true</c>, если вид совпадает или категория универсальна.</returns>
+    public bool Accepts(CategoryKind kind) => AcceptsAnyKind || Kind == kind;
+
+    /// <summary>
     /// Название категории.
     /// </summary>
     public required string Name { get; init; }

@@ -97,6 +97,44 @@ public sealed partial class FrequentCategoriesTests
     }
 
     /// <summary>
+    /// У универсальной группы частота считается по операциям спрашиваемого вида:
+    /// сотня трат в «Маркетплейсах» не делает их частым доходом, а единственный
+    /// возврат — делает.
+    /// </summary>
+    [Fact]
+    public async Task Частота_универсальной_группы_считается_по_виду_операции()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 100_000m);
+        Guid group = await given.GroupAsync("Маркетплейсы", CategoryKind.Expense, acceptsAnyKind: true);
+        Guid market = await given.SubcategoryAsync(group, "Озон");
+
+        await given.SaveAsync(given.Expense(card, 1_000m, category: market));
+        await given.SaveAsync(given.Expense(card, 2_000m, category: market));
+        await given.SaveAsync(given.Income(card, 300m, category: market));
+
+        // Число берётся у запроса: в панели строка — чип без счётчика,
+        // и частоту по ней не сверить
+        IFrequentCategoriesQuery query = given.Database.Resolve<IFrequentCategoriesQuery>();
+
+        Assert.Equal(
+            2,
+            (await query.ReadAsync(CategoryKind.Expense, limit: 8))
+                .Single(item => item.Name == "Озон").Count);
+
+        Assert.Equal(
+            1,
+            (await query.ReadAsync(CategoryKind.Income, limit: 8))
+                .Single(item => item.Name == "Озон").Count);
+
+        CategoryPickerViewModel incomes = Picker(given);
+        await incomes.LoadAsync(CategoryKind.Income, selected: null);
+
+        Assert.Contains("Озон", incomes.Frequent.Select(line => line.Name));
+    }
+
+    /// <summary>
     /// Пока операций нет, панели нет вовсе: пустая полоса над списком объясняла бы
     /// только то, что приложением ещё не пользовались.
     /// </summary>

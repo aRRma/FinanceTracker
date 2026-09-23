@@ -46,8 +46,9 @@ internal static class Given
     public static Category Group(
         string name = "Еда",
         CategoryKind kind = CategoryKind.Expense,
-        CategoryRole role = CategoryRole.Normal) =>
-        Category.CreateGroup(name, kind, "tools-kitchen-2", NowUtc, role);
+        CategoryRole role = CategoryRole.Normal,
+        bool acceptsAnyKind = false) =>
+        Category.CreateGroup(name, kind, "tools-kitchen-2", NowUtc, role, acceptsAnyKind: acceptsAnyKind);
 
     public static Category Subcategory(
         Category parent,

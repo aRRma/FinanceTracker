@@ -81,7 +81,7 @@
 | INV-05 | Если валюты счетов перевода совпадают, `amount` и `target_amount` равны · `Invariant.SameCurrencyTransferAmountsEqual` |
 | INV-06 | Категория обязательна для дохода и расхода, запрещена для перевода · `Invariant.CategoryOnlyInIncomeAndExpense` |
 | INV-07 | Категория операции всегда второго уровня · `Invariant.CategoryIsSubcategory` |
-| INV-29 | Вид категории совпадает с видом операции: расход относится к подкатегории расходной группы, доход — доходной. Иначе расход попал бы в доходную часть отчёта, и обе половины разошлись бы с лентой · `Invariant.CategoryKindMatchesTransaction` |
+| INV-29 | Вид категории совпадает с видом операции — либо группа универсальна и принимает оба вида. Без этого возврат в магазине и кэшбек записать было бы некуда, кроме доходной статьи, и траты по статье перестали бы быть чистыми · `Invariant.CategoryKindMatchesTransaction` |
 | INV-08 | `occurred_on` не раньше `opened_on` обоих задействованных счетов · `Invariant.TransactionNotBeforeAccountOpened` |
 | INV-09 | `occurred_on` находится в диапазоне от 2000 года до текущей даты включительно · `Invariant.TransactionDateInRange` |
 | INV-10 | Длина заметки не превышает 1000 символов · `Invariant.NoteWithinLimit` |
@@ -101,7 +101,7 @@ INV-11 не закрывает многоустройственную гонку
 | INV-13 | Дерево категорий имеет ровно два уровня; третий уровень заменён местом (ADR-0005) · `Invariant.TwoCategoryLevels` |
 |---|---|
 | INV-14 | Подкатегория обязана ссылаться на группу; группа ни на что не ссылается · `Invariant.SubcategoryBelongsToGroup` |
-| INV-15 | Вид (доход или расход) задаётся на первом уровне и наследуется вторым · `Invariant.KindInheritedFromGroup` |
+| INV-15 | Вид (доход или расход) и универсальность задаются на первом уровне и наследуются вторым · `Invariant.KindInheritedFromGroup` |
 | INV-16 | Подкатегория может быть перенесена в другую группу того же вида · `Invariant.MoveKeepsKind` |
 | INV-17 | Подкатегория не может быть повышена до группы · `Invariant.CategoryLevelFixed` |
 | INV-18 | У каждой группы существует подкатегория «Прочее». Исключение — служебные группы, чья единственная подкатегория неудаляема · `Invariant.GroupHasReceiver` |

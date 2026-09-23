@@ -91,6 +91,7 @@ public sealed class DatabaseInitializer
                 Key = group.Id,
                 ParentKey = null,
                 Kind = group.Kind,
+                AcceptsAnyKind = group.AcceptsAnyKind,
                 Name = group.Name,
                 Icon = group.Icon,
                 Role = group.Role,
@@ -111,6 +112,7 @@ public sealed class DatabaseInitializer
                     // Вид хранится только на группе: подкатегория наследует его,
                     // и своя копия вида разошлась бы с ней при переносе
                     Kind = null,
+                    AcceptsAnyKind = null,
                     Name = subcategory.Name,
                     Icon = subcategory.Icon,
                     Role = subcategory.Role,

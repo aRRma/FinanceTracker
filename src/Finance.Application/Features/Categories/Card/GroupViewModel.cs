@@ -22,7 +22,7 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     private readonly ICategoriesQuery _categories;
     private readonly ISaveCategoryHandler _handler;
 
-    private (string, CategoryKind, string) _saved;
+    private (string Name, CategoryKind Kind, bool AcceptsAnyKind, string Icon) _saved;
 
     /// <summary>
     /// Создаёт модель представления карточки группы.
@@ -75,6 +75,14 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     public partial CategoryKind Kind { get; set; } = CategoryKind.Expense;
 
     /// <summary>
+    /// Группа принимает операции обоих видов, а не только своего. Возврат в магазине
+    /// и кэшбэк ложатся в ту же статью, где лежит трата, и в отчёте вычитаются
+    /// из неё. Как и вид, выбирается при заведении и потом не меняется.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool AcceptsAnyKind { get; set; }
+
+    /// <summary>
     /// Группа служебная: в неё нельзя ни заводить, ни переносить.
     /// </summary>
     [ObservableProperty]
@@ -125,6 +133,20 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     public string KindCaption => Kind is CategoryKind.Expense ? UiTexts.KindExpense : UiTexts.KindIncome;
 
     /// <summary>
+    /// Подпись универсальности: чем группа отличается от односторонней.
+    /// </summary>
+    public string AcceptsAnyKindCaption => AcceptsAnyKind
+        ? UiTexts.GroupAcceptsAnyKind
+        : UiTexts.GroupAcceptsOwnKind;
+
+    /// <summary>
+    /// Пояснение универсальности показано: при заведении — что даёт переключатель,
+    /// у заведённой — только если она и правда универсальна. У односторонней группы
+    /// то же пояснение противоречило бы подписи над ним.
+    /// </summary>
+    public bool AcceptsAnyKindHintVisible => KindEditable || AcceptsAnyKind;
+
+    /// <summary>
     /// Заголовок экрана.
     /// </summary>
     public string Title => Key is null ? UiTexts.GroupTitleNew : UiTexts.GroupTitleExisting;
@@ -162,7 +184,8 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     /// сразу: список «что считать правкой» отдельно от полей разошёлся бы с ними
     /// при первом же новом поле.
     /// </summary>
-    private (string Name, CategoryKind Kind, string Icon) Snapshot() => (Name, Kind, Icon.Selected);
+    private (string Name, CategoryKind Kind, bool AcceptsAnyKind, string Icon) Snapshot() =>
+        (Name, Kind, AcceptsAnyKind, Icon.Selected);
 
     /// <summary>
     /// Загружает группу для правки. Пустой ключ оставляет форму пустой.
@@ -193,6 +216,7 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
         Key = group.Key;
         Name = group.Name;
         Kind = group.Kind;
+        AcceptsAnyKind = group.AcceptsAnyKind;
         IsService = group.Role is CategoryRole.Service;
         Icon.Show(group.Icon);
 
@@ -237,9 +261,10 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
                     Name = Name,
                     Icon = Icon.Selected,
 
-                    // Вид читается только при заведении: у существующей группы
-                    // обработчик его не меняет, и передавать его незачем
-                    Kind = Kind
+                    // Вид и универсальность читаются только при заведении:
+                    // у существующей группы обработчик их не меняет
+                    Kind = Kind,
+                    AcceptsAnyKind = AcceptsAnyKind
                 },
                 cancellationToken);
 
@@ -272,9 +297,17 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
         OnPropertyChanged(nameof(PreviewCaption));
     }
 
+    partial void OnAcceptsAnyKindChanged(bool value)
+    {
+        OnPropertyChanged(nameof(AcceptsAnyKindCaption));
+        OnPropertyChanged(nameof(AcceptsAnyKindHintVisible));
+    }
+
     private void Refresh()
     {
         OnPropertyChanged(nameof(Title));
+        OnPropertyChanged(nameof(AcceptsAnyKindCaption));
+        OnPropertyChanged(nameof(AcceptsAnyKindHintVisible));
         OnPropertyChanged(nameof(KindIndex));
         OnPropertyChanged(nameof(KindLocked));
         OnPropertyChanged(nameof(KindEditable));

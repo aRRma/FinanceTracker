@@ -53,7 +53,13 @@ public sealed class TransactionFormQuery : ITransactionFormQuery
             from subcategory in context.Categories.AsNoTracking()
             join parent in context.Categories.AsNoTracking() on subcategory.ParentKey equals parent.Key
             orderby parent.Kind, parent.Name, subcategory.Name
-            select new CategoryOption(subcategory.Key, subcategory.Name, parent.Name, parent.Kind!.Value, subcategory.Icon))
+            select new CategoryOption(
+                subcategory.Key,
+                subcategory.Name,
+                parent.Name,
+                parent.Kind!.Value,
+                parent.AcceptsAnyKind == true,
+                subcategory.Icon))
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 

@@ -158,6 +158,61 @@ public sealed class PickerTests
     }
 
     /// <summary>
+    /// Универсальная расходная группа предлагается и при выборе для дохода:
+    /// возврату место в той же статье, где лежит трата. Односторонняя — нет.
+    /// </summary>
+    [Fact]
+    public async Task Универсальная_группа_предлагается_обоим_видам()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        await given.GroupAsync("Маркетплейсы", CategoryKind.Expense, acceptsAnyKind: true);
+        await given.GroupAsync("Питомцы", CategoryKind.Expense);
+
+        CategoryPickerViewModel expenses = CategoryPicker(given);
+        await expenses.LoadAsync(CategoryKind.Expense, selected: null);
+
+        Assert.Contains("Маркетплейсы", expenses.Lines.Select(line => line.Name));
+        Assert.Contains("Питомцы", expenses.Lines.Select(line => line.Name));
+
+        CategoryPickerViewModel incomes = CategoryPicker(given);
+        await incomes.LoadAsync(CategoryKind.Income, selected: null);
+
+        Assert.Contains("Маркетплейсы", incomes.Lines.Select(line => line.Name));
+        Assert.DoesNotContain("Питомцы", incomes.Lines.Select(line => line.Name));
+    }
+
+    /// <summary>
+    /// Подкатегория универсальной расходной группы, выбранная для дохода, доезжает
+    /// до формы: список формы отбирается тем же правилом, что и экран выбора, —
+    /// иначе выбор возврата молча пропадал бы, а поле оставалось пустым.
+    /// </summary>
+    [Fact]
+    public async Task Подкатегория_универсальной_группы_подставляется_в_доход()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        await given.AccountAsync("Карта", 1000m);
+
+        Guid group = await given.GroupAsync("Маркетплейсы", CategoryKind.Expense, acceptsAnyKind: true);
+        Guid subcategory = await given.SubcategoryAsync(group, "Возврат заказа");
+
+        TransactionViewModel form = Form(given);
+        await form.LoadAsync(key: null);
+
+        form.Kind = TransactionKind.Income;
+
+        CategoryPickerViewModel picker = CategoryPicker(given);
+        await picker.LoadAsync(form.CategoryKind, selected: null);
+
+        picker.Toggle(picker.Lines.First(line => line.Key == group));
+        picker.Pick(picker.Lines.First(line => line.Key == subcategory));
+        form.ApplyPicks();
+
+        Assert.Equal(subcategory, form.Category?.Key);
+    }
+
+    /// <summary>
     /// Поиск раскрывает группы сам и оставляет только подходящие строки.
     /// </summary>
     [Fact]

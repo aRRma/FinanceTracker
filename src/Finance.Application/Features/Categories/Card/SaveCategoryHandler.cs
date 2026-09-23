@@ -82,7 +82,8 @@ public sealed class SaveCategoryHandler : ISaveCategoryHandler
         await EnsureGroupNameFreeAsync(context, command.Name, kind, self: null, cancellationToken)
             .ConfigureAwait(false);
 
-        Category group = Category.CreateGroup(command.Name, kind, command.Icon, _clock.NowUtc);
+        Category group = Category.CreateGroup(
+            command.Name, kind, command.Icon, _clock.NowUtc, acceptsAnyKind: command.AcceptsAnyKind);
 
         // Приёмник заводится здесь же, а не следующей командой: между двумя
         // командами группа успела бы остаться без «Прочего», и удаление

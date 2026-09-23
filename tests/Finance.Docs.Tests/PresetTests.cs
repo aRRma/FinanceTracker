@@ -158,6 +158,28 @@ public sealed class PresetTests
     }
 
     /// <summary>
+    /// Расходные группы набора принимают оба вида, доходные — только свой.
+    /// Возврат, кэшбэк и правка расхождения ложатся в ту же статью, где лежит
+    /// трата, а доход в «Зарплате» расходом не бывает.
+    /// </summary>
+    [Fact]
+    public void Расходные_группы_набора_принимают_оба_вида()
+    {
+        string[] oneSidedExpenses = Set.Groups
+            .Where(group => group.Kind == CategoryKind.Expense && !group.AcceptsAnyKind)
+            .Select(group => group.Key)
+            .ToArray();
+
+        string[] universalIncomes = Set.Groups
+            .Where(group => group.Kind == CategoryKind.Income && group.AcceptsAnyKind)
+            .Select(group => group.Key)
+            .ToArray();
+
+        Assert.Empty(oneSidedExpenses);
+        Assert.Empty(universalIncomes);
+    }
+
+    /// <summary>
     /// Собирает доменную категорию из строки набора, чтобы прогнать её через доменные
     /// правила. Порядок параметров повторяет <see cref="Category.Restore"/>; именем
     /// служит текстовый ключ набора — он и попадёт в текст ошибки.
@@ -165,7 +187,7 @@ public sealed class PresetTests
     private static Category AsCategory(
         Guid key, Guid? parentKey, CategoryKind? kind, string textKey, string icon, CategoryRole role) =>
         Category.Restore(
-            key, parentKey, kind, textKey, icon, role,
+            key, parentKey, kind, acceptsAnyKind: null, textKey, icon, role,
             excludeFromReports: false, Set.SeededAtUtc, Set.SeededAtUtc, null, null, null);
 
     /// <summary>

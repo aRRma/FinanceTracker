@@ -43,6 +43,22 @@
                     <Label Text="{Binding KindCaption}" IsVisible="{Binding KindLocked}" />
                     <Label Text="{x:Static texts:UiTexts.GroupKindHint}"
                            Style="{StaticResource CaptionLabel}" />
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <!-- Универсальность запирается вместе с видом: выключить её
+                         у группы, куда уже записали возвраты, значит оставить их
+                         вне правил, а вычищать такие операции задним числом некому -->
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12"
+                          IsVisible="{Binding KindEditable}">
+                        <Label Grid.Column="0" Text="{x:Static texts:UiTexts.GroupAcceptsAnyKindTitle}"
+                               VerticalOptions="Center" />
+                        <Switch Grid.Column="1" IsToggled="{Binding AcceptsAnyKind}" VerticalOptions="Center" />
+                    </Grid>
+                    <Label Text="{Binding AcceptsAnyKindCaption}" IsVisible="{Binding KindLocked}" />
+                    <Label Text="{x:Static texts:UiTexts.GroupAcceptsAnyKindHint}"
+                           IsVisible="{Binding AcceptsAnyKindHintVisible}"
+                           Style="{StaticResource CaptionLabel}" />
                 </VerticalStackLayout>
             </Border>
 

@@ -194,6 +194,45 @@ public sealed class TransactionRulesTests
         TransactionRules.EnsureValid(income, card, null, Wage, Salary);
     }
 
+    /// <summary>
+    /// Универсальная группа принимает оба вида: возврат в магазине ложится в ту же
+    /// статью, где лежит трата, и вычитается из неё в отчёте.
+    /// </summary>
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.CategoryKindMatchesTransaction))]
+    public void Доход_в_универсальной_расходной_категории_принимается()
+    {
+        Account card = Given.Account();
+        Category shopping = Given.Group("Покупки", CategoryKind.Expense, acceptsAnyKind: true);
+        Category pharmacy = Given.Subcategory(shopping, "Аптека");
+        Transaction refund = Transaction.Create(
+            TransactionKind.Income, card.Key, Given.Rubles(100m), null, null, pharmacy.Key, null,
+            Given.Today, null, Given.Today, Given.NowUtc);
+
+        TransactionRules.EnsureValid(refund, card, null, pharmacy, shopping);
+    }
+
+    /// <summary>
+    /// Односторонняя группа по-прежнему отвергает чужой вид: универсальность —
+    /// решение по каждой группе, а не общее ослабление правила.
+    /// </summary>
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.CategoryKindMatchesTransaction))]
+    public void Доход_в_обычной_расходной_категории_отвергается()
+    {
+        Account card = Given.Account();
+        Category shopping = Given.Group("Покупки");
+        Category pharmacy = Given.Subcategory(shopping, "Аптека");
+        Transaction refund = Transaction.Create(
+            TransactionKind.Income, card.Key, Given.Rubles(100m), null, null, pharmacy.Key, null,
+            Given.Today, null, Given.Today, Given.NowUtc);
+
+        DomainException error = Assert.Throws<DomainException>(
+            () => TransactionRules.EnsureValid(refund, card, null, pharmacy, shopping));
+
+        Assert.Equal(Invariant.CategoryKindMatchesTransaction, error.Invariant);
+    }
+
     [Fact]
     public void Перевод_между_валютами_проходит_проверки()
     {

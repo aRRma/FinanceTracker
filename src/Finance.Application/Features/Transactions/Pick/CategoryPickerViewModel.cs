@@ -156,7 +156,7 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
             // Дети раскладываются по группам одним проходом, а не проходом по всему справочнику на каждую группу
             ILookup<Guid?, CategoryListItem> byParent = all.ToLookup(static item => item.ParentKey);
 
-            foreach (CategoryListItem group in all.Where(item => item.IsGroup && item.Kind == kind))
+            foreach (CategoryListItem group in all.Where(item => item.IsGroup && item.Accepts(kind)))
             {
                 CategoryListItem[] children = [.. byParent[group.Key]];
 

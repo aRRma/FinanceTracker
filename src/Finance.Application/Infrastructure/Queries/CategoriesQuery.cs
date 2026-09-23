@@ -40,6 +40,7 @@ public sealed class CategoriesQuery : ICategoriesQuery
                 row.Key,
                 row.ParentKey,
                 row.Kind,
+                row.AcceptsAnyKind,
                 row.Name,
                 row.Icon,
                 row.Role
@@ -64,11 +65,14 @@ public sealed class CategoriesQuery : ICategoriesQuery
             CategoryKind kind = parent.Kind
                                 ?? throw new InvalidOperationException(Faults.GroupKindMissing(parent.Name));
 
+            bool anyKind = parent.AcceptsAnyKind is true;
+
             items.Add(new CategoryListItem
             {
                 Key = parent.Key,
                 ParentKey = null,
                 Kind = kind,
+                AcceptsAnyKind = anyKind,
                 Name = parent.Name,
                 Icon = parent.Icon,
                 Role = parent.Role
@@ -82,6 +86,7 @@ public sealed class CategoriesQuery : ICategoriesQuery
                     Key = row.Key,
                     ParentKey = parent.Key,
                     Kind = kind,
+                    AcceptsAnyKind = anyKind,
                     Name = row.Name,
                     Icon = row.Icon,
                     Role = row.Role

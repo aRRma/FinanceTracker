@@ -13,6 +13,7 @@ namespace Finance.Application.Infrastructure.Initialization;
 /// <param name="Id">Идентификатор, выведенный из пространства имён и ключа.</param>
 /// <param name="Subcategories">Подкатегории группы.</param>
 /// <param name="ExcludeFromReports">Не показывать в отчёте.</param>
+/// <param name="AcceptsAnyKind">Принимать операции обоих видов, а не только своего.</param>
 public sealed record PresetGroup(
     string Key,
     string Name,
@@ -21,4 +22,5 @@ public sealed record PresetGroup(
     CategoryRole Role,
     Guid Id,
     IReadOnlyList<PresetSubcategory> Subcategories,
-    bool ExcludeFromReports = false);
+    bool ExcludeFromReports = false,
+    bool AcceptsAnyKind = false);

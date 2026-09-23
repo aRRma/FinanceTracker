@@ -904,7 +904,10 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
         foreach (CategoryOption category in _allCategories)
         {
-            if (category.Kind == kind)
+            // Универсальная группа принимает оба вида: без этого выбранный на
+            // экране выбора возврат в расходной статье в список не попадал бы,
+            // а форма молча оставалась бы без категории
+            if (category.Accepts(kind))
             {
                 Categories.Add(category);
             }

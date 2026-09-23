@@ -146,8 +146,11 @@ public static class TransactionRules
             ? CategoryKind.Income
             : CategoryKind.Expense;
 
+        // Универсальная группа принимает оба вида: возврат в магазине, кэшбэк
+        // и правка расхождения ложатся в ту же статью, где лежит трата,
+        // и в отчёте вычитаются из неё, а не заводят доход на пустом месте
         DomainException.ThrowIf(
-            categoryGroup.Kind != expected,
+            !categoryGroup.Accepts(expected),
             Invariant.CategoryKindMatchesTransaction,
             RuleText.CategoryKindMatchesTransaction,
             transaction.Kind, categoryGroup.Name, categoryGroup.Kind);

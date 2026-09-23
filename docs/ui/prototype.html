@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Личный трекер финансов — прототип</title>
 <!-- СГЕНЕРИРОВАНО из mockups.html скриптом tools/build_prototype.py. Руками не править. -->
-<!-- отпечатки источников: mockups.html=9ed5de38c2c39215538098927bab1eef6a6660c8e987edca1d430e0a366e06d6 build_prototype.py=e83a4c9f8b4b07fc9aae964aa3bb58e372b0e585fdffa6c96f6c99969799fe10 -->
+<!-- отпечатки источников: mockups.html=0e23adfc28f95006b469d80e05ccff4701742c04305c2687428843b9e57ecbf7 build_prototype.py=e83a4c9f8b4b07fc9aae964aa3bb58e372b0e585fdffa6c96f6c99969799fe10 -->
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -668,6 +668,8 @@ body{padding:0}
   <div class="sec tight"><span class="k">Вид</span></div>
   <div class="seg" style="padding-top:4px"><b class="on">Расход</b><b>Доход</b></div>
   <div class="note">Вид группы наследуется подкатегориями и не меняется после создания</div>
+  <div class="fld"><span class="k" style="flex:1">Принимает оба вида</span><span class="sw2 on"><i></i></span></div>
+  <div class="note">Возврат и кэшбек лягут в ту же статью, где лежит трата, и вычтутся из неё в отчёте</div>
   <div class="sec tight" style="border-top:1px solid var(--line)"><span class="k">Будет создано</span></div>
   <div class="row tp"><div class="g"><div class="t">Дом</div><div class="s">Группа расходов</div></div></div>
   <div class="row child"><svg class="ic sm dim"><use href="#i-more"/></svg><div class="g"><div class="t dim">Прочее</div><div class="s">Создаётся автоматически</div></div></div>
