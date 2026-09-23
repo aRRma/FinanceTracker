@@ -65,11 +65,15 @@ internal sealed class TestDatabase : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        string connectionString = Location.ConnectionString;
         await _services.DisposeAsync();
 
         // Пул держит файл открытым: без сброса папка не удалится,
-        // и временные базы будут копиться до перезагрузки
-        Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+        // и временные базы будут копиться до перезагрузки. Сбрасывается только
+        // свой пул: ClearAllPools закрывал соединения соседних тестов, идущих
+        // параллельно, и те падали с ObjectDisposedException в Open
+        using Microsoft.Data.Sqlite.SqliteConnection own = new(connectionString);
+        Microsoft.Data.Sqlite.SqliteConnection.ClearPool(own);
 
         try
         {
