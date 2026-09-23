@@ -160,8 +160,10 @@ public sealed class DatabaseBootstrapper
 
         // Файл базы держат открытым соединения из пула, а рядом с ним лежат журнал
         // и разделяемая память: не закрыв пул и не убрав их, мы положили бы
-        // поверх копии чужое незавершённое состояние
-        SqliteConnection.ClearAllPools();
+        // поверх копии чужое незавершённое состояние. Закрывается пул только этой
+        // базы: общий сброс оборвал бы соединения с другими базами того же процесса
+        using SqliteConnection own = new(_location.ConnectionString);
+        SqliteConnection.ClearPool(own);
 
         File.Delete(_location.Path + "-wal");
         File.Delete(_location.Path + "-shm");
