@@ -63,7 +63,6 @@ public sealed partial class ReportViewModel : ScreenViewModel
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EmptyTitle))]
-    [NotifyPropertyChangedFor(nameof(IsTotalExpense))]
     public partial CategoryKind Kind { get; set; } = CategoryKind.Expense;
 
     /// <summary>
@@ -73,9 +72,11 @@ public sealed partial class ReportViewModel : ScreenViewModel
     public partial string Total { get; private set; } = string.Empty;
 
     /// <summary>
-    /// Итог — расходный: красится тем же цветом, что строки под ним.
+    /// Итог со знаком отрицателен — красится цветом расхода. Идёт за знаком, а не
+    /// за видом: месяц одних возвратов сводит расходы в плюс.
     /// </summary>
-    public bool IsTotalExpense => Kind is CategoryKind.Expense;
+    [ObservableProperty]
+    public partial bool IsTotalExpense { get; private set; }
 
     /// <summary>
     /// Операций этого вида за месяц нет — показывается пустое состояние.
@@ -231,12 +232,17 @@ public sealed partial class ReportViewModel : ScreenViewModel
         // Итог — сложение показанных строк, а не второй запрос: строки уровня
         // получены все до одной, страниц у него нет, и повторный проход по той же
         // таблице дал бы ровно это число
+        Money shareBase = ReportRowItem.ShareBase(shown);
+
         foreach (ReportTotal row in shown)
         {
-            Rows.Add(ReportRowItem.From(row, total));
+            Rows.Add(ReportRowItem.From(row, shareBase));
         }
 
-        Total = ReportRowItem.Signed(total, Kind).DisplaySigned;
+        Money signed = ReportRowItem.Signed(total, Kind);
+
+        Total = signed.DisplaySigned;
+        IsTotalExpense = signed.Amount < 0m;
         IsEmpty = Rows.Count is 0;
 
         OnPropertyChanged(nameof(KindIndex));

@@ -193,6 +193,83 @@ public sealed partial class ReportTests
     }
 
     /// <summary>
+    /// Группа, где возвратов за месяц больше, чем трат, показывает сумму плюсом
+    /// цветом дохода и без доли; доли остальных считаются без неё и сходятся к сотне.
+    /// </summary>
+    [Fact]
+    public async Task Группа_в_минусе_от_возвратов_показывается_без_доли()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 10_000m);
+        Guid returned = await SubcategoryOfNewGroupAsync(given, "Только возврат", acceptsAnyKind: true);
+        Guid other = await SubcategoryOfNewGroupAsync(given, "Обычная");
+
+        await given.SaveAsync(given.Income(card, 300m, category: returned));
+        await given.SaveAsync(given.Expense(card, 1_000m, category: other));
+
+        ReportViewModel model = await LoadedModelAsync(given);
+
+        Assert.Equal(["100%", string.Empty], model.Rows.Select(row => row.Share));
+
+        ReportRowItem refund = model.Rows[1];
+
+        Assert.Equal("Только возврат", refund.Name);
+        Assert.Equal(Money.Restore(300m, Currency.RUB).DisplaySigned, refund.Amount);
+        Assert.False(refund.IsExpense);
+        Assert.False(refund.HasShare);
+        Assert.Equal(0d, refund.Fraction);
+
+        // Итог — настоящая сумма: возврат и правда уменьшил расход месяца
+        Assert.Equal(Money.Restore(-700m, Currency.RUB).DisplaySigned, model.Total);
+        Assert.True(model.IsTotalExpense);
+    }
+
+    /// <summary>
+    /// Месяц одних возвратов сводит расходы в плюс, и итог красится по знаку, а не по виду.
+    /// </summary>
+    [Fact]
+    public async Task Итог_из_одних_возвратов_красится_по_знаку()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 10_000m);
+        Guid returned = await SubcategoryOfNewGroupAsync(given, "Только возврат", acceptsAnyKind: true);
+
+        await given.SaveAsync(given.Income(card, 300m, category: returned));
+
+        ReportViewModel model = await LoadedModelAsync(given);
+
+        Assert.Equal(Money.Restore(300m, Currency.RUB).DisplaySigned, model.Total);
+        Assert.False(model.IsTotalExpense);
+        Assert.False(Assert.Single(model.Rows).HasShare);
+    }
+
+    /// <summary>
+    /// На втором уровне то же: шапка группы в минусе не называет долю месяца.
+    /// </summary>
+    [Fact]
+    public async Task Шапка_группы_в_минусе_не_называет_долю()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 10_000m);
+        Guid group = await given.GroupAsync("Только возврат", CategoryKind.Expense, acceptsAnyKind: true);
+        Guid subcategory = await given.SubcategoryAsync(group, "Возвраты");
+
+        await given.SaveAsync(given.Income(card, 300m, category: subcategory));
+        await given.SaveAsync(given.Expense(card, 1_000m));
+
+        ReportGroupViewModel model = new(given.Database.Resolve<IReportQuery>(), given.Database.Resolve<IChangeNotifier>());
+
+        await model.LoadAsync(group, ReportMonth.Of(given.Today));
+
+        Assert.Equal(ReportMonth.Of(given.Today).Caption, model.Caption);
+        Assert.False(model.IsTotalExpense);
+        Assert.False(Assert.Single(model.Rows).HasShare);
+    }
+
+    /// <summary>
     /// Точное значение в рублях: сумма поверх конвертера копеек считает то, что ожидается.
     /// </summary>
     [Fact]

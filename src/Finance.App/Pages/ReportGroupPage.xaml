@@ -61,7 +61,7 @@
                                MinimumWidthRequest="40" HorizontalTextAlignment="End"
                                Style="{StaticResource SecondaryLabel}" />
                         <ProgressBar Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3"
-                                     Progress="{Binding Fraction}" HeightRequest="4"
+                                     Progress="{Binding Fraction}" IsVisible="{Binding HasShare}" HeightRequest="4"
                                      ProgressColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
                     </Grid>
                 </DataTemplate>
