@@ -11,11 +11,27 @@ namespace Finance.Application.Features.Transactions.Card;
 /// <param name="Name">Название подкатегории.</param>
 /// <param name="GroupName">Название группы.</param>
 /// <param name="Kind">Вид группы — по нему список отбирается под вид операции.</param>
+/// <param name="AcceptsAnyKind">Группа принимает операции обоих видов.</param>
 /// <param name="Icon">Ключ значка.</param>
-public sealed record CategoryOption(Guid Key, string Name, string GroupName, CategoryKind Kind, string Icon)
+public sealed record CategoryOption(
+    Guid Key,
+    string Name,
+    string GroupName,
+    CategoryKind Kind,
+    bool AcceptsAnyKind,
+    string Icon)
 {
     /// <summary>
     /// Подпись строки выбора: группа и подкатегория.
     /// </summary>
     public string Label => $"{GroupName} · {Name}";
+
+    /// <summary>
+    /// Операция такого вида допустима в этой подкатегории. Экран выбора отбирает
+    /// строки тем же правилом, и без него выбранная в универсальной группе
+    /// подкатегория не нашлась бы в списке формы и молча пропадала.
+    /// </summary>
+    /// <param name="kind">Вид операции.</param>
+    /// <returns><c>true</c>, если вид совпадает или группа универсальна.</returns>
+    public bool Accepts(CategoryKind kind) => AcceptsAnyKind || Kind == kind;
 }

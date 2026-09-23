@@ -8,6 +8,7 @@
       "key": "food",
       "name": "Еда",
       "kind": "expense",
+      "acceptsAnyKind": true,
       "icon": "tools-kitchen-2",
       "role": "normal",
       "subcategories": [
@@ -60,6 +61,7 @@
       "key": "home",
       "name": "Жильё",
       "kind": "expense",
+      "acceptsAnyKind": true,
       "icon": "home",
       "role": "normal",
       "subcategories": [
@@ -98,6 +100,7 @@
       "key": "shopping",
       "name": "Покупки",
       "kind": "expense",
+      "acceptsAnyKind": true,
       "icon": "shopping-bag",
       "role": "normal",
       "subcategories": [
@@ -150,6 +153,7 @@
       "key": "kids",
       "name": "Дети",
       "kind": "expense",
+      "acceptsAnyKind": true,
       "icon": "baby-carriage",
       "role": "normal",
       "subcategories": [
@@ -202,6 +206,7 @@
       "key": "transport",
       "name": "Транспорт",
       "kind": "expense",
+      "acceptsAnyKind": true,
       "icon": "train",
       "role": "normal",
       "subcategories": [
@@ -240,6 +245,7 @@
       "key": "car",
       "name": "Автомобиль",
       "kind": "expense",
+      "acceptsAnyKind": true,
       "icon": "steering-wheel",
       "role": "normal",
       "subcategories": [
@@ -285,6 +291,7 @@
       "key": "health",
       "name": "Здоровье",
       "kind": "expense",
+      "acceptsAnyKind": true,
       "icon": "stethoscope",
       "role": "normal",
       "subcategories": [
@@ -330,6 +337,7 @@
       "key": "leisure",
       "name": "Отдых",
       "kind": "expense",
+      "acceptsAnyKind": true,
       "icon": "mood-happy",
       "role": "normal",
       "subcategories": [
@@ -396,6 +404,7 @@
       "key": "digital",
       "name": "Связь и подписки",
       "kind": "expense",
+      "acceptsAnyKind": true,
       "icon": "wifi",
       "role": "normal",
       "subcategories": [
@@ -434,6 +443,7 @@
       "key": "finance",
       "name": "Финансы",
       "kind": "expense",
+      "acceptsAnyKind": true,
       "icon": "coins",
       "role": "normal",
       "subcategories": [
@@ -545,6 +555,7 @@
       "key": "service_exp",
       "name": "Служебное",
       "kind": "expense",
+      "acceptsAnyKind": true,
       "icon": "adjustments",
       "role": "service",
       "subcategories": [

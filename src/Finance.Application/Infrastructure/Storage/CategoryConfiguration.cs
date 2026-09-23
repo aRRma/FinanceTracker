@@ -14,6 +14,7 @@ internal sealed class CategoryConfiguration : IEntityTypeConfiguration<CategoryR
         builder.ToTable("categories");
         builder.Property(row => row.ParentKey).HasColumnName("parent_key");
         builder.Property(row => row.Kind).HasColumnName("kind");
+        builder.Property(row => row.AcceptsAnyKind).HasColumnName("accepts_any_kind");
         builder.Property(row => row.Name).HasColumnName("name").IsRequired();
         builder.Property(row => row.Icon).HasColumnName("icon").IsRequired();
         builder.Property(row => row.Role).HasColumnName("role").IsRequired();

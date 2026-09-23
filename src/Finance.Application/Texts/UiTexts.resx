@@ -414,6 +414,18 @@
   <data name="GroupKindHint" xml:space="preserve">
     <value>Вид задаётся при создании и не меняется: его наследуют все подкатегории</value>
   </data>
+  <data name="GroupAcceptsAnyKindTitle" xml:space="preserve">
+    <value>Принимает оба вида</value>
+  </data>
+  <data name="GroupAcceptsAnyKindHint" xml:space="preserve">
+    <value>Возврат, кэшбэк и правка расхождения лягут в ту же статью, где лежит трата, и вычтутся из неё в отчёте. Задаётся при создании и не меняется</value>
+  </data>
+  <data name="GroupAcceptsAnyKind" xml:space="preserve">
+    <value>Принимает расходы и доходы</value>
+  </data>
+  <data name="GroupAcceptsOwnKind" xml:space="preserve">
+    <value>Только операции своего вида</value>
+  </data>
   <data name="GroupWillBeCreated" xml:space="preserve">
     <value>Будет создано</value>
   </data>

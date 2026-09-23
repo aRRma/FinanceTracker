@@ -19,6 +19,11 @@ internal sealed class CategoryRow : EntityRow
     public CategoryKind? Kind { get; set; }
 
     /// <summary>
+    /// Группа принимает операции обоих видов. Задан только у группы, как и вид.
+    /// </summary>
+    public bool? AcceptsAnyKind { get; set; }
+
+    /// <summary>
     /// Название категории.
     /// </summary>
     public required string Name { get; set; }

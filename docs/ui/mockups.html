@@ -647,7 +647,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-04</span><b>Завести группу</b><span class="uc">UC-11</span><em>Вид задаётся здесь и наследуется всеми подкатегориями. «Прочее» создаётся автоматически — об этом сказано до нажатия, а не после.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-04</span><b>Завести группу</b><span class="uc">UC-11</span><em>Вид задаётся здесь и наследуется всеми подкатегориями; рядом — универсальность: у расходной группы она включена по умолчанию, и возврат ляжет туда же, где лежит покупка. «Прочее» создаётся автоматически — об этом сказано до нажатия, а не после.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic act"><use href="#i-x"/></svg><h2>Новая группа</h2><svg class="ic act on"><use href="#i-check"/></svg></div>
   <div class="fld" style="border-top:none"><span class="k">Название</span><span class="v">Дом</span></div>
@@ -655,6 +655,8 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="sec tight"><span class="k">Вид</span></div>
   <div class="seg" style="padding-top:4px"><b class="on">Расход</b><b>Доход</b></div>
   <div class="note">Вид группы наследуется подкатегориями и не меняется после создания</div>
+  <div class="fld"><span class="k" style="flex:1">Принимает оба вида</span><span class="sw2 on"><i></i></span></div>
+  <div class="note">Возврат и кэшбек лягут в ту же статью, где лежит трата, и вычтутся из неё в отчёте</div>
   <div class="sec tight" style="border-top:1px solid var(--line)"><span class="k">Будет создано</span></div>
   <div class="row tp"><div class="g"><div class="t">Дом</div><div class="s">Группа расходов</div></div></div>
   <div class="row child"><svg class="ic sm dim"><use href="#i-more"/></svg><div class="g"><div class="t dim">Прочее</div><div class="s">Создаётся автоматически</div></div></div>

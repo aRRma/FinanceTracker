@@ -97,12 +97,13 @@ internal sealed class TransactionFixture : IAsyncDisposable
     /// </summary>
     public DateOnly PreviousMonth => new DateOnly(Today.Year, Today.Month, 1).AddMonths(-1);
 
-    public Task<Guid> GroupAsync(string name, CategoryKind kind) =>
+    public Task<Guid> GroupAsync(string name, CategoryKind kind, bool acceptsAnyKind = false) =>
         Database.Resolve<ISaveCategoryHandler>().HandleAsync(new SaveCategoryCommand
         {
             Name = name,
             Icon = "cash",
-            Kind = kind
+            Kind = kind,
+            AcceptsAnyKind = acceptsAnyKind
         });
 
     public Task<Guid> SubcategoryAsync(Guid group, string name) =>

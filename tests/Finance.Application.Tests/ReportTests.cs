@@ -151,6 +151,48 @@ public sealed partial class ReportTests
     }
 
     /// <summary>
+    /// Возврат в универсальной расходной группе вычитается из её расхода, а не
+    /// прибавляется к нему: иначе возврат читался бы как ещё одна трата.
+    /// </summary>
+    [Fact]
+    public async Task Возврат_вычитается_из_расхода_универсальной_группы()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 10_000m);
+        Guid shopping = await SubcategoryOfNewGroupAsync(given, "Маркетплейсы", acceptsAnyKind: true);
+
+        await given.SaveAsync(given.Expense(card, 1_000m, category: shopping));
+        await given.SaveAsync(given.Income(card, 300m, category: shopping));
+
+        ReportTotal group = Assert.Single(await given.ReportAsync());
+
+        Assert.Equal(Money.Restore(700m, Currency.RUB), group.Total);
+    }
+
+    /// <summary>
+    /// Порядок строк считается по сведённому итогу, а не по одной из двух сумм:
+    /// группа с крупным возвратом обязана съехать вниз.
+    /// </summary>
+    [Fact]
+    public async Task Группы_идут_по_убыванию_сведённого_итога()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 10_000m);
+        Guid returned = await SubcategoryOfNewGroupAsync(given, "С возвратом", acceptsAnyKind: true);
+        Guid plain = await SubcategoryOfNewGroupAsync(given, "Без возврата");
+
+        await given.SaveAsync(given.Expense(card, 1_000m, category: returned));
+        await given.SaveAsync(given.Income(card, 900m, category: returned));
+        await given.SaveAsync(given.Expense(card, 500m, category: plain));
+
+        IReadOnlyList<ReportTotal> groups = await given.ReportAsync();
+
+        Assert.Equal(["Без возврата", "С возвратом"], groups.Select(group => group.Name));
+    }
+
+    /// <summary>
     /// Точное значение в рублях: сумма поверх конвертера копеек считает то, что ожидается.
     /// </summary>
     [Fact]
@@ -517,6 +559,10 @@ public sealed partial class ReportTests
 
     /// <summary>
     /// Сложение, уехавшее в память, на маленьких данных ничем себя не выдаст — сверяется сам SQL.
+    /// Группировка идёт и по виду операции: у универсальной группы лежат оба вида,
+    /// и свести их со знаком можно только двумя суммами. Порядок строк поэтому
+    /// считается уже по сведённому итогу, в памяти, — его сверяет
+    /// <see cref="Группы_идут_по_убыванию_сведённого_итога"/>.
     /// </summary>
     [Fact]
     public async Task Суммы_месяца_считает_база()
@@ -528,7 +574,7 @@ public sealed partial class ReportTests
 
         Assert.Contains("SUM(", sql, StringComparison.Ordinal);
         Assert.Contains("GROUP BY", sql, StringComparison.Ordinal);
-        Assert.Matches(@"ORDER BY .*SUM\(.*DESC", sql);
+        Assert.Contains("kind", sql, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -567,9 +613,12 @@ public sealed partial class ReportTests
         return model;
     }
 
-    private static async Task<Guid> SubcategoryOfNewGroupAsync(TransactionFixture given, string name)
+    private static async Task<Guid> SubcategoryOfNewGroupAsync(
+        TransactionFixture given,
+        string name,
+        bool acceptsAnyKind = false)
     {
-        Guid group = await given.GroupAsync(name, CategoryKind.Expense);
+        Guid group = await given.GroupAsync(name, CategoryKind.Expense, acceptsAnyKind);
 
         return await given.SubcategoryAsync(group, name);
     }

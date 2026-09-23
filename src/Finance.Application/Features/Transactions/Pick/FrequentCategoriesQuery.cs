@@ -70,16 +70,26 @@ public sealed class FrequentCategoriesQuery : IFrequentCategoriesQuery
         FinanceDbContext context,
         CategoryKind kind,
         DateOnly since,
-        int limit) =>
-        (from row in context.Transactions.AsNoTracking()
-         where row.CategoryKey != null && row.OccurredOn >= since
+        int limit)
+    {
+        // Вид операции сравнивается со значением, посчитанным заранее: в дереве
+        // выражений сопоставление с образцом не живёт, а LINQ-запрос — дерево
+        TransactionKind operationKind = kind is CategoryKind.Income
+            ? TransactionKind.Income
+            : TransactionKind.Expense;
+
+        return (from row in context.Transactions.AsNoTracking()
+         // Вид операции задан явно: у универсальной группы лежат оба вида,
+         // и без этого условия расходные траты попадали бы в панель дохода
+         where row.CategoryKey != null && row.OccurredOn >= since && row.Kind == operationKind
          join category in context.Categories.AsNoTracking() on row.CategoryKey equals category.Key
          // Вид хранится у группы, и без соединения со вторым уровнем расходные
          // подкатегории от доходных не отличить
          join parent in context.Categories.AsNoTracking() on category.ParentKey equals parent.Key
          // Служебная подкатегория в панели не нужна: ею правят расхождения,
          // а не записывают траты, и место частой она занимала бы зря
-         where parent.Kind == kind && category.Role != CategoryRole.Service
+         where (parent.Kind == kind || parent.AcceptsAnyKind == true)
+               && category.Role != CategoryRole.Service
          group row by new { category.Key, category.Name, category.Icon } into bucket
          // Ничья разрывается названием только ради устойчивого порядка: русского
          // алфавита SQLite не знает, но два запуска подряд обязаны дать одно и то же
@@ -91,5 +101,6 @@ public sealed class FrequentCategoriesQuery : IFrequentCategoriesQuery
              Icon = bucket.Key.Icon,
              Count = bucket.Count()
          })
-        .Take(limit);
+            .Take(limit);
+    }
 }

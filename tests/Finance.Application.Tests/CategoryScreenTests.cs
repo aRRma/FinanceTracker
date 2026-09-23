@@ -157,6 +157,33 @@ public sealed class CategoryScreenTests
     }
 
     /// <summary>
+    /// Пояснение универсальности показано, пока она выбирается, и у заведённой
+    /// универсальной группы. У односторонней оно противоречило бы подписи над ним:
+    /// там сказано «только операции своего вида».
+    /// </summary>
+    [Fact]
+    public async Task Пояснение_универсальности_не_спорит_с_подписью()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        GroupViewModel universal = GroupCard(database);
+
+        Assert.True(universal.AcceptsAnyKindHintVisible);
+
+        universal.Name = "Маркетплейсы";
+        universal.AcceptsAnyKind = true;
+
+        Assert.True(await universal.SaveAsync());
+        Assert.True(universal.AcceptsAnyKindHintVisible);
+
+        GroupViewModel plain = GroupCard(database);
+        plain.Name = "Питомцы";
+
+        Assert.True(await plain.SaveAsync());
+        Assert.False(plain.AcceptsAnyKindHintVisible);
+    }
+
+    /// <summary>
     /// Занятое имя показывается текстом рядом с формой, а не роняет экран.
     /// </summary>
     [Fact]

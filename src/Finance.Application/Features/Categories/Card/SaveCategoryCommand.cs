@@ -36,4 +36,10 @@ public sealed record SaveCategoryCommand
     /// он наследуется, а у существующей группы не меняется никогда.
     /// </summary>
     public CategoryKind? Kind { get; init; }
+
+    /// <summary>
+    /// Группа принимает операции обоих видов. Читается только при заведении
+    /// группы: у существующей не меняется, как и вид.
+    /// </summary>
+    public bool AcceptsAnyKind { get; init; }
 }
