@@ -110,6 +110,20 @@ PLAN = {
     "Транспортное средство": (NEW, "Автомобиль / Покупка и продажа"),
 }
 
+# Odno imya na dve kategorii Wallet: reshenie vyvoditsya iz gruppy.
+# «Аренда» est u zhilya i u mashiny, «Подарки» — v pokupkah i v dohodah,
+# «Алименты» — v dohodah i v rashodah. Predlozhenie po odnomu imeni tyanulo
+# by obe stroki v odnu podkategoriyu, a kind u nih raznyy.
+# Gde nasha podkategoriya ne ochevidna, resheniya net vovse: stroka obyazana
+# vsplyt v spiske, a ne uehat v chuzhuyu vetku molcha.
+BY_NAME_AND_GROUP = {
+    ("Подарки", "Income"): (KEEP, "Доход / Подарки"),
+    ("Аренда", "Vehicle"): (None, "не разобрано"),
+    # Dve rashodnye operacii v gruppe «Прочее»: po imeni predlagalis v dohodnuyu
+    # podkategoriyu, i znak u nih perevernulsya by
+    ("Прочее", "Others"): (None, "не разобрано"),
+}
+
 # Bezymyannye standartnye kategorii Wallet: reshenie po nomeru konverta.
 BY_ENVELOPE = {
     1000: (KEEP, "Еда / Продукты"),
@@ -208,9 +222,12 @@ def money_text(value):
 
 def decide(wallet, cid):
     name = wallet.name(cid)
+    envelope = wallet.categories.get(cid, {}).get("envelopeId", 0)
+    group = GROUPS.get(envelope // 1000, "")
+    if (name, group) in BY_NAME_AND_GROUP:
+        return BY_NAME_AND_GROUP[(name, group)]
     if name and name in PLAN:
         return PLAN[name]
-    envelope = wallet.categories.get(cid, {}).get("envelopeId", 0)
     if not name and envelope in BY_ENVELOPE:
         return BY_ENVELOPE[envelope]
     if envelope // 1000 == 20:

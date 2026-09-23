@@ -57,13 +57,20 @@ def main():
         "groupIcons": GROUP_ICONS,
         "wallet": [
             {
+                # Идентификатор категории Wallet: имена у них повторяются
+                # («Аренда» есть у жилья и у машины), и решение крепится к нему
+                "id": row["id"],
                 "name": row["title"],
                 "group": group_ru(row["group"]),
                 "count": row["count"],
                 "sum": float(row["sum"]),
                 "decision": row["decision"] or "open",
                 "target": row["target"],
-                "income": bool(row["kinds"].get("income")) and not row["kinds"].get("expense"),
+                # Расходов и доходов поштучно, а не признаком «это доход»: у части
+                # категорий Wallet есть и то и другое, и вид у них виден только числами.
+                # Переводы в паре дают две записи, расход и приход — их считаем вместе
+                "expense": row["kinds"].get("expense", 0) + row["kinds"].get("transfer_out", 0),
+                "income": row["kinds"].get("income", 0) + row["kinds"].get("transfer_in", 0),
             }
             for row in rows if row["count"]
         ],
@@ -108,8 +115,9 @@ html,body{height:100%}
 body{margin:0;background:var(--paper);color:var(--ink);font:14.5px/1.5 var(--sans);
   -webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
 button{font:inherit;cursor:pointer}
-.top{padding:14px 20px 0;display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
-h1{font-size:20px;margin:0}
+.top{padding:10px 16px 0;display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+h1{font-size:18px;margin:0}
+h1 .dim{color:var(--ink3);font-size:12px;font-weight:400}
 .sub{color:var(--ink3);font-size:12.5px;margin:2px 0 0}
 .tools{display:flex;gap:8px;flex-wrap:wrap}
 .btn{background:var(--card);color:var(--ink2);border:1px solid var(--line2);border-radius:8px;
@@ -117,21 +125,23 @@ h1{font-size:20px;margin:0}
 .btn:hover{border-color:var(--ink3);color:var(--ink)}
 .btn.primary{background:var(--acc);border-color:var(--acc);color:#fff}
 .btn.primary:hover{opacity:.9;color:#fff}
-.stats{padding:10px 20px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.stats{padding:8px 16px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 12px;font-size:13px}
 .stat b{font-size:15px}
 .stat i{color:var(--ink3);font-style:normal;margin-left:5px;font-size:12px}
 .meter{flex:1;min-width:200px;height:10px;background:var(--sunk);border:1px solid var(--line);
   border-radius:6px;overflow:hidden;display:flex}
 .meter span{display:block;height:100%}
-.split{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:12px 20px 20px;min-height:0}
+.split{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:8px 16px 12px;min-height:0}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;display:flex;
   flex-direction:column;min-height:0;overflow:hidden}
-.phead{padding:11px 14px;border-bottom:1px solid var(--line);display:flex;gap:10px;
+.phead{padding:8px 12px;border-bottom:1px solid var(--line);display:flex;gap:10px;
   align-items:center;justify-content:space-between;background:var(--sunk)}
 .phead h2{font-size:14px;margin:0}
 .phead .dim{color:var(--ink3);font-size:12.5px;font-weight:400}
-.plist{overflow:auto;padding:8px;flex:1}
+.phead > .dim{border:1px solid var(--line2);border-radius:50%;width:18px;height:18px;flex:none;
+  display:flex;align-items:center;justify-content:center;font-size:11px;cursor:help}
+.plist{overflow:auto;padding:6px;flex:1}
 input[type=text],input[type=search],select{background:var(--card);color:var(--ink);
   border:1px solid var(--line2);border-radius:8px;padding:6px 9px;font:inherit;font-size:13px}
 input:focus,select:focus{outline:2px solid var(--acc);outline-offset:-1px}
@@ -159,6 +169,7 @@ input:focus,select:focus{outline:2px solid var(--acc);outline-offset:-1px}
 .tag.new{background:var(--newbg);color:var(--new)}
 .tag.open{background:var(--sunk);color:var(--open)}
 .tag.transfer{background:var(--sunk);color:var(--ink3)}
+.tag.clash{background:var(--negbg);color:var(--neg)}
 .wgroup{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--card)}
 .whead{display:flex;align-items:center;gap:9px;padding:9px 11px;cursor:pointer;user-select:none}
 .whead:hover{background:var(--sunk)}
@@ -173,7 +184,7 @@ input:focus,select:focus{outline:2px solid var(--acc);outline-offset:-1px}
 .dot{width:5px;height:5px;border-radius:50%;background:var(--line2);flex:none;margin-left:-13px}
 .wrow.done .dot{background:var(--keep)}
 .wrow .tgt{font-size:12px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:38%}
-.filters{display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:center}
+.filters{display:flex;gap:6px;padding:6px 8px;border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:center}
 .chip{background:var(--card);border:1px solid var(--line2);color:var(--ink3);border-radius:999px;
   padding:4px 10px;font-size:12.5px}
 .chip.on{background:var(--accbg);border-color:var(--acc);color:var(--acc);font-weight:600}
@@ -206,16 +217,13 @@ input:focus,select:focus{outline:2px solid var(--acc);outline-offset:-1px}
 .modes{display:flex;gap:6px;flex-wrap:wrap}
 .modes .chip{padding:6px 12px;font-size:13px}
 .wrow{cursor:pointer}
-footer{padding:0 20px 14px;color:var(--ink3);font-size:12px}
 code{background:var(--sunk);border-radius:4px;padding:1px 5px;font-size:11.5px}
 </style>
 </head>
 <body>
 <div class="top">
   <div>
-    <h1>Набор категорий: верстак</h1>
-    <p class="sub">Слева — наш стартовый набор, его можно править. Справа — категории Wallet с числом
-      операций. Итог выгружается в JSON той же формы, что файл стартового набора.</p>
+    <h1>Набор категорий: верстак <span class="dim" id="when"></span></h1>
   </div>
   <div class="tools">
     <button class="btn" onclick="flip()">Тема</button>
@@ -233,7 +241,7 @@ code{background:var(--sunk);border-radius:4px;padding:1px 5px;font-size:11.5px}
   <section class="panel">
     <div class="phead">
       <h2>Наш набор <span class="dim" id="leftCount"></span></h2>
-      <span class="dim">число справа — операций Wallet, которые сюда лягут · подкатегорию можно перетащить</span>
+      <span class="dim" title="Число справа — операций Wallet, которые сюда лягут. Подкатегорию можно перетащить в другую группу мышкой">?</span>
     </div>
     <div class="plist" id="left"></div>
   </section>
@@ -241,21 +249,20 @@ code{background:var(--sunk);border-radius:4px;padding:1px 5px;font-size:11.5px}
   <section class="panel">
     <div class="phead">
       <h2>Категории Wallet <span class="dim" id="rightCount"></span></h2>
-      <span class="dim">строка открывает выбор, куда её переносить · число справа — операций в Wallet</span>
+      <span class="dim" title="Строка открывает выбор, куда её переносить. Число справа — операций в Wallet">?</span>
     </div>
     <div class="filters">
       <input type="search" id="q" placeholder="поиск" oninput="render()" style="flex:1;min-width:120px">
       <button class="chip on" data-f="all" onclick="setFilter(this)">все</button>
       <button class="chip" data-f="todo" onclick="setFilter(this)">не покрытые</button>
-      <button class="chip" data-f="new" onclick="setFilter(this)">новые</button>
+      <button class="chip" data-f="new" onclick="setFilter(this)">заведём новую</button>
       <button class="chip" data-f="place" onclick="setFilter(this)">места</button>
+      <button class="chip" data-f="clash" onclick="setFilter(this)">вид не сходится</button>
       <button class="chip" onclick="foldAll()" title="Свернуть или развернуть все группы">⌄⌃</button>
     </div>
     <div class="plist" id="right"></div>
   </section>
 </div>
-
-<footer id="foot"></footer>
 
 <div class="veil" id="veil" onclick="if(event.target===this)closeEditor()">
   <div class="modal" id="modal"></div>
@@ -279,6 +286,7 @@ function fromPreset(preset){
     note: preset.note,
     groups: preset.groups.map(g => ({
       uid: 'g' + (seq++), key: g.key, name: g.name, kind: g.kind, icon: g.icon,
+      acceptsAnyKind: g.acceptsAnyKind === true,
       role: g.role, id: g.id,
       subs: g.subcategories.map(s => ({
         uid: 's' + (seq++), key: s.key, name: s.name, icon: s.icon, role: s.role, id: s.id
@@ -288,20 +296,44 @@ function fromPreset(preset){
   };
 }
 
+/* Ключ решения — идентификатор категории Wallet, а не её название. Названия там
+   повторяются: «Аренда» есть и у жилья, и у машины, «Подарки» — и в покупках,
+   и в доходах, «Алименты» — в доходах и в расходах. По названию обе строки делили
+   одно решение и ездили вместе, будто это одна категория. */
+const WALLET_IDS = new Set(SEED.wallet.map(w => w.id));
+const WALLET_BY_NAME = SEED.wallet.reduce((map, w) => {
+  (map[w.name] = map[w.name] || []).push(w.id);
+  return map;
+}, {});
+
+// Файлы и сохранения прошлых заходов ключом держат название: разворачиваем его
+// во все категории с таким именем — решение достаётся каждой, дальше они разойдутся
+function keyById(map){
+  const out = {};
+  for (const [key, rule] of Object.entries(map || {})) {
+    if (WALLET_IDS.has(key)) { out[key] = rule; continue; }
+    for (const id of (WALLET_BY_NAME[key] || [])) out[id] = rule;
+  }
+  return out;
+}
+
 /* Решение по каждой категории Wallet: куда её переносить. Одна таблица на всё —
-   справочник мест выводится из неё же, иначе имя места разошлось бы с решением. */
+   справочник мест выводится из неё же, иначе имя места разошлось бы с решением.
+   Из файла связь приезжает ключом подкатегории (`targetKey`): uid у каждого захода
+   свой, а ключ — то, из чего в приложении выводится идентификатор. */
 function buildMap(preset){
   const map = {};
   for (const rule of (preset.mapping || [])) {
-    if (!rule || !rule.wallet) continue;
-    map[rule.wallet] = { mode: rule.mode || 'sub', target: rule.target || '', place: rule.place || '' };
+    if (!rule || !(rule.id || rule.wallet)) continue;
+    map[rule.id || rule.wallet] = { mode: rule.mode || 'sub', key: rule.targetKey || '',
+      want: rule.target || '', place: rule.place || '' };
   }
   for (const p of (preset.places || [])) {
     for (const source of (p.sources || [])) {
-      map[source] = { mode: 'place', target: p.target || '', place: p.name };
+      map[source] = { mode: 'place', key: p.targetKey || '', want: p.target || '', place: p.name };
     }
   }
-  return map;
+  return keyById(map);
 }
 function save(){ localStorage.setItem(STORE, JSON.stringify(state)); }
 function load(){
@@ -318,6 +350,7 @@ function load(){
         }
       }
       delete saved.places;
+      saved.map = keyById(saved.map);
       return saved;
     } catch (e) { /* испорчено — берём набор */ }
   }
@@ -327,6 +360,7 @@ function reset(){
   if (!confirm('Вернуть набор к тому, что лежит в файле стартового набора?')) return;
   localStorage.removeItem(STORE);
   state = fromPreset(SEED.preset);
+  seedDrafts();
   render();
 }
 
@@ -359,25 +393,102 @@ function esc(text){
   return String(text).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 }
 
-/* ---------- сколько операций Wallet ложится на пару «группа / подкатегория» ---------- */
-function ruleOf(w){
-  const custom = state.map[w.name];
-  if (custom) return custom;
-  if (w.decision === 'transfer') return { mode: 'transfer', target: '', place: '' };
-  if (w.decision === 'place') return { mode: 'place', target: w.target || '', place: '' };
-  if (w.decision === 'open') return { mode: 'open', target: '', place: '' };
-  return { mode: 'sub', target: w.target || '', place: '' };
+/* ---------- связь решения с нашей подкатегорией ----------
+   Решение держит внутренний идентификатор подкатегории (uid), а не пару
+   «Группа / Подкатегория»: на именах переименование рвало связь молча — таблица
+   соответствий начинала указывать в пустоту, а счёт операций обнулялся. Пара имён
+   остаётся только подписью и хранится рядом (want) как след того, что имелось
+   в виду: подкатегорию могли и удалить.
+   Наружу uid не выходит — в файл уезжает ключ подкатегории, из него в приложении
+   выводится идентификатор. */
+function subByUid(uid){
+  if (!uid) return null;
+  for (const g of state.groups) {
+    const s = g.subs.find(x => x.uid === uid);
+    if (s) return { group: g, sub: s };
+  }
+  return null;
 }
+function pairOf(group, sub){ return group.name + ' / ' + sub.name; }
+function pairOfUid(uid){
+  const hit = subByUid(uid);
+  return hit ? pairOf(hit.group, hit.sub) : '';
+}
+function uidByPair(pair){
+  if (!pair) return '';
+  for (const g of state.groups) for (const s of g.subs) if (pairOf(g, s) === pair) return s.uid;
+  return '';
+}
+function uidByKey(key){
+  if (!key) return '';
+  for (const g of state.groups) for (const s of g.subs) if (s.key === key) return s.uid;
+  return '';
+}
+function kindOfUid(uid){
+  const hit = subByUid(uid);
+  return hit ? hit.group.kind : '';
+}
+// Универсальная группа принимает оба вида: расхождение видов у неё не ошибка,
+// а возврат — приложение вычтет его из расхода той же статьи
+function anyKindOfUid(uid){
+  const hit = subByUid(uid);
+  return !!hit && hit.group.acceptsAnyKind === true;
+}
+
+/* Вид категории Wallet по её операциям: у части категорий есть и расходы,
+   и доходы — «Разница» тому пример, и вид у неё не один. */
+function kindOf(w){
+  if (w.expense && w.income) return 'both';
+  return w.income ? 'income' : 'expense';
+}
+const KIND_RU = { expense: 'расход', income: 'доход', both: 'расход и доход' };
+
+/* Решение приводится к рабочему виду при каждом чтении. Три пути до подкатегории,
+   в порядке надёжности: живой uid, ключ подкатегории (им связь приезжает из файла,
+   где uid уже другой), пара имён (так подхватываются сохранения прошлых заходов
+   и черновик предложений). Не нашлось ничего, а ссылка была, — подкатегорию удалили,
+   и строка обязана сказать об этом, а не молча показать «решения нет». */
+function settle(raw){
+  const rule = { mode: raw.mode || 'sub', sub: '', key: raw.key || '', place: raw.place || '',
+    want: raw.want || raw.target || '', gone: false };
+  const alive = raw.sub && subByUid(raw.sub) ? raw.sub : '';
+  rule.sub = alive || uidByKey(rule.key) || uidByPair(rule.want);
+  rule.gone = !rule.sub && !!(raw.sub || raw.key);
+  if (rule.sub) {
+    const hit = subByUid(rule.sub);
+    rule.want = pairOf(hit.group, hit.sub);
+    rule.key = hit.sub.key;
+  }
+  return rule;
+}
+function draftOf(w){
+  if (w.decision === 'transfer') return { mode: 'transfer' };
+  if (w.decision === 'open') return { mode: 'open' };
+  return { mode: w.decision === 'place' ? 'place' : 'sub', want: w.target || '' };
+}
+function ruleOf(w){ return settle(state.map[w.id] || draftOf(w)); }
 function isMine(rule){ return rule.mode === 'sub' || rule.mode === 'place'; }
+
+// Решение принято и ведёт в живую подкатегорию
+function linked(rule){ return isMine(rule) && !!rule.sub; }
+// Решение принято, а подкатегории такой у нас пока нет: перенос её создаст
+function needsNew(rule){ return isMine(rule) && !rule.sub && !!rule.want && !rule.gone; }
+// Вид нашей подкатегории не сходится с видом операций Wallet
+function kindClash(w, rule){
+  if (!linked(rule) || anyKindOfUid(rule.sub)) return false;
+  const ours = kindOfUid(rule.sub);
+  return kindOf(w) === 'both' ? false : kindOf(w) !== ours;
+}
 
 function walletIndex(){
   const map = new Map();
   for (const w of SEED.wallet) {
     const rule = ruleOf(w);
-    if (!isMine(rule) || !rule.target) continue;
-    const box = map.get(rule.target) || { count: 0, names: [] };
+    if (!linked(rule)) continue;
+    const box = map.get(rule.sub) || { count: 0, names: [], clash: 0 };
     box.count += w.count; box.names.push(w.name);
-    map.set(rule.target, box);
+    if (kindClash(w, rule)) box.clash += 1;
+    map.set(rule.sub, box);
   }
   return map;
 }
@@ -385,16 +496,8 @@ function walletIndex(){
 // а они живут в state, которое поднимается ниже
 let WALLET = new Map();
 const TOTAL = SEED.wallet.reduce((sum, w) => sum + w.count, 0);
-const TRANSFERS = SEED.wallet.filter(w => w.decision === 'transfer')
-  .reduce((sum, w) => sum + w.count, 0);
 
-function pairOf(group, sub){ return group.name + ' / ' + sub.name; }
-function hitsOf(group, sub){ return WALLET.get(pairOf(group, sub)); }
-function existingPairs(){
-  const set = new Set();
-  for (const g of state.groups) for (const s of g.subs) set.add(pairOf(g, s));
-  return set;
-}
+function hitsOf(group, sub){ return WALLET.get(sub.uid); }
 
 /* ---------- отрисовка ---------- */
 function render(){
@@ -404,19 +507,19 @@ function render(){
     '<button class="add" onclick="editGroup(null)">+ Группа</button>' +
     renderPlaces();
 
-  const pairs = existingPairs();
   const q = document.getElementById('q').value.trim().toLowerCase();
   const buckets = new Map();
   for (const w of SEED.wallet) {
     const rule = ruleOf(w);
-    if (q && !(w.name.toLowerCase().includes(q) || (rule.target || '').toLowerCase().includes(q) ||
+    if (q && !(w.name.toLowerCase().includes(q) || (rule.want || '').toLowerCase().includes(q) ||
       (rule.place || '').toLowerCase().includes(q))) continue;
-    const covered = rule.mode === 'transfer' || rule.mode === 'skip' ||
-      (!!rule.target && pairs.has(rule.target));
+    const covered = rule.mode === 'transfer' || rule.mode === 'skip' || linked(rule);
+    const clash = kindClash(w, rule);
     if (filter === 'todo' && covered) continue;
-    if (filter === 'new' && w.decision !== 'new') continue;
+    if (filter === 'new' && !needsNew(rule)) continue;
     if (filter === 'place' && rule.mode !== 'place') continue;
-    (buckets.get(w.group) || buckets.set(w.group, []).get(w.group)).push({ w, rule, covered });
+    if (filter === 'clash' && !clash) continue;
+    (buckets.get(w.group) || buckets.set(w.group, []).get(w.group)).push({ w, rule, covered, clash });
   }
   const right = document.getElementById('right');
   const cards = [...buckets.entries()]
@@ -432,7 +535,7 @@ function render(){
     subs + ' ' + pl(subs, 'подкатегория', 'подкатегории', 'подкатегорий') + ' · ' +
     np + ' ' + pl(np, 'место', 'места', 'мест');
   document.getElementById('rightCount').textContent = SEED.wallet.length + ' категорий';
-  renderStats(pairs);
+  renderStats();
   save();
 }
 
@@ -453,10 +556,16 @@ function renderGroup(g){
     '</div>';
   const subs = g.subs.map(s => {
     const hit = hitsOf(g, s);
-    const tag = s.role === 'other' ? '<span class="tag other">приёмник</span>'
+    const role = s.role === 'other' ? '<span class="tag other">приёмник</span>'
       : s.role === 'service' ? '<span class="tag service">служебная</span>' : '';
+    // Сюда легли категории Wallet другого вида: доходные в расходную группу или наоборот
+    const clash = hit && hit.clash
+      ? '<span class="tag clash" title="' + hit.clash + ' ' +
+        pl(hit.clash, 'категория', 'категории', 'категорий') +
+        ' Wallet другого вида, чем эта группа">вид ⚠</span>' : '';
+    const tag = role + clash;
     const tip = hit ? ' title="Из Wallet: ' + esc(hit.names.join(', ')) + '"' : '';
-    return '<div class="grow sub" data-pair="' + esc(pairOf(g, s)) + '" draggable="true"' +
+    return '<div class="grow sub" data-sub="' + s.uid + '" draggable="true"' +
       ' ondragstart="dragStart(event,\'' + g.uid + '\',\'' + s.uid + '\')"' + tip + '>' +
       icon(s.icon) + '<span class="nm">' + esc(s.name) + '</span>' + tag +
       '<span class="cnt' + (hit ? '' : ' zero') + '">' + (hit ? hit.count : 0) + '</span>' +
@@ -475,7 +584,7 @@ function places(){
     const rule = ruleOf(w);
     if (rule.mode !== 'place' || !rule.place) continue;
     const box = byName.get(rule.place) ||
-      { name: rule.place, target: rule.target, count: 0, sources: [] };
+      { name: rule.place, target: rule.want, targetKey: rule.key, count: 0, sources: [] };
     box.count += w.count;
     box.sources.push(w.name);
     byName.set(rule.place, box);
@@ -531,20 +640,37 @@ function renderWalletRow(item){
   const w = item.w;
   const rule = item.rule;
   const index = SEED.wallet.indexOf(w);
-  const custom = !!state.map[w.name];
+  const custom = chosen(w);
+  const kind = kindOf(w);
 
-  const tags = { sub: 'в набор', place: 'место', transfer: 'перевод', skip: 'не переносим', open: 'решить' };
-  const tagClass = { sub: 'keep', place: 'place', transfer: 'transfer', skip: 'open', open: 'open' };
-  const tagText = (rule.mode === 'place' && rule.place ? 'место ✓' : tags[rule.mode]) +
-    (custom ? ' ·' : '');
+  /* Что станет с категорией, подписано словом, а не цветом одного тега: «заведём»
+     у переноса, который создаст подкатегорию, отличается от «в набор» у того,
+     который ляжет в готовую. Раньше и то и то было «в набор», и создание новой
+     ветки набора выглядело обычной привязкой. */
+  const label = rule.mode === 'transfer' ? ['transfer', 'перевод']
+    : rule.mode === 'skip' ? ['open', 'не переносим']
+    : rule.gone ? ['clash', 'подкатегории нет']
+    : rule.mode === 'place' ? (!rule.sub ? ['new', 'место, заведём']
+        : rule.place ? ['place', 'место ✓'] : ['place', 'место'])
+    : linked(rule) ? ['keep', 'в набор']
+    : needsNew(rule) ? ['new', 'заведём новую']
+    : ['open', 'решить'];
+
+  // Вид: расход у доходной группы (и наоборот) — это не мелочь, а перевёрнутый знак
+  const kindTag = '<span class="tag ' + (kind === 'both' ? 'service' : kind) + '" title="' +
+    (kind === 'both' ? w.expense + ' расходных и ' + w.income + ' доходных операций'
+      : 'все операции этой категории — ' + KIND_RU[kind]) + '">' + KIND_RU[kind] + '</span>';
+  const clashTag = item.clash
+    ? '<span class="tag clash" title="Операции ' + KIND_RU[kind] + ', а «' + esc(rule.want) +
+      '» лежит в группе вида «' + KIND_RU[kindOfUid(rule.sub)] + '»">вид ⚠</span>' : '';
 
   let act = '';
-  if (rule.mode === 'sub' && item.covered) {
+  if (linked(rule)) {
     act = '<button class="icon-btn" title="Показать в наборе слева" ' +
-      'onclick="event.stopPropagation();reveal(\'' + esc(rule.target) + '\')">⤢</button>';
-  } else if (rule.mode === 'sub' && rule.target) {
-    act = '<button class="icon-btn" title="Завести такую подкатегорию в наборе" ' +
-      'onclick="event.stopPropagation();fromWallet(' + index + ')">→</button>';
+      'onclick="event.stopPropagation();reveal(\'' + rule.sub + '\')">⤢</button>';
+  } else if (needsNew(rule)) {
+    act = '<button class="icon-btn" title="Завести такую подкатегорию и привязать к ней" ' +
+      'onclick="event.stopPropagation();fromWallet(' + index + ')">＋</button>';
   }
   act += '<button class="icon-btn" title="Куда переносить" ' +
     'onclick="event.stopPropagation();openTarget(' + index + ')">⋯</button>';
@@ -555,26 +681,30 @@ function renderWalletRow(item){
     : w.name;
   const where = rule.mode === 'transfer' ? 'Перевод: категория не нужна вовсе'
     : rule.mode === 'skip' ? 'Решено не переносить'
-    : rule.mode === 'place' ? 'Место «' + (rule.place || w.name) + '», операции лягут в «' + rule.target + '»'
-    : rule.target ? 'Операции лягут в «' + rule.target + '»' +
-        (item.covered ? ' — эта подкатегория в наборе уже есть' : ' — такой подкатегории в наборе пока нет')
+    : rule.gone ? 'Подкатегорию «' + rule.want + '» удалили из набора — выберите другую'
+    : rule.mode === 'place' ? 'Место «' + (rule.place || w.name) + '», операции лягут в «' + rule.want + '»' +
+        (rule.sub ? '' : ' — такой подкатегории в наборе пока нет, перенос её заведёт')
+    : linked(rule) ? 'Операции лягут в «' + rule.want + '» — эта подкатегория в наборе уже есть'
+    : needsNew(rule) ? 'Перенос заведёт новую подкатегорию «' + rule.want + '»: в наборе её пока нет'
     : 'Решение ещё не принято';
 
-  const shown = rule.mode === 'place' && rule.place ? rule.place + ' → ' + rule.target : rule.target;
+  const shown = rule.mode === 'place' && rule.place ? rule.place + ' → ' + rule.want : rule.want;
 
   return '<div class="wrow' + (item.covered ? ' done' : '') + '" onclick="openTarget(' + index + ')" title="' +
-      esc(what + '\n' + where + (custom ? '\nВыбор изменён вручную' : '') + '\n' + w.count + ' ' +
-        pl(w.count, 'операция', 'операции', 'операций') + ' в Wallet') + '">' +
+      esc(what + '\n' + where + '\nВ Wallet: ' + KIND_RU[kind] + ', ' + w.count + ' ' +
+        pl(w.count, 'операция', 'операции', 'операций') +
+        (custom ? '\nВыбор изменён вручную' : '')) + '">' +
     '<span class="dot"></span>' +
     '<span class="nm">' + esc(w.name) + '</span>' +
-    '<span class="tag ' + tagClass[rule.mode] + '">' + tagText + '</span>' +
+    kindTag + clashTag +
+    '<span class="tag ' + label[0] + '">' + label[1] + (custom ? ' ·' : '') + '</span>' +
     '<span class="tgt">' + esc(rule.mode === 'open' ? '' : (shown || '')) + '</span>' +
     '<span class="cnt" title="операций в этой категории Wallet">' + w.count + '</span>' +
     '<span class="acts">' + act + '</span></div>';
 }
 
-function reveal(pair){
-  const node = document.querySelector('[data-pair="' + pair.replace(/"/g, '&quot;') + '"]');
+function reveal(uid){
+  const node = document.querySelector('[data-sub="' + uid + '"]');
   if (!node) return;
   node.scrollIntoView({ block: 'center', behavior: 'smooth' });
   node.classList.remove('flash');
@@ -592,27 +722,36 @@ function foldAll(){
   render();
 }
 
-function renderStats(pairs){
-  let covered = 0, open = 0, aside = 0;
+function renderStats(){
+  let covered = 0, open = 0, aside = 0, clash = 0, gone = 0;
+  const fresh = new Set();
   for (const w of SEED.wallet) {
     const rule = ruleOf(w);
+    if (kindClash(w, rule)) clash += w.count;
+    if (rule.gone) gone += w.count;
+    if (needsNew(rule)) fresh.add(rule.want);
     if (rule.mode === 'transfer' || rule.mode === 'skip') { aside += w.count; continue; }
-    if (rule.target && pairs.has(rule.target)) covered += w.count; else open += w.count;
+    if (linked(rule)) covered += w.count; else open += w.count;
   }
   const pc = n => (n / TOTAL * 100).toFixed(1) + '%';
   document.getElementById('stats').innerHTML =
     '<div class="stat"><b>' + covered + '</b><i>операций Wallet ложится на набор</i></div>' +
     '<div class="stat"><b>' + open + '</b><i>пока некуда</i></div>' +
     '<div class="stat"><b>' + aside + '</b><i>переводы и то, что не переносим</i></div>' +
+    '<div class="stat"><b>' + fresh.size + '</b><i>' +
+      pl(fresh.size, 'подкатегорию', 'подкатегории', 'подкатегорий') + ' заведёт перенос</i></div>' +
+    (clash ? '<div class="stat" style="border-color:var(--neg)"><b>' + clash +
+      '</b><i>операций легло бы в группу другого вида</i></div>' : '') +
+    (gone ? '<div class="stat" style="border-color:var(--neg)"><b>' + gone +
+      '</b><i>операций смотрят на удалённую подкатегорию</i></div>' : '') +
     '<div class="meter" title="' + pc(covered) + ' покрыто">' +
       '<span style="width:' + (covered / TOTAL * 100) + '%;background:var(--keep)"></span>' +
       '<span style="width:' + (aside / TOTAL * 100) + '%;background:var(--line2)"></span>' +
       '<span style="width:' + (open / TOTAL * 100) + '%;background:var(--new)"></span>' +
     '</div>';
-  document.getElementById('foot').innerHTML =
-    'Счёт операций считается по паре «группа / подкатегория»: переименование оторвёт его от категории Wallet — это нормально, ' +
-    'соответствия всё равно задаются отдельной таблицей. Выгрузка от ' + SEED.generatedAt +
-    ' · страница собрана скриптом <code>tasks/wallet-import/tools/wallet_workbench.py</code>';
+  // Дата выгрузки — единственное, что от подписи внизу стоило оставить: она говорит,
+  // насколько свежи числа. Остальное место отдано таблицам
+  document.getElementById('when').textContent = 'выгрузка от ' + SEED.generatedAt;
 }
 
 /* ---------- правка ---------- */
@@ -626,18 +765,26 @@ function editGroup(uid){
     key: g ? g.key : '',
     icon: g ? g.icon : 'basket',
     kind: g ? g.kind : 'expense',
+    acceptsAnyKind: g ? g.acceptsAnyKind === true : true,
     withKind: true,
     onSave: (data) => {
-      if (g) { g.name = data.name; g.icon = data.icon; g.kind = data.kind; g.key = data.key; }
+      if (g) {
+        g.name = data.name; g.icon = data.icon; g.kind = data.kind; g.key = data.key;
+        g.acceptsAnyKind = data.acceptsAnyKind;
+      }
       else state.groups.push({ uid: 'g' + (seq++), key: data.key, name: data.name, kind: data.kind,
-        icon: data.icon, role: 'normal', subs: [
+        acceptsAnyKind: data.acceptsAnyKind, icon: data.icon, role: 'normal', subs: [
           { uid: 's' + (seq++), key: data.key + '.other', name: 'Прочее', icon: 'dots', role: 'other' }
         ] });
     }
   });
 }
 
-function editSub(gid, uid, preset){
+/* Правка подкатегории. Переименование связь не рвёт: решения держат uid, а он
+   у подкатегории не меняется ни от имени, ни от переезда в другую группу.
+   `after` получает uid заведённой подкатегории — им форма переноса привязывает
+   к ней категорию Wallet сразу же, не заставляя выбирать её второй раз. */
+function editSub(gid, uid, preset, after){
   const g = groupBy(gid);
   const s = uid ? g.subs.find(x => x.uid === uid) : null;
   openEditor({
@@ -655,37 +802,75 @@ function editSub(gid, uid, preset){
           icon: data.icon, role: 'normal' };
         const receiver = target.subs.findIndex(x => x.role !== 'normal');
         if (receiver < 0) target.subs.push(fresh); else target.subs.splice(receiver, 0, fresh);
+        if (after) after(fresh.uid);
       }
     }
   });
 }
 
-function fromWallet(index){
+/* «Заведём новую»: подкатегория создаётся из предложения и привязывается к строке
+   сразу. Вид и место приходят из формы переноса, если её открывали: выбранный там
+   режим важнее записанного — пользователь как раз его и меняет. */
+function fromWallet(index, mode, place){
   const w = SEED.wallet[index];
-  const target = (w.target || '').split(' / ');
-  const group = state.groups.find(g => g.name === target[0]) ||
-    state.groups.find(g => g.kind === (w.income ? 'income' : 'expense')) || state.groups[0];
+  const rule = ruleOf(w);
+  const want = (rule.want || w.name).split(' / ');
+  const kind = kindOf(w) === 'income' ? 'income' : 'expense';
+  const group = state.groups.find(g => g.name === want[0]) ||
+    state.groups.find(g => g.kind === kind) || state.groups[0];
   if (!group) { alert('Сначала заведите хотя бы одну группу'); return; }
-  editSub(group.uid, null, { name: target[1] || w.name, icon: group.icon });
+  const how = mode || (rule.mode === 'place' ? 'place' : 'sub');
+  const where = how === 'place' ? (place || rule.place || w.name) : '';
+  editSub(group.uid, null, { name: want[1] || want[0], icon: group.icon },
+    (uid) => link(w, how, uid, where));
 }
+
+// Одно место, где решение кладётся в таблицу: ключ подкатегории и подпись
+// пишутся рядом с uid, чтобы связь пережила и выгрузку, и чужой заход
+function link(w, mode, uid, place){
+  state.map[w.id] = { mode, sub: uid, key: '', want: '', place: place || '' };
+  const hit = subByUid(uid);
+  if (hit) {
+    state.map[w.id].key = hit.sub.key;
+    state.map[w.id].want = pairOf(hit.group, hit.sub);
+  }
+}
+
+const NEW_SUB = '@new';
 
 function openTarget(index){
   const w = SEED.wallet[index];
   const rule = ruleOf(w);
   const mode = rule.mode === 'transfer' ? 'skip' : rule.mode === 'open' ? 'sub' : rule.mode;
-  const pairs = state.groups.flatMap(g => g.subs.map(s => pairOf(g, s)));
-  const known = pairs.includes(rule.target);
-  const options = (known || !rule.target ? pairs : [rule.target].concat(pairs))
-    .map(pair => '<option value="' + esc(pair) + '"' + (pair === rule.target ? ' selected' : '') + '>' +
-      esc(pair) + (pair === rule.target && !known ? '  — такой подкатегории в наборе пока нет' : '') +
-      '</option>').join('');
+  const kind = kindOf(w);
+
+  /* Подкатегории в списке разложены по виду, и свой вид идёт первым: доходную
+     категорию Wallet проще не уронить в расходную группу, если расходные
+     не первые в списке. Совсем не запрещаем — «Возврат денег» бывает и там. */
+  const order = kind === 'income' ? ['income', 'expense'] : ['expense', 'income'];
+  const options = order.map(k => {
+    const inner = state.groups.filter(g => g.kind === k).map(g =>
+      g.subs.map(s => '<option value="' + s.uid + '"' + (s.uid === rule.sub ? ' selected' : '') + '>' +
+        esc(pairOf(g, s)) + (g.acceptsAnyKind ? ' · оба вида' : '') + '</option>').join('')).join('');
+    if (!inner) return '';
+    const mark = kind !== 'both' && k !== kind ? ' — другой вид' : '';
+    return '<optgroup label="' + (k === 'income' ? 'Доход' : 'Расход') + mark + '">' + inner + '</optgroup>';
+  }).join('') +
+    '<optgroup label="Нет нужной"><option value="' + NEW_SUB + '"' +
+      (!rule.sub && rule.want ? ' selected' : '') + '>＋ Завести новую подкатегорию' +
+      (rule.want && !rule.sub ? ': ' + esc(rule.want) : '') + '</option></optgroup>';
 
   document.getElementById('modal').innerHTML =
     '<h3>Куда переносить «' + esc(w.name) + '»</h3>' +
     '<p class="hint" style="margin:-8px 0 14px">' + w.count + ' ' +
-      pl(w.count, 'операция', 'операции', 'операций') + ' · в Wallet лежит в группе «' +
-      esc(w.group) + '»' + (state.map[w.name] ? ' · выбор изменён вручную' : ' · предложение по умолчанию') +
+      pl(w.count, 'операция', 'операции', 'операций') + ' · ' +
+      (kind === 'both' ? w.expense + ' расходных и ' + w.income + ' доходных'
+        : 'все ' + KIND_RU[kind]) +
+      ' · в Wallet лежит в группе «' + esc(w.group) + '»' +
+      (chosen(w) ? ' · выбор изменён вручную' : ' · предложение по умолчанию') +
       '</p>' +
+    (rule.gone ? '<p class="hint" style="color:var(--neg);margin:-8px 0 14px">Подкатегория «' +
+      esc(rule.want) + '», на которую смотрело решение, из набора удалена.</p>' : '') +
     '<div class="field"><label>Чем эта категория станет у нас</label>' +
       '<div class="modes">' +
         ['sub', 'place', 'skip'].map(m =>
@@ -696,16 +881,17 @@ function openTarget(index){
     '<div class="field" id="fPlaceBox"><label>Название места — с ним оно попадёт в справочник</label>' +
       '<input type="text" id="tPlace" value="' + esc(rule.place || w.name) + '"></div>' +
     '<div class="field" id="fTargetBox"><label>Операции лягут в подкатегорию</label>' +
-      '<select id="tTarget">' + options + '</select>' +
-      '<p class="hint">Нужной подкатегории в списке нет? Заведите её слева кнопкой «＋» у группы.</p></div>' +
+      '<select id="tTarget" onchange="warnKind(' + index + ')">' + options + '</select>' +
+      '<p class="hint" id="tWarn"></p></div>' +
     '<div class="row-end">' +
-      (state.map[w.name] ? '<button class="btn" onclick="resetTarget(' + index + ')">Вернуть предложенное</button>' : '') +
+      (chosen(w) ? '<button class="btn" onclick="resetTarget(' + index + ')">Вернуть предложенное</button>' : '') +
       '<button class="btn" onclick="closeEditor()">Отмена</button>' +
       '<button class="btn primary" onclick="commitTarget(' + index + ')">Сохранить</button>' +
     '</div>';
   document.getElementById('veil').classList.add('on');
   window.__editor = { targeting: true, index, mode };
   syncModes();
+  warnKind(index);
 }
 
 function pickMode(btn){
@@ -720,20 +906,44 @@ function syncModes(){
   document.getElementById('fTargetBox').style.display = mode === 'skip' ? 'none' : '';
 }
 
+// Вид выбранной подкатегории проверяется на месте: ошибка знака видна до сохранения
+function warnKind(index){
+  const box = document.getElementById('tWarn');
+  if (!box) return;
+  const w = SEED.wallet[index];
+  const uid = document.getElementById('tTarget').value;
+  if (uid === NEW_SUB) {
+    box.style.color = '';
+    box.textContent = 'Перенос заведёт новую подкатегорию: по «Сохранить» откроется её карточка.';
+    return;
+  }
+  const ours = kindOfUid(uid);
+  const clash = kindOf(w) !== 'both' && ours && ours !== kindOf(w) && !anyKindOfUid(uid);
+  box.style.color = clash ? 'var(--neg)' : '';
+  box.textContent = clash
+    ? 'Вид не сходится: операции ' + KIND_RU[kindOf(w)] + ', а группа — ' + KIND_RU[ours] +
+      '. Так тоже бывает (возвраты, компенсации), но проверьте.'
+    : 'Связь держится за саму подкатегорию: переименуете её — решение останется на месте.';
+}
+
 function commitTarget(index){
   const w = SEED.wallet[index];
   const mode = window.__editor.mode;
-  const target = mode === 'skip' ? '' : (document.getElementById('tTarget').value || '');
+  const uid = mode === 'skip' ? '' : (document.getElementById('tTarget').value || '');
   const place = mode === 'place' ? document.getElementById('tPlace').value.trim() : '';
   if (mode === 'place' && !place) { alert('Название места пустое'); return; }
-  if (mode !== 'skip' && !target) { alert('Выберите подкатегорию'); return; }
-  state.map[w.name] = { mode, target, place };
+  if (mode !== 'skip' && !uid) { alert('Выберите подкатегорию'); return; }
+  if (uid === NEW_SUB) { closeEditor(); fromWallet(index, mode, place); return; }
+  if (mode === 'skip') state.map[w.id] = { mode, sub: '', key: '', want: '', place: '' };
+  else link(w, mode, uid, place);
   closeEditor();
   render();
 }
 
 function resetTarget(index){
-  delete state.map[SEED.wallet[index].name];
+  const w = SEED.wallet[index];
+  delete state.map[w.id];
+  seedDrafts();
   closeEditor();
   render();
 }
@@ -757,17 +967,37 @@ function dropPlace(name){
   render();
 }
 
+// Сколько категорий Wallet смотрит на эти подкатегории: удаление рвёт связь,
+// и сказать об этом нужно до удаления, а не строкой «подкатегории нет» после
+function linkedTo(uids){
+  const set = new Set(uids);
+  let cats = 0, ops = 0;
+  for (const w of SEED.wallet) {
+    const rule = ruleOf(w);
+    if (linked(rule) && set.has(rule.sub)) { cats += 1; ops += w.count; }
+  }
+  return { cats, ops };
+}
+function linkWarning(uids){
+  const hit = linkedTo(uids);
+  if (!hit.cats) return '';
+  return '\n\nНа неё смотрит ' + hit.cats + ' ' +
+    pl(hit.cats, 'категория', 'категории', 'категорий') + ' Wallet (' + hit.ops + ' ' +
+    pl(hit.ops, 'операция', 'операции', 'операций') + '): решение по ним придётся принять заново.';
+}
+
 function delGroup(uid){
   const g = groupBy(uid);
   const kept = g.subs.filter(s => s.role === 'normal').length;
-  if (!confirm('Удалить группу «' + g.name + '»' + (kept ? ' и ' + kept + ' подкатегорий?' : '?'))) return;
+  if (!confirm('Удалить группу «' + g.name + '»' + (kept ? ' и ' + kept + ' подкатегорий?' : '?') +
+    linkWarning(g.subs.map(s => s.uid)))) return;
   state.groups = state.groups.filter(x => x.uid !== uid);
   render();
 }
 function delSub(gid, uid){
   const g = groupBy(gid);
   const s = g.subs.find(x => x.uid === uid);
-  if (!confirm('Удалить подкатегорию «' + s.name + '»?')) return;
+  if (!confirm('Удалить подкатегорию «' + s.name + '»?' + linkWarning([uid]))) return;
   g.subs = g.subs.filter(x => x.uid !== uid);
   render();
 }
@@ -782,6 +1012,12 @@ function openEditor(opts){
     '<div class="field"><label>Название</label><input type="text" id="fName" value="' +
       esc(opts.name) + '" oninput="syncKey()"></div>' +
     (opts.withGroup ? '<div class="field"><label>Группа</label><select id="fGroup">' + groups + '</select></div>' : '') +
+    (opts.withKind ? '<div class="field"><label>Принимает оба вида</label>' +
+      '<select id="fAnyKind">' +
+      '<option value="1"' + (opts.acceptsAnyKind ? ' selected' : '') + '>Да: возврат и кэшбэк лягут сюда же</option>' +
+      '<option value="0"' + (opts.acceptsAnyKind ? '' : ' selected') + '>Нет: только операции своего вида</option>' +
+      '</select><p class="hint">Вид говорит, на какой стороне отчёта группа живёт: ' +
+      'возврат в расходной группе вычтется из её расхода.</p></div>' : '') +
     (opts.withKind ? '<div class="field"><label>Вид</label><select id="fKind">' +
       '<option value="expense"' + (opts.kind === 'expense' ? ' selected' : '') + '>Расход</option>' +
       '<option value="income"' + (opts.kind === 'income' ? ' selected' : '') + '>Доход</option>' +
@@ -820,11 +1056,13 @@ function commit(){
   if (!name) { alert('Название пустое'); return; }
   const sel = document.getElementById('fGroup');
   const kindSel = document.getElementById('fKind');
+  const anyKindSel = document.getElementById('fAnyKind');
   opts.onSave({
     name,
     key: document.getElementById('fKey').value.trim() || slug(name),
     icon: window.__icon,
     kind: kindSel ? kindSel.value : undefined,
+    acceptsAnyKind: anyKindSel ? anyKindSel.value === '1' : opts.acceptsAnyKind === true,
     groupUid: sel ? sel.value : opts.groupUid
   });
   closeEditor();
@@ -873,14 +1111,22 @@ function exportJson(){
     seededAtUtc: state.seededAtUtc,
     note: state.note,
     groups: state.groups.map(g => ({
-      key: g.key, name: g.name, kind: g.kind, icon: g.icon, role: g.role,
+      key: g.key, name: g.name, kind: g.kind, acceptsAnyKind: g.acceptsAnyKind, icon: g.icon, role: g.role,
       subcategories: g.subs.map(s => ({ key: s.key, name: s.name, icon: s.icon, role: s.role }))
     })),
-    places: places().map(p => ({ name: p.name, target: p.target, sources: p.sources })),
+    places: places().map(p => ({ name: p.name, target: p.target, targetKey: p.targetKey,
+      sources: p.sources })),
+    /* Соответствия: категория Wallet узнаётся по своему идентификатору, наша
+       подкатегория — по ключу (из него в приложении выводится её идентификатор).
+       Названия рядом — для человека; вид операций выписан, чтобы расхождение
+       со видом группы было видно в файле, а не только на странице. */
     mapping: SEED.wallet.map(w => {
       const rule = ruleOf(w);
-      return { wallet: w.name, walletGroup: w.group, count: w.count,
-        mode: rule.mode, target: rule.target, place: rule.place || '' };
+      return { id: w.id, wallet: w.name, walletGroup: w.group, count: w.count,
+        walletKind: kindOf(w), expense: w.expense, income: w.income,
+        mode: rule.mode, targetKey: rule.key || '', target: rule.want || '',
+        creates: needsNew(rule), kindClash: kindClash(w, rule), place: rule.place || '',
+        reviewed: chosen(w) };
     })
   };
   const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
@@ -898,6 +1144,8 @@ function importFile(event){
       const data = JSON.parse(reader.result);
       if (!data.groups) throw new Error('нет списка групп');
       state = fromPreset(data);
+      upgradeMap();
+      seedDrafts();
       render();
     } catch (err) { alert('Файл не читается: ' + err.message); }
   };
@@ -916,7 +1164,39 @@ function flip(){
   root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
 }
 
+/* Решения прошлых заходов записаны парой имён. Раз развернув её в подкатегорию,
+   прикалываем решение к ней: иначе переименование снова оторвало бы связь, потому
+   что искать её было бы по-прежнему по имени. Неразвернувшиеся не трогаем —
+   в них ещё живёт след того, что имелось в виду. */
+function upgradeMap(){
+  for (const [id, raw] of Object.entries(state.map)) {
+    const rule = settle(raw);
+    if (!rule.sub) continue;
+    state.map[id] = { mode: rule.mode, sub: rule.sub, key: rule.key,
+      want: rule.want, place: rule.place, draft: !!raw.draft };
+  }
+}
+
+/* Черновик предложений тоже прикалывается к подкатегориям, а не остаётся парой
+   имён: иначе переименование рвало бы как раз то, к чему ещё не притрагивались,
+   и строка начинала бы просить завести подкатегорию с прежним именем.
+   Пометка draft отличает предложение от решения, принятого руками. */
+function seedDrafts(){
+  for (const w of SEED.wallet) {
+    if (state.map[w.id]) continue;
+    const rule = settle(draftOf(w));
+    state.map[w.id] = { mode: rule.mode, sub: rule.sub, key: rule.key,
+      want: rule.want, place: rule.place, draft: true };
+  }
+}
+function chosen(w){
+  const raw = state.map[w.id];
+  return !!raw && !raw.draft;
+}
+
 state = load();
+upgradeMap();
+seedDrafts();
 render();
 </script>
 </body>
