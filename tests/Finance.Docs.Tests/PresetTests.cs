@@ -226,6 +226,26 @@ public sealed class PresetTests
         Assert.Contains(Set.Groups, group => group.Kind == CategoryKind.Income);
     }
 
+    /// <summary>
+    /// Разбор строг: незнакомое поле, пропущенное обязательное и незнакомое имя
+    /// перечисления роняют загрузку. Настройки разбора живут в атрибуте генератора,
+    /// и выпавшая из него строка превратила бы опечатку в значение по умолчанию молча.
+    /// </summary>
+    /// <param name="original">Фрагмент настоящего файла.</param>
+    /// <param name="spoiled">Чем он заменяется.</param>
+    [Theory]
+    [InlineData("\"key\": \"food\",", "\"key\": \"food\", \"kidn\": \"expense\",")]
+    [InlineData("\"presetVersion\": 1,", "")]
+    [InlineData("\"kind\": \"expense\"", "\"kind\": \"expens\"")]
+    public void Испорченный_набор_не_разбирается(string original, string spoiled)
+    {
+        string json = File.ReadAllText(Repository.Preset);
+        string broken = json.Replace(original, spoiled, StringComparison.Ordinal);
+
+        Assert.NotEqual(json, broken);
+        Assert.Throws<JsonException>(() => Preset.Parse(broken));
+    }
+
     private static IReadOnlySet<string> LoadIcons()
     {
         using JsonDocument document = JsonDocument.Parse(File.ReadAllText(Repository.Icons));
