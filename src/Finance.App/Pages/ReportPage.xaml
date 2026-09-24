@@ -18,16 +18,18 @@
 
     <Grid RowDefinitions="Auto,Auto,Auto,*">
 
-        <Grid Grid.Row="0" Padding="16,12,16,4" ColumnDefinitions="*,*" ColumnSpacing="6"
-              RadioButtonGroup.GroupName="reportKind"
-              RadioButtonGroup.SelectedValue="{Binding Kind}">
-            <!-- Своим цветом и знаком, как вид операции в форме: общая плашка цветом
-                 действия под словом «Расходы» читалась цветом дохода -->
-            <RadioButton Grid.Column="0" Content="{x:Static texts:UiTexts.KindExpensePlural}" Value="{x:Static domain:CategoryKind.Expense}"
-                         ControlTemplate="{StaticResource ExpenseSegmentTemplate}" />
-            <RadioButton Grid.Column="1" Content="{x:Static texts:UiTexts.KindIncomePlural}" Value="{x:Static domain:CategoryKind.Income}"
-                         ControlTemplate="{StaticResource IncomeSegmentTemplate}" />
-        </Grid>
+        <!-- Своим цветом и знаком, как вид операции в форме: общая плашка цветом
+             действия под словом «Расходы» читалась цветом дохода -->
+        <Border Grid.Row="0" Margin="16,12,16,4" Style="{StaticResource SegmentBar}">
+            <Grid ColumnDefinitions="*,*" HeightRequest="{StaticResource TouchTarget}"
+                  RadioButtonGroup.GroupName="reportKind"
+                  RadioButtonGroup.SelectedValue="{Binding Kind}">
+                <RadioButton Grid.Column="0" Content="{x:Static texts:UiTexts.KindExpensePlural}" Value="{x:Static domain:CategoryKind.Expense}"
+                             ControlTemplate="{StaticResource ExpenseSegmentTemplate}" />
+                <RadioButton Grid.Column="1" Content="{x:Static texts:UiTexts.KindIncomePlural}" Value="{x:Static domain:CategoryKind.Income}"
+                             ControlTemplate="{StaticResource IncomeSegmentTemplate}" />
+            </Grid>
+        </Border>
 
         <Grid Grid.Row="1" Padding="16,4" ColumnDefinitions="Auto,*,Auto">
             <!-- Стрелки — круглые кнопки со значком. Знак ничего не говорит вслух:

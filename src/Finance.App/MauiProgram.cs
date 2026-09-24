@@ -30,6 +30,23 @@ public static class MauiProgram
             // Фигуру своего типа MAUI не находит: обработчики фигур записаны
             // поимённо, и без этой строки любой экран со значком падает при открытии
             .ConfigureMauiHandlers(handlers => handlers.AddHandler<Icon, ShapeViewHandler>())
+            // FitLabel подбирает кегль по ширине: сумма в двенадцать разрядов при крупном
+            // масштабе экрана иначе не помещается в строку. Прямой размер текста, который
+            // MAUI ставит по FontSize, платформа при включённом автоподборе не применяет,
+            // поэтому FontSize служит его верхним пределом
+            .ConfigureMauiHandlers(static _ => LabelHandler.Mapper.AppendToMapping(nameof(FitLabel), static (handler, view) =>
+            {
+                if (view is FitLabel fit)
+                {
+                    // Пределы кегля, шаг подбора в один пункт и единицы — пункты шрифта
+                    AndroidX.Core.Widget.TextViewCompat.SetAutoSizeTextTypeUniformWithConfiguration(
+                        handler.PlatformView,
+                        fit.MinimumSize,
+                        (int)Math.Max(fit.FontSize, fit.MinimumSize),
+                        1,
+                        (int)Android.Util.ComplexUnitType.Sp);
+                }
+            }))
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

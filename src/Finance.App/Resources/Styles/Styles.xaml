@@ -128,21 +128,57 @@
         <Setter Property="FontSize" Value="12" />
     </Style>
 
-    <!-- Главная цифра формы операции: вычисленный итог по центру -->
+    <!-- Главная цифра формы операции: вычисленный итог по центру, в одну строку.
+         Кегль 40 — верхний предел: длинную сумму FitLabel ужимает по ширине. Высота
+         закреплена: подсказка вместо итога мельче, и без неё карточка прыгала бы -->
     <Style x:Key="AmountHero" TargetType="Label">
         <Setter Property="FontFamily" Value="OpenSansSemibold" />
-        <Setter Property="FontSize" Value="34" />
+        <Setter Property="FontSize" Value="40" />
         <Setter Property="HorizontalTextAlignment" Value="Center" />
+        <Setter Property="VerticalTextAlignment" Value="Center" />
+        <Setter Property="HeightRequest" Value="56" />
+        <Setter Property="MaxLines" Value="1" />
     </Style>
 
-    <!-- Набранное выражение над итогом -->
-    <Style x:Key="AmountExpression" TargetType="Label">
-        <Setter Property="FontFamily" Value="OpenSansRegular" />
-        <Setter Property="FontSize" Value="13" />
+    <!-- Подсказка на месте итога, пока в сумме незакрыто действие: той же высоты,
+         что итог, чтобы карточка не прыгала -->
+    <Style x:Key="AmountPending" TargetType="Label">
+        <Setter Property="FontSize" Value="16" />
         <Setter Property="HorizontalTextAlignment" Value="Center" />
+        <Setter Property="VerticalTextAlignment" Value="Center" />
+        <Setter Property="HeightRequest" Value="56" />
         <Setter Property="TextColor"
                 Value="{AppThemeBinding Light={StaticResource Ink3Light}, Dark={StaticResource Ink3Dark}}" />
-        <Setter Property="MinimumHeightRequest" Value="18" />
+    </Style>
+
+    <!-- Набранное выражение над итогом — только когда в нём есть знак действия -->
+    <Style x:Key="AmountExpression" TargetType="Label">
+        <Setter Property="FontFamily" Value="OpenSansRegular" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+        <Setter Property="LineBreakMode" Value="HeadTruncation" />
+        <Setter Property="TextColor"
+                Value="{AppThemeBinding Light={StaticResource Ink2Light}, Dark={StaticResource Ink2Dark}}" />
+    </Style>
+
+    <!-- Значок поля под суммой: счёт или подкатегория на круглой плашке -->
+    <Style x:Key="FieldBadge" TargetType="Border">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource SunkLight}, Dark={StaticResource SunkDark}}" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 18" />
+        <Setter Property="WidthRequest" Value="36" />
+        <Setter Property="HeightRequest" Value="36" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
+
+    <!-- Подпись и значение поля под суммой -->
+    <Style x:Key="FieldValue" TargetType="Label">
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="LineBreakMode" Value="TailTruncation" />
+        <Setter Property="MaxLines" Value="1" />
     </Style>
 
     <!-- Заголовок пустого состояния и название экрана внутри страницы -->
@@ -407,12 +443,6 @@
         <Setter Property="Padding" Value="0" />
     </Style>
 
-    <!-- Поле суммы: набранное выражение, под ним итог. Набираемое сейчас
-         обводится цветом действия — обводку ставит триггер на самой странице -->
-    <Style x:Key="AmountField" TargetType="Border" BasedOn="{StaticResource Card}">
-        <Setter Property="Padding" Value="14,10" />
-    </Style>
-
     <Style TargetType="Entry">
         <Setter Property="TextColor"
                 Value="{AppThemeBinding Light={StaticResource InkLight}, Dark={StaticResource InkDark}}" />
@@ -500,24 +530,36 @@
         слова читаются как подпись, а не как выбор, и расход от дохода глазом
         не отличить. Шаблонов три, а не один с параметрами: цвет плашки живёт
         в сеттере состояния, а тот принимает только готовое значение.
+        Сегменты стоят в одной плитке и читаются одним переключателем, а не тремя
+        кнопками: без полей, во всю её высоту, углы срезает сама плитка. Выбранный
+        залит своим цветом с жирной подписью кнопки действия: бледная плашка того же
+        тона сливалась с соседними, и выбор с первого взгляда не читался.
     -->
+    <Style x:Key="SegmentBar" TargetType="Border" BasedOn="{StaticResource Card}" />
+
     <ControlTemplate x:Key="ExpenseSegmentTemplate">
-        <Border x:Name="Plate" BackgroundColor="Transparent" StrokeThickness="0"
-                StrokeShape="RoundRectangle 8" Padding="0,8"
-                MinimumHeightRequest="{StaticResource TouchTarget}">
-            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
-                <controls:Icon Key="arrow-down-left"
+        <Border x:Name="Plate" StrokeThickness="0"
+                StrokeShape="Rectangle" Padding="0"
+                MinimumHeightRequest="{StaticResource TouchTarget}"
+                BackgroundColor="Transparent">
+            <Grid HorizontalOptions="Center" ColumnDefinitions="Auto,*" ColumnSpacing="6" Padding="4,0">
+                <controls:Icon x:Name="Glyph" Key="arrow-down-left"
                                Stroke="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
-                <Label x:Name="Caption" Text="{TemplateBinding Content}" VerticalOptions="Center"
+                <controls:FitLabel x:Name="Caption" Grid.Column="1" MinimumSize="11" Text="{TemplateBinding Content}" VerticalOptions="Center"
                        TextColor="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
-            </HorizontalStackLayout>
+            </Grid>
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroupList>
                     <VisualStateGroup x:Name="CheckedStates">
                         <VisualState x:Name="Checked">
                             <VisualState.Setters>
                                 <Setter TargetName="Plate" Property="Border.BackgroundColor"
-                                        Value="{AppThemeBinding Light={StaticResource NegativeBackgroundLight}, Dark={StaticResource NegativeBackgroundDark}}" />
+                                        Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+                                <Setter TargetName="Glyph" Property="Shape.Stroke"
+                                        Value="{AppThemeBinding Light={StaticResource OnAccentLight}, Dark={StaticResource OnAccentDark}}" />
+                                <Setter TargetName="Caption" Property="Label.TextColor"
+                                        Value="{AppThemeBinding Light={StaticResource OnAccentLight}, Dark={StaticResource OnAccentDark}}" />
+                                <Setter TargetName="Caption" Property="Label.FontFamily" Value="OpenSansSemibold" />
                             </VisualState.Setters>
                         </VisualState>
                         <VisualState x:Name="Unchecked" />
@@ -528,22 +570,28 @@
     </ControlTemplate>
 
     <ControlTemplate x:Key="IncomeSegmentTemplate">
-        <Border x:Name="Plate" BackgroundColor="Transparent" StrokeThickness="0"
-                StrokeShape="RoundRectangle 8" Padding="0,8"
-                MinimumHeightRequest="{StaticResource TouchTarget}">
-            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
-                <controls:Icon Key="arrow-up-right"
+        <Border x:Name="Plate" StrokeThickness="0"
+                StrokeShape="Rectangle" Padding="0"
+                MinimumHeightRequest="{StaticResource TouchTarget}"
+                BackgroundColor="Transparent">
+            <Grid HorizontalOptions="Center" ColumnDefinitions="Auto,*" ColumnSpacing="6" Padding="4,0">
+                <controls:Icon x:Name="Glyph" Key="arrow-up-right"
                                Stroke="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
-                <Label x:Name="Caption" Text="{TemplateBinding Content}" VerticalOptions="Center"
+                <controls:FitLabel x:Name="Caption" Grid.Column="1" MinimumSize="11" Text="{TemplateBinding Content}" VerticalOptions="Center"
                        TextColor="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
-            </HorizontalStackLayout>
+            </Grid>
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroupList>
                     <VisualStateGroup x:Name="CheckedStates">
                         <VisualState x:Name="Checked">
                             <VisualState.Setters>
                                 <Setter TargetName="Plate" Property="Border.BackgroundColor"
-                                        Value="{AppThemeBinding Light={StaticResource PositiveBackgroundLight}, Dark={StaticResource PositiveBackgroundDark}}" />
+                                        Value="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
+                                <Setter TargetName="Glyph" Property="Shape.Stroke"
+                                        Value="{AppThemeBinding Light={StaticResource OnAccentLight}, Dark={StaticResource OnAccentDark}}" />
+                                <Setter TargetName="Caption" Property="Label.TextColor"
+                                        Value="{AppThemeBinding Light={StaticResource OnAccentLight}, Dark={StaticResource OnAccentDark}}" />
+                                <Setter TargetName="Caption" Property="Label.FontFamily" Value="OpenSansSemibold" />
                             </VisualState.Setters>
                         </VisualState>
                         <VisualState x:Name="Unchecked" />
@@ -554,24 +602,28 @@
     </ControlTemplate>
 
     <ControlTemplate x:Key="TransferSegmentTemplate">
-        <Border x:Name="Plate" BackgroundColor="Transparent" StrokeThickness="0"
-                StrokeShape="RoundRectangle 8" Padding="0,8"
-                MinimumHeightRequest="{StaticResource TouchTarget}">
-            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
-                <controls:Icon Key="swap"
-                               Stroke="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
-                <Label x:Name="Caption" Text="{TemplateBinding Content}" VerticalOptions="Center"
-                       TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
-            </HorizontalStackLayout>
+        <Border x:Name="Plate" StrokeThickness="0"
+                StrokeShape="Rectangle" Padding="0"
+                MinimumHeightRequest="{StaticResource TouchTarget}"
+                BackgroundColor="Transparent">
+            <Grid HorizontalOptions="Center" ColumnDefinitions="Auto,*" ColumnSpacing="6" Padding="4,0">
+                <controls:Icon x:Name="Glyph" Key="swap"
+                               Stroke="{AppThemeBinding Light={StaticResource TransferLight}, Dark={StaticResource TransferDark}}" />
+                <controls:FitLabel x:Name="Caption" Grid.Column="1" MinimumSize="11" Text="{TemplateBinding Content}" VerticalOptions="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource TransferLight}, Dark={StaticResource TransferDark}}" />
+            </Grid>
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroupList>
                     <VisualStateGroup x:Name="CheckedStates">
                         <VisualState x:Name="Checked">
                             <VisualState.Setters>
                                 <Setter TargetName="Plate" Property="Border.BackgroundColor"
-                                        Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}" />
+                                        Value="{AppThemeBinding Light={StaticResource TransferLight}, Dark={StaticResource TransferDark}}" />
+                                <Setter TargetName="Glyph" Property="Shape.Stroke"
+                                        Value="{AppThemeBinding Light={StaticResource OnAccentLight}, Dark={StaticResource OnAccentDark}}" />
                                 <Setter TargetName="Caption" Property="Label.TextColor"
-                                        Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource InkDark}}" />
+                                        Value="{AppThemeBinding Light={StaticResource OnAccentLight}, Dark={StaticResource OnAccentDark}}" />
+                                <Setter TargetName="Caption" Property="Label.FontFamily" Value="OpenSansSemibold" />
                             </VisualState.Setters>
                         </VisualState>
                         <VisualState x:Name="Unchecked" />

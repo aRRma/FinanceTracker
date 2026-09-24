@@ -25,6 +25,10 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     private static readonly TransactionKind[] KindOrder =
         [TransactionKind.Expense, TransactionKind.Income, TransactionKind.Transfer];
 
+    // Значки невыбранных полей — ключи набора значков интерфейса
+    private const string NoAccountIcon = "wallet";
+    private const string NoCategoryIcon = "tag";
+
     private readonly ITransactionFormQuery _form;
     private readonly ITransactionCardQuery _card;
     private readonly ISaveTransactionHandler _save;
@@ -105,6 +109,8 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     [NotifyPropertyChangedFor(nameof(IsNotTransfer))]
     [NotifyPropertyChangedFor(nameof(SourceLabel))]
     [NotifyPropertyChangedFor(nameof(CanSave))]
+    [NotifyPropertyChangedFor(nameof(AmountHero))]
+    [NotifyPropertyChangedFor(nameof(AmountTone))]
     public partial TransactionKind Kind { get; set; } = TransactionKind.Expense;
 
     /// <summary>
@@ -141,8 +147,10 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// Сумма, как набрана: выражение из четырёх действий или число.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(AmountPreview))]
     [NotifyPropertyChangedFor(nameof(AmountDisplay))]
+    [NotifyPropertyChangedFor(nameof(HasAmountOperation))]
+    [NotifyPropertyChangedFor(nameof(AmountHero))]
+    [NotifyPropertyChangedFor(nameof(AmountTone))]
     [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial string Amount { get; set; } = string.Empty;
 
@@ -150,8 +158,10 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// Сумма зачисления — у перевода между валютами.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(TargetAmountPreview))]
     [NotifyPropertyChangedFor(nameof(TargetAmountDisplay))]
+    [NotifyPropertyChangedFor(nameof(HasTargetAmountOperation))]
+    [NotifyPropertyChangedFor(nameof(TargetAmountHero))]
+    [NotifyPropertyChangedFor(nameof(TargetAmountTone))]
     [NotifyPropertyChangedFor(nameof(CanSave))]
     public partial string TargetAmount { get; set; } = string.Empty;
 
@@ -182,7 +192,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     public bool IsTargetAmountActive => ActiveAmount is AmountField.Target;
 
     /// <summary>
-    /// Набранное выражение для показа над итогом. Пустое поле — пустая строка: ноль показывает итог.
+    /// Набранное выражение для показа над итогом — когда в нём есть знак действия.
     /// </summary>
     public string AmountDisplay => Amount;
 
@@ -192,18 +202,40 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     public string TargetAmountDisplay => TargetAmount;
 
     /// <summary>
-    /// Итог выражения в валюте счёта списания. Показывается, только когда в поле
-    /// уже число: пока действие не закрыто, итог даёт клавиша «=» — считать за
-    /// пользователя раньше, чем он попросил, значит показывать не тот итог,
-    /// который он набирает. Пустое поле показывает ноль в валюте: главная цифра
-    /// формы не должна пропадать.
+    /// В сумме набран знак действия. Только тогда над итогом показано выражение:
+    /// у простого числа оно повторяло бы итог.
     /// </summary>
-    public string AmountPreview => Preview(Amount, SourceAccount?.Currency);
+    public bool HasAmountOperation => AmountInput.HasOperation(Amount);
 
     /// <summary>
-    /// Итог суммы зачисления в валюте счёта зачисления — по тем же правилам.
+    /// В сумме зачисления набран знак действия.
     /// </summary>
-    public string TargetAmountPreview => Preview(TargetAmount, TargetAccount?.Currency);
+    public bool HasTargetAmountOperation => AmountInput.HasOperation(TargetAmount);
+
+    /// <summary>
+    /// Главная цифра формы: итог в валюте счёта списания со знаком вида — расход
+    /// с минусом, доход с плюсом, перевод без знака, как в ленте. Пустое поле
+    /// показывает ноль в валюте: главная цифра формы не должна пропадать.
+    /// Пока действие не закрыто, вместо итога — подсказка про «=»: считать за
+    /// пользователя раньше, чем он попросил, значит показывать не тот итог,
+    /// который он набирает, а минус вида перед выражением читался бы вычитанием.
+    /// </summary>
+    public string AmountHero => Hero(Amount, SourceAccount?.Currency, Kind);
+
+    /// <summary>
+    /// Каким тоном показана главная цифра формы.
+    /// </summary>
+    public AmountTone AmountTone => Tone(Amount, SourceAccount?.Currency, Kind);
+
+    /// <summary>
+    /// Сумма зачисления крупно. Знака у неё нет: зачисление бывает только у перевода.
+    /// </summary>
+    public string TargetAmountHero => Hero(TargetAmount, TargetAccount?.Currency, TransactionKind.Transfer);
+
+    /// <summary>
+    /// Каким тоном показана сумма зачисления.
+    /// </summary>
+    public AmountTone TargetAmountTone => Tone(TargetAmount, TargetAccount?.Currency, TransactionKind.Transfer);
 
     /// <summary>
     /// Сохранять есть что: счёт выбран и суммы набраны до конца. Кнопка сохранения
@@ -239,29 +271,40 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// Счёт списания.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(AmountPreview))]
+    [NotifyPropertyChangedFor(nameof(AmountHero))]
+    [NotifyPropertyChangedFor(nameof(AmountTone))]
     [NotifyPropertyChangedFor(nameof(NeedsTargetAmount))]
     [NotifyPropertyChangedFor(nameof(EarliestDate))]
     [NotifyPropertyChangedFor(nameof(CanSave))]
     [NotifyPropertyChangedFor(nameof(SourceAccountCaption))]
+    [NotifyPropertyChangedFor(nameof(SourceAccountIcon))]
     public partial AccountOption? SourceAccount { get; set; }
 
     /// <summary>
     /// Счёт зачисления — у перевода.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(TargetAmountPreview))]
+    [NotifyPropertyChangedFor(nameof(TargetAmountHero))]
+    [NotifyPropertyChangedFor(nameof(TargetAmountTone))]
     [NotifyPropertyChangedFor(nameof(NeedsTargetAmount))]
     [NotifyPropertyChangedFor(nameof(EarliestDate))]
     [NotifyPropertyChangedFor(nameof(CanSave))]
     [NotifyPropertyChangedFor(nameof(TargetAccountCaption))]
+    [NotifyPropertyChangedFor(nameof(TargetAccountIcon))]
+    [NotifyPropertyChangedFor(nameof(HasTargetAccount))]
     public partial AccountOption? TargetAccount { get; set; }
+
+    /// <summary>
+    /// Счёт зачисления выбран: иначе поле показывает приглашение цветом действия.
+    /// </summary>
+    public bool HasTargetAccount => TargetAccount is not null;
 
     /// <summary>
     /// Подкатегория — у дохода и расхода.
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CategoryCaption))]
+    [NotifyPropertyChangedFor(nameof(CategoryIcon))]
     [NotifyPropertyChangedFor(nameof(HasCategory))]
     public partial CategoryOption? Category { get; set; }
 
@@ -295,6 +338,22 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// Место в строке-поле. Место необязательно, и пустое так и подписано.
     /// </summary>
     public string PlaceCaption => PlaceName.Length > 0 ? PlaceName : UiTexts.CommonOptional;
+
+    /// <summary>
+    /// Значок счёта списания — тот же, что у счёта в балансах и в выборе. Пока счёт
+    /// не выбран — общий значок кошелька.
+    /// </summary>
+    public string SourceAccountIcon => SourceAccount?.Icon ?? NoAccountIcon;
+
+    /// <summary>
+    /// Значок счёта зачисления.
+    /// </summary>
+    public string TargetAccountIcon => TargetAccount?.Icon ?? NoAccountIcon;
+
+    /// <summary>
+    /// Значок выбранной подкатегории, пока не выбрана — общий значок метки.
+    /// </summary>
+    public string CategoryIcon => Category?.Icon ?? NoCategoryIcon;
 
     /// <summary>
     /// Категория выбрана: иначе строка показывает приглашение приглушённо.
@@ -938,4 +997,27 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         : AmountInput.HasOperation(expression) ? string.Empty
         : AmountExpression.TryEvaluate(expression, out decimal value) ? Money.Restore(value, known).Display
         : string.Empty;
+
+    // Знак вида ставится только ненулевому итогу: «−0,00 ₽» читался бы как долг
+    private static string Hero(string expression, Currency? currency, TransactionKind kind) =>
+        AmountInput.HasOperation(expression) ? UiTexts.TransactionPressEquals
+        : currency is not { } known || !AmountExpression.TryEvaluate(expression, out decimal value) || value is 0m
+            ? Preview(expression, currency)
+        : kind switch
+        {
+            TransactionKind.Expense => Money.Restore(-value, known).DisplaySigned,
+            TransactionKind.Income => Money.Restore(value, known).DisplaySigned,
+            _ => Money.Restore(value, known).Display,
+        };
+
+    // Незакрытое действие тона не получает: итог тогда скрыт, на его месте подсказка
+    private static AmountTone Tone(string expression, Currency? currency, TransactionKind kind) =>
+        currency is null || !AmountExpression.TryEvaluate(expression, out decimal value) || value is 0m
+            ? AmountTone.Placeholder
+        : kind switch
+        {
+            TransactionKind.Expense => AmountTone.Expense,
+            TransactionKind.Income => AmountTone.Income,
+            _ => AmountTone.Plain,
+        };
 }

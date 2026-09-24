@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Форма операции — вариант Б и две палитры видов</title>
+<!--
+  Набросок, а не макет: форма операции по отзыву от 24 сентября 2026. Из двух вариантов
+  шапки выбран «Б» — одна карточка: вид, сумма, счёт и категория; необязательное ниже.
+  Раздаётся из корня репозитория, иначе не найдутся шрифты приложения и контуры значков:
+  dotnet tools/serve.cs -- . 8778  →  http://127.0.0.1:8778/docs/design/transaction-form.html
+  Экран 375×835 dp — телефон с крупным масштабом и трёхкнопочной навигацией, на котором
+  заметка уходила под клавиатуру. Клавиатура и панели — в тех же размерах, что в приложении.
+  Цвета палитр сверены с порогом контраста 4,5: текст на странице и на карточке, подпись
+  на заливке — в обеих темах.
+-->
+<style>
+@font-face{font-family:"Open Sans";src:url(/src/Finance.App/Resources/Fonts/OpenSans-Regular.ttf);font-weight:400}
+@font-face{font-family:"Open Sans";src:url(/src/Finance.App/Resources/Fonts/OpenSans-Semibold.ttf);font-weight:600}
+:root{
+  --paper:#EDEFF1;--card:#FFFFFF;--sunk:#F4F6F7;
+  --ink:#16191C;--ink2:#4C535A;--ink3:#676D74;--line:#E3E6E9;
+  --acc:#0F5C4C;--accbg:#E2EFEB;--onacc:#FFFFFF;
+}
+.dark{
+  --paper:#101315;--card:#1C2124;--sunk:#252B2F;
+  --ink:#E7EAEC;--ink2:#A8AFB5;--ink3:#8A9299;--line:#2F373C;
+  --acc:#48A78E;--accbg:#1B342D;--onacc:#0B1310;
+}
+/* Палитры видов операции: расход, доход, перевод */
+.p1{--neg:#C9302C;--pos:#15784A;--trf:#2259D6}
+.p1.dark{--neg:#FF8A80;--pos:#5FD08F;--trf:#8AB1FF}
+.p2{--neg:#C2305F;--pos:#0F7A63;--trf:#6C4BD6}
+.p2.dark{--neg:#FF8FB1;--pos:#4FD1B0;--trf:#B39DFF}
+.ph{--negbg:color-mix(in srgb,var(--neg) 12%,var(--card));--posbg:color-mix(in srgb,var(--pos) 12%,var(--card));--trfbg:color-mix(in srgb,var(--trf) 12%,var(--card))}
+.ph.dark{--negbg:color-mix(in srgb,var(--neg) 18%,var(--card));--posbg:color-mix(in srgb,var(--pos) 18%,var(--card));--trfbg:color-mix(in srgb,var(--trf) 18%,var(--card))}
+
+*{box-sizing:border-box}
+body{margin:0;padding:28px;background:#D9DDE0;font-family:"Open Sans",sans-serif;color:#16191C}
+h1{font-size:22px;font-weight:600;margin:0 0 6px}
+.lead{margin:0 0 26px;max-width:120ch;font-size:14px;color:#4C535A}
+section{margin:0 0 40px}
+section h2{font-size:18px;font-weight:600;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+section h2 i{display:inline-block;width:18px;height:18px;border-radius:9px}
+section>p{margin:0 0 14px;max-width:120ch;font-size:13.5px;color:#4C535A}
+.phones{display:flex;gap:22px;align-items:flex-start}
+figure.unit{margin:0}
+.unit figcaption{font-size:12.5px;color:#4C535A;margin:0 0 6px;max-width:375px}
+
+.ph{position:relative;width:375px;height:835px;background:var(--paper);color:var(--ink);overflow:hidden;border-radius:18px;box-shadow:0 0 0 1px #0002}
+.status{height:28px;background:var(--card)}
+.bar{height:56px;background:var(--card);display:flex;align-items:center;gap:14px;padding:0 10px 0 16px}
+.bar h3{flex:1;margin:0;font-size:19px;font-weight:600}
+.bar .save{background:var(--acc);color:var(--onacc);font-weight:600;font-size:15px;padding:0 18px;height:40px;line-height:40px;border-radius:20px}
+.body{position:absolute;left:0;right:0;top:84px;bottom:289px;overflow:hidden}
+.kp{position:absolute;left:0;right:0;bottom:48px;height:241px;display:grid;grid-template-columns:3fr 1fr;gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.kp .n{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:1px}
+.kp .o{display:grid;grid-template-rows:repeat(5,1fr);background:var(--sunk)}
+.kp b{background:var(--card);display:flex;align-items:center;justify-content:center;font-weight:400;font-size:22px}
+.kp .o b{background:none;color:var(--acc)}
+.navbar{position:absolute;left:0;right:0;bottom:0;height:48px;background:var(--card)}
+
+svg.i{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+svg.s{width:18px;height:18px}
+.mut{color:var(--ink3)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:12px 16px 0;overflow:hidden}
+.card.main{margin-top:8px}
+
+/* Вид операции: сегменты без полей сверху и снизу, выбранный залит своим цветом */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);height:48px;border-bottom:1px solid var(--line)}
+.tabs b{display:flex;align-items:center;justify-content:center;gap:6px;font-weight:400;font-size:15.5px}
+.tabs b.exp{color:var(--neg)}.tabs b.inc{color:var(--pos)}.tabs b.trf{color:var(--trf)}
+.tabs b.on{color:var(--onacc);font-weight:600}
+.tabs b.exp.on{background:var(--neg)}.tabs b.inc.on{background:var(--pos)}.tabs b.trf.on{background:var(--trf)}
+
+/* Сумма: как раньше — подпись, набранное выражение, крупный итог, всё по центру */
+.amt{padding:14px 16px 16px;text-align:center}
+.amt .cap{font-size:12.5px;color:var(--ink3)}
+.amt .expr{font-size:17px;color:var(--ink2);min-height:26px;letter-spacing:.01em}
+.amt .hero{font-size:42px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden}
+.amt .hero.exp{color:var(--neg)}.amt .hero.inc{color:var(--pos)}.amt .hero.trf{color:var(--ink)}
+.amt .hero.zero{color:var(--ink3)}
+.amt .hero.wait{font-size:17px;font-weight:400;color:var(--ink3);line-height:50px}
+
+/* Счёт и категория под суммой, пополам, со значками */
+.fields{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.cell{display:flex;align-items:center;gap:10px;min-height:58px;padding:6px 12px;min-width:0}
+.cell+.cell{border-left:1px solid var(--line)}
+.cell .g{min-width:0}
+.cell .k{font-size:12px;color:var(--ink3)}
+.cell .v{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell .v.ask{color:var(--acc)}
+.ico{width:36px;height:36px;border-radius:18px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--sunk);color:var(--ink2)}
+.ico.exp{background:var(--negbg);color:var(--neg)}.ico.inc{background:var(--posbg);color:var(--pos)}.ico.trf{background:var(--trfbg);color:var(--trf)}
+.hint{font-size:12px;color:var(--ink3);padding:7px 14px 9px;border-top:1px solid var(--line)}
+
+.rowx{display:flex;align-items:center;gap:12px;min-height:48px;padding:0 14px;color:var(--ink2)}
+.rowx+.rowx{border-top:1px solid var(--line)}
+.rowx .v{flex:1;font-size:15.5px;color:var(--ink)}
+.rowx .k{font-size:15px;color:var(--ink2)}
+.rowx .r{flex:1;text-align:right;font-size:15.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rowx .r.mut{color:var(--ink3)}
+.chip{font-size:13px;padding:5px 12px;border-radius:16px;border:1px solid var(--line);color:var(--ink2)}
+.chip.on{background:var(--accbg);border-color:transparent;color:var(--acc)}
+.dark .chip.on{color:var(--ink)}
+.note{color:var(--ink3);font-size:16px;flex:1}
+</style>
+</head>
+<body>
+
+<h1>Форма операции · вариант Б, доработка</h1>
+<p class="lead">Одна карточка сверху: вид операции без полей, сумма, счёт и категория. Поле суммы снова крупное:
+подпись, под ней набранное выражение, ниже итог 42 dp со знаком и цветом вида. Расход «−» своим цветом,
+доход «+», перевод без знака и основным текстом, пустая сумма — серый ноль. Пока действие не закрыто, выражение
+стоит на своём месте сверху, а вместо итога — приглушённая подсказка: итог по-прежнему только по «=».
+Значок категории стоит на плашке цвета вида. Место, дата и заметка — всё необязательное — во второй карточке.
+Экран 375×835 dp, крупный масштаб и трёхкнопочная навигация.</p>
+
+<section>
+  <h2><i style="background:#C9302C"></i><i style="background:#15784A"></i><i style="background:#2259D6"></i>Палитра 1 · Сочная: красный, зелёный, синий</h2>
+  <p>Привычные цвета денег, только чище и ярче нынешних кирпичного и болотного. Перевод получает свой синий
+  и перестаёт совпадать с цветом кнопки «Сохранить».</p>
+  <div class="phones" data-palette="p1"></div>
+</section>
+
+<section>
+  <h2><i style="background:#C2305F"></i><i style="background:#0F7A63"></i><i style="background:#6C4BD6"></i>Палитра 2 · Ягодная: малиновый, изумрудный, фиолетовый</h2>
+  <p>Смелее и праздничнее: расход малиновый, доход изумрудный, перевод фиолетовый.
+  Красный и зелёный читаются по-прежнему, но мягче.</p>
+  <div class="phones" data-palette="p2"></div>
+</section>
+
+<script>
+const S = [
+  {kind:'exp', expr:'1200', hero:'−1 200,00 ₽', acc:'Карта', accIcon:'credit-card', cat:'Продукты', catIcon:'shopping-cart', place:'Магнит', cap:'Расход'},
+  {kind:'inc', expr:'1 200 + 5', hero:'нажмите «=», чтобы посчитать', wait:true, acc:'Карта', accIcon:'credit-card', cat:null, place:null, cap:'Доход, в сумме незакрытое действие, категория не выбрана'},
+  {kind:'trf', expr:'5000', hero:'5 000,00 ₽', acc:'Карта', accIcon:'credit-card', to:'Наличные', toIcon:'cash', cap:'Перевод'},
+  {kind:'exp', expr:'1200', hero:'−1 200,00 ₽', acc:'Карта', accIcon:'credit-card', cat:'Продукты', catIcon:'shopping-cart', place:'Магнит', cap:'Тёмная тема', dark:true},
+];
+
+const i = (k, s='') => `<svg class="i ${s}" data-i="${k}"></svg>`;
+const tabs = kind => `<div class="tabs">
+  <b class="exp ${kind==='exp'?'on':''}">${i('arrow-down-left','s')}Расход</b>
+  <b class="inc ${kind==='inc'?'on':''}">${i('arrow-up-right','s')}Доход</b>
+  <b class="trf ${kind==='trf'?'on':''}">${i('swap','s')}Перевод</b></div>`;
+const amt = s => `<div class="amt"><div class="cap">Сумма</div><div class="expr">${s.expr}</div>
+  <div class="hero ${s.wait ? 'wait' : s.kind}">${s.hero}</div></div>`;
+const cell = (k, v, icon, vCls='', icoCls='') => `<div class="cell"><span class="ico ${icoCls}">${i(icon,'s')}</span>
+  <span class="g"><div class="k">${k}</div><div class="v ${vCls}">${v}</div></span></div>`;
+const date = `<div class="rowx">${i('calendar')}<span class="v">Сегодня</span>
+  <span class="chip on">Сегодня</span><span class="chip">Вчера</span><span class="chip">…</span></div>`;
+const note = `<div class="rowx">${i('pencil')}<span class="note">Заметка — необязательно</span></div>`;
+
+function form(s){
+  const fields = s.kind==='trf'
+    ? `<div class="fields">${cell('Откуда', s.acc, s.accIcon)}${cell('Куда', s.to, s.toIcon)}</div><div class="hint">Перевод не попадает ни в доходы, ни в расходы</div>`
+    : `<div class="fields">${cell('Счёт', s.acc, s.accIcon)}${s.cat ? cell('Категория', s.cat, s.catIcon, '', s.kind) : cell('Категория', 'Выбрать', 'tag', 'ask')}</div>`;
+  const place = s.kind==='trf' ? '' : `<div class="rowx">${i('map-pin')}<span class="k">Место</span>
+    <span class="r ${s.place ? '' : 'mut'}">${s.place ?? 'Необязательно'}</span>${i('chevron-right','s')}</div>`;
+  return `<div class="card main">${tabs(s.kind)}${amt(s)}${fields}</div><div class="card">${date}${place}${note}</div>`;
+}
+
+const keypad = `<div class="kp"><div class="n">${['7','8','9','4','5','6','1','2','3',',','0'].map(k=>`<b>${k}</b>`).join('')}<b>${i('backspace')}</b></div>
+  <div class="o">${['÷','×','−','+','='].map(k=>`<b>${k}</b>`).join('')}</div></div>`;
+
+for (const host of document.querySelectorAll('.phones')) {
+  host.innerHTML = S.map(s => `<figure class="unit"><figcaption>${s.cap}</figcaption>
+    <div class="ph ${host.dataset.palette} ${s.dark?'dark':''}"><div class="status"></div>
+    <div class="bar"><span style="display:flex;transform:rotate(180deg)">${i('chevron-right')}</span><h3>Новая операция</h3><span class="save">Сохранить</span></div>
+    <div class="body">${form(s)}</div>${keypad}<div class="navbar"></div></div></figure>`).join('');
+}
+
+fetch('/data/icon-paths.json').then(r => r.json()).then(j => {
+  for (const el of document.querySelectorAll('svg[data-i]')) {
+    el.setAttribute('viewBox', '0 0 24 24');
+    el.innerHTML = `<path d="${j.icons[el.dataset.i] ?? ''}"/>`;
+  }
+  document.body.dataset.ready = '1';
+});
+</script>
+</body>
+</html>

@@ -5,6 +5,10 @@
     Форма перестраивается по виду: у перевода второй счёт вместо категории и места,
     вторая сумма — только при разных валютах счетов. Клавиатура суммы прижата
     к низу и открыта сразу: сумму меняют всегда. Сохранение — на панели заголовка.
+
+    Две карточки: в первой обязательное — вид, сумма, счёт и категория, во второй
+    всё, что можно не заполнять, — дата, место и заметка. Набросок и отвергнутый
+    вариант с тремя полями в ряд — docs/design/transaction-form.html.
 -->
 <pages:DataPage
     x:Class="Finance.App.Pages.TransactionPage"
@@ -43,156 +47,228 @@
     <Grid RowDefinitions="*,Auto,Auto" SafeAreaEdges="Container, Container, Container, All">
 
         <ScrollView Grid.Row="0">
-            <VerticalStackLayout Padding="16,12" Spacing="16">
+            <VerticalStackLayout Padding="16,8" Spacing="12">
 
-                <!-- Вид операции. По умолчанию расход — он записывается чаще всего.
-                     У каждого вида свой цвет и свой знак: три одинаковых слова
-                     читаются как подпись, а не как выбор -->
-                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="6"
-                      RadioButtonGroup.GroupName="kind"
-                      RadioButtonGroup.SelectedValue="{Binding Kind}">
-                    <RadioButton Grid.Column="0" Content="{x:Static texts:UiTexts.KindExpense}" Value="{x:Static domain:TransactionKind.Expense}"
-                                 ControlTemplate="{StaticResource ExpenseSegmentTemplate}" />
-                    <RadioButton Grid.Column="1" Content="{x:Static texts:UiTexts.KindIncome}" Value="{x:Static domain:TransactionKind.Income}"
-                                 ControlTemplate="{StaticResource IncomeSegmentTemplate}" />
-                    <RadioButton Grid.Column="2" Content="{x:Static texts:UiTexts.KindTransfer}" Value="{x:Static domain:TransactionKind.Transfer}"
-                                 ControlTemplate="{StaticResource TransferSegmentTemplate}" />
-                </Grid>
-
-                <!-- Набранное выражение сверху, его итог под ним: считать в уме при
-                     разделе счёта не приходится, а сохраняется именно итог. Итог
-                     незакрытого действия показывает клавиша «=» -->
-                <Border Style="{StaticResource AmountField}">
-                    <Border.Triggers>
-                        <DataTrigger TargetType="Border" Binding="{Binding IsSourceAmountActive}" Value="True">
-                            <Setter Property="Stroke"
-                                    Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
-                        </DataTrigger>
-                    </Border.Triggers>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ActivateSourceAmountCommand}" />
-                    </Border.GestureRecognizers>
-
-                    <!-- Итог — главная цифра экрана, по центру и крупно; набранное
-                         выражение над ним мелким. Пока ничего не набрано, итог показывает
-                         ноль в валюте: пустая рамка читалась как поломка. С незакрытым
-                         действием итога нет — вместо него видно само выражение -->
-                    <VerticalStackLayout Spacing="4">
-                        <Label Text="{x:Static texts:UiTexts.TransactionAmount}" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="Center" />
-                        <Label Text="{Binding AmountDisplay}" Style="{StaticResource AmountExpression}" />
-                        <Label Text="{Binding AmountPreview}" Style="{StaticResource AmountHero}" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <Border Style="{StaticResource AmountField}" IsVisible="{Binding NeedsTargetAmount}">
-                    <Border.Triggers>
-                        <DataTrigger TargetType="Border" Binding="{Binding IsTargetAmountActive}" Value="True">
-                            <Setter Property="Stroke"
-                                    Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
-                        </DataTrigger>
-                    </Border.Triggers>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ActivateTargetAmountCommand}" />
-                    </Border.GestureRecognizers>
-
-                    <VerticalStackLayout Spacing="4">
-                        <Label Text="{x:Static texts:UiTexts.TransactionTargetAmount}" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="Center" />
-                        <Label Text="{Binding TargetAmountDisplay}" Style="{StaticResource AmountExpression}" />
-                        <Label Text="{Binding TargetAmountPreview}" Style="{StaticResource AmountHero}" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <!--
-                    Счёт, категория и место выбираются на своих экранах: списков
-                    здесь по полсотни строк, и системный выпадающий список показывал
-                    бы их сплошняком, без групп, значков и поиска. В форме остаётся
-                    строка со значением и знаком перехода.
-                -->
                 <Border Style="{StaticResource Card}">
                     <VerticalStackLayout>
-                        <Grid Padding="14,12" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12"
-                              MinimumHeightRequest="{StaticResource TouchTarget}">
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnPickAccount" />
-                            </Grid.GestureRecognizers>
 
-                            <controls:Icon Grid.Column="0" Key="wallet" Style="{StaticResource MutedIcon}" />
-                            <Label Grid.Column="1" Text="{Binding SourceLabel}" VerticalOptions="Center"
-                                   Style="{StaticResource SecondaryLabel}" />
-                            <Label Grid.Column="2" Text="{Binding SourceAccountCaption}" VerticalOptions="Center"
-                                   HorizontalTextAlignment="End" LineBreakMode="TailTruncation" />
-                            <controls:Icon Grid.Column="3" Key="chevron-right" Style="{StaticResource MutedIcon}" />
+                        <!-- Вид операции. По умолчанию расход — он записывается чаще всего.
+                             Сегменты во всю высоту шапки карточки, углы срезает сама карточка -->
+                        <Grid ColumnDefinitions="*,*,*" HeightRequest="{StaticResource TouchTarget}"
+                              RadioButtonGroup.GroupName="kind"
+                              RadioButtonGroup.SelectedValue="{Binding Kind}">
+                            <RadioButton Grid.Column="0" Content="{x:Static texts:UiTexts.KindExpense}" Value="{x:Static domain:TransactionKind.Expense}"
+                                         ControlTemplate="{StaticResource ExpenseSegmentTemplate}" />
+                            <RadioButton Grid.Column="1" Content="{x:Static texts:UiTexts.KindIncome}" Value="{x:Static domain:TransactionKind.Income}"
+                                         ControlTemplate="{StaticResource IncomeSegmentTemplate}" />
+                            <RadioButton Grid.Column="2" Content="{x:Static texts:UiTexts.KindTransfer}" Value="{x:Static domain:TransactionKind.Transfer}"
+                                         ControlTemplate="{StaticResource TransferSegmentTemplate}" />
+                        </Grid>
+
+                        <BoxView Style="{StaticResource Divider}" />
+
+                        <!--
+                            Итог — главная цифра экрана, крупно и поровну отступив сверху
+                            и снизу. Выражение появляется над ним, в верхнем отступе, только
+                            когда набран знак действия: у простого числа оно повторяло бы итог.
+                            Подписи «Сумма» нет — поле и так узнаётся, а вслух его называет
+                            описание. Набираемое поле подсвечено, только когда полей два.
+                        -->
+                        <Grid RowDefinitions="30,Auto,30" Padding="16,0"
+                              SemanticProperties.Description="{x:Static texts:UiTexts.TransactionAmount}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ActivateSourceAmountCommand}" />
+                            </Grid.GestureRecognizers>
+                            <Grid.Triggers>
+                                <MultiTrigger TargetType="Grid">
+                                    <MultiTrigger.Conditions>
+                                        <BindingCondition Binding="{Binding NeedsTargetAmount}" Value="True" />
+                                        <BindingCondition Binding="{Binding IsSourceAmountActive}" Value="True" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="BackgroundColor"
+                                            Value="{AppThemeBinding Light={StaticResource SunkLight}, Dark={StaticResource SunkDark}}" />
+                                </MultiTrigger>
+                            </Grid.Triggers>
+
+                            <Label Grid.Row="0" Text="{Binding AmountDisplay}" Style="{StaticResource AmountExpression}"
+                                   IsVisible="{Binding HasAmountOperation}" VerticalOptions="End" />
+                            <!-- Подсказка про «=» — отдельной подписью, а не тем же полем
+                                 мельче: главная цифра подбирает кегль по ширине и раздула бы её -->
+                            <Label Grid.Row="1" Text="{Binding AmountHero}" Style="{StaticResource AmountPending}"
+                                   IsVisible="{Binding HasAmountOperation}" />
+                            <controls:FitLabel Grid.Row="1" Text="{Binding AmountHero}" Style="{StaticResource AmountHero}">
+                                <controls:FitLabel.Triggers>
+                                    <DataTrigger TargetType="controls:FitLabel" Binding="{Binding HasAmountOperation}" Value="True">
+                                        <Setter Property="IsVisible" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="controls:FitLabel" Binding="{Binding AmountTone}" Value="{x:Static card:AmountTone.Expense}">
+                                        <Setter Property="TextColor"
+                                                Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="controls:FitLabel" Binding="{Binding AmountTone}" Value="{x:Static card:AmountTone.Income}">
+                                        <Setter Property="TextColor"
+                                                Value="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="controls:FitLabel" Binding="{Binding AmountTone}" Value="{x:Static card:AmountTone.Placeholder}">
+                                        <Setter Property="TextColor"
+                                                Value="{AppThemeBinding Light={StaticResource Ink3Light}, Dark={StaticResource Ink3Dark}}" />
+                                    </DataTrigger>
+                                </controls:FitLabel.Triggers>
+                            </controls:FitLabel>
+                        </Grid>
+
+                        <!-- Сумма зачисления — у перевода между валютами. Подпись у неё
+                             остаётся: без неё две суммы в одной карточке не различить -->
+                        <VerticalStackLayout IsVisible="{Binding NeedsTargetAmount}">
+                            <BoxView Style="{StaticResource Divider}" />
+                            <Grid RowDefinitions="30,Auto,30" Padding="16,0">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ActivateTargetAmountCommand}" />
+                                </Grid.GestureRecognizers>
+                                <Grid.Triggers>
+                                    <DataTrigger TargetType="Grid" Binding="{Binding IsTargetAmountActive}" Value="True">
+                                        <Setter Property="BackgroundColor"
+                                                Value="{AppThemeBinding Light={StaticResource SunkLight}, Dark={StaticResource SunkDark}}" />
+                                    </DataTrigger>
+                                </Grid.Triggers>
+
+                                <Grid Grid.Row="0" ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="End">
+                                    <Label Grid.Column="0" Text="{x:Static texts:UiTexts.TransactionTargetAmount}" Style="{StaticResource CaptionLabel}"
+                                           VerticalOptions="Center" />
+                                    <Label Grid.Column="1" Text="{Binding TargetAmountDisplay}" Style="{StaticResource AmountExpression}"
+                                           IsVisible="{Binding HasTargetAmountOperation}" HorizontalTextAlignment="End" />
+                                </Grid>
+                                <Label Grid.Row="1" Text="{Binding TargetAmountHero}" Style="{StaticResource AmountPending}"
+                                       IsVisible="{Binding HasTargetAmountOperation}" />
+                                <controls:FitLabel Grid.Row="1" Text="{Binding TargetAmountHero}" Style="{StaticResource AmountHero}">
+                                    <controls:FitLabel.Triggers>
+                                        <DataTrigger TargetType="controls:FitLabel" Binding="{Binding HasTargetAmountOperation}" Value="True">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="controls:FitLabel" Binding="{Binding TargetAmountTone}" Value="{x:Static card:AmountTone.Placeholder}">
+                                            <Setter Property="TextColor"
+                                                    Value="{AppThemeBinding Light={StaticResource Ink3Light}, Dark={StaticResource Ink3Dark}}" />
+                                        </DataTrigger>
+                                    </controls:FitLabel.Triggers>
+                                </controls:FitLabel>
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <BoxView Style="{StaticResource Divider}" />
+
+                        <!--
+                            Счёт и категория — под суммой, пополам. Выбираются на своих
+                            экранах: списков по полсотни строк, и системный выпадающий список
+                            показал бы их сплошняком, без групп, значков и поиска. Значок
+                            у счёта — его типа, у категории — самой подкатегории на плашке
+                            цвета вида. У перевода справа вместо категории — счёт зачисления.
+                        -->
+                        <Grid ColumnDefinitions="*,1,*">
+                            <Grid Grid.Column="0" Padding="12,8" ColumnDefinitions="Auto,*" ColumnSpacing="10"
+                                  MinimumHeightRequest="58">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnPickAccount" />
+                                </Grid.GestureRecognizers>
+                                <Border Grid.Column="0" Style="{StaticResource FieldBadge}">
+                                    <controls:Icon Key="{Binding SourceAccountIcon}" HorizontalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                    <Label Text="{Binding SourceLabel}" Style="{StaticResource CaptionLabel}" />
+                                    <Label Text="{Binding SourceAccountCaption}" Style="{StaticResource FieldValue}" />
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <BoxView Grid.Column="1" WidthRequest="1"
+                                     Color="{AppThemeBinding Light={StaticResource LineLight}, Dark={StaticResource LineDark}}" />
+
+                            <Grid Grid.Column="2" Padding="12,8" ColumnDefinitions="Auto,*" ColumnSpacing="10"
+                                  MinimumHeightRequest="58" IsVisible="{Binding IsNotTransfer}">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnPickCategory" />
+                                </Grid.GestureRecognizers>
+                                <Border Grid.Column="0" Style="{StaticResource FieldBadge}">
+                                    <Border.Triggers>
+                                        <MultiTrigger TargetType="Border">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition Binding="{Binding HasCategory}" Value="True" />
+                                                <BindingCondition Binding="{Binding Kind}" Value="{x:Static domain:TransactionKind.Expense}" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="BackgroundColor"
+                                                    Value="{AppThemeBinding Light={StaticResource NegativeBackgroundLight}, Dark={StaticResource NegativeBackgroundDark}}" />
+                                        </MultiTrigger>
+                                        <MultiTrigger TargetType="Border">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition Binding="{Binding HasCategory}" Value="True" />
+                                                <BindingCondition Binding="{Binding Kind}" Value="{x:Static domain:TransactionKind.Income}" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="BackgroundColor"
+                                                    Value="{AppThemeBinding Light={StaticResource PositiveBackgroundLight}, Dark={StaticResource PositiveBackgroundDark}}" />
+                                        </MultiTrigger>
+                                    </Border.Triggers>
+                                    <controls:Icon Key="{Binding CategoryIcon}" HorizontalOptions="Center">
+                                        <controls:Icon.Triggers>
+                                            <MultiTrigger TargetType="controls:Icon">
+                                                <MultiTrigger.Conditions>
+                                                    <BindingCondition Binding="{Binding HasCategory}" Value="True" />
+                                                    <BindingCondition Binding="{Binding Kind}" Value="{x:Static domain:TransactionKind.Expense}" />
+                                                </MultiTrigger.Conditions>
+                                                <Setter Property="Stroke"
+                                                        Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+                                            </MultiTrigger>
+                                            <MultiTrigger TargetType="controls:Icon">
+                                                <MultiTrigger.Conditions>
+                                                    <BindingCondition Binding="{Binding HasCategory}" Value="True" />
+                                                    <BindingCondition Binding="{Binding Kind}" Value="{x:Static domain:TransactionKind.Income}" />
+                                                </MultiTrigger.Conditions>
+                                                <Setter Property="Stroke"
+                                                        Value="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
+                                            </MultiTrigger>
+                                        </controls:Icon.Triggers>
+                                    </controls:Icon>
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                    <Label Text="{x:Static texts:UiTexts.TransactionCategory}" Style="{StaticResource CaptionLabel}" />
+                                    <Label Text="{Binding CategoryCaption}" Style="{StaticResource FieldValue}">
+                                        <Label.Triggers>
+                                            <!-- Невыбранная категория подписана цветом действия:
+                                                 это приглашение, а не значение поля -->
+                                            <DataTrigger TargetType="Label" Binding="{Binding HasCategory}" Value="False">
+                                                <Setter Property="TextColor"
+                                                        Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <Grid Grid.Column="2" Padding="12,8" ColumnDefinitions="Auto,*" ColumnSpacing="10"
+                                  MinimumHeightRequest="58" IsVisible="{Binding IsTransfer}">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnPickTargetAccount" />
+                                </Grid.GestureRecognizers>
+                                <Border Grid.Column="0" Style="{StaticResource FieldBadge}">
+                                    <controls:Icon Key="{Binding TargetAccountIcon}" HorizontalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                    <Label Text="{x:Static texts:UiTexts.TransactionTarget}" Style="{StaticResource CaptionLabel}" />
+                                    <Label Text="{Binding TargetAccountCaption}" Style="{StaticResource FieldValue}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding HasTargetAccount}" Value="False">
+                                                <Setter Property="TextColor"
+                                                        Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Grid>
                         </Grid>
 
                         <VerticalStackLayout IsVisible="{Binding IsTransfer}">
                             <BoxView Style="{StaticResource Divider}" />
-
-                            <Grid Padding="14,12" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12"
-                                  MinimumHeightRequest="{StaticResource TouchTarget}">
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnPickTargetAccount" />
-                                </Grid.GestureRecognizers>
-
-                                <controls:Icon Grid.Column="0" Key="swap" Style="{StaticResource MutedIcon}" />
-                                <Label Grid.Column="1" Text="{x:Static texts:UiTexts.TransactionTarget}" VerticalOptions="Center"
-                                       Style="{StaticResource SecondaryLabel}" />
-                                <Label Grid.Column="2" Text="{Binding TargetAccountCaption}" VerticalOptions="Center"
-                                       HorizontalTextAlignment="End" LineBreakMode="TailTruncation" />
-                                <controls:Icon Grid.Column="3" Key="chevron-right" Style="{StaticResource MutedIcon}" />
-                            </Grid>
-
-                            <Label Padding="14,0,14,10" Text="{x:Static texts:UiTexts.TransactionTransferHint}"
+                            <Label Padding="14,6,14,8" Text="{x:Static texts:UiTexts.TransactionTransferHint}"
                                    Style="{StaticResource CaptionLabel}" />
                         </VerticalStackLayout>
 
-                        <VerticalStackLayout IsVisible="{Binding IsNotTransfer}">
-                            <BoxView Style="{StaticResource Divider}" />
-
-                            <Grid Padding="14,12" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12"
-                                  MinimumHeightRequest="{StaticResource TouchTarget}">
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnPickCategory" />
-                                </Grid.GestureRecognizers>
-
-                                <controls:Icon Grid.Column="0" Key="tag" Style="{StaticResource MutedIcon}" />
-                                <Label Grid.Column="1" Text="{x:Static texts:UiTexts.TransactionCategory}" VerticalOptions="Center"
-                                       Style="{StaticResource SecondaryLabel}" />
-                                <Label Grid.Column="2" Text="{Binding CategoryCaption}" VerticalOptions="Center"
-                                       HorizontalTextAlignment="End" LineBreakMode="TailTruncation">
-                                    <Label.Triggers>
-                                        <!-- Невыбранная категория подписана приглушённо: это
-                                             приглашение, а не значение поля -->
-                                        <DataTrigger TargetType="Label" Binding="{Binding HasCategory}" Value="False">
-                                            <Setter Property="TextColor"
-                                                    Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
-                                <controls:Icon Grid.Column="3" Key="chevron-right" Style="{StaticResource MutedIcon}" />
-                            </Grid>
-
-                            <BoxView Style="{StaticResource Divider}" />
-
-                            <Grid Padding="14,12" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12"
-                                  MinimumHeightRequest="{StaticResource TouchTarget}">
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnPickPlace" />
-                                </Grid.GestureRecognizers>
-
-                                <controls:Icon Grid.Column="0" Key="map-pin" Style="{StaticResource MutedIcon}" />
-                                <Label Grid.Column="1" Text="{x:Static texts:UiTexts.TransactionPlace}" VerticalOptions="Center"
-                                       Style="{StaticResource SecondaryLabel}" />
-                                <Label Grid.Column="2" Text="{Binding PlaceCaption}" VerticalOptions="Center"
-                                       HorizontalTextAlignment="End" LineBreakMode="TailTruncation">
-                                    <Label.Triggers>
-                                        <DataTrigger TargetType="Label" Binding="{Binding HasPlace}" Value="False">
-                                            <Setter Property="Style" Value="{StaticResource CaptionLabel}" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
-                                <controls:Icon Grid.Column="3" Key="chevron-right" Style="{StaticResource MutedIcon}" />
-                            </Grid>
-                        </VerticalStackLayout>
                     </VerticalStackLayout>
                 </Border>
 
@@ -262,8 +338,33 @@
                                     MaximumDate="{Binding LatestDate}"
                                     Opacity="0" HeightRequest="1" MinimumHeightRequest="1" InputTransparent="True" />
 
+                        <!-- Место необязательно, поэтому стоит здесь, рядом с датой и
+                             заметкой, а не под суммой со счётом и категорией -->
+                        <VerticalStackLayout IsVisible="{Binding IsNotTransfer}">
+                            <BoxView Style="{StaticResource Divider}" />
+                            <Grid Padding="14,0" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12"
+                                  MinimumHeightRequest="{StaticResource TouchTarget}">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnPickPlace" />
+                                </Grid.GestureRecognizers>
+
+                                <controls:Icon Grid.Column="0" Key="map-pin" Style="{StaticResource MutedIcon}" />
+                                <Label Grid.Column="1" Text="{x:Static texts:UiTexts.TransactionPlace}" VerticalOptions="Center"
+                                       Style="{StaticResource SecondaryLabel}" />
+                                <Label Grid.Column="2" Text="{Binding PlaceCaption}" VerticalOptions="Center"
+                                       HorizontalTextAlignment="End" LineBreakMode="TailTruncation">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding HasPlace}" Value="False">
+                                            <Setter Property="Style" Value="{StaticResource CaptionLabel}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <controls:Icon Grid.Column="3" Key="chevron-right" Style="{StaticResource MutedIcon}" />
+                            </Grid>
+                        </VerticalStackLayout>
+
                         <BoxView Style="{StaticResource Divider}" />
-                        <Grid Padding="14,4,14,4" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Grid Padding="14,0" ColumnDefinitions="Auto,*" ColumnSpacing="12">
                             <controls:Icon Grid.Column="0" Key="pencil" Style="{StaticResource MutedIcon}" />
                             <Entry Grid.Column="1" Text="{Binding Note}" Placeholder="{x:Static texts:UiTexts.TransactionNotePlaceholder}"
                                    Focused="OnTextFocused" Unfocused="OnTextUnfocused" />

@@ -291,6 +291,9 @@
   <data name="TransactionAmount" xml:space="preserve">
     <value>Сумма</value>
   </data>
+  <data name="TransactionPressEquals" xml:space="preserve">
+    <value>нажмите «=», чтобы посчитать</value>
+  </data>
   <data name="TransactionTargetAmount" xml:space="preserve">
     <value>Зачисление</value>
   </data>

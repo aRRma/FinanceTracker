@@ -2,6 +2,7 @@ using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
+using Finance.Application.Texts;
 using Finance.Domain.Enums;
 using Finance.Domain.Errors;
 using Finance.Domain.Values;
@@ -33,14 +34,14 @@ public sealed class TransactionKeypadTests
         }
 
         Assert.Equal("1250+340", model.Amount);
-        Assert.Equal(string.Empty, model.AmountPreview);
+        Assert.True(model.HasAmountOperation);
         Assert.True(model.CanSave);
 
         model.EvaluateCommand.Execute(null);
 
         Assert.Equal("1590", model.Amount);
-        // Разряды в показе разделены неразрывным пробелом — сверяется хвост суммы
-        Assert.Contains("590,00", model.AmountPreview, StringComparison.Ordinal);
+        // Сверка через Display: разряды разделены пробелом, который в тесте не набрать
+        Assert.Equal(Money.Restore(-1590m, Currency.RUB).DisplaySigned, model.AmountHero);
     }
 
     /// <summary>
@@ -125,7 +126,7 @@ public sealed class TransactionKeypadTests
 
         // Пока ничего не набрано, выражение пусто, а итог показывает ноль в валюте счёта
         Assert.Equal(string.Empty, model.AmountDisplay);
-        Assert.Equal(Money.Restore(0m, Currency.RUB).Display, model.AmountPreview);
+        Assert.Equal(Money.Restore(0m, Currency.RUB).Display, model.AmountHero);
 
         model.PressKeyCommand.Execute("0");
 
@@ -134,6 +135,70 @@ public sealed class TransactionKeypadTests
         model.PressKeyCommand.Execute("5");
 
         Assert.True(model.CanSave);
+    }
+
+    /// <summary>
+    /// Итог крупно подписан знаком вида: расход минусом, доход плюсом, перевод
+    /// без знака. Ноль знака не получает — «−0,00 ₽» читался бы как долг.
+    /// </summary>
+    [Fact]
+    public async Task Итог_подписан_знаком_вида()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        await fixture.AccountAsync("Карта");
+
+        TransactionViewModel model = Model(fixture);
+        await model.LoadAsync(key: null);
+
+        Assert.Equal(Money.Restore(0m, Currency.RUB).Display, model.AmountHero);
+        Assert.Equal(AmountTone.Placeholder, model.AmountTone);
+
+        model.PressKeyCommand.Execute("1");
+        model.PressKeyCommand.Execute("2");
+
+        Assert.Equal(Money.Restore(-12m, Currency.RUB).DisplaySigned, model.AmountHero);
+        Assert.StartsWith("-", model.AmountHero, StringComparison.Ordinal);
+        Assert.Equal(AmountTone.Expense, model.AmountTone);
+
+        model.Kind = TransactionKind.Income;
+
+        Assert.StartsWith("+", model.AmountHero, StringComparison.Ordinal);
+        Assert.Equal(AmountTone.Income, model.AmountTone);
+
+        model.Kind = TransactionKind.Transfer;
+
+        Assert.Equal(Money.Restore(12m, Currency.RUB).Display, model.AmountHero);
+        Assert.Equal(AmountTone.Plain, model.AmountTone);
+    }
+
+    /// <summary>
+    /// Выражение над итогом показано только со знаком действия: у простого числа
+    /// оно повторяло бы итог. Пока действие не закрыто, вместо итога подсказка
+    /// про «=», а знак вида не ставится — перед выражением он читался бы вычитанием.
+    /// </summary>
+    [Fact]
+    public async Task Выражение_показано_только_со_знаком_действия()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        await fixture.AccountAsync("Карта");
+
+        TransactionViewModel model = Model(fixture);
+        await model.LoadAsync(key: null);
+
+        model.PressKeyCommand.Execute("7");
+
+        Assert.False(model.HasAmountOperation);
+
+        model.PressKeyCommand.Execute("+");
+        model.PressKeyCommand.Execute("5");
+
+        Assert.True(model.HasAmountOperation);
+        Assert.Equal(UiTexts.TransactionPressEquals, model.AmountHero);
+
+        model.EvaluateCommand.Execute(null);
+
+        Assert.False(model.HasAmountOperation);
+        Assert.Equal(Money.Restore(-12m, Currency.RUB).DisplaySigned, model.AmountHero);
     }
 
     /// <summary>
