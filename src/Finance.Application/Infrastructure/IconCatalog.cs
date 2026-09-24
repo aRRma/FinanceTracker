@@ -10,7 +10,7 @@ namespace Finance.Application.Infrastructure;
 /// офлайн-first, и значок, не нарисовавшийся без сети, — это дыра в интерфейсе там,
 /// где никакой сети не требовалось.
 /// </summary>
-public sealed class IconCatalog
+public sealed partial class IconCatalog
 {
     private const string ResourceName = "Finance.Application.icons.json";
 
@@ -46,7 +46,7 @@ public sealed class IconCatalog
         using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(ResourceName)
                               ?? throw new InvalidOperationException(Faults.ResourceMissing(ResourceName));
 
-        IconSet set = JsonSerializer.Deserialize<IconSet>(stream, IconSet.Options)
+        IconSet set = JsonSerializer.Deserialize(stream, IconSetJson.Default.IconSet)
                       ?? throw new InvalidOperationException(Faults.IconSetEmpty());
 
         return new IconCatalog(set.Fallback, set.Icons.ToFrozenSet(StringComparer.Ordinal))
@@ -68,13 +68,14 @@ public sealed class IconCatalog
     /// </summary>
     /// <param name="Fallback">Запасной значок.</param>
     /// <param name="Icons">Ключи набора.</param>
-    private sealed record IconSet(string Fallback, IReadOnlyList<string> Icons)
-    {
-        public static readonly JsonSerializerOptions Options = new()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
-            RespectRequiredConstructorParameters = true
-        };
-    }
+    private sealed record IconSet(string Fallback, IReadOnlyList<string> Icons);
+
+    // Набор читается при каждом запуске, ещё при регистрации служб: разбор,
+    // собранный при компиляции, не строит метаданные отражением на этом пути
+    [JsonSerializable(typeof(IconSet))]
+    [JsonSourceGenerationOptions(
+        PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        RespectRequiredConstructorParameters = true)]
+    private sealed partial class IconSetJson : JsonSerializerContext;
 }

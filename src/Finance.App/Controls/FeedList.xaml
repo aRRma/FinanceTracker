@@ -25,7 +25,7 @@
             SelectionMode="None"
             RemainingItemsThreshold="10"
             RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}"
-            EmptyView="{Binding Empty, Source={x:Reference Root}}">
+            EmptyView="{Binding Empty, Source={x:Reference Root}, x:DataType=controls:FeedList}">
 
             <CollectionView.GroupHeaderTemplate>
                 <DataTemplate x:DataType="feed:FeedDay">

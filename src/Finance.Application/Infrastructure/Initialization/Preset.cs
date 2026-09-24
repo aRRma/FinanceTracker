@@ -15,7 +15,7 @@ namespace Finance.Application.Infrastructure.Initialization;
 /// <param name="SeededAtUtc">Заведомо давняя метка изменения строк набора, единая для всех устройств.</param>
 /// <param name="Note">Пояснение для того, кто откроет файл. В коде не используется.</param>
 /// <param name="Groups">Группы набора вместе с их подкатегориями.</param>
-public sealed record Preset(
+public sealed partial record Preset(
     int PresetVersion,
     Guid Namespace,
     DateTimeOffset SeededAtUtc,
@@ -24,24 +24,12 @@ public sealed record Preset(
 {
     private const string ResourceName = "Finance.Application.preset.json";
 
-    private static readonly JsonSerializerOptions Options = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
-
-        // Незнакомое поле — ошибка, а не мусор к пропуску: опечатка в ключе или
-        // забытый после переименования признак иначе прошли бы как «значение
-        // по умолчанию», а файл этот правится необратимо
-        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
-        RespectRequiredConstructorParameters = true
-    };
-
     /// <summary>
     /// Разбирает набор из текста файла.
     /// </summary>
     /// <param name="json">Содержимое <c>preset.json</c>.</param>
     public static Preset Parse(string json) =>
-        JsonSerializer.Deserialize<Preset>(json, Options)
+        JsonSerializer.Deserialize(json, PresetJson.Default.Preset)
         ?? throw new InvalidOperationException(Faults.PresetEmpty());
 
     /// <summary>
@@ -74,4 +62,18 @@ public sealed record Preset(
             }
         }
     }
+
+    // Разбор собирается при компиляции, а не отражением на первом вызове: так он
+    // не стоит времени при запуске и переживает обрезку кода в релизе.
+    // Незнакомое поле — ошибка, а не мусор к пропуску: опечатка в ключе или
+    // забытый после переименования признак иначе прошли бы как «значение
+    // по умолчанию», а файл этот правится необратимо. Перечисления читаются
+    // по имени без учёта регистра: `expense` из файла находит `Expense`
+    [JsonSerializable(typeof(Preset))]
+    [JsonSourceGenerationOptions(
+        PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+        UseStringEnumConverter = true,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        RespectRequiredConstructorParameters = true)]
+    private sealed partial class PresetJson : JsonSerializerContext;
 }

@@ -37,6 +37,15 @@
 
 		<!-- Android 16 (API 36): приложение личное, охват старых версий не требуется (SYS-01) -->
 		<SupportedOSPlatformVersion>36.0</SupportedOSPlatformVersion>
+
+		<!-- Полный AOT вместо профильного. Релиз по умолчанию заранее компилирует
+		     только то, что попало в стартовый профиль шаблонного приложения MAUI,
+		     а EF Core и наш код при запуске компилирует JIT. Замер на эмуляторе
+		     (сентябрь 2026, медиана десяти холодных стартов): 4,2 → 2,1 с до
+		     первого кадра с данными, цена — APK 40,7 → 62,1 МБ. NativeAOT
+		     недоступен: для Android он экспериментальный, MAUI и EF Core на нём
+		     не поддерживаются. Действует только в Release: Debug идёт без AOT -->
+		<AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
 	</PropertyGroup>
 
 	<ItemGroup>
