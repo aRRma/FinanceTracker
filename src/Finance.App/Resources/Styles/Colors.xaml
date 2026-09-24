@@ -51,15 +51,23 @@
     <Color x:Key="OnAccentLight">#FFFFFF</Color>
     <Color x:Key="OnAccentDark">#0B1310</Color>
 
-    <!-- Смысловые цвета: доход, расход и ошибка, фон ошибки -->
-    <Color x:Key="PositiveLight">#2F6B2A</Color>
-    <Color x:Key="PositiveDark">#7CBC74</Color>
-    <Color x:Key="NegativeLight">#963232</Color>
-    <Color x:Key="NegativeDark">#D48A8A</Color>
-    <Color x:Key="NegativeBackgroundLight">#F7EAEA</Color>
-    <Color x:Key="NegativeBackgroundDark">#372525</Color>
-    <Color x:Key="PositiveBackgroundLight">#E9F2E7</Color>
-    <Color x:Key="PositiveBackgroundDark">#22331F</Color>
+    <!-- Смысловые цвета: доход, расход и ошибка, перевод; их бледные фоны.
+         Чистые и яркие, а не приглушённые: прежние кирпичный и болотный читались
+         блёкло. Каждый держит контраст 4,5 и текстом на странице, и под подписью
+         на своей заливке. Перевод — свой синий, а не цвет действия: иначе выбранный
+         «Перевод» не отличался от кнопки «Сохранить» -->
+    <Color x:Key="PositiveLight">#15784A</Color>
+    <Color x:Key="PositiveDark">#5FD08F</Color>
+    <Color x:Key="NegativeLight">#C9302C</Color>
+    <Color x:Key="NegativeDark">#FF8A80</Color>
+    <Color x:Key="TransferLight">#2259D6</Color>
+    <Color x:Key="TransferDark">#8AB1FF</Color>
+    <Color x:Key="NegativeBackgroundLight">#FBEEEE</Color>
+    <Color x:Key="NegativeBackgroundDark">#453435</Color>
+    <Color x:Key="PositiveBackgroundLight">#E3EFE9</Color>
+    <Color x:Key="PositiveBackgroundDark">#284037</Color>
+    <Color x:Key="TransferBackgroundLight">#E4EBFA</Color>
+    <Color x:Key="TransferBackgroundDark">#303B4B</Color>
 
     <!-- Кружок переключателя -->
     <Color x:Key="KnobLight">#FFFFFF</Color>

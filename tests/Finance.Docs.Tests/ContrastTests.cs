@@ -34,18 +34,23 @@ public sealed partial class ContrastTests
             // Цвет действия: ссылка в строке, знак выбранного значка
             ("Accent", "Paper"), ("Accent", "Card"), ("Accent", "Sunk"),
 
-            // Подпись на кнопке действия и на кнопке удаления
-            ("OnAccent", "Accent"), ("OnAccent", "Negative"),
+            // Подпись на кнопке действия и на кнопке удаления, а также на залитом
+            // выбранном сегменте вида операции: расход, доход, перевод
+            ("OnAccent", "Accent"), ("OnAccent", "Negative"), ("OnAccent", "Positive"), ("OnAccent", "Transfer"),
 
-            // Смысловые цвета сумм
+            // Смысловые цвета сумм и невыбранных сегментов вида
             ("Positive", "Paper"), ("Positive", "Card"),
             ("Negative", "Paper"), ("Negative", "Card"),
+            ("Transfer", "Card"),
+
+            // Значок подкатегории на бледном кружке цвета вида; расход и доход
+            // на своих фонах сверяются ниже
+            ("Transfer", "TransferBackground"),
 
             // Карточка нарушенного правила: сообщение и обычный текст на её фоне
             ("Negative", "NegativeBackground"), ("Ink", "NegativeBackground"),
 
-            // Сегменты вида операции: выбранный расход и выбранный доход стоят
-            // на своей плашке, подписанные тем же смысловым цветом
+            // Смысловой цвет на бледной плашке своего тона
             ("Positive", "PositiveBackground"),
             ("Ink", "PositiveBackground"), ("Ink2", "PositiveBackground"),
 
