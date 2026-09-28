@@ -32,11 +32,34 @@ public partial class FeedList : ContentView
         set => SetValue(EmptyProperty, value);
     }
 
+    /// <summary>
+    /// Жест «потянуть вниз». Обработчиком, а не привязкой команды: сбой команды,
+    /// запущенной разметкой, закрыл бы окно молча.
+    /// </summary>
+    private void OnRefreshing(object? sender, EventArgs e)
+    {
+        if (BindingContext is FeedViewModel model)
+        {
+            Guarded.Run(model.RefreshAsync);
+        }
+    }
+
+    /// <summary>
+    /// Прокрутка подошла к концу прочитанного — дочитать следующую страницу.
+    /// </summary>
+    private void OnRemainingItemsThresholdReached(object? sender, EventArgs e)
+    {
+        if (BindingContext is FeedViewModel model)
+        {
+            Guarded.Run(() => model.LoadMoreAsync());
+        }
+    }
+
     private void OnRowTapped(object? sender, TappedEventArgs e)
     {
         if (sender is BindableObject { BindingContext: FeedRowItem row })
         {
-            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Transaction}?key={row.Key}"));
+            Navigator.Go($"{Routes.Transaction}?key={row.Key}");
         }
     }
 }

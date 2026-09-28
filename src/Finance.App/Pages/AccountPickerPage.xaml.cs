@@ -57,7 +57,7 @@ public partial class AccountPickerPage : DataPage
         {
             _model.Pick(row);
 
-            Guarded.Run(() => Shell.Current.GoToAsync(".."));
+            Navigator.Go("..");
         }
     }
 }

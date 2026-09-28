@@ -21,6 +21,7 @@ using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Finance.Application;
 
@@ -75,7 +76,10 @@ public static class FinanceServices
         services.AddSingleton(new ThemeApplier(applyTheme, dispatchToInterface));
 
         // Часы регистрируются одним объектом под двумя именами: настройки меняют
-        // зону через SystemClock, а читают время все остальные через IClock
+        // зону через SystemClock, а читают время все остальные через IClock.
+        // Источник момента — TryAdd: тесты подставляют свой, и «сегодня» у них
+        // не зависит от дня и часа запуска
+        services.TryAddSingleton(TimeProvider.System);
         services.AddSingleton<SystemClock>();
         services.AddSingleton<IClock>(provider => provider.GetRequiredService<SystemClock>());
 

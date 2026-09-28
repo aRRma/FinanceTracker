@@ -58,11 +58,6 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     public ObservableCollection<CategoryRowItem> Subcategories { get; } = [];
 
     /// <summary>
-    /// Подписи видов для переключателя.
-    /// </summary>
-    public static IReadOnlyList<string> KindNames { get; } = [UiTexts.KindExpense, UiTexts.KindIncome];
-
-    /// <summary>
     /// Название группы.
     /// </summary>
     [ObservableProperty]

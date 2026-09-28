@@ -48,7 +48,7 @@ public partial class ReportSubcategoryPage : DataPage
     {
         if (sender is BindableObject { BindingContext: ReportTransactionItem row })
         {
-            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Transaction}?key={row.Key}"));
+            Navigator.Go($"{Routes.Transaction}?key={row.Key}");
         }
     }
 }

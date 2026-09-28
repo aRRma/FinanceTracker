@@ -20,6 +20,6 @@ public sealed class DesignTimeFinanceDbContextFactory : IDesignTimeDbContextFact
             .UseSqlite("Data Source=design-time.db")
             .Options;
 
-        return new FinanceDbContext(options, new SystemClock());
+        return new FinanceDbContext(options, new SystemClock(TimeProvider.System));
     }
 }

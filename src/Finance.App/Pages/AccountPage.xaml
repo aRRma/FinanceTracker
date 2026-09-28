@@ -14,71 +14,74 @@
     x:DataType="card:AccountViewModel"
     Title="{Binding Title}">
 
-    <!-- Container: .NET 10 пускает страницу под системные полосы, а ScrollView
-         из всех областей понимает только эту -->
-    <ScrollView SafeAreaEdges="Container">
-        <VerticalStackLayout Padding="16,12" Spacing="16">
+    <!-- Container: .NET 10 пускает страницу под системные полосы. Клавиатуру
+         ScrollView не понимает вовсе, поэтому снизу её держит обёртка: без неё
+         «Сохранить» оставалась под клавиатурой, и прокрутка до неё не доставала -->
+    <Grid SafeAreaEdges="Container, Container, Container, All">
+        <ScrollView>
+            <VerticalStackLayout Padding="16,12" Spacing="16">
 
-            <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="14,10" Spacing="10">
-                    <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
-                    <Entry Text="{Binding Name}" Placeholder="{x:Static texts:UiTexts.AccountNamePlaceholder}" />
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Padding="14,10" Spacing="10">
+                        <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
+                        <Entry Text="{Binding Name}" Placeholder="{x:Static texts:UiTexts.AccountNamePlaceholder}" />
 
-                    <BoxView Style="{StaticResource Divider}" />
+                        <BoxView Style="{StaticResource Divider}" />
 
-                    <Label Text="{x:Static texts:UiTexts.AccountTypeLabel}" Style="{StaticResource CaptionLabel}" />
-                    <Picker ItemsSource="{Binding TypeNames}" SelectedIndex="{Binding TypeIndex}" />
+                        <Label Text="{x:Static texts:UiTexts.AccountTypeLabel}" Style="{StaticResource CaptionLabel}" />
+                        <Picker ItemsSource="{Binding TypeNames}" SelectedIndex="{Binding TypeIndex}" />
 
-                    <BoxView Style="{StaticResource Divider}" />
+                        <BoxView Style="{StaticResource Divider}" />
 
-                    <Label Text="{x:Static texts:UiTexts.AccountCurrencyLabel}" Style="{StaticResource CaptionLabel}" />
-                    <Picker ItemsSource="{Binding CurrencyNames}" SelectedIndex="{Binding CurrencyIndex}"
-                            IsEnabled="{Binding CurrencyEditable}" />
-                    <Label Text="{x:Static texts:UiTexts.AccountCurrencyLocked}"
-                           Style="{StaticResource CaptionLabel}" IsVisible="{Binding CurrencyLocked}" />
+                        <Label Text="{x:Static texts:UiTexts.AccountCurrencyLabel}" Style="{StaticResource CaptionLabel}" />
+                        <Picker ItemsSource="{Binding CurrencyNames}" SelectedIndex="{Binding CurrencyIndex}"
+                                IsEnabled="{Binding CurrencyEditable}" />
+                        <Label Text="{x:Static texts:UiTexts.AccountCurrencyLocked}"
+                               Style="{StaticResource CaptionLabel}" IsVisible="{Binding CurrencyLocked}" />
 
-                    <BoxView Style="{StaticResource Divider}" />
+                        <BoxView Style="{StaticResource Divider}" />
 
-                    <Label Text="{x:Static texts:UiTexts.AccountOpeningBalanceLabel}" Style="{StaticResource CaptionLabel}" />
-                    <Entry Text="{Binding OpeningBalance}" Keyboard="Numeric" />
+                        <Label Text="{x:Static texts:UiTexts.AccountOpeningBalanceLabel}" Style="{StaticResource CaptionLabel}" />
+                        <Entry Text="{Binding OpeningBalance}" Keyboard="Numeric" />
 
-                    <BoxView Style="{StaticResource Divider}" />
+                        <BoxView Style="{StaticResource Divider}" />
 
-                    <Label Text="{x:Static texts:UiTexts.AccountOpenedOnLabel}" Style="{StaticResource CaptionLabel}" />
-                    <DatePicker Date="{Binding OpenedOnDate}" MaximumDate="{Binding LatestOpeningDate}" />
-                    <Label Text="{Binding OpenedOnHint}" Style="{StaticResource CaptionLabel}"
-                           IsVisible="{Binding HasOpenedOnHint}" />
-                </VerticalStackLayout>
-            </Border>
+                        <Label Text="{x:Static texts:UiTexts.AccountOpenedOnLabel}" Style="{StaticResource CaptionLabel}" />
+                        <DatePicker Date="{Binding OpenedOnDate}" MaximumDate="{Binding LatestOpeningDate}" />
+                        <Label Text="{Binding OpenedOnHint}" Style="{StaticResource CaptionLabel}"
+                               IsVisible="{Binding HasOpenedOnHint}" />
+                    </VerticalStackLayout>
+                </Border>
 
-            <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="14,10" Spacing="10">
-                    <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
-                        <Label Grid.Column="0" Text="{x:Static texts:UiTexts.AccountExcludeLabel}" VerticalOptions="Center" />
-                        <Switch Grid.Column="1" IsToggled="{Binding ExcludedFromTotals}" />
-                    </Grid>
-                    <Label Text="{x:Static texts:UiTexts.AccountExcludeHint}"
-                           Style="{StaticResource CaptionLabel}" />
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Padding="14,10" Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Label Grid.Column="0" Text="{x:Static texts:UiTexts.AccountExcludeLabel}" VerticalOptions="Center" />
+                            <Switch Grid.Column="1" IsToggled="{Binding ExcludedFromTotals}" />
+                        </Grid>
+                        <Label Text="{x:Static texts:UiTexts.AccountExcludeHint}"
+                               Style="{StaticResource CaptionLabel}" />
 
-                    <BoxView Style="{StaticResource Divider}" />
+                        <BoxView Style="{StaticResource Divider}" />
 
-                    <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
-                        <Label Grid.Column="0" Text="{x:Static texts:UiTexts.AccountClosedLabel}" VerticalOptions="Center" />
-                        <Switch Grid.Column="1" IsToggled="{Binding IsClosed}" />
-                    </Grid>
-                    <Label Text="{x:Static texts:UiTexts.AccountClosedHint}"
-                           Style="{StaticResource CaptionLabel}" />
-                </VerticalStackLayout>
-            </Border>
+                        <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Label Grid.Column="0" Text="{x:Static texts:UiTexts.AccountClosedLabel}" VerticalOptions="Center" />
+                            <Switch Grid.Column="1" IsToggled="{Binding IsClosed}" />
+                        </Grid>
+                        <Label Text="{x:Static texts:UiTexts.AccountClosedHint}"
+                               Style="{StaticResource CaptionLabel}" />
+                    </VerticalStackLayout>
+                </Border>
 
-            <Border Style="{StaticResource ErrorCard}" IsVisible="{Binding HasError}">
-                <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
-            </Border>
+                <Border Style="{StaticResource ErrorCard}" IsVisible="{Binding HasError}">
+                    <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
+                </Border>
 
-            <Button Text="{x:Static texts:UiTexts.CommonSave}" Clicked="OnSave" IsEnabled="{Binding CanSave}"
-                    Style="{StaticResource SaveButton}" AutomationId="SaveAccount" />
+                <Button Text="{x:Static texts:UiTexts.CommonSave}" Clicked="OnSave" IsEnabled="{Binding CanSave}"
+                        Style="{StaticResource SaveButton}" AutomationId="SaveAccount" />
 
-        </VerticalStackLayout>
-    </ScrollView>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 
 </pages:DataPage>

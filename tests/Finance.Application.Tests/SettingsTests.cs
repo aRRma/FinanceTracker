@@ -1,3 +1,5 @@
+using System.Globalization;
+using Finance.Application.Features.Settings.About;
 using Finance.Application.Features.Settings.Appearance;
 using Finance.Application.Features.Settings.TimeZones;
 using Finance.Application.Infrastructure;
@@ -148,6 +150,24 @@ public sealed class SettingsTests
         Assert.Equal("1.0", summary.Version);
         Assert.True(summary.Schema > 0);
         Assert.True(summary.TimeZoneFromSystem);
+    }
+
+    /// <summary>
+    /// Экран «О программе» показывает ту же версию и тот же номер схемы, что сводка:
+    /// по номеру схемы сверяют, накатилась ли миграция после обновления.
+    /// </summary>
+    [Fact]
+    public async Task О_программе_показывает_версию_и_схему()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync(applicationVersion: "1.2.3");
+
+        SettingsSummary summary = await database.Resolve<ISettingsSummaryQuery>().ReadAsync();
+
+        AboutViewModel model = database.Resolve<AboutViewModel>();
+        await model.LoadAsync();
+
+        Assert.Equal("1.2.3", model.Version);
+        Assert.Equal(summary.Schema.ToString(CultureInfo.InvariantCulture), model.Schema);
     }
 
     /// <summary>

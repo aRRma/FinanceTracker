@@ -239,7 +239,11 @@
         <Setter Property="VerticalOptions" Value="Center" />
     </Style>
 
-    <Style TargetType="Button">
+    <!-- Кнопка действия. Недоступная гаснет прозрачностью: IsEnabled сам кнопку
+         не гасит, и залитая цветом действия она обещала бы нажатие, которого не будет.
+         Прозрачностью, а не своим цветом — погашенная пара «текст на фоне» не попадает
+         в палитру и в ContrastTests -->
+    <Style x:Key="ActionButton" TargetType="Button">
         <Setter Property="BackgroundColor"
                 Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
         <Setter Property="TextColor"
@@ -249,7 +253,21 @@
         <Setter Property="CornerRadius" Value="12" />
         <Setter Property="MinimumHeightRequest" Value="{StaticResource TouchTarget}" />
         <Setter Property="Padding" Value="20,0" />
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="Opacity" Value="0.35" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
     </Style>
+
+    <Style TargetType="Button" BasedOn="{StaticResource ActionButton}" />
 
     <!-- Плавающая кнопка добавления операции: правый нижний угол, поверх списка.
          Знак «+» подписью, а не картинкой: подпись перекрашивается вместе с темой,
@@ -291,7 +309,7 @@
 
     <!-- Кнопка сохранения формы. Пока запись идёт, подпись говорит об этом:
          погашенная кнопка без объяснения читается как поломка, а не как ожидание -->
-    <Style x:Key="SaveButton" TargetType="Button">
+    <Style x:Key="SaveButton" TargetType="Button" BasedOn="{StaticResource ActionButton}">
         <Style.Triggers>
             <DataTrigger TargetType="Button" Binding="{Binding IsSaving}" Value="True">
                 <Setter Property="Text" Value="{x:Static texts:UiTexts.CommonSaving}" />
@@ -360,7 +378,7 @@
     </Style>
 
     <!-- Необратимое действие: удаление -->
-    <Style x:Key="DangerButton" TargetType="Button">
+    <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource ActionButton}">
         <Setter Property="BackgroundColor"
                 Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
         <Setter Property="TextColor"

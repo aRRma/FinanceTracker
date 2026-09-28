@@ -46,6 +46,22 @@ public sealed class FeedDay : ObservableCollection<FeedRowItem>
     public bool IsTotalPositive { get; }
 
     /// <summary>
+    /// День показывает то же, что и другой: ту же шапку и те же строки в том же порядке.
+    /// По этому признаку перечитанная лента меняет в списке только изменившиеся дни.
+    /// </summary>
+    /// <param name="other">Другой день.</param>
+    public bool SameAs(FeedDay other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+
+        return Date == other.Date
+            && Title == other.Title
+            && Total == other.Total
+            && IsTotalPositive == other.IsTotalPositive
+            && this.SequenceEqual(other);
+    }
+
+    /// <summary>
     /// Год пишется только чужой: в ленте за этот год он был бы шумом в каждой шапке.
     /// </summary>
     private static string Format(DateOnly date, DateOnly today) =>

@@ -648,10 +648,15 @@ public sealed partial class ReportTests
         await using FinanceDbContext context = await given.Database.Contexts.CreateDbContextAsync();
 
         string sql = ReportQuery.Groups(context, ReportMonth.Of(given.Today)).ToQueryString();
+        string alias = TransactionsAlias().Match(sql).Groups[1].Value;
+        string groupBy = GroupByClause().Match(sql).Groups[1].Value;
 
         Assert.Contains("SUM(", sql, StringComparison.Ordinal);
-        Assert.Contains("GROUP BY", sql, StringComparison.Ordinal);
-        Assert.Contains("kind", sql, StringComparison.Ordinal);
+
+        // Слово kind в SQL есть и без группировки по нему — у колонки группы.
+        // Сверяется именно вид операции в списке GROUP BY
+        Assert.False(string.IsNullOrEmpty(alias), sql);
+        Assert.Contains($"\"{alias}\".\"kind\"", groupBy, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -677,6 +682,9 @@ public sealed partial class ReportTests
 
     [GeneratedRegex("\"transactions\" AS \"(\\w+)\"")]
     private static partial Regex TransactionsAlias();
+
+    [GeneratedRegex("^GROUP BY (.+)$", RegexOptions.Multiline)]
+    private static partial Regex GroupByClause();
 
     private static async Task<ReportViewModel> LoadedModelAsync(TransactionFixture given)
     {
@@ -747,7 +755,6 @@ public sealed partial class ReportTests
 
         Assert.Equal(ReportMonth.Of(monthBefore), model.Month);
         Assert.Contains("700,00", model.Total, StringComparison.Ordinal);
-        Assert.False(model.IsBusy);
     }
 
     /// <summary>

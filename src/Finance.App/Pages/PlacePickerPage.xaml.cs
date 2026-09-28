@@ -60,5 +60,5 @@ public partial class PlacePickerPage : DataPage
         Leave();
     }
 
-    private static void Leave() => Guarded.Run(() => Shell.Current.GoToAsync(".."));
+    private static void Leave() => Navigator.Go("..");
 }

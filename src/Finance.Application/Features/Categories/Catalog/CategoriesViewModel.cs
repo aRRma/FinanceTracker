@@ -1,4 +1,3 @@
-using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -23,6 +22,10 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
 
     private IReadOnlyList<CategoryListItem> _all = [];
 
+    // Номер чтения: жест обновления и перечитывание по чужой правке могут
+    // совпасть, и отставшее чтение не должно перекрыть свежее
+    private int _generation;
+
     /// <summary>
     /// Создаёт модель представления справочника категорий.
     /// </summary>
@@ -42,11 +45,6 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
     public ObservableCollection<CategoryLine> Lines { get; } = [];
 
     /// <summary>
-    /// Подписи видов для переключателя.
-    /// </summary>
-    public static IReadOnlyList<string> KindNames { get; } = [UiTexts.KindExpensePlural, UiTexts.KindIncomePlural];
-
-    /// <summary>
     /// Какой вид показан.
     /// </summary>
     [ObservableProperty]
@@ -58,13 +56,6 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
     /// </summary>
     [ObservableProperty]
     public partial string Filter { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Идёт чтение. Запись открыта намеренно: к этому признаку привязан жест
-    /// «потянуть вниз», и он сам поднимает его в начале обновления.
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsBusy { get; set; }
 
     /// <summary>
     /// Выбранный вид — номером в переключателе.
@@ -93,26 +84,25 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
     /// Перечитывает справочник.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
-        IsBusy = true;
+        int generation = ++_generation;
 
-        try
+        // ConfigureAwait(false) здесь недопустим: дальше наполняются
+        // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
+        IReadOnlyList<CategoryListItem> all = await _categories.ReadAsync(cancellationToken);
+
+        if (generation != _generation)
         {
-            // ConfigureAwait(false) здесь недопустим: дальше наполняются
-            // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-            _all = await _categories.ReadAsync(cancellationToken);
-
-            Rebuild();
-
-            // Не в Rebuild: его же зовёт переключатель вида, а он о чтении ничего не говорит
-            IsLoaded = true;
+            return;
         }
-        finally
-        {
-            IsBusy = false;
-        }
+
+        _all = all;
+
+        Rebuild();
+
+        // Не в Rebuild: его же зовёт переключатель вида, а он о чтении ничего не говорит
+        IsLoaded = true;
     }
 
     /// <summary>

@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 
@@ -16,6 +15,10 @@ public sealed partial class PlacesViewModel : ScreenViewModel
     private readonly IPlacesQuery _places;
 
     private IReadOnlyList<PlaceListItem> _all = [];
+
+    // Номер чтения: жест обновления и перечитывание по чужой правке могут
+    // совпасть, и отставшее чтение не должно перекрыть свежее
+    private int _generation;
 
     /// <summary>
     /// Создаёт модель представления справочника мест.
@@ -42,13 +45,6 @@ public sealed partial class PlacesViewModel : ScreenViewModel
     public partial string Filter { get; set; } = string.Empty;
 
     /// <summary>
-    /// Идёт чтение. Запись открыта намеренно: к этому признаку привязан жест
-    /// «потянуть вниз», и он сам поднимает его в начале обновления.
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsBusy { get; set; }
-
-    /// <summary>
     /// Справочник прочитан хотя бы раз. Пустой список до чтения значит «ещё
     /// не читали», а не «мест нет», и объяснение про пустой справочник мигнуло бы
     /// на каждом заходе.
@@ -71,26 +67,25 @@ public sealed partial class PlacesViewModel : ScreenViewModel
     /// Перечитывает справочник.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
-        IsBusy = true;
+        int generation = ++_generation;
 
-        try
+        // ConfigureAwait(false) здесь недопустим: следом наполняется привязанная
+        // коллекция, а её правка вне потока интерфейса роняет разметку
+        IReadOnlyList<PlaceListItem> all = await _places.ReadAsync(cancellationToken);
+
+        if (generation != _generation)
         {
-            // ConfigureAwait(false) здесь недопустим: следом наполняется привязанная
-            // коллекция, а её правка вне потока интерфейса роняет разметку
-            _all = await _places.ReadAsync(cancellationToken);
-
-            Rebuild();
-
-            // Не в Rebuild: его же зовёт набор букв в поиске, а он о чтении ничего не говорит
-            IsLoaded = true;
+            return;
         }
-        finally
-        {
-            IsBusy = false;
-        }
+
+        _all = all;
+
+        Rebuild();
+
+        // Не в Rebuild: его же зовёт набор букв в поиске, а он о чтении ничего не говорит
+        IsLoaded = true;
     }
 
     /// <summary>

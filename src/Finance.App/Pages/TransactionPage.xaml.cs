@@ -98,7 +98,7 @@ public partial class TransactionPage : DataPage
     {
         if (await _model.SaveAsync())
         {
-            await Shell.Current.GoToAsync("..");
+            await Navigator.GoAsync("..");
         }
     }
 
@@ -118,29 +118,27 @@ public partial class TransactionPage : DataPage
 
         if (confirmed && await _model.DeleteAsync())
         {
-            await Shell.Current.GoToAsync("..");
+            await Navigator.GoAsync("..");
         }
     }
 
     private void OnPickAccount(object? sender, TappedEventArgs e) =>
-        Go($"{Routes.PickAccount}?selected={_model.SourceAccount?.Key}");
+        Navigator.Go($"{Routes.PickAccount}?selected={_model.SourceAccount?.Key}");
 
     /// <summary>
     /// Счёт списания в список «Куда» не попадает: перевод на себя запрещён доменом,
     /// и предлагать его значило бы рассказывать о запрете уже после сохранения.
     /// </summary>
     private void OnPickTargetAccount(object? sender, TappedEventArgs e) =>
-        Go($"{Routes.PickAccount}?selected={_model.TargetAccount?.Key}&excluded={_model.SourceAccount?.Key}&target=1");
+        Navigator.Go($"{Routes.PickAccount}?selected={_model.TargetAccount?.Key}&excluded={_model.SourceAccount?.Key}&target=1");
 
     private void OnPickCategory(object? sender, TappedEventArgs e) =>
-        Go($"{Routes.PickCategory}?kind={_model.CategoryKind}&selected={_model.Category?.Key}");
+        Navigator.Go($"{Routes.PickCategory}?kind={_model.CategoryKind}&selected={_model.Category?.Key}");
 
     /// <summary>
     /// Название места уезжает в маршрут экранированным: в нём кириллица и пробелы,
     /// а неэкранированное оборвалось бы на первом же знаке разметки адреса.
     /// </summary>
     private void OnPickPlace(object? sender, TappedEventArgs e) =>
-        Go($"{Routes.PickPlace}?current={Uri.EscapeDataString(_model.PlaceName)}");
-
-    private static void Go(string route) => Guarded.Run(() => Shell.Current.GoToAsync(route));
+        Navigator.Go($"{Routes.PickPlace}?current={Uri.EscapeDataString(_model.PlaceName)}");
 }

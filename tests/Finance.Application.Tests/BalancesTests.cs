@@ -16,6 +16,7 @@ public sealed class BalancesTests
 {
     private static readonly DateOnly OpenedOn = new(2026, 1, 1);
     private static readonly DateOnly Today = new(2026, 8, 25);
+    private static readonly DateTimeOffset NowUtc = new(2026, 8, 25, 9, 30, 0, TimeSpan.Zero);
 
     /// <summary>
     /// Минус на счёте помечен признаком, а не только знаком в тексте: экран красит
@@ -105,6 +106,58 @@ public sealed class BalancesTests
         Assert.False(Tile(section, cash).IsNegative);
     }
 
+    /// <summary>
+    /// Жест обновления и перечитывание по чужой правке совпали, и более раннее
+    /// чтение закончилось последним. Его устаревшие счета не должны перекрыть свежие.
+    /// </summary>
+    [Fact]
+    public async Task Отставшее_чтение_не_перекрывает_свежее()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        await SaveAsync(database, Command("Наличные", 1000m));
+
+        DelayingAccounts accounts = new(database.Resolve<IAccountsQuery>()) { Delay = new TaskCompletionSource() };
+        BalancesViewModel model = new(accounts, database.Resolve<IChangeNotifier>());
+
+        Task slow = model.LoadAsync();
+
+        TaskCompletionSource hold = accounts.Delay;
+        accounts.Delay = null;
+        await SaveAsync(database, Command("Карта", 500m));
+        await model.LoadAsync();
+
+        hold.SetResult();
+        await slow;
+
+        Assert.Equal(2, Assert.Single(model.Sections).Spendable.Count);
+    }
+
+    /// <summary>
+    /// Читает счета сразу, а отдаёт по сигналу теста: так прочитанное оказывается
+    /// старше того, что успело записаться, пока чтение ждало.
+    /// </summary>
+    private sealed class DelayingAccounts(IAccountsQuery inner) : IAccountsQuery
+    {
+        public TaskCompletionSource? Delay { get; set; }
+
+        public async Task<IReadOnlyList<AccountListItem>> ReadAsync(CancellationToken cancellationToken = default)
+        {
+            TaskCompletionSource? delay = Delay;
+            IReadOnlyList<AccountListItem> accounts = await inner.ReadAsync(cancellationToken);
+
+            if (delay is not null)
+            {
+                await delay.Task;
+            }
+
+            return accounts;
+        }
+
+        public Task<AccountListItem?> ReadOneAsync(Guid key, CancellationToken cancellationToken = default) =>
+            inner.ReadOneAsync(key, cancellationToken);
+    }
+
     private static BalancesViewModel Model(TestDatabase database) => new(
         database.Resolve<IAccountsQuery>(),
         database.Resolve<IChangeNotifier>());
@@ -140,5 +193,5 @@ public sealed class BalancesTests
         Transaction.Create(
             TransactionKind.Expense, account, Money.Create(amount, Currency.RUB),
             targetAccountKey: null, targetAmount: null, categoryKey: Guid.CreateVersion7(),
-            placeKey: null, occurredOn: Today, note: null, Today, DateTimeOffset.UtcNow);
+            placeKey: null, occurredOn: Today, note: null, Today, NowUtc);
 }

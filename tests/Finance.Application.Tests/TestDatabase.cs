@@ -57,7 +57,9 @@ internal sealed class TestDatabase : IAsyncDisposable
         Directory.CreateDirectory(folder);
 
         ServiceProvider services = new ServiceCollection()
+            .AddSingleton<TimeProvider>(new TestTime())
             .AddFinance(Path.Combine(folder, "finance.db"), applyTheme: applyTheme, applicationVersion: applicationVersion)
+            .ConfigureDbContext<FinanceDbContext>(static options => options.AddInterceptors(NoSyncInterceptor.Instance))
             .BuildServiceProvider();
 
         return new TestDatabase(folder, services);

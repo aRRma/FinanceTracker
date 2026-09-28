@@ -30,16 +30,16 @@ public partial class BalancesPage : DataPage
     protected override Task LoadAsync() => _model.LoadAsync();
 
     private void OnCreateAccount(object? sender, EventArgs e) =>
-        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Account));
+        Navigator.Go(Routes.Account);
 
     private void OnAddTransaction(object? sender, EventArgs e) =>
-        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Transaction));
+        Navigator.Go(Routes.Transaction);
 
     private void OnAccountTapped(object? sender, TappedEventArgs e)
     {
         if (sender is BindableObject { BindingContext: AccountTile account })
         {
-            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.AccountFeed}?key={account.Key}"));
+            Navigator.Go($"{Routes.AccountFeed}?key={account.Key}");
         }
     }
 }

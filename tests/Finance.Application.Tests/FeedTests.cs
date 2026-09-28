@@ -1,4 +1,6 @@
+using System.Collections.Specialized;
 using Finance.Application.Features.Feed;
+using Finance.Application.Features.Places.Card;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
@@ -180,7 +182,8 @@ public sealed class FeedTests
     }
 
     /// <summary>
-    /// Место, удалённое из справочника, в строке не показывается — операция как без места.
+    /// Строка расхода несёт подкатегорию заголовком, её группу, значок и место —
+    /// именно этой операции, а не соседней записи справочника.
     /// </summary>
     [Fact]
     public async Task Строка_несёт_название_места_и_группы()
@@ -191,12 +194,37 @@ public sealed class FeedTests
 
         await given.SaveAsync(given.Expense(cash, 10m, place: "Пятёрочка"));
 
+        IReadOnlyList<CategoryListItem> categories = await given.Database.Resolve<ICategoriesQuery>().ReadAsync();
+        CategoryListItem category = categories.Single(entry => entry.Key == given.ExpenseCategory);
+        CategoryListItem group = categories.Single(entry => entry.Key == category.ParentKey);
+
         FeedItem item = Assert.Single((await given.FeedAsync()).Items);
 
         Assert.Equal("Пятёрочка", item.Place);
-        Assert.False(string.IsNullOrEmpty(item.Group));
-        Assert.False(string.IsNullOrEmpty(item.Title));
-        Assert.False(string.IsNullOrEmpty(item.Icon));
+        Assert.Equal(category.Name, item.Title);
+        Assert.Equal(group.Name, item.Group);
+        Assert.Equal(category.Icon, item.Icon);
+    }
+
+    /// <summary>
+    /// Место, удалённое из справочника, в строке не показывается — операция как без места.
+    /// Сама ссылка в операции остаётся: массовая правка ссылок запрещена.
+    /// </summary>
+    [Fact]
+    public async Task Удалённое_место_в_строке_не_показывается()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные");
+
+        await given.SaveAsync(given.Expense(cash, 10m, place: "Пятёрочка"));
+
+        PlaceListItem place = Assert.Single(await given.Database.Resolve<IPlacesQuery>().ReadAsync());
+        await given.Database.Resolve<IDeletePlaceHandler>().HandleAsync(place.Key);
+
+        FeedItem item = Assert.Single((await given.FeedAsync()).Items);
+
+        Assert.Null(item.Place);
     }
 
     /// <summary>
@@ -235,6 +263,154 @@ public sealed class FeedTests
         Assert.Equal(2, model.Days[0].Count);
         Assert.Single(model.Days[1]);
         Assert.Equal(Money.Restore(-5m, Currency.RUB).DisplaySigned, model.Days[0].Total);
+    }
+
+    /// <summary>
+    /// Перечитывание той же ленты сохраняет дочитанное: правка операции из глубины
+    /// истории иначе срезала бы ленту до первой страницы.
+    /// </summary>
+    [Fact]
+    public async Task Перечитывание_ленты_сохраняет_дочитанную_глубину()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+
+        for (int i = 0; i < 60; i++)
+        {
+            await given.SaveAsync(given.Expense(cash, 1m, on: given.Today.AddDays(-(i / 3))));
+        }
+
+        FeedViewModel model = new(
+            given.Database.Resolve<IFeedQuery>(),
+            given.Database.Resolve<IAccountsQuery>(),
+            given.Database.Resolve<IClock>(),
+            given.Database.Resolve<IChangeNotifier>());
+
+        await model.LoadAsync(accountKey: null);
+
+        Assert.Equal(50, model.Days.Sum(static day => day.Count));
+
+        await model.LoadMoreAsync();
+        await model.LoadAsync(accountKey: null);
+
+        Assert.Equal(60, model.Days.Sum(static day => day.Count));
+        Assert.False(model.HasMore);
+
+        // Другая лента начинается с первой страницы, а не с чужой глубины
+        await model.LoadAsync(cash);
+        await model.LoadAsync(accountKey: null);
+
+        Assert.Equal(50, model.Days.Sum(static day => day.Count));
+    }
+
+    /// <summary>
+    /// Перечитанная лента меняет в списке только изменившиеся дни: сброс списка
+    /// вернул бы прокрутку к началу, и сохранивший правку из глубины истории
+    /// оказывался бы наверху.
+    /// </summary>
+    [Fact]
+    public async Task Перечитывание_меняет_только_изменившиеся_дни()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+
+        await given.SaveAsync(given.Expense(cash, 1m, on: given.Today));
+        await given.SaveAsync(given.Expense(cash, 2m, on: given.Today.AddDays(-1)));
+        await given.SaveAsync(given.Expense(cash, 3m, on: given.Today.AddDays(-2)));
+
+        FeedViewModel model = new(
+            given.Database.Resolve<IFeedQuery>(),
+            given.Database.Resolve<IAccountsQuery>(),
+            given.Database.Resolve<IClock>(),
+            given.Database.Resolve<IChangeNotifier>());
+
+        await model.LoadAsync(accountKey: null);
+
+        FeedDay[] before = [.. model.Days];
+        int resets = 0;
+        model.Days.CollectionChanged += (_, e) => resets += e.Action is NotifyCollectionChangedAction.Reset ? 1 : 0;
+
+        await given.SaveAsync(given.Expense(cash, 4m, on: given.Today));
+        await model.LoadAsync(accountKey: null);
+
+        Assert.Equal(0, resets);
+        Assert.Equal(3, model.Days.Count);
+        Assert.NotSame(before[0], model.Days[0]);
+        Assert.Equal(2, model.Days[0].Count);
+        Assert.Same(before[1], model.Days[1]);
+        Assert.Same(before[2], model.Days[2]);
+    }
+
+    /// <summary>
+    /// Лента, скрытая за карточкой операции, узнаёт о сохранённой правке и только
+    /// о ней: просмотр без правок не должен возвращать прокрутку к началу.
+    /// </summary>
+    [Fact]
+    public async Task Лента_устаревает_только_от_правки_пока_скрыта()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+
+        FeedViewModel model = new(
+            given.Database.Resolve<IFeedQuery>(),
+            given.Database.Resolve<IAccountsQuery>(),
+            given.Database.Resolve<IClock>(),
+            given.Database.Resolve<IChangeNotifier>());
+
+        model.Activate();
+        await model.LoadAsync(accountKey: null);
+        model.Deactivate();
+
+        Assert.False(model.IsOutdated);
+
+        await given.SaveAsync(given.Expense(cash, 1m, on: given.Today));
+
+        Assert.True(model.IsOutdated);
+    }
+
+    /// <summary>
+    /// Наступил другой день — или сменился часовой пояс: шапки дней подписаны от
+    /// прежнего «сегодня», и лента устарела без единой правки.
+    /// </summary>
+    [Fact]
+    public async Task Лента_устаревает_со_сменой_дня()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        ShiftedClock clock = new(given.Database.Resolve<IClock>());
+
+        FeedViewModel model = new(
+            given.Database.Resolve<IFeedQuery>(),
+            given.Database.Resolve<IAccountsQuery>(),
+            clock,
+            given.Database.Resolve<IChangeNotifier>());
+
+        model.Activate();
+        await model.LoadAsync(accountKey: null);
+        model.Deactivate();
+
+        Assert.False(model.IsOutdated);
+
+        clock.Days = 1;
+
+        Assert.True(model.IsOutdated);
+    }
+
+    /// <summary>
+    /// Часы, у которых «сегодня» сдвигается по требованию теста.
+    /// </summary>
+    private sealed class ShiftedClock(IClock inner) : IClock
+    {
+        public int Days { get; set; }
+
+        public DateTimeOffset NowUtc => inner.NowUtc.AddDays(Days);
+
+        public DateOnly Today => inner.Today.AddDays(Days);
+
+        public TimeZoneInfo TimeZone => inner.TimeZone;
     }
 
     /// <summary>

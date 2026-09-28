@@ -29,11 +29,17 @@ public partial class ReportPage : DataPage
     /// <inheritdoc />
     protected override Task LoadAsync() => _model.LoadAsync();
 
+    // Листание месяцев — команды модели: их доступность и защиту от второго нажатия
+    // держит сама команда, а запуск из обработчика показывает сбой, а не роняет окно
+    private void OnPreviousMonth(object? sender, TappedEventArgs e) => Guarded.Execute(_model.PreviousMonthCommand);
+
+    private void OnNextMonth(object? sender, TappedEventArgs e) => Guarded.Execute(_model.NextMonthCommand);
+
     private void OnRowTapped(object? sender, TappedEventArgs e)
     {
         if (sender is BindableObject { BindingContext: ReportRowItem row })
         {
-            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.ReportGroup}?key={row.Key}&month={_model.Month}"));
+            Navigator.Go($"{Routes.ReportGroup}?key={row.Key}&month={_model.Month}");
         }
     }
 }

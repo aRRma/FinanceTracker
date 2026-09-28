@@ -13,6 +13,14 @@ public interface IChangeNotifier
     event Action<DataChange>? Changed;
 
     /// <summary>
+    /// Номер последнего изменения среди видов <paramref name="kinds"/>; ноль — таких
+    /// ещё не было. По нему экран, ушедший со своей подпиской, узнаёт на возврате,
+    /// пропустил ли он что-нибудь.
+    /// </summary>
+    /// <param name="kinds">Виды изменений, которые интересуют экран.</param>
+    long VersionOf(DataChange kinds);
+
+    /// <summary>
     /// Сообщает об изменении. Вызывается единой точкой выполнения команд.
     /// </summary>
     /// <param name="change">Что именно изменилось.</param>

@@ -30,7 +30,7 @@ public partial class AccountsPage : DataPage
     protected override Task LoadAsync() => _model.LoadAsync();
 
     private void OnCreateAccount(object? sender, EventArgs e) =>
-        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Account));
+        Navigator.Go(Routes.Account);
 
     // Перетаскиваемая строка запоминается здесь, а не передаётся через данные
     // жеста: те сериализуются платформой, а нужна ссылка на строку модели
@@ -65,7 +65,7 @@ public partial class AccountsPage : DataPage
     {
         if (sender is BindableObject { BindingContext: AccountRowItem account })
         {
-            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Account}?key={account.Key}"));
+            Navigator.Go($"{Routes.Account}?key={account.Key}");
         }
     }
 }

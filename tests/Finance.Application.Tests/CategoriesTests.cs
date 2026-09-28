@@ -262,11 +262,12 @@ public sealed class CategoriesTests
 
         IReadOnlyList<CategoryListItem> groups = [.. (await ReadAsync(database)).Where(item => item.IsGroup)];
 
-        Assert.All(
-            groups.TakeWhile(group => group.Role is CategoryRole.Normal),
-            group => Assert.Equal(CategoryRole.Normal, group.Role));
+        // От первой служебной группы до конца списка — только служебные, и они есть:
+        // служебная посреди списка оставила бы после себя обычные
+        IReadOnlyList<CategoryListItem> tail = [.. groups.SkipWhile(group => group.Role is not CategoryRole.Service)];
 
-        Assert.Equal(CategoryRole.Service, groups[^1].Role);
+        Assert.NotEmpty(tail);
+        Assert.All(tail, group => Assert.Equal(CategoryRole.Service, group.Role));
     }
 
     /// <summary>

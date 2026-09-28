@@ -48,7 +48,7 @@ public partial class ReportGroupPage : DataPage
     {
         if (sender is BindableObject { BindingContext: ReportRowItem row })
         {
-            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.ReportSubcategory}?key={row.Key}&month={Month}"));
+            Navigator.Go($"{Routes.ReportSubcategory}?key={row.Key}&month={Month}");
         }
     }
 }

@@ -242,4 +242,59 @@ public sealed class TransactionRulesTests
 
         TransactionRules.EnsureValid(transfer, rubles, dollars, null, null);
     }
+
+    // Ниже — записи, поданные не те, на которые ссылается операция. Пользователь
+    // так ошибиться не может, это ошибка вызывающего кода, поэтому ArgumentException.
+    // Имя параметра сверяется, чтобы тест попадал именно в свою проверку
+
+    [Fact]
+    public void Чужой_счёт_списания_отвергается()
+    {
+        Account card = Given.Account();
+        Account other = Given.Account("Другой");
+        Transaction expense = Given.Expense(card, Groceries);
+
+        ArgumentException error = Assert.Throws<ArgumentException>(
+            () => TransactionRules.EnsureValid(expense, other, null, Groceries, Food));
+
+        Assert.Equal("account", error.ParamName);
+    }
+
+    [Fact]
+    public void Перевод_без_счёта_зачисления_отвергается()
+    {
+        Account from = Given.Account("Карта");
+        Account to = Given.Account("Наличные");
+        Transaction transfer = Given.Transfer(from, to);
+
+        ArgumentException error = Assert.Throws<ArgumentException>(
+            () => TransactionRules.EnsureValid(transfer, from, null, null, null));
+
+        Assert.Equal("account", error.ParamName);
+    }
+
+    [Fact]
+    public void Чужая_подкатегория_отвергается()
+    {
+        Account card = Given.Account();
+        Category bakery = Given.Subcategory(Food, "Выпечка");
+        Transaction expense = Given.Expense(card, Groceries);
+
+        ArgumentException error = Assert.Throws<ArgumentException>(
+            () => TransactionRules.EnsureValid(expense, card, null, bakery, Food));
+
+        Assert.Equal("category", error.ParamName);
+    }
+
+    [Fact]
+    public void Чужая_группа_подкатегории_отвергается()
+    {
+        Account card = Given.Account();
+        Transaction expense = Given.Expense(card, Groceries);
+
+        ArgumentException error = Assert.Throws<ArgumentException>(
+            () => TransactionRules.EnsureValid(expense, card, null, Groceries, Salary));
+
+        Assert.Equal("categoryGroup", error.ParamName);
+    }
 }

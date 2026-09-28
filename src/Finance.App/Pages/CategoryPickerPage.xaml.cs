@@ -64,6 +64,6 @@ public partial class CategoryPickerPage : DataPage
 
         _model.Pick(line);
 
-        Guarded.Run(() => Shell.Current.GoToAsync(".."));
+        Navigator.Go("..");
     }
 }

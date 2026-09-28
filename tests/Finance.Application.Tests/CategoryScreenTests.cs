@@ -149,7 +149,7 @@ public sealed class CategoryScreenTests
         model.Name = "Еда";
         model.KindIndex = 1;
 
-        Assert.True(await model.SaveAsync());
+        Assert.True(await model.SaveAsync(), model.Error);
 
         Assert.True(model.KindLocked);
         Assert.False(model.ShowPreview);
@@ -173,13 +173,13 @@ public sealed class CategoryScreenTests
         universal.Name = "Маркетплейсы";
         universal.AcceptsAnyKind = true;
 
-        Assert.True(await universal.SaveAsync());
+        Assert.True(await universal.SaveAsync(), universal.Error);
         Assert.True(universal.AcceptsAnyKindHintVisible);
 
         GroupViewModel plain = GroupCard(database);
         plain.Name = "Питомцы";
 
-        Assert.True(await plain.SaveAsync());
+        Assert.True(await plain.SaveAsync(), plain.Error);
         Assert.False(plain.AcceptsAnyKindHintVisible);
     }
 
@@ -259,15 +259,15 @@ public sealed class CategoryScreenTests
         SubcategoryViewModel model = SubcategoryCard(database);
         await model.LoadAsync(taxi.Key, group: null);
 
-        Guid[] offered = [.. model.Groups.Select(option => option.Key)];
+        // Сверка с полным ожидаемым составом, а не «все предложенные подходят»:
+        // та проверка проходила и на пустом списке, где переносить некуда
+        Guid[] expected = [.. categories
+            .Where(item => item.IsGroup && item.Kind is CategoryKind.Expense && item.Role is not CategoryRole.Service)
+            .Select(item => item.Key)
+            .Order()];
 
-        Assert.All(
-            offered,
-            key => Assert.Equal(CategoryKind.Expense, categories.Single(item => item.Key == key).Kind));
-
-        Assert.DoesNotContain(
-            offered,
-            key => categories.Single(item => item.Key == key).Role is CategoryRole.Service);
+        Assert.Contains(taxi.ParentKey!.Value, expected);
+        Assert.Equal(expected, model.Groups.Select(option => option.Key).Order());
 
         Assert.True(model.CanDelete);
     }
@@ -309,7 +309,7 @@ public sealed class CategoryScreenTests
         await model.LoadAsync(products, group: null);
 
         Assert.Equal("Операций в ней нет. Отменить удаление будет нельзя.", await model.DeletePromptAsync());
-        Assert.True(await model.DeleteAsync());
+        Assert.True(await model.DeleteAsync(), model.Error);
 
         Assert.DoesNotContain(await database.Resolve<ICategoriesQuery>().ReadAsync(), item => item.Key == products);
     }
@@ -331,7 +331,7 @@ public sealed class CategoryScreenTests
 
         model.Group = model.Groups.Single(option => option.Key == car);
 
-        Assert.True(await model.SaveAsync());
+        Assert.True(await model.SaveAsync(), model.Error);
 
         CategoryListItem moved = (await database.Resolve<ICategoriesQuery>().ReadAsync())
             .Single(item => item.Key == taxi);

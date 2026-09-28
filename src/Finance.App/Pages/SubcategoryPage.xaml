@@ -15,50 +15,53 @@
     x:DataType="card:SubcategoryViewModel"
     Title="{Binding Title}">
 
-    <!-- Container: .NET 10 пускает страницу под системные полосы, а ScrollView
-         из всех областей понимает только эту -->
-    <ScrollView SafeAreaEdges="Container">
-        <VerticalStackLayout Padding="16,12" Spacing="16">
+    <!-- Container: .NET 10 пускает страницу под системные полосы. Клавиатуру
+         ScrollView не понимает вовсе, поэтому снизу её держит обёртка: без неё
+         «Сохранить» оставалась под клавиатурой, и прокрутка до неё не доставала -->
+    <Grid SafeAreaEdges="Container, Container, Container, All">
+        <ScrollView>
+            <VerticalStackLayout Padding="16,12" Spacing="16">
 
-            <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="14,10" Spacing="10">
-                    <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
-                    <Entry Text="{Binding Name}" Placeholder="{x:Static texts:UiTexts.SubcategoryNamePlaceholder}" />
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Padding="14,10" Spacing="10">
+                        <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
+                        <Entry Text="{Binding Name}" Placeholder="{x:Static texts:UiTexts.SubcategoryNamePlaceholder}" />
 
-                    <BoxView Style="{StaticResource Divider}" />
+                        <BoxView Style="{StaticResource Divider}" />
 
-                    <controls:IconGrid BindingContext="{Binding Icon}" />
+                        <controls:IconGrid BindingContext="{Binding Icon}" />
 
-                    <BoxView Style="{StaticResource Divider}" />
+                        <BoxView Style="{StaticResource Divider}" />
 
-                    <Label Text="{x:Static texts:UiTexts.SubcategoryGroupLabel}" Style="{StaticResource CaptionLabel}" />
-                    <!-- Только группы того же вида: перенос в чужой вид перевернул бы
-                         знак у всей истории подкатегории -->
-                    <Picker ItemsSource="{Binding Groups}"
-                            ItemDisplayBinding="{Binding Name, x:DataType=card:CategoryGroupOption}"
-                            SelectedItem="{Binding Group}" Title="{x:Static texts:UiTexts.SubcategoryChooseGroup}" />
+                        <Label Text="{x:Static texts:UiTexts.SubcategoryGroupLabel}" Style="{StaticResource CaptionLabel}" />
+                        <!-- Только группы того же вида: перенос в чужой вид перевернул бы
+                             знак у всей истории подкатегории -->
+                        <Picker ItemsSource="{Binding Groups}"
+                                ItemDisplayBinding="{Binding Name, x:DataType=card:CategoryGroupOption}"
+                                SelectedItem="{Binding Group}" Title="{x:Static texts:UiTexts.SubcategoryChooseGroup}" />
 
-                    <BoxView Style="{StaticResource Divider}" />
+                        <BoxView Style="{StaticResource Divider}" />
 
-                    <Label Text="{x:Static texts:UiTexts.CommonKind}" Style="{StaticResource CaptionLabel}" />
-                    <Label Text="{Binding KindCaption}" />
-                    <Label Text="{x:Static texts:UiTexts.SubcategoryKindHint}"
-                           Style="{StaticResource CaptionLabel}" />
-                </VerticalStackLayout>
-            </Border>
+                        <Label Text="{x:Static texts:UiTexts.CommonKind}" Style="{StaticResource CaptionLabel}" />
+                        <Label Text="{Binding KindCaption}" />
+                        <Label Text="{x:Static texts:UiTexts.SubcategoryKindHint}"
+                               Style="{StaticResource CaptionLabel}" />
+                    </VerticalStackLayout>
+                </Border>
 
-            <Border Style="{StaticResource ErrorCard}" IsVisible="{Binding HasError}">
-                <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
-            </Border>
+                <Border Style="{StaticResource ErrorCard}" IsVisible="{Binding HasError}">
+                    <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
+                </Border>
 
-            <Button Text="{x:Static texts:UiTexts.CommonSave}" Clicked="OnSave" IsEnabled="{Binding CanSave}"
-                    Style="{StaticResource SaveButton}" AutomationId="SaveSubcategory" />
+                <Button Text="{x:Static texts:UiTexts.CommonSave}" Clicked="OnSave" IsEnabled="{Binding CanSave}"
+                        Style="{StaticResource SaveButton}" AutomationId="SaveSubcategory" />
 
-            <Button Text="{x:Static texts:UiTexts.SubcategoryDelete}" Clicked="OnDelete" IsVisible="{Binding CanDelete}" IsEnabled="{Binding IsIdle}"
-                    AutomationId="DeleteSubcategory"
-                    Style="{StaticResource DangerButton}" />
+                <Button Text="{x:Static texts:UiTexts.SubcategoryDelete}" Clicked="OnDelete" IsVisible="{Binding CanDelete}" IsEnabled="{Binding IsIdle}"
+                        AutomationId="DeleteSubcategory"
+                        Style="{StaticResource DangerButton}" />
 
-        </VerticalStackLayout>
-    </ScrollView>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 
 </pages:DataPage>
