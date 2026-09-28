@@ -6,7 +6,7 @@ description: .NET SDK и набор рабочих нагрузок из global.
 runs:
   using: composite
   steps:
-    - uses: actions/setup-dotnet@v5
+    - uses: actions/setup-dotnet@v6
       with:
         global-json-file: global.json
 
