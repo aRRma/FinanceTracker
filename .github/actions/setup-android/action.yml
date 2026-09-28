@@ -16,7 +16,7 @@ runs:
         java-version: '21'
 
     # Пакеты NuGet между прогонами не качаются заново: ключ — состав проектов и SDK
-    - uses: actions/cache@v4
+    - uses: actions/cache@v6
       with:
         path: ~/.nuget/packages
         key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/*.props', 'global.json') }}
