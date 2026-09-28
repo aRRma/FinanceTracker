@@ -1,0 +1,98 @@
+name: Release
+
+# Релиз по тегу v1.0.x: тесты, APK под arm64, подписанный своим ключом, выкладка в релиз GitHub.
+# Версия и versionCode выводятся из тега и перекрывают значения из Finance.App.csproj:
+# заданное через -p: свойство у MSBuild глобальное. Ключ и пароль — в секретах репозитория
+# ANDROID_KEYSTORE_BASE64 и ANDROID_KEY_PASS; порядок публикации — навык build.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    # Windows — как рабочая машина: те же пути, культура и сборка, что проверены локально
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Версия из тега
+        id: version
+        shell: pwsh
+        run: |
+          $tag = '${{ github.ref_name }}'
+          if ($tag -notmatch '^v(\d+)\.(\d+)\.(\d+)$') { throw "тег $tag не вида v1.0.5" }
+          # versionCode = major*10000 + minor*100 + patch: на меньший Android обновление не ставит
+          $code = [int]$Matches[1] * 10000 + [int]$Matches[2] * 100 + [int]$Matches[3]
+          "display=$($tag.Substring(1))" >> $env:GITHUB_OUTPUT
+          "code=$code" >> $env:GITHUB_OUTPUT
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: microsoft
+          java-version: '21'
+
+      # Набор рабочих нагрузок закреплён: от него зависят версии MAUI и Android для .NET,
+      # и без закрепления релиз собрался бы не тем, что проверено на рабочей машине
+      - name: Рабочая нагрузка MAUI
+        run: dotnet workload install maui-android --version 10.0.400.1
+
+      - name: Android SDK
+        shell: pwsh
+        run: dotnet build src/Finance.App/Finance.App.csproj -t:InstallAndroidDependencies -f net10.0-android "-p:AndroidSdkDirectory=$env:ANDROID_HOME" -p:AcceptAndroidSDKLicenses=true
+
+      - name: Тесты
+        run: dotnet test -v q
+
+      - name: Ключ подписи
+        shell: pwsh
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if (-not $env:KEYSTORE_BASE64) { throw 'нет секрета ANDROID_KEYSTORE_BASE64' }
+          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\release.keystore", [Convert]::FromBase64String($env:KEYSTORE_BASE64))
+
+      - name: Публикация
+        shell: pwsh
+        env:
+          FINANCE_KEY_PASS: ${{ secrets.ANDROID_KEY_PASS }}
+        run: |
+          if (-not $env:FINANCE_KEY_PASS) { throw 'нет секрета ANDROID_KEY_PASS' }
+          dotnet publish src/Finance.App/Finance.App.csproj -f net10.0-android -c Release -r android-arm64 `
+            -p:AndroidPackageFormat=apk `
+            -p:ApplicationDisplayVersion=${{ steps.version.outputs.display }} `
+            -p:ApplicationVersion=${{ steps.version.outputs.code }} `
+            -p:AndroidKeyStore=true "-p:AndroidSigningKeyStore=$env:RUNNER_TEMP\release.keystore" -p:AndroidSigningKeyAlias=finance `
+            -p:AndroidSigningStorePass=env:FINANCE_KEY_PASS -p:AndroidSigningKeyPass=env:FINANCE_KEY_PASS `
+            "-p:AndroidSdkDirectory=$env:ANDROID_HOME" -o publish
+          if ($LASTEXITCODE -ne 0) { throw 'публикация упала' }
+
+      # Код выхода публикации подпись не подтверждает: после упавшей подписи в папке
+      # всё равно лежит -Signed.apk. Сверяется сертификат — ровно тот, что у ключа пользователя
+      - name: Проверка подписи
+        shell: pwsh
+        run: |
+          $apk = 'publish\ru.finance.tracker-Signed.apk'
+          $tools = Get-ChildItem "$env:ANDROID_HOME\build-tools" -Directory | Sort-Object { [version]$_.Name } | Select-Object -Last 1
+          $certs = & "$($tools.FullName)\apksigner.bat" verify --print-certs $apk | Out-String
+          if ($LASTEXITCODE -ne 0) { throw "пакет не подписан: $certs" }
+          if ($certs -notmatch 'bff51e9bf69ac593206508aa20d42ea90db39e865458ee7e2a183f1dbaf7794d') { throw "пакет подписан чужим ключом: $certs" }
+          Copy-Item $apk "FinanceTracker-${{ steps.version.outputs.display }}.apk"
+
+      - name: Релиз
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create ${{ github.ref_name }} "FinanceTracker-${{ steps.version.outputs.display }}.apk" --title "${{ steps.version.outputs.display }}" --generate-notes
+
+      - name: Удаление ключа
+        if: always()
+        shell: pwsh
+        run: Remove-Item "$env:RUNNER_TEMP\release.keystore" -Force -ErrorAction SilentlyContinue
