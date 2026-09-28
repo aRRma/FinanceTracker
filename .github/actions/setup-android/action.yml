@@ -1,0 +1,33 @@
+name: Подготовка сборки Android
+description: .NET SDK и набор рабочих нагрузок из global.json, Java 21, кэш NuGet, Android SDK
+
+# Общая часть релиза и проверки на push: разойдись они — проверка зеленела бы
+# на окружении, в котором релиз не собирается
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-dotnet@v5
+      with:
+        global-json-file: global.json
+
+    - uses: actions/setup-java@v5
+      with:
+        distribution: microsoft
+        java-version: '21'
+
+    # Пакеты NuGet между прогонами не качаются заново: ключ — состав проектов и SDK
+    - uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/*.props', 'global.json') }}
+        restore-keys: nuget-${{ runner.os }}-
+
+    # Версия набора рабочих нагрузок (а с ней MAUI и Android для .NET) берётся
+    # из global.json — того же, по которому собирает рабочая машина
+    - name: Рабочая нагрузка MAUI
+      shell: pwsh
+      run: dotnet workload install maui-android
+
+    - name: Android SDK
+      shell: pwsh
+      run: dotnet build src/Finance.App/Finance.App.csproj -t:InstallAndroidDependencies -f net10.0-android "-p:AndroidSdkDirectory=$env:ANDROID_HOME" -p:AcceptAndroidSDKLicenses=true

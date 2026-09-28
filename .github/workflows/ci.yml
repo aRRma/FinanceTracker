@@ -1,0 +1,43 @@
+name: CI
+
+# Проверка каждого push в master: тесты и сборка всего решения. dotnet test не собирает
+# Finance.App, и ошибка страницы без этой проверки всплыла бы только при выпуске релиза.
+# Отладочная сборка — без AOT и подписи, в несколько раз быстрее релизной.
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Новый push отменяет недоделанную проверку прежнего: важен результат последнего
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 40
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: ./.github/actions/setup-android
+
+      - name: Тесты
+        run: dotnet test -v q
+
+      - name: Сборка решения
+        run: dotnet build Finance.slnx -v q "-p:AndroidSdkDirectory=$env:ANDROID_HOME"
