@@ -42,7 +42,7 @@ jobs:
 
     steps:
       # Полная история с тегами — для проверки ветки, сравнения версий и списка изменений
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
