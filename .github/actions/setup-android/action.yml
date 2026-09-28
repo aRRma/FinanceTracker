@@ -6,17 +6,17 @@ description: .NET SDK и набор рабочих нагрузок из global.
 runs:
   using: composite
   steps:
-    - uses: actions/setup-dotnet@v5
+    - uses: actions/setup-dotnet@v6
       with:
         global-json-file: global.json
 
-    - uses: actions/setup-java@v5
+    - uses: actions/setup-java@v6
       with:
         distribution: microsoft
         java-version: '21'
 
     # Пакеты NuGet между прогонами не качаются заново: ключ — состав проектов и SDK
-    - uses: actions/cache@v4
+    - uses: actions/cache@v6
       with:
         path: ~/.nuget/packages
         key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/*.props', 'global.json') }}

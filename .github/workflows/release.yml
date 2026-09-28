@@ -133,7 +133,7 @@ jobs:
 
       # Пакет остаётся в прогоне в любом случае: у пробной сборки это единственный выход,
       # у релиза — запас на случай, если упадёт сама выкладка
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.version.outputs.apk }}
           path: |
