@@ -1,0 +1,13 @@
+# Действия GitHub в workflow обновляются предложениями раз в неделю: старые версии
+# GitHub со временем отключает, и релиз сломался бы в день выпуска, а не заранее.
+# Пакеты NuGet сюда не входят: MAUI и Android для .NET идут набором рабочих нагрузок
+# из global.json и обновляются отдельной правкой с прогоном всех экранов.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    # Корень покрывает workflow, вторая папка — общую подготовку сборки
+    directories: ['/', '/.github/actions/*']
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
