@@ -10,7 +10,7 @@ runs:
       with:
         global-json-file: global.json
 
-    - uses: actions/setup-java@v5
+    - uses: actions/setup-java@v6
       with:
         distribution: microsoft
         java-version: '21'
