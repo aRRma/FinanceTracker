@@ -37,7 +37,7 @@
             <Border Grid.Column="0" Style="{StaticResource IconButton}"
                     SemanticProperties.Description="{x:Static texts:UiTexts.ReportPreviousMonth}" AutomationId="PreviousMonth">
                 <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding PreviousMonthCommand}" />
+                    <TapGestureRecognizer Tapped="OnPreviousMonth" />
                 </Border.GestureRecognizers>
                 <controls:Icon Key="chevron-right" Rotation="180" HorizontalOptions="Center" VerticalOptions="Center" />
             </Border>
@@ -47,7 +47,7 @@
                     SemanticProperties.Description="{x:Static texts:UiTexts.ReportNextMonth}" AutomationId="NextMonth"
                     IsEnabled="{Binding CanGoForward}">
                 <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding NextMonthCommand}" />
+                    <TapGestureRecognizer Tapped="OnNextMonth" />
                 </Border.GestureRecognizers>
                 <!-- На текущем месяце стрелка гаснет: операций в будущем не бывает -->
                 <controls:Icon Key="chevron-right" HorizontalOptions="Center" VerticalOptions="Center">
@@ -76,8 +76,10 @@
             </Label.Triggers>
         </Label>
 
-        <!-- Тот же признак занятости гасит и ожидание первого чтения, и жест обновления -->
-        <RefreshView Grid.Row="3" IsRefreshing="{Binding IsBusy}" Command="{Binding LoadCommand}">
+        <!-- Признак жеста свой, а не занятость модели: RefreshView на каждый его подъём
+             запускает обновление, и чтение, поднявшее признак само, запускало бы второе.
+             Обработчик, а не команда: сбой команды из разметки закрыл бы окно молча -->
+        <RefreshView Grid.Row="3" IsRefreshing="{Binding IsRefreshing}" Refreshing="OnRefreshing">
 
             <CollectionView ItemsSource="{Binding Rows}" SelectionMode="None">
                 <CollectionView.ItemTemplate>

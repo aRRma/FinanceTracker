@@ -54,7 +54,7 @@ public partial class SubcategoryPage : DataPage
     {
         if (await _model.SaveAsync())
         {
-            await Shell.Current.GoToAsync("..");
+            await Navigator.GoAsync("..");
         }
     }
 
@@ -77,7 +77,7 @@ public partial class SubcategoryPage : DataPage
 
         if (await _model.DeleteAsync())
         {
-            await Shell.Current.GoToAsync("..");
+            await Navigator.GoAsync("..");
         }
     }
 }

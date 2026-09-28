@@ -28,10 +28,7 @@ public sealed class TransactionKeypadTests
         TransactionViewModel model = Model(fixture);
         await model.LoadAsync(key: null);
 
-        foreach (char key in "1250+340")
-        {
-            model.PressKeyCommand.Execute(key.ToString());
-        }
+        Press(model, "1250+340");
 
         Assert.Equal("1250+340", model.Amount);
         Assert.True(model.HasAmountOperation);
@@ -46,44 +43,42 @@ public sealed class TransactionKeypadTests
 
     /// <summary>
     /// «=» сворачивает выражение в число и уходит в то же поле, что и цифры:
-    /// у перевода между валютами их два.
+    /// у перевода между валютами их два, и соседнее поле остаётся как было.
     /// </summary>
     [Fact]
     public async Task Равно_сворачивает_выражение_в_выбранном_поле()
     {
         await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        TransactionViewModel model = await TransferBetweenCurrenciesAsync(fixture);
 
-        Guid rubles = await fixture.AccountAsync("Карта");
-        Guid euros = await fixture.AccountAsync("Валютный", currency: Currency.EUR);
-
-        TransactionViewModel model = Model(fixture);
-        await model.LoadAsync(key: null);
-
-        model.Kind = TransactionKind.Transfer;
-        model.SourceAccount = model.Accounts.First(account => account.Key == rubles);
-        model.TargetAccount = model.Accounts.First(account => account.Key == euros);
-
-        foreach (char key in "90×2")
-        {
-            model.PressKeyCommand.Execute(key.ToString());
-        }
-
+        Press(model, "90×2");
         model.ActivateTargetAmountCommand.Execute(null);
-
-        foreach (char key in "10÷4")
-        {
-            model.PressKeyCommand.Execute(key.ToString());
-        }
+        Press(model, "10÷4");
 
         model.EvaluateCommand.Execute(null);
 
         Assert.Equal("90×2", model.Amount);
         Assert.Equal("2,5", model.TargetAmount);
+    }
 
-        // Набор продолжается с итога: он вернулся в поле теми же знаками, что набирают
+    /// <summary>
+    /// Итог «=» возвращается в поле теми же знаками, что набирают, — с запятой,
+    /// поэтому набор продолжается с него, а не с пустого поля. Проверяется на поле
+    /// зачисления: оно второе, и итог обязан вернуться именно в него.
+    /// </summary>
+    [Fact]
+    public async Task Набор_продолжается_с_итога()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        TransactionViewModel model = await TransferBetweenCurrenciesAsync(fixture);
+
+        model.ActivateTargetAmountCommand.Execute(null);
+        Press(model, "10÷4");
+        model.EvaluateCommand.Execute(null);
         model.PressKeyCommand.Execute("5");
 
         Assert.Equal("2,55", model.TargetAmount);
+        Assert.Equal(string.Empty, model.Amount);
     }
 
     /// <summary>
@@ -203,47 +198,61 @@ public sealed class TransactionKeypadTests
 
     /// <summary>
     /// У перевода между валютами нажатия уходят в то поле, которое выбрано.
-    /// Обе суммы обязаны быть набраны — иначе сохранять нечего.
     /// </summary>
     [Fact]
     public async Task Нажатия_уходят_в_выбранное_поле()
     {
         await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        TransactionViewModel model = await TransferBetweenCurrenciesAsync(fixture);
 
-        Guid rubles = await fixture.AccountAsync("Карта");
-        Guid euros = await fixture.AccountAsync("Валютный", currency: Currency.EUR);
-
-        TransactionViewModel model = Model(fixture);
-        await model.LoadAsync(key: null);
-
-        model.Kind = TransactionKind.Transfer;
-        model.SourceAccount = model.Accounts.First(account => account.Key == rubles);
-        model.TargetAccount = model.Accounts.First(account => account.Key == euros);
-
-        Assert.True(model.NeedsTargetAmount);
-
-        model.PressKeyCommand.Execute("1");
-        model.PressKeyCommand.Execute("0");
-        model.PressKeyCommand.Execute("0");
-
-        Assert.Equal("100", model.Amount);
-        Assert.False(model.CanSave);
-
+        Press(model, "100");
         model.ActivateTargetAmountCommand.Execute(null);
-        model.PressKeyCommand.Execute("1");
+        Press(model, "1");
 
         Assert.True(model.IsTargetAmountActive);
         Assert.Equal("100", model.Amount);
         Assert.Equal("1", model.TargetAmount);
+    }
+
+    /// <summary>
+    /// Перевод между валютами сохраняется только с обеими суммами: курс
+    /// приложение не знает, и вторую сумму взять неоткуда.
+    /// </summary>
+    [Fact]
+    public async Task Перевод_между_валютами_сохраняется_с_обеими_суммами()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        TransactionViewModel model = await TransferBetweenCurrenciesAsync(fixture);
+
+        Assert.True(model.NeedsTargetAmount);
+
+        Press(model, "100");
+
+        Assert.False(model.CanSave);
+
+        model.ActivateTargetAmountCommand.Execute(null);
+        Press(model, "1");
+
         Assert.True(model.CanSave);
+    }
 
-        // Возврат к расходу убирает второе поле, и набор возвращается в первое
+    /// <summary>
+    /// Возврат к расходу убирает второе поле, и набор возвращается в первое,
+    /// а не уходит в невидимое.
+    /// </summary>
+    [Fact]
+    public async Task Смена_вида_возвращает_набор_в_первое_поле()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        TransactionViewModel model = await TransferBetweenCurrenciesAsync(fixture);
+
+        Press(model, "100");
+        model.ActivateTargetAmountCommand.Execute(null);
+
         model.Kind = TransactionKind.Expense;
-
-        Assert.True(model.IsSourceAmountActive);
-
         model.PressKeyCommand.Execute("5");
 
+        Assert.True(model.IsSourceAmountActive);
         Assert.Equal("1005", model.Amount);
     }
 
@@ -324,6 +333,32 @@ public sealed class TransactionKeypadTests
             await Delay.Task;
 
             return await inner.HandleAsync(command, cancellationToken);
+        }
+    }
+
+    /// <summary>
+    /// Форма перевода с рублёвого счёта на евровый: у неё два поля суммы.
+    /// </summary>
+    private static async Task<TransactionViewModel> TransferBetweenCurrenciesAsync(TransactionFixture fixture)
+    {
+        Guid rubles = await fixture.AccountAsync("Карта");
+        Guid euros = await fixture.AccountAsync("Валютный", currency: Currency.EUR);
+
+        TransactionViewModel model = Model(fixture);
+        await model.LoadAsync(key: null);
+
+        model.Kind = TransactionKind.Transfer;
+        model.SourceAccount = model.Accounts.First(account => account.Key == rubles);
+        model.TargetAccount = model.Accounts.First(account => account.Key == euros);
+
+        return model;
+    }
+
+    private static void Press(TransactionViewModel model, string keys)
+    {
+        foreach (char key in keys)
+        {
+            model.PressKeyCommand.Execute(key.ToString());
         }
     }
 

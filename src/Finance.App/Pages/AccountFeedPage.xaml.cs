@@ -32,10 +32,16 @@ public partial class AccountFeedPage : DataPage
     /// </summary>
     public string? Key { get; set; }
 
+    /// <summary>
+    /// Только устаревшая лента: перечитывание возвращает прокрутку к началу, и
+    /// заглянувший в операцию из глубины истории терял бы место, с которого ушёл.
+    /// </summary>
+    protected override bool ReloadsOnAppearing => _model.IsOutdated;
+
     /// <inheritdoc />
     protected override Task LoadAsync() =>
         Guid.TryParse(Key, out Guid key) ? _model.LoadAsync(key) : Task.CompletedTask;
 
     private void OnAdd(object? sender, EventArgs e) =>
-        Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Transaction}?account={Key}"));
+        Navigator.Go($"{Routes.Transaction}?account={Key}");
 }

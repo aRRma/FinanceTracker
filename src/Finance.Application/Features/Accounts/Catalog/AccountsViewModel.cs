@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
@@ -14,6 +13,10 @@ public sealed partial class AccountsViewModel : ScreenViewModel
 {
     private readonly IAccountsQuery _accounts;
     private readonly IReorderAccountsHandler _reorder;
+
+    // Номер чтения: жест обновления и перечитывание по чужой правке могут
+    // совпасть, и отставшее чтение не должно перекрыть свежее
+    private int _generation;
 
     /// <summary>
     /// Создаёт модель представления справочника счетов.
@@ -61,38 +64,28 @@ public sealed partial class AccountsViewModel : ScreenViewModel
     public bool HasClosed => Closed.Count > 0;
 
     /// <summary>
-    /// Идёт чтение. Запись открыта намеренно: к этому признаку привязан жест
-    /// «потянуть вниз», и он сам поднимает его в начале обновления.
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsBusy { get; set; }
-
-    /// <summary>
     /// Перечитывает справочник.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
-        IsBusy = true;
+        int generation = ++_generation;
 
-        try
+        // ConfigureAwait(false) здесь недопустим: дальше наполняются
+        // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
+        IReadOnlyList<AccountListItem> accounts = await _accounts.ReadAsync(cancellationToken);
+
+        if (generation != _generation)
         {
-            // ConfigureAwait(false) здесь недопустим: дальше наполняются
-            // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-            IReadOnlyList<AccountListItem> accounts = await _accounts.ReadAsync(cancellationToken);
-
-            Fill(Spendable, accounts.Where(static account => !account.IsClosed && !account.ExcludedFromTotals));
-            Fill(Savings, accounts.Where(static account => !account.IsClosed && account.ExcludedFromTotals));
-            Fill(Closed, accounts.Where(static account => account.IsClosed));
-
-            OnPropertyChanged(nameof(HasSavings));
-            OnPropertyChanged(nameof(HasClosed));
+            return;
         }
-        finally
-        {
-            IsBusy = false;
-        }
+
+        Fill(Spendable, accounts.Where(static account => !account.IsClosed && !account.ExcludedFromTotals));
+        Fill(Savings, accounts.Where(static account => !account.IsClosed && account.ExcludedFromTotals));
+        Fill(Closed, accounts.Where(static account => account.IsClosed));
+
+        OnPropertyChanged(nameof(HasSavings));
+        OnPropertyChanged(nameof(HasClosed));
     }
 
     /// <summary>

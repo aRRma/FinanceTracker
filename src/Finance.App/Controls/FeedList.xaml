@@ -16,15 +16,17 @@
     x:DataType="feed:FeedViewModel"
     x:Name="Root">
 
-    <!-- Тот же признак занятости гасит и ожидание первого чтения, и жест обновления -->
-    <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding RefreshCommand}">
+    <!-- Признак жеста свой, а не занятость модели: RefreshView на каждый его подъём
+         запускает обновление, и чтение, поднявшее признак само, запускало бы второе.
+         Обработчик, а не команда: сбой команды из разметки закрыл бы окно молча -->
+    <RefreshView IsRefreshing="{Binding IsRefreshing}" Refreshing="OnRefreshing">
 
         <CollectionView
             ItemsSource="{Binding Days}"
             IsGrouped="True"
             SelectionMode="None"
             RemainingItemsThreshold="10"
-            RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}"
+            RemainingItemsThresholdReached="OnRemainingItemsThresholdReached"
             EmptyView="{Binding Empty, Source={x:Reference Root}, x:DataType=controls:FeedList}">
 
             <CollectionView.GroupHeaderTemplate>

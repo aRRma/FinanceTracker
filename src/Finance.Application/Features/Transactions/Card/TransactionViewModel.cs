@@ -96,11 +96,6 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     public string Title => IsExisting ? UiTexts.TransactionTitleExisting : UiTexts.TransactionTitleNew;
 
     /// <summary>
-    /// Подписи видов для переключателя, в порядке <see cref="KindIndex"/>.
-    /// </summary>
-    public static IReadOnlyList<string> KindNames { get; } = [UiTexts.KindExpense, UiTexts.KindIncome, UiTexts.KindTransfer];
-
-    /// <summary>
     /// Вид операции. По умолчанию расход — он записывается чаще всего.
     /// </summary>
     [ObservableProperty]

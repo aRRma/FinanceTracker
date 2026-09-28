@@ -107,7 +107,12 @@ public sealed partial class ContrastTests
     [Fact]
     public void Разбор_что_то_нашёл()
     {
-        Assert.InRange(Palette.Value.Count, 20, 40);
+        // Нижняя граница, а не точное число: новый токен темы не должен ронять эту
+        // проверку. Двадцать — заведомо меньше палитры двух тем, поэтому срабатывает
+        // она только на сломанном разборе
+        Assert.True(
+            Palette.Value.Count >= 20,
+            $"из словаря цветов разобрано токенов: {Palette.Value.Count}");
 
         // Цвет на себе самом даёт единицу, порядок пары на счёт не влияет
         Assert.Equal(1.0, Ratio("InkLight", "InkLight"), precision: 2);

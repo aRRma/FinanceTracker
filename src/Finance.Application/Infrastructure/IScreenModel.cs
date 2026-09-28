@@ -19,7 +19,8 @@ public interface IScreenModel
     event Action<Exception>? ReloadFailed;
 
     /// <summary>
-    /// Экран появился: подписаться на изменения.
+    /// Экран появился: подписаться на изменения. Всё, что изменилось раньше,
+    /// считается учтённым — решать, перечитывать ли экран, надо до этого вызова.
     /// </summary>
     void Activate();
 
@@ -27,4 +28,9 @@ public interface IScreenModel
     /// Экран ушёл: отписаться.
     /// </summary>
     void Deactivate();
+
+    /// <summary>
+    /// Перечитывает экран по жесту «потянуть вниз» и гасит индикатор жеста.
+    /// </summary>
+    Task RefreshAsync();
 }

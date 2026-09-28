@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain.Values;
@@ -28,6 +27,14 @@ public sealed partial class FeedViewModel : ScreenViewModel
     // Номер перечитывания: по нему дочитанная страница узнаёт, что лента
     // за время запроса была перечитана заново и её строки уже не к месту
     private int _generation;
+
+    // Идёт чтение: дочитывание ждёт, пока лента не прочитана целиком
+    // и пока не пришла предыдущая страница
+    private bool _reading;
+
+    // День, которым подписаны шапки: после полуночи и смены часового пояса
+    // «сегодня» другое, и прочитанная лента устаревает без единой правки
+    private DateOnly _shownOn;
 
     /// <summary>
     /// Создаёт модель представления ленты.
@@ -120,35 +127,30 @@ public sealed partial class FeedViewModel : ScreenViewModel
     public partial bool HasMore { get; private set; }
 
     /// <summary>
-    /// Идёт чтение. Запись открыта намеренно: к этому признаку привязан жест
-    /// «потянуть вниз», и он сам поднимает его в начале обновления.
+    /// Лента устарела: пока её не было видно, изменились операции или справочники,
+    /// или наступил другой день. Неустаревшую ленту на возврате не перечитывают:
+    /// перечитывание вернуло бы прокрутку к началу, и заглянувший в операцию
+    /// из глубины истории терял бы место, с которого ушёл.
     /// </summary>
-    [ObservableProperty]
-    public partial bool IsBusy { get; set; }
+    public override bool IsOutdated => base.IsOutdated || _shownOn != _clock.Today;
 
     /// <summary>
-    /// Перечитывает ту же ленту заново — жест «потянуть вниз». Отдельно от
-    /// <see cref="LoadAsync"/>: тому нужен счёт параметром, а жест знает только,
-    /// что показано сейчас.
-    /// </summary>
-    /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
-    public Task RefreshAsync(CancellationToken cancellationToken = default) =>
-        LoadAsync(AccountKey, cancellationToken);
-
-    /// <summary>
-    /// Перечитывает ленту с начала.
+    /// Перечитывает ленту с начала. Ту же ленту — на прочитанную глубину, а не на
+    /// одну страницу: правка операции из глубины истории иначе срезала бы всё
+    /// дочитанное, и возвращаться к месту пришлось бы заново.
     /// </summary>
     /// <param name="accountKey">Счёт, чью ленту читать; пусто — общая лента.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     public async Task LoadAsync(Guid? accountKey, CancellationToken cancellationToken = default)
     {
+        int take = IsLoaded && accountKey == AccountKey ? Math.Max(PageSize, _loaded) : PageSize;
+
         AccountKey = accountKey;
         OnPropertyChanged(nameof(IsAccountFeed));
 
         int generation = ++_generation;
 
-        IsBusy = true;
+        _reading = true;
 
         try
         {
@@ -159,28 +161,31 @@ public sealed partial class FeedViewModel : ScreenViewModel
                 await ReadAccountAsync(key, cancellationToken);
             }
 
-            FeedPage page = await _feed.ReadAsync(accountKey, skip: 0, PageSize, cancellationToken);
+            DateOnly today = _clock.Today;
+            FeedPage page = await _feed.ReadAsync(accountKey, skip: 0, take, cancellationToken);
 
             if (generation != _generation)
             {
                 return;
             }
 
-            Days.Clear();
             _loaded = 0;
+            _shownOn = today;
 
-            Append(page);
+            List<FeedDay> fresh = [];
+            Append(page, fresh);
+            Replace(fresh);
 
             IsEmpty = page.Items.Count == 0;
             IsLoaded = true;
         }
         finally
         {
-            // Занятость снимает только последнее чтение: более раннее, завершившись,
+            // Чтение снимает отметку только последнее: более раннее, завершившись,
             // открыло бы дочитывание, пока свежее ещё наполняет ленту
             if (generation == _generation)
             {
-                IsBusy = false;
+                _reading = false;
             }
         }
     }
@@ -189,17 +194,16 @@ public sealed partial class FeedViewModel : ScreenViewModel
     /// Дочитывает следующую страницу в конец ленты.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task LoadMoreAsync(CancellationToken cancellationToken = default)
     {
-        if (!HasMore || IsBusy)
+        if (!HasMore || _reading)
         {
             return;
         }
 
         int generation = _generation;
 
-        IsBusy = true;
+        _reading = true;
 
         try
         {
@@ -213,15 +217,15 @@ public sealed partial class FeedViewModel : ScreenViewModel
                 return;
             }
 
-            Append(page);
+            Append(page, Days);
         }
         finally
         {
-            // Занятость снимает только последнее чтение: более раннее, завершившись
-            // позже перечитывания с начала, сбросило бы занятость свежего запроса
+            // Отметку снимает только последнее чтение: более раннее, завершившись
+            // позже перечитывания с начала, сняло бы отметку свежего запроса
             if (generation == _generation)
             {
-                IsBusy = false;
+                _reading = false;
             }
         }
     }
@@ -231,10 +235,10 @@ public sealed partial class FeedViewModel : ScreenViewModel
     /// продолжать день с прошлой страницы — тогда она встаёт в него, а не заводит
     /// вторую шапку с той же датой.
     /// </summary>
-    private void Append(FeedPage page)
+    private void Append(FeedPage page, IList<FeedDay> days)
     {
         DateOnly today = _clock.Today;
-        FeedDay? current = Days.Count > 0 ? Days[^1] : null;
+        FeedDay? current = days.Count > 0 ? days[^1] : null;
 
         foreach (FeedItem item in page.Items)
         {
@@ -243,7 +247,7 @@ public sealed partial class FeedViewModel : ScreenViewModel
                 Money? total = page.DayTotals.TryGetValue(item.OccurredOn, out Money known) ? known : null;
 
                 current = new FeedDay(item.OccurredOn, total, today);
-                Days.Add(current);
+                days.Add(current);
             }
 
             current.Add(FeedRowItem.From(item, showAccount: !IsAccountFeed));
@@ -251,6 +255,31 @@ public sealed partial class FeedViewModel : ScreenViewModel
 
         _loaded += page.Items.Count;
         HasMore = page.HasMore;
+    }
+
+    /// <summary>
+    /// Ставит перечитанные дни на место прежних поштучно, меняя только изменившиеся.
+    /// Очистка с наполнением заново приходит в список сбросом, и тот возвращает
+    /// прокрутку к началу: сохранивший правку из глубины истории оказывался бы наверху.
+    /// </summary>
+    private void Replace(List<FeedDay> fresh)
+    {
+        for (int i = 0; i < fresh.Count; i++)
+        {
+            if (i >= Days.Count)
+            {
+                Days.Add(fresh[i]);
+            }
+            else if (!fresh[i].SameAs(Days[i]))
+            {
+                Days[i] = fresh[i];
+            }
+        }
+
+        while (Days.Count > fresh.Count)
+        {
+            Days.RemoveAt(Days.Count - 1);
+        }
     }
 
     /// <summary>

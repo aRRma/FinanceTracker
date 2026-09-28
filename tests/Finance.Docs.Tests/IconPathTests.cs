@@ -55,6 +55,19 @@ public sealed class IconPathTests
     }
 
     /// <summary>
+    /// Оба файла разобраны, и контуров не меньше, чем ключей набора. Иначе проверка
+    /// контуров выше обошла бы пустой словарь и прошла, не разобрав ни одного.
+    /// </summary>
+    [Fact]
+    public void Разбор_что_то_нашёл()
+    {
+        Assert.NotEmpty(LoadedKeys.Value);
+        Assert.True(
+            LoadedPaths.Value.Count >= LoadedKeys.Value.Count,
+            $"контуров {LoadedPaths.Value.Count}, ключей набора {LoadedKeys.Value.Count}");
+    }
+
+    /// <summary>
     /// Значок перевода нужен ленте, хотя в наборе для категорий его нет.
     /// </summary>
     [Fact]

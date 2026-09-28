@@ -508,10 +508,11 @@ internal sealed partial class Ui
     private async Task CrashAsync()
     {
         // Буфер crash держит падения процесса, в том числе необработанное исключение .NET,
-        // которое доходит до Java обёрткой; сам рантайм пишет своё тегами DOTNET и mono-rt.
+        // которое доходит до Java обёрткой; сам рантайм пишет своё тегами DOTNET и mono-rt,
+        // а сбои, перехваченные приложением и показанные сообщением, — тегом Finance.
         // Тег AndroidRuntime из основного буфера не нужен — он повторил бы буфер crash
         string java = await AdbAsync("logcat", "-d", "-b", "crash");
-        string managed = await AdbAsync("logcat", "-d", "DOTNET:E", "mono-rt:E", "*:S");
+        string managed = await AdbAsync("logcat", "-d", "DOTNET:E", "mono-rt:E", "Finance:E", "*:S");
         string report = string.Join('\n', $"{java}\n{managed}".Split('\n')
             .Select(static line => line.TrimEnd())
             .Where(static line => line.Length > 0 && !line.StartsWith("--------- beginning", StringComparison.Ordinal)));

@@ -57,7 +57,7 @@ public partial class AccountPage : DataPage
 
         if (await _model.SaveAsync())
         {
-            await Shell.Current.GoToAsync("..");
+            await Navigator.GoAsync("..");
         }
     }
 }

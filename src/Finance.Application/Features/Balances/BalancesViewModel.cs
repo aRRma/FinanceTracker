@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain.Enums;
@@ -15,6 +14,10 @@ namespace Finance.Application.Features.Balances;
 public sealed partial class BalancesViewModel : ScreenViewModel
 {
     private readonly IAccountsQuery _accounts;
+
+    // Номер чтения: жест обновления и перечитывание по чужой правке могут
+    // совпасть, и отставшее чтение не должно перекрыть свежее
+    private int _generation;
 
     /// <summary>
     /// Создаёт модель представления главного экрана.
@@ -33,14 +36,6 @@ public sealed partial class BalancesViewModel : ScreenViewModel
     /// Разделы по валютам, в порядке появления счетов.
     /// </summary>
     public ObservableCollection<CurrencySection> Sections { get; } = [];
-
-    /// <summary>
-    /// Идёт чтение — экран показывает ожидание вместо пустоты. Запись открыта
-    /// намеренно: к этому признаку привязан жест «потянуть вниз», и он сам
-    /// поднимает его в начале обновления.
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsBusy { get; set; }
 
     /// <summary>
     /// Счета прочитаны хотя бы раз. До этого экран не знает, пусто на нём или нет,
@@ -68,38 +63,35 @@ public sealed partial class BalancesViewModel : ScreenViewModel
     /// Перечитывает счета и балансы.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
-        IsBusy = true;
+        int generation = ++_generation;
 
-        try
+        // ConfigureAwait(false) здесь недопустим, хотя и стоит в остальном
+        // прикладном слое: дальше наполняются привязанные коллекции,
+        // а их правка вне потока интерфейса роняет разметку
+        IReadOnlyList<AccountListItem> accounts = await _accounts.ReadAsync(cancellationToken);
+
+        if (generation != _generation)
         {
-            // ConfigureAwait(false) здесь недопустим, хотя и стоит в остальном
-            // прикладном слое: дальше наполняются привязанные коллекции,
-            // а их правка вне потока интерфейса роняет разметку
-            IReadOnlyList<AccountListItem> accounts = await _accounts.ReadAsync(cancellationToken);
-
-            // Закрытый счёт с главного экрана уходит целиком: он выведен
-            // из употребления, а лента и отчёт его сохраняют
-            AccountListItem[] visible = accounts.Where(static account => !account.IsClosed).ToArray();
-
-            Sections.Clear();
-
-            foreach (CurrencySection section in BuildSections(visible))
-            {
-                Sections.Add(section);
-            }
-
-            // Пусто — когда счетов нет вовсе, а не когда все они закрыты:
-            // иначе закрытие последнего счёта выглядело бы как первый запуск
-            IsEmpty = accounts.Count == 0;
-            IsLoaded = true;
+            return;
         }
-        finally
+
+        // Закрытый счёт с главного экрана уходит целиком: он выведен
+        // из употребления, а лента и отчёт его сохраняют
+        AccountListItem[] visible = accounts.Where(static account => !account.IsClosed).ToArray();
+
+        Sections.Clear();
+
+        foreach (CurrencySection section in BuildSections(visible))
         {
-            IsBusy = false;
+            Sections.Add(section);
         }
+
+        // Пусто — когда счетов нет вовсе, а не когда все они закрыты:
+        // иначе закрытие последнего счёта выглядело бы как первый запуск
+        IsEmpty = accounts.Count == 0;
+        IsLoaded = true;
     }
 
     /// <summary>

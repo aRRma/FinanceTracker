@@ -31,7 +31,7 @@ public partial class CategoriesPage : DataPage
     protected override Task LoadAsync() => _model.LoadAsync();
 
     private void OnCreateGroup(object? sender, EventArgs e) =>
-        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Group));
+        Navigator.Go(Routes.Group);
 
     /// <summary>
     /// Открывает карточку. «Прочее» и служебные не открываются: переносить
@@ -47,7 +47,7 @@ public partial class CategoriesPage : DataPage
 
         string route = line.IsGroup ? Routes.Group : Routes.Subcategory;
 
-        Guarded.Run(() => Shell.Current.GoToAsync($"{route}?key={line.Key}"));
+        Navigator.Go($"{route}?key={line.Key}");
     }
 
     private void OnToggleTapped(object? sender, TappedEventArgs e)

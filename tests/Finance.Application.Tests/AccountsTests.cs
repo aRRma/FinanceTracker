@@ -67,7 +67,7 @@ public sealed class AccountsTests
 
         Guid cash = await SaveAsync(database, Command("Наличные", 1000m));
         Transaction expense = Expense(cash, 250m);
-        expense.Delete(DateTimeOffset.UtcNow);
+        expense.Delete(NowUtc);
 
         await AddAsync(database, expense);
 
@@ -115,7 +115,7 @@ public sealed class AccountsTests
 
         model.Name = "Наличные в тумбочке";
 
-        Assert.True(await model.SaveAsync());
+        Assert.True(await model.SaveAsync(), model.Error);
     }
 
     /// <summary>
@@ -180,7 +180,7 @@ public sealed class AccountsTests
 
         Guid key = await SaveAsync(database, Command("Наличные", 0m));
         Transaction expense = Expense(key, 10m);
-        expense.Delete(DateTimeOffset.UtcNow);
+        expense.Delete(NowUtc);
 
         await AddAsync(database, expense);
 
@@ -193,6 +193,50 @@ public sealed class AccountsTests
             () => SaveAsync(database, Command("Наличные", 0m) with { Key = key, Currency = Currency.USD }));
 
         Assert.Equal(Invariant.CurrencyFixedOnceUsed, error.Invariant);
+    }
+
+    /// <summary>
+    /// Пока операций не было, валюту можно поправить: ошибка при заведении
+    /// не должна требовать удалять счёт и заводить заново.
+    /// </summary>
+    [Fact]
+    public async Task Валюта_меняется_у_счёта_без_операций()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        Guid key = await SaveAsync(database, Command("Наличные", 100m));
+
+        await SaveAsync(database, Command("Наличные", 100m) with { Key = key, Currency = Currency.USD });
+
+        AccountCard? card = await database.Resolve<IAccountCardQuery>().ReadAsync(key);
+
+        Assert.NotNull(card);
+        Assert.Equal(Currency.USD, card.Currency);
+        Assert.False(card.CurrencyLocked);
+    }
+
+    /// <summary>
+    /// Дату открытия можно сдвинуть вперёд вплоть до первой операции, но не дальше:
+    /// иначе операция оказалась бы раньше открытия своего счёта.
+    /// </summary>
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.OpenedOnNotAfterTransactions))]
+    public async Task Дата_открытия_сдвигается_не_дальше_первой_операции()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        Guid key = await SaveAsync(database, Command("Наличные", 0m));
+        await AddAsync(database, Expense(key, 10m));
+
+        await SaveAsync(database, Command("Наличные", 0m) with { Key = key, OpenedOn = Today });
+
+        AccountCard? card = await database.Resolve<IAccountCardQuery>().ReadAsync(key);
+        Assert.Equal(Today, card!.OpenedOn);
+
+        DomainException error = await Assert.ThrowsAsync<DomainException>(
+            () => SaveAsync(database, Command("Наличные", 0m) with { Key = key, OpenedOn = Today.AddDays(1) }));
+
+        Assert.Equal(Invariant.OpenedOnNotAfterTransactions, error.Invariant);
     }
 
     /// <summary>
@@ -336,21 +380,25 @@ public sealed class AccountsTests
         Transaction.Create(
             TransactionKind.Expense, account, Money.Create(amount, Currency.RUB),
             targetAccountKey: null, targetAmount: null, categoryKey: Guid.CreateVersion7(),
-            placeKey: null, occurredOn: Today, note: null, Today, DateTimeOffset.UtcNow);
+            placeKey: null, occurredOn: Today, note: null, Today, NowUtc);
 
     private static Transaction Income(Guid account, decimal amount) =>
         Transaction.Create(
             TransactionKind.Income, account, Money.Create(amount, Currency.RUB),
             targetAccountKey: null, targetAmount: null, categoryKey: Guid.CreateVersion7(),
-            placeKey: null, occurredOn: Today, note: null, Today, DateTimeOffset.UtcNow);
+            placeKey: null, occurredOn: Today, note: null, Today, NowUtc);
 
     private static Transaction Transfer(Guid from, Guid to, decimal amount) =>
         Transaction.Create(
             TransactionKind.Transfer, from, Money.Create(amount, Currency.RUB),
             targetAccountKey: to, targetAmount: Money.Create(amount, Currency.RUB), categoryKey: null,
-            placeKey: null, occurredOn: Today, note: null, Today, DateTimeOffset.UtcNow);
+            placeKey: null, occurredOn: Today, note: null, Today, NowUtc);
 
     // Фиксированная, а не из часов: тест не должен зависеть от того,
     // в какую сторону от полуночи по UTC его запустили
     private static DateOnly Today => new(2026, 8, 25);
+
+    // Метка создания и удаления операций в проверках не участвует, но и она
+    // не берётся из часов: исход теста не должен зависеть от момента запуска
+    private static DateTimeOffset NowUtc => new(2026, 8, 25, 9, 30, 0, TimeSpan.Zero);
 }

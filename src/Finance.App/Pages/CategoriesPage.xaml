@@ -31,8 +31,10 @@
 
         <SearchBar Grid.Row="1" Text="{Binding Filter}" Placeholder="{x:Static texts:UiTexts.CommonSearchByName}" />
 
-        <!-- Тот же признак занятости гасит и ожидание первого чтения, и жест обновления -->
-        <RefreshView Grid.Row="2" IsRefreshing="{Binding IsBusy}" Command="{Binding LoadCommand}">
+        <!-- Признак жеста свой, а не занятость модели: RefreshView на каждый его подъём
+             запускает обновление, и чтение, поднявшее признак само, запускало бы второе.
+             Обработчик, а не команда: сбой команды из разметки закрыл бы окно молча -->
+        <RefreshView Grid.Row="2" IsRefreshing="{Binding IsRefreshing}" Refreshing="OnRefreshing">
 
             <!-- Список плоский, а не с группировкой: группировка прячет заголовок
                  вместе с содержимым, а свёрнутой группе заголовок как раз и нужен.

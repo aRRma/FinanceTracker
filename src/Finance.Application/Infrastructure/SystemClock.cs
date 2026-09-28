@@ -5,7 +5,8 @@ namespace Finance.Application.Infrastructure;
 /// числовым смещением: смещение перестаёт соответствовать зоне на переходе
 /// на летнее время, и «сегодня» съезжает на сутки.
 /// </summary>
-public sealed class SystemClock : IClock
+/// <param name="time">Источник момента: в приложении системный, в тестах заданный, чтобы «сегодня» не зависело от дня запуска.</param>
+public sealed class SystemClock(TimeProvider time) : IClock
 {
     /// <summary>
     /// Зона пользователя. По умолчанию системная; настройка приложения
@@ -23,7 +24,7 @@ public sealed class SystemClock : IClock
     } = TimeZoneInfo.Local;
 
     /// <inheritdoc />
-    public DateTimeOffset NowUtc => DateTimeOffset.UtcNow;
+    public DateTimeOffset NowUtc => time.GetUtcNow();
 
     /// <inheritdoc />
     public DateOnly Today => DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(NowUtc, TimeZone).DateTime);

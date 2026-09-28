@@ -17,112 +17,115 @@
     x:DataType="card:GroupViewModel"
     Title="{Binding Title}">
 
-    <!-- Container: .NET 10 пускает страницу под системные полосы, а ScrollView
-         из всех областей понимает только эту -->
-    <ScrollView SafeAreaEdges="Container">
-        <VerticalStackLayout Padding="16,12" Spacing="16">
+    <!-- Container: .NET 10 пускает страницу под системные полосы. Клавиатуру
+         ScrollView не понимает вовсе, поэтому снизу её держит обёртка: без неё
+         «Сохранить» оставалась под клавиатурой, и прокрутка до неё не доставала -->
+    <Grid SafeAreaEdges="Container, Container, Container, All">
+        <ScrollView>
+            <VerticalStackLayout Padding="16,12" Spacing="16">
 
-            <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="14,10" Spacing="10">
-                    <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
-                    <Entry Text="{Binding Name}" Placeholder="{x:Static texts:UiTexts.GroupNamePlaceholder}" />
-
-                    <BoxView Style="{StaticResource Divider}" />
-
-                    <controls:IconGrid BindingContext="{Binding Icon}" />
-
-                    <BoxView Style="{StaticResource Divider}" />
-
-                    <Label Text="{x:Static texts:UiTexts.CommonKind}" Style="{StaticResource CaptionLabel}" />
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="6" IsVisible="{Binding KindEditable}"
-                          RadioButtonGroup.GroupName="groupKind"
-                          RadioButtonGroup.SelectedValue="{Binding Kind}">
-                        <RadioButton Grid.Column="0" Content="{x:Static texts:UiTexts.KindExpense}" Value="{x:Static domain:CategoryKind.Expense}" />
-                        <RadioButton Grid.Column="1" Content="{x:Static texts:UiTexts.KindIncome}" Value="{x:Static domain:CategoryKind.Income}" />
-                    </Grid>
-                    <Label Text="{Binding KindCaption}" IsVisible="{Binding KindLocked}" />
-                    <Label Text="{x:Static texts:UiTexts.GroupKindHint}"
-                           Style="{StaticResource CaptionLabel}" />
-
-                    <BoxView Style="{StaticResource Divider}" />
-
-                    <!-- Универсальность запирается вместе с видом: выключить её
-                         у группы, куда уже записали возвраты, значит оставить их
-                         вне правил, а вычищать такие операции задним числом некому -->
-                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12"
-                          IsVisible="{Binding KindEditable}">
-                        <Label Grid.Column="0" Text="{x:Static texts:UiTexts.GroupAcceptsAnyKindTitle}"
-                               VerticalOptions="Center" />
-                        <Switch Grid.Column="1" IsToggled="{Binding AcceptsAnyKind}" VerticalOptions="Center" />
-                    </Grid>
-                    <Label Text="{Binding AcceptsAnyKindCaption}" IsVisible="{Binding KindLocked}" />
-                    <Label Text="{x:Static texts:UiTexts.GroupAcceptsAnyKindHint}"
-                           IsVisible="{Binding AcceptsAnyKindHintVisible}"
-                           Style="{StaticResource CaptionLabel}" />
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- Превью новой группы: приёмник «Прочее» создаётся вместе с ней,
-                 и узнать об этом лучше до сохранения, а не после -->
-            <VerticalStackLayout Spacing="8" IsVisible="{Binding ShowPreview}">
-                <Label Text="{x:Static texts:UiTexts.GroupWillBeCreated}" Style="{StaticResource SectionLabel}" />
                 <Border Style="{StaticResource Card}">
-                    <VerticalStackLayout Padding="14,10" Spacing="4">
-                        <Label Text="{Binding Name}" />
-                        <Label Text="{Binding PreviewCaption}" Style="{StaticResource SecondaryLabel}" />
+                    <VerticalStackLayout Padding="14,10" Spacing="10">
+                        <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
+                        <Entry Text="{Binding Name}" Placeholder="{x:Static texts:UiTexts.GroupNamePlaceholder}" />
+
                         <BoxView Style="{StaticResource Divider}" />
-                        <Label Text="{Binding ReceiverName}" Style="{StaticResource SecondaryLabel}" />
-                        <Label Text="{x:Static texts:UiTexts.GroupCreatedAutomatically}" Style="{StaticResource CaptionLabel}" />
-                    </VerticalStackLayout>
-                </Border>
-            </VerticalStackLayout>
 
-            <VerticalStackLayout Spacing="8" IsVisible="{Binding KindLocked}">
-                <Label Text="{x:Static texts:UiTexts.GroupSubcategories}" Style="{StaticResource SectionLabel}" />
-                <Border Style="{StaticResource Card}">
-                    <VerticalStackLayout>
-                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Subcategories}">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate x:DataType="catalog:CategoryRowItem">
-                                    <Grid Padding="14,12" MinimumHeightRequest="{StaticResource TouchTarget}">
-                                        <Grid.GestureRecognizers>
-                                            <TapGestureRecognizer Tapped="OnSubcategoryTapped" />
-                                        </Grid.GestureRecognizers>
+                        <controls:IconGrid BindingContext="{Binding Icon}" />
 
-                                        <Label Text="{Binding Name}">
-                                            <Label.Triggers>
-                                                <DataTrigger TargetType="Label" Binding="{Binding IsProtected}" Value="True">
-                                                    <Setter Property="TextColor"
-                                                            Value="{AppThemeBinding Light={StaticResource Ink3Light}, Dark={StaticResource Ink3Dark}}" />
-                                                </DataTrigger>
-                                            </Label.Triggers>
-                                        </Label>
-                                    </Grid>
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
-                        </VerticalStackLayout>
+                        <BoxView Style="{StaticResource Divider}" />
 
-                        <Grid Padding="14,12" MinimumHeightRequest="{StaticResource TouchTarget}"
-                              IsVisible="{Binding CanAddSubcategory}">
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnAddSubcategory" />
-                            </Grid.GestureRecognizers>
-
-                            <Label Text="{x:Static texts:UiTexts.GroupAddSubcategory}"
-                                   TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                        <Label Text="{x:Static texts:UiTexts.CommonKind}" Style="{StaticResource CaptionLabel}" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="6" IsVisible="{Binding KindEditable}"
+                              RadioButtonGroup.GroupName="groupKind"
+                              RadioButtonGroup.SelectedValue="{Binding Kind}">
+                            <RadioButton Grid.Column="0" Content="{x:Static texts:UiTexts.KindExpense}" Value="{x:Static domain:CategoryKind.Expense}" />
+                            <RadioButton Grid.Column="1" Content="{x:Static texts:UiTexts.KindIncome}" Value="{x:Static domain:CategoryKind.Income}" />
                         </Grid>
+                        <Label Text="{Binding KindCaption}" IsVisible="{Binding KindLocked}" />
+                        <Label Text="{x:Static texts:UiTexts.GroupKindHint}"
+                               Style="{StaticResource CaptionLabel}" />
+
+                        <BoxView Style="{StaticResource Divider}" />
+
+                        <!-- Универсальность запирается вместе с видом: выключить её
+                             у группы, куда уже записали возвраты, значит оставить их
+                             вне правил, а вычищать такие операции задним числом некому -->
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12"
+                              IsVisible="{Binding KindEditable}">
+                            <Label Grid.Column="0" Text="{x:Static texts:UiTexts.GroupAcceptsAnyKindTitle}"
+                                   VerticalOptions="Center" />
+                            <Switch Grid.Column="1" IsToggled="{Binding AcceptsAnyKind}" VerticalOptions="Center" />
+                        </Grid>
+                        <Label Text="{Binding AcceptsAnyKindCaption}" IsVisible="{Binding KindLocked}" />
+                        <Label Text="{x:Static texts:UiTexts.GroupAcceptsAnyKindHint}"
+                               IsVisible="{Binding AcceptsAnyKindHintVisible}"
+                               Style="{StaticResource CaptionLabel}" />
                     </VerticalStackLayout>
                 </Border>
+
+                <!-- Превью новой группы: приёмник «Прочее» создаётся вместе с ней,
+                     и узнать об этом лучше до сохранения, а не после -->
+                <VerticalStackLayout Spacing="8" IsVisible="{Binding ShowPreview}">
+                    <Label Text="{x:Static texts:UiTexts.GroupWillBeCreated}" Style="{StaticResource SectionLabel}" />
+                    <Border Style="{StaticResource Card}">
+                        <VerticalStackLayout Padding="14,10" Spacing="4">
+                            <Label Text="{Binding Name}" />
+                            <Label Text="{Binding PreviewCaption}" Style="{StaticResource SecondaryLabel}" />
+                            <BoxView Style="{StaticResource Divider}" />
+                            <Label Text="{Binding ReceiverName}" Style="{StaticResource SecondaryLabel}" />
+                            <Label Text="{x:Static texts:UiTexts.GroupCreatedAutomatically}" Style="{StaticResource CaptionLabel}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="8" IsVisible="{Binding KindLocked}">
+                    <Label Text="{x:Static texts:UiTexts.GroupSubcategories}" Style="{StaticResource SectionLabel}" />
+                    <Border Style="{StaticResource Card}">
+                        <VerticalStackLayout>
+                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Subcategories}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="catalog:CategoryRowItem">
+                                        <Grid Padding="14,12" MinimumHeightRequest="{StaticResource TouchTarget}">
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnSubcategoryTapped" />
+                                            </Grid.GestureRecognizers>
+
+                                            <Label Text="{Binding Name}">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding IsProtected}" Value="True">
+                                                        <Setter Property="TextColor"
+                                                                Value="{AppThemeBinding Light={StaticResource Ink3Light}, Dark={StaticResource Ink3Dark}}" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+
+                            <Grid Padding="14,12" MinimumHeightRequest="{StaticResource TouchTarget}"
+                                  IsVisible="{Binding CanAddSubcategory}">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnAddSubcategory" />
+                                </Grid.GestureRecognizers>
+
+                                <Label Text="{x:Static texts:UiTexts.GroupAddSubcategory}"
+                                       TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <Border Style="{StaticResource ErrorCard}" IsVisible="{Binding HasError}">
+                    <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
+                </Border>
+
+                <Button Text="{x:Static texts:UiTexts.CommonSave}" Clicked="OnSave" IsEnabled="{Binding CanSave}"
+                        Style="{StaticResource SaveButton}" AutomationId="SaveGroup" />
+
             </VerticalStackLayout>
-
-            <Border Style="{StaticResource ErrorCard}" IsVisible="{Binding HasError}">
-                <Label Padding="14,10" Text="{Binding Error}" Style="{StaticResource NegativeLabel}" />
-            </Border>
-
-            <Button Text="{x:Static texts:UiTexts.CommonSave}" Clicked="OnSave" IsEnabled="{Binding CanSave}"
-                    Style="{StaticResource SaveButton}" AutomationId="SaveGroup" />
-
-        </VerticalStackLayout>
-    </ScrollView>
+        </ScrollView>
+    </Grid>
 
 </pages:DataPage>

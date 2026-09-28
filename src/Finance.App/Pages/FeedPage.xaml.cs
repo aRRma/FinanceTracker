@@ -26,9 +26,15 @@ public partial class FeedPage : DataPage
         BindingContext = model;
     }
 
+    /// <summary>
+    /// Только устаревшая лента: перечитывание возвращает прокрутку к началу, и
+    /// заглянувший в операцию из глубины истории терял бы место, с которого ушёл.
+    /// </summary>
+    protected override bool ReloadsOnAppearing => _model.IsOutdated;
+
     /// <inheritdoc />
     protected override Task LoadAsync() => _model.LoadAsync(accountKey: null);
 
     private void OnAdd(object? sender, EventArgs e) =>
-        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Transaction));
+        Navigator.Go(Routes.Transaction);
 }

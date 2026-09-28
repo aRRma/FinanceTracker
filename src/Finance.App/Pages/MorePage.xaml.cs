@@ -30,20 +30,20 @@ public partial class MorePage : DataPage
     protected override Task LoadAsync() => _model.LoadAsync();
 
     private void OnAccounts(object? sender, TappedEventArgs e) =>
-        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Accounts));
+        Navigator.Go(Routes.Accounts);
 
     private void OnPlaces(object? sender, TappedEventArgs e) =>
-        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Places));
+        Navigator.Go(Routes.Places);
 
     private void OnCategories(object? sender, TappedEventArgs e) =>
-        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Categories));
+        Navigator.Go(Routes.Categories);
 
     private void OnAppearance(object? sender, TappedEventArgs e) =>
-        Guarded.Run(() => Shell.Current.GoToAsync(Routes.Appearance));
+        Navigator.Go(Routes.Appearance);
 
     private void OnTimeZone(object? sender, TappedEventArgs e) =>
-        Guarded.Run(() => Shell.Current.GoToAsync(Routes.TimeZone));
+        Navigator.Go(Routes.TimeZone);
 
     private void OnAbout(object? sender, TappedEventArgs e) =>
-        Guarded.Run(() => Shell.Current.GoToAsync(Routes.About));
+        Navigator.Go(Routes.About);
 }

@@ -9,6 +9,10 @@ namespace Finance.Docs.Tests;
 /// </summary>
 public sealed partial class SkillTests
 {
+    // Сорок знаков — примерно пять-шесть слов: меньше не хватает, чтобы назвать,
+    // когда навык загружать, и описание вида «сборка» не срабатывает
+    private const int MinimumDescription = 40;
+
     private static readonly Lazy<IReadOnlyList<string>> Loaded = new(Collect);
 
     private static readonly Lazy<string> LoadedInstructions = new(
@@ -65,7 +69,7 @@ public sealed partial class SkillTests
     public void Вступление_навыка_заполнено()
     {
         string[] broken = Files
-            .Where(static file => Name(file) != Folder(file) || Description(file).Length < 40)
+            .Where(static file => Name(file) != Folder(file) || Description(file).Length < MinimumDescription)
             .Select(Documents.Relative)
             .Order(StringComparer.Ordinal)
             .ToArray();

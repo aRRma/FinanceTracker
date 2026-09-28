@@ -43,6 +43,7 @@ internal sealed class TransactionFixture : IAsyncDisposable
 
     /// <summary>
     /// Сегодняшняя дата по часам приложения: дата операции не может быть в будущем.
+    /// Часы тестовые (<see cref="TestTime"/>), поэтому дата одна и та же в любой день запуска.
     /// </summary>
     public DateOnly Today => Database.Resolve<Finance.Application.Infrastructure.IClock>().Today;
 

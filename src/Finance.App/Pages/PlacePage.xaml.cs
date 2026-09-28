@@ -46,7 +46,7 @@ public partial class PlacePage : DataPage
     {
         if (await _model.SaveAsync())
         {
-            await Shell.Current.GoToAsync("..");
+            await Navigator.GoAsync("..");
         }
     }
 
@@ -63,7 +63,7 @@ public partial class PlacePage : DataPage
 
         if (await _model.DeleteAsync())
         {
-            await Shell.Current.GoToAsync("..");
+            await Navigator.GoAsync("..");
         }
     }
 }

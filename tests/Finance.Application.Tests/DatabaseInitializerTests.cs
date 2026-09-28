@@ -103,14 +103,32 @@ public sealed class DatabaseInitializerTests
     public async Task Набор_и_отметка_о_версии_пишутся_вместе()
     {
         await using TestDatabase database = await TestDatabase.CreateAsync();
-        await database.Resolve<DatabaseInitializer>().InitializeAsync();
+        DatabaseInitializer initializer = database.Resolve<DatabaseInitializer>();
 
-        await using FinanceDbContext context = await database.Contexts.CreateDbContextAsync();
+        // Обрыв ровно между двумя записями: отметка о версии не вставляется.
+        // Пишись набор отдельным сохранением, категории остались бы в базе без отметки
+        await using (FinanceDbContext context = await database.Contexts.CreateDbContextAsync())
+        {
+            await context.Database.ExecuteSqlRawAsync(
+                "CREATE TRIGGER interrupt BEFORE INSERT ON settings BEGIN SELECT RAISE(ABORT, 'interrupted'); END;");
+        }
 
-        // Одно сохранение — одна транзакция: категории и отметка о версии
-        // не могут разойтись, и повторный проход набор не вставляет
-        Assert.NotEmpty(await context.Categories.ToListAsync());
-        Assert.Single(await context.Settings.Where(row => row.Name == SettingName.PresetVersion).ToListAsync());
+        await Assert.ThrowsAsync<DbUpdateException>(() => initializer.InitializeAsync());
+
+        await using (FinanceDbContext context = await database.Contexts.CreateDbContextAsync())
+        {
+            Assert.Equal(0, await context.Categories.CountAsync());
+
+            await context.Database.ExecuteSqlRawAsync("DROP TRIGGER interrupt;");
+        }
+
+        // После сбоя следующий запуск записывает набор заново, без отказа по ключу
+        await initializer.InitializeAsync();
+
+        await using FinanceDbContext after = await database.Contexts.CreateDbContextAsync();
+
+        Assert.Equal(Preset.Embedded().All().Count(), await after.Categories.CountAsync());
+        Assert.Single(await after.Settings.Where(row => row.Name == SettingName.PresetVersion).ToListAsync());
     }
 
     /// <summary>

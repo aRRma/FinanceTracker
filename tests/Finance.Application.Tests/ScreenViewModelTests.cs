@@ -59,6 +59,69 @@ public sealed class ScreenViewModelTests
     }
 
     /// <summary>
+    /// Скрытый экран не подписан, но о пропущенном узнаёт на возврате. Появившись,
+    /// он считает прежнее учтённым: иначе перечитывался бы на каждом возврате.
+    /// </summary>
+    [Fact]
+    public void Скрытый_экран_узнаёт_о_пропущенном_изменении()
+    {
+        ChangeNotifier notifier = new();
+        Screen screen = new(notifier, DataChange.Accounts);
+
+        screen.Activate();
+        screen.Deactivate();
+
+        Assert.False(screen.IsOutdated);
+
+        notifier.Publish(DataChange.Places);
+
+        Assert.False(screen.IsOutdated);
+
+        notifier.Publish(DataChange.Accounts | DataChange.Places);
+
+        Assert.True(screen.IsOutdated);
+
+        screen.Activate();
+
+        Assert.False(screen.IsOutdated);
+    }
+
+    /// <summary>
+    /// Изменение, пришедшее на виду, экран уже перечитал: возврат приложения из фона
+    /// без ухода с экрана не должен принимать его за пропущенное.
+    /// </summary>
+    [Fact]
+    public void Учтённое_на_виду_изменение_экран_не_устаревает()
+    {
+        ChangeNotifier notifier = new();
+        Screen screen = new(notifier, DataChange.Accounts);
+
+        screen.Activate();
+        notifier.Publish(DataChange.Accounts);
+
+        Assert.Equal(1, screen.Reloads);
+        Assert.False(screen.IsOutdated);
+    }
+
+    /// <summary>
+    /// Индикатор жеста гаснет и после сбоя: иначе крутился бы до следующего жеста,
+    /// а сам сбой уходит вызывающему — показывать его есть кому.
+    /// </summary>
+    [Fact]
+    public async Task Обновление_жестом_гасит_индикатор_и_при_сбое()
+    {
+        ChangeNotifier notifier = new();
+        Screen screen = new(notifier, DataChange.Accounts) { Failure = new InvalidOperationException("база занята") };
+
+        screen.IsRefreshing = true;
+
+        await Assert.ThrowsAsync<InvalidOperationException>(screen.RefreshAsync);
+
+        Assert.False(screen.IsRefreshing);
+        Assert.Equal(1, screen.Reloads);
+    }
+
+    /// <summary>
     /// Заготовка экрана: считает перечитывания и по требованию роняет чтение.
     /// </summary>
     private sealed class Screen(IChangeNotifier changes, DataChange watched) : ScreenViewModel(changes)

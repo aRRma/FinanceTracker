@@ -45,7 +45,7 @@ public partial class GroupPage : DataPage
     {
         if (sender is BindableObject { BindingContext: CategoryRowItem { IsEditable: true } subcategory })
         {
-            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Subcategory}?key={subcategory.Key}"));
+            Navigator.Go($"{Routes.Subcategory}?key={subcategory.Key}");
         }
     }
 
@@ -53,7 +53,7 @@ public partial class GroupPage : DataPage
     {
         if (_model.Key is { } group)
         {
-            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Subcategory}?group={group}"));
+            Navigator.Go($"{Routes.Subcategory}?group={group}");
         }
     }
 
@@ -63,7 +63,7 @@ public partial class GroupPage : DataPage
     {
         if (await _model.SaveAsync())
         {
-            await Shell.Current.GoToAsync("..");
+            await Navigator.GoAsync("..");
         }
     }
 }

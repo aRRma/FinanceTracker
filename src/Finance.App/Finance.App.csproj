@@ -32,8 +32,8 @@
 		     ApplicationVersion — versionCode Android, целое и только растущее:
 		     на меньшее платформа обновление не ставит. Считается из версии как
 		     major*10000 + minor*100 + patch, поэтому руками не правится. -->
-		<ApplicationDisplayVersion>1.0.2</ApplicationDisplayVersion>
-		<ApplicationVersion>10002</ApplicationVersion>
+		<ApplicationDisplayVersion>1.0.3</ApplicationDisplayVersion>
+		<ApplicationVersion>10003</ApplicationVersion>
 
 		<!-- Android 16 (API 36): приложение личное, охват старых версий не требуется (SYS-01) -->
 		<SupportedOSPlatformVersion>36.0</SupportedOSPlatformVersion>
@@ -42,9 +42,15 @@
 		     только то, что попало в стартовый профиль шаблонного приложения MAUI,
 		     а EF Core и наш код при запуске компилирует JIT. Замер на эмуляторе
 		     (сентябрь 2026, медиана десяти холодных стартов): 4,2 → 2,1 с до
-		     первого кадра с данными, цена — APK 40,7 → 62,1 МБ. NativeAOT
-		     недоступен: для Android он экспериментальный, MAUI и EF Core на нём
-		     не поддерживаются. Действует только в Release: Debug идёт без AOT -->
+		     первого кадра с данными, цена — APK 40,7 → 62,1 МБ. Действует только
+		     в Release: Debug идёт без AOT.
+
+		     Свойство относится к Mono. В .NET 11 Mono для MAUI убран, Android
+		     переходит на CoreCLR с ReadyToRun, и здесь оно перестанет действовать:
+		     при переходе его заменяет MauiEnableFullReadyToRun=true, запуск
+		     замеряется заново. NativeAOT в MAUI 10 официально только для iOS и
+		     Mac Catalyst, на Android — экспериментальный; EF Core под ним требует
+		     предкомпилированную модель, а её не даёт фильтр мягкого удаления -->
 		<AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
 	</PropertyGroup>
 
@@ -70,7 +76,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.12" />
 	</ItemGroup>
 
 	<ItemGroup>

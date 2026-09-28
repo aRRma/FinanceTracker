@@ -35,6 +35,7 @@ public abstract class DataPage : ContentPage
     /// Перечитывать ли страницу при каждом появлении. Списки — да: вернувшись
     /// с карточки, пользователь ждёт свежих чисел. Формы — нет: появление приходит
     /// и при возврате приложения из фона, и перечитывание стёрло бы набранное.
+    /// Ленты — только устаревшие: перечитывание сбрасывает прокрутку.
     /// </summary>
     protected virtual bool ReloadsOnAppearing => true;
 
@@ -53,6 +54,10 @@ public abstract class DataPage : ContentPage
             });
         }
 
+        // Решение о перечитывании — до подписки: появившийся экран считает
+        // всё изменённое раньше учтённым, и устаревшим он был бы уже не виден
+        bool reload = ReloadsOnAppearing || !_loaded;
+
         // Подписка на изменения живёт только пока экран на виду: оповещение
         // одно на приложение, и подписка от создания модели копилась бы
         // с каждым заходом на экран
@@ -63,7 +68,7 @@ public abstract class DataPage : ContentPage
             screen.Activate();
         }
 
-        if (ReloadsOnAppearing || !_loaded)
+        if (reload)
         {
             _loaded = true;
             Guarded.Run(PrepareAndLoadAsync);
@@ -74,8 +79,19 @@ public abstract class DataPage : ContentPage
     /// Перечитать экран по чужой правке не удалось. Сказать об этом обязательно:
     /// пользователь ничего не нажимал и принял бы устаревшие числа за нынешние.
     /// </summary>
-    private void OnReloadFailed(Exception error) =>
-        Guarded.Run(() => DisplayAlertAsync(UiTexts.ErrorReloadFailedTitle, error.Message, UiTexts.CommonClose));
+    private void OnReloadFailed(Exception error) => Guarded.Report(UiTexts.ErrorReloadFailedTitle, error);
+
+    /// <summary>
+    /// Жест «потянуть вниз». Обработчиком, а не привязкой команды: сбой команды,
+    /// запущенной разметкой, закрыл бы окно молча, а здесь его покажет <see cref="Guarded"/>.
+    /// </summary>
+    protected void OnRefreshing(object? sender, EventArgs e)
+    {
+        if (BindingContext is IScreenModel screen)
+        {
+            Guarded.Run(screen.RefreshAsync);
+        }
+    }
 
     /// <summary>
     /// Подготовка базы и первое чтение. Общий перехват живёт в <see cref="Guarded"/>;
@@ -131,7 +147,7 @@ public abstract class DataPage : ContentPage
             return;
         }
 
-        await Shell.Current.GoToAsync("..");
+        await Navigator.GoAsync("..");
     }
 
     /// <inheritdoc />

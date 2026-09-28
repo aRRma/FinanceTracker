@@ -34,7 +34,7 @@ public partial class PlacesPage : DataPage
     {
         if (sender is BindableObject { BindingContext: PlaceListItem place })
         {
-            Guarded.Run(() => Shell.Current.GoToAsync($"{Routes.Place}?key={place.Key}"));
+            Navigator.Go($"{Routes.Place}?key={place.Key}");
         }
     }
 }

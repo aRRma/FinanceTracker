@@ -86,13 +86,6 @@ public sealed partial class ReportViewModel : ScreenViewModel
     public partial bool IsEmpty { get; private set; }
 
     /// <summary>
-    /// Идёт чтение. Запись открыта намеренно: к этому признаку привязан жест
-    /// «потянуть вниз», и он сам поднимает его в начале обновления.
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsBusy { get; set; }
-
-    /// <summary>
     /// Отчёт прочитан хотя бы раз. До этого сказать «трат не было» нельзя:
     /// пустое состояние мигнуло бы и сменилось списком групп.
     /// </summary>
@@ -145,44 +138,29 @@ public sealed partial class ReportViewModel : ScreenViewModel
     /// Перечитывает отчёт за показанный месяц.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
         int generation = ++_generation;
 
-        IsBusy = true;
+        // ConfigureAwait(false) здесь недопустим: дальше наполняются
+        // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
+        IReadOnlyList<ReportTotal> all = await _report.ReadGroupsAsync(Month, cancellationToken);
 
-        try
+        // Второй запрос только когда отчёт пуст целиком: при строках подсказка не видна
+        bool hasUncounted = all.Count is 0 && await _report.HasUncountedAsync(Month, cancellationToken);
+
+        if (generation != _generation)
         {
-            // ConfigureAwait(false) здесь недопустим: дальше наполняются
-            // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-            IReadOnlyList<ReportTotal> all = await _report.ReadGroupsAsync(Month, cancellationToken);
-
-            // Второй запрос только когда отчёт пуст целиком: при строках подсказка не видна
-            bool hasUncounted = all.Count is 0 && await _report.HasUncountedAsync(Month, cancellationToken);
-
-            if (generation != _generation)
-            {
-                return;
-            }
-
-            _all = all;
-            EmptyHint = hasUncounted ? UiTexts.ReportEmptyCurrency : UiTexts.ReportEmptyOtherMonth;
-
-            Rebuild();
-
-            // Не в Rebuild: его же зовёт переключатель вида, а он о чтении ничего не говорит
-            IsLoaded = true;
+            return;
         }
-        finally
-        {
-            // Занятость снимает только последнее чтение: более раннее ещё не значит,
-            // что экран готов
-            if (generation == _generation)
-            {
-                IsBusy = false;
-            }
-        }
+
+        _all = all;
+        EmptyHint = hasUncounted ? UiTexts.ReportEmptyCurrency : UiTexts.ReportEmptyOtherMonth;
+
+        Rebuild();
+
+        // Не в Rebuild: его же зовёт переключатель вида, а он о чтении ничего не говорит
+        IsLoaded = true;
     }
 
     /// <summary>

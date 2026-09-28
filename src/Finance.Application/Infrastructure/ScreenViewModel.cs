@@ -8,9 +8,12 @@ namespace Finance.Application.Infrastructure;
 /// экран» иначе повторялось бы в каждой модели, и при появлении нового вида
 /// изменения одну из копий забыли бы.
 /// </summary>
-public abstract class ScreenViewModel : ObservableObject, IScreenModel
+public abstract partial class ScreenViewModel : ObservableObject, IScreenModel
 {
     private readonly IChangeNotifier _changes;
+
+    // Номер изменения, которое экран уже учёл; минус один — экран ещё не появлялся
+    private long _seen = -1;
 
     /// <summary>
     /// Создаёт модель экрана.
@@ -25,6 +28,23 @@ public abstract class ScreenViewModel : ObservableObject, IScreenModel
 
     /// <inheritdoc />
     public event Action<Exception>? ReloadFailed;
+
+    /// <summary>
+    /// Идёт обновление жестом «потянуть вниз». Признак принадлежит только жесту:
+    /// жест поднимает его сам, а гасит <see cref="RefreshAsync"/>. Своё чтение
+    /// модель им не отмечает — <c>RefreshView</c> на каждый подъём признака
+    /// запускает обновление, и чтение, поднявшее его само, запускало бы второе:
+    /// дочитывание ленты перечитывало её с начала.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsRefreshing { get; set; }
+
+    /// <summary>
+    /// Пока экран был скрыт, изменилось то, что он показывает. Скрытый экран
+    /// не подписан на изменения и узнаёт о пропущенном только так. Спрашивать
+    /// до <see cref="Activate"/>: появление считает всё прежнее учтённым.
+    /// </summary>
+    public virtual bool IsOutdated => _seen >= 0 && _changes.VersionOf(Watched) > _seen;
 
     /// <summary>
     /// Какие изменения устаревают этот экран.
@@ -45,10 +65,28 @@ public abstract class ScreenViewModel : ObservableObject, IScreenModel
         // перечитывания экрана на каждое изменение
         _changes.Changed -= OnChanged;
         _changes.Changed += OnChanged;
+
+        // Пропущенное экран либо перечитывает прямо сейчас, либо оно его не касалось
+        _seen = _changes.VersionOf(Watched);
     }
 
     /// <inheritdoc />
     public void Deactivate() => _changes.Changed -= OnChanged;
+
+    /// <inheritdoc />
+    public async Task RefreshAsync()
+    {
+        try
+        {
+            // ConfigureAwait(false) здесь недопустим: перечитывание наполняет
+            // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
+            await ReloadAsync();
+        }
+        finally
+        {
+            IsRefreshing = false;
+        }
+    }
 
     /// <summary>
     /// Метод async void: подписчик события иначе не бывает. Перехват поэтому
@@ -61,6 +99,10 @@ public abstract class ScreenViewModel : ObservableObject, IScreenModel
         {
             return;
         }
+
+        // Изменение учтено на виду: возврат из фона без ухода с экрана
+        // иначе принял бы его за пропущенное и перечитал экран ещё раз
+        _seen = _changes.VersionOf(Watched);
 
         try
         {
