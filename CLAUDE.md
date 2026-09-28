@@ -193,6 +193,7 @@ dotnet build Finance.slnx                       # только он собира
 dotnet tools/coverage.cs [-- ИмяФайла]          # покрытие тестами: итог или непокрытые строки файла
 dotnet tools/ui.cs -- boot run dump             # эмулятор, развёртывание, экран текстом; справка — help
 python tools/build_prototype.py                 # после КАЖДОЙ правки mockups.html
+dotnet tools/mockup_icons.cs                    # значки макетов из набора приложения — после новой ссылки #i-ключ
 ```
 
 **Скрипты и разовые команды — на C#, Python без резкой необходимости не используется**, в том числе `python -c` и `python -m http.server`. Скрипт — файловое приложение .NET 10 в `tools/` или во временной папке сессии (`dotnet путь.cs -- аргументы`), разовое выражение — `echo '…' | dotnet run -`, раздача папки — `dotnet tools/serve.cs -- docs/ui 8777`. Python остаётся только в сборщике прототипа и в `tasks/wallet-import/tools/` до их переписывания; новый — с согласия пользователя. Ловушки файловых приложений (`PublishAot=false` в каждом скрипте и прочие) — навык `build`.
