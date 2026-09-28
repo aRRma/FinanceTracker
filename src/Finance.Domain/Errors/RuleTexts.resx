@@ -6,8 +6,8 @@
 
     Ключ каждой строки — член перечисления RuleText, и полнота обеих сторон
     сверяется тестом. Подстановки позиционные ({0}, {1}): при переводе порядок
-    слов меняется, а формат внутри подстановки ({1:yyyy-MM-dd}) — часть
-    предложения, и правится вместе с ним.
+    слов меняется. Дату шаблоном здесь не форматировать: она приходит словами
+    («3 февраля 2026») из RuleTexts.Format, как на экране.
   -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -110,10 +110,10 @@
     <value>Заметка длиной {0} символов превышает предел {1}</value>
   </data>
   <data name="DateTooEarly" xml:space="preserve">
-    <value>{0} {1:yyyy-MM-dd} раньше {2:yyyy-MM-dd}</value>
+    <value>{0} {1} раньше {2}</value>
   </data>
   <data name="DateInFuture" xml:space="preserve">
-    <value>{0} {1:yyyy-MM-dd} в будущем: сегодня {2:yyyy-MM-dd}</value>
+    <value>{0} {1} в будущем: сегодня {2}</value>
   </data>
   <data name="NameEmpty" xml:space="preserve">
     <value>Имя ({0}) не может быть пустым</value>
@@ -125,7 +125,7 @@
     <value>Валюта счёта «{0}» не меняется: по нему уже есть операции</value>
   </data>
   <data name="OpenedOnNotAfterTransactions" xml:space="preserve">
-    <value>Дату открытия счёта «{0}» нельзя сдвинуть на {1:yyyy-MM-dd}: есть операция от {2:yyyy-MM-dd}</value>
+    <value>Дату открытия счёта «{0}» нельзя сдвинуть на {1}: есть операция от {2}</value>
   </data>
   <data name="ReceiverIsNotGroup" xml:space="preserve">
     <value>Приёмником «Прочее» бывает только подкатегория, не группа</value>
@@ -161,7 +161,7 @@
     <value>Счёт «{0}» закрыт и в новой операции использован быть не может</value>
   </data>
   <data name="TransactionNotBeforeAccountOpened" xml:space="preserve">
-    <value>Дата операции {0:yyyy-MM-dd} раньше открытия счёта «{1}» ({2:yyyy-MM-dd})</value>
+    <value>Дата операции {0} раньше открытия счёта «{1}» ({2})</value>
   </data>
   <data name="CategoryIsSubcategory" xml:space="preserve">
     <value>«{0}» — группа: в операции указывается подкатегория</value>

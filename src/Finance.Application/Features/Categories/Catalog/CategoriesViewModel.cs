@@ -15,8 +15,6 @@ namespace Finance.Application.Features.Categories.Catalog;
 /// </summary>
 public sealed partial class CategoriesViewModel : ScreenViewModel
 {
-    private static readonly CategoryKind[] KindOrder = [CategoryKind.Expense, CategoryKind.Income];
-
     private readonly ICategoriesQuery _categories;
     private readonly HashSet<Guid> _expanded = [];
 
@@ -56,15 +54,6 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
     /// </summary>
     [ObservableProperty]
     public partial string Filter { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Выбранный вид — номером в переключателе.
-    /// </summary>
-    public int KindIndex
-    {
-        get => Array.IndexOf(KindOrder, Kind);
-        set => Kind = KindOrder[Math.Clamp(value, 0, KindOrder.Length - 1)];
-    }
 
     /// <summary>
     /// Справочник прочитан хотя бы раз. Пустая коллекция до чтения значит «ещё
@@ -217,7 +206,6 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
             }
         }
 
-        OnPropertyChanged(nameof(KindIndex));
         OnPropertyChanged(nameof(IsEmpty));
     }
 

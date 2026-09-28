@@ -280,54 +280,61 @@
                             Системный календарь с подчёркиванием в форме не показывается:
                             он чужой для остального оформления, а «Сегодня / Вчера»
                             под ним уезжали под клавиатуру.
+                            При крупном шрифте системы дате и чипам не хватает одной строки:
+                            тогда на вторую строку уходят чипы целиком, а дата остаётся
+                            целой. Ужать её не выходило — даже мельчайшим кеглем
+                            «24 сентября» обрезалась до «24 сен», а прежде ломалась пополам.
                         -->
-                        <Grid Padding="14,8" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"
+                        <Grid Padding="14,8" ColumnDefinitions="Auto,*" ColumnSpacing="12"
                               MinimumHeightRequest="{StaticResource TouchTarget}">
                             <controls:Icon Grid.Column="0" Key="calendar" Style="{StaticResource MutedIcon}" />
-                            <Label Grid.Column="1" Text="{Binding OccurredOnCaption}" VerticalOptions="Center" />
-                            <HorizontalStackLayout Grid.Column="2" Spacing="6">
-                                <Border Style="{StaticResource Chip}" AutomationId="DateToday">
-                                    <Border.Triggers>
-                                        <DataTrigger TargetType="Border" Binding="{Binding IsToday}" Value="True">
-                                            <Setter Property="Style" Value="{StaticResource ChipSelected}" />
-                                        </DataTrigger>
-                                    </Border.Triggers>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding SetTodayCommand}" />
-                                    </Border.GestureRecognizers>
-                                    <Label Text="{x:Static texts:UiTexts.TransactionToday}" Style="{StaticResource ChipLabel}">
-                                        <Label.Triggers>
-                                            <DataTrigger TargetType="Label" Binding="{Binding IsToday}" Value="True">
-                                                <Setter Property="Style" Value="{StaticResource ChipSelectedLabel}" />
+                            <FlexLayout Grid.Column="1" Wrap="Wrap" JustifyContent="SpaceBetween"
+                                        AlignItems="Center" AlignContent="Center">
+                                <Label Text="{Binding OccurredOnCaption}" MaxLines="1" Margin="0,0,12,0" VerticalOptions="Center" />
+                                <HorizontalStackLayout Spacing="6">
+                                    <Border Style="{StaticResource Chip}" AutomationId="DateToday">
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsToday}" Value="True">
+                                                <Setter Property="Style" Value="{StaticResource ChipSelected}" />
                                             </DataTrigger>
-                                        </Label.Triggers>
-                                    </Label>
-                                </Border>
-                                <Border Style="{StaticResource Chip}" AutomationId="DateYesterday">
-                                    <Border.Triggers>
-                                        <DataTrigger TargetType="Border" Binding="{Binding IsYesterday}" Value="True">
-                                            <Setter Property="Style" Value="{StaticResource ChipSelected}" />
-                                        </DataTrigger>
-                                    </Border.Triggers>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding SetYesterdayCommand}" />
-                                    </Border.GestureRecognizers>
-                                    <Label Text="{x:Static texts:UiTexts.TransactionYesterday}" Style="{StaticResource ChipLabel}">
-                                        <Label.Triggers>
-                                            <DataTrigger TargetType="Label" Binding="{Binding IsYesterday}" Value="True">
-                                                <Setter Property="Style" Value="{StaticResource ChipSelectedLabel}" />
+                                        </Border.Triggers>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding SetTodayCommand}" />
+                                        </Border.GestureRecognizers>
+                                        <Label Text="{x:Static texts:UiTexts.TransactionToday}" Style="{StaticResource ChipLabel}">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsToday}" Value="True">
+                                                    <Setter Property="Style" Value="{StaticResource ChipSelectedLabel}" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </Border>
+                                    <Border Style="{StaticResource Chip}" AutomationId="DateYesterday">
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsYesterday}" Value="True">
+                                                <Setter Property="Style" Value="{StaticResource ChipSelected}" />
                                             </DataTrigger>
-                                        </Label.Triggers>
-                                    </Label>
-                                </Border>
-                                <Border Style="{StaticResource Chip}" AutomationId="DateOther"
-                                        SemanticProperties.Description="{x:Static texts:UiTexts.TransactionCalendarHint}">
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnPickDate" />
-                                    </Border.GestureRecognizers>
-                                    <Label Text="…" Style="{StaticResource ChipLabel}" />
-                                </Border>
-                            </HorizontalStackLayout>
+                                        </Border.Triggers>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding SetYesterdayCommand}" />
+                                        </Border.GestureRecognizers>
+                                        <Label Text="{x:Static texts:UiTexts.TransactionYesterday}" Style="{StaticResource ChipLabel}">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsYesterday}" Value="True">
+                                                    <Setter Property="Style" Value="{StaticResource ChipSelectedLabel}" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </Border>
+                                    <Border Style="{StaticResource Chip}" AutomationId="DateOther"
+                                            SemanticProperties.Description="{x:Static texts:UiTexts.TransactionCalendarHint}">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnPickDate" />
+                                        </Border.GestureRecognizers>
+                                        <Label Text="…" Style="{StaticResource ChipLabel}" />
+                                    </Border>
+                                </HorizontalStackLayout>
+                            </FlexLayout>
                         </Grid>
 
                         <!-- Календарь живёт на экране невидимым: открыть системный диалог

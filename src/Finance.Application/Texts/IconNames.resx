@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Названия значков набора для чтения вслух: сетка выбора значка иначе
+    озвучивается восемью десятками безымянных ячеек. Ключ строки — ключ значка
+    из data/icons.json как есть; полноту обеих сторон сверяет тест.
+
+    Название говорит, что нарисовано, а не для какой категории значок годится:
+    одну и ту же корзину ставят и продуктам, и хозяйственным покупкам.
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="adjustments" xml:space="preserve">
+    <value>Ползунки</value>
+  </data>
+  <data name="arrow-back-up" xml:space="preserve">
+    <value>Стрелка возврата</value>
+  </data>
+  <data name="baby-carriage" xml:space="preserve">
+    <value>Детская коляска</value>
+  </data>
+  <data name="ball-football" xml:space="preserve">
+    <value>Футбольный мяч</value>
+  </data>
+  <data name="barbell" xml:space="preserve">
+    <value>Штанга</value>
+  </data>
+  <data name="basket" xml:space="preserve">
+    <value>Корзина</value>
+  </data>
+  <data name="beach" xml:space="preserve">
+    <value>Пляж</value>
+  </data>
+  <data name="beer" xml:space="preserve">
+    <value>Пиво</value>
+  </data>
+  <data name="bike" xml:space="preserve">
+    <value>Велосипед</value>
+  </data>
+  <data name="bolt" xml:space="preserve">
+    <value>Молния</value>
+  </data>
+  <data name="book" xml:space="preserve">
+    <value>Книга</value>
+  </data>
+  <data name="bread" xml:space="preserve">
+    <value>Хлеб</value>
+  </data>
+  <data name="building-bank" xml:space="preserve">
+    <value>Банк</value>
+  </data>
+  <data name="building-carousel" xml:space="preserve">
+    <value>Карусель</value>
+  </data>
+  <data name="bulb" xml:space="preserve">
+    <value>Лампочка</value>
+  </data>
+  <data name="bus" xml:space="preserve">
+    <value>Автобус</value>
+  </data>
+  <data name="camera" xml:space="preserve">
+    <value>Фотоаппарат</value>
+  </data>
+  <data name="car" xml:space="preserve">
+    <value>Автомобиль</value>
+  </data>
+  <data name="carrot" xml:space="preserve">
+    <value>Морковь</value>
+  </data>
+  <data name="cash" xml:space="preserve">
+    <value>Банкнота</value>
+  </data>
+  <data name="cloud" xml:space="preserve">
+    <value>Облако</value>
+  </data>
+  <data name="coffee" xml:space="preserve">
+    <value>Кофе</value>
+  </data>
+  <data name="coins" xml:space="preserve">
+    <value>Монеты</value>
+  </data>
+  <data name="confetti" xml:space="preserve">
+    <value>Конфетти</value>
+  </data>
+  <data name="dental" xml:space="preserve">
+    <value>Зуб</value>
+  </data>
+  <data name="device-desktop" xml:space="preserve">
+    <value>Монитор</value>
+  </data>
+  <data name="device-gamepad" xml:space="preserve">
+    <value>Геймпад</value>
+  </data>
+  <data name="device-laptop" xml:space="preserve">
+    <value>Ноутбук</value>
+  </data>
+  <data name="device-mobile" xml:space="preserve">
+    <value>Телефон</value>
+  </data>
+  <data name="dots" xml:space="preserve">
+    <value>Три точки</value>
+  </data>
+  <data name="flower" xml:space="preserve">
+    <value>Цветок</value>
+  </data>
+  <data name="gas-station" xml:space="preserve">
+    <value>Заправка</value>
+  </data>
+  <data name="gift" xml:space="preserve">
+    <value>Подарок</value>
+  </data>
+  <data name="heart-handshake" xml:space="preserve">
+    <value>Рукопожатие с сердцем</value>
+  </data>
+  <data name="home" xml:space="preserve">
+    <value>Дом</value>
+  </data>
+  <data name="home-2" xml:space="preserve">
+    <value>Домик</value>
+  </data>
+  <data name="ice-cream" xml:space="preserve">
+    <value>Мороженое</value>
+  </data>
+  <data name="key" xml:space="preserve">
+    <value>Ключ</value>
+  </data>
+  <data name="massage" xml:space="preserve">
+    <value>Массаж</value>
+  </data>
+  <data name="mood-happy" xml:space="preserve">
+    <value>Улыбка</value>
+  </data>
+  <data name="movie" xml:space="preserve">
+    <value>Кинолента</value>
+  </data>
+  <data name="music" xml:space="preserve">
+    <value>Нота</value>
+  </data>
+  <data name="parking" xml:space="preserve">
+    <value>Парковка</value>
+  </data>
+  <data name="paw" xml:space="preserve">
+    <value>Лапа</value>
+  </data>
+  <data name="pencil" xml:space="preserve">
+    <value>Карандаш</value>
+  </data>
+  <data name="percentage" xml:space="preserve">
+    <value>Процент</value>
+  </data>
+  <data name="pill" xml:space="preserve">
+    <value>Таблетка</value>
+  </data>
+  <data name="plane" xml:space="preserve">
+    <value>Самолёт</value>
+  </data>
+  <data name="plant-2" xml:space="preserve">
+    <value>Росток</value>
+  </data>
+  <data name="question-mark" xml:space="preserve">
+    <value>Вопросительный знак</value>
+  </data>
+  <data name="receipt" xml:space="preserve">
+    <value>Чек</value>
+  </data>
+  <data name="receipt-tax" xml:space="preserve">
+    <value>Чек с процентом</value>
+  </data>
+  <data name="road" xml:space="preserve">
+    <value>Дорога</value>
+  </data>
+  <data name="school" xml:space="preserve">
+    <value>Академическая шапочка</value>
+  </data>
+  <data name="scissors" xml:space="preserve">
+    <value>Ножницы</value>
+  </data>
+  <data name="scooter" xml:space="preserve">
+    <value>Самокат</value>
+  </data>
+  <data name="shield" xml:space="preserve">
+    <value>Щит</value>
+  </data>
+  <data name="shield-check" xml:space="preserve">
+    <value>Щит с галочкой</value>
+  </data>
+  <data name="shirt" xml:space="preserve">
+    <value>Футболка</value>
+  </data>
+  <data name="shoe" xml:space="preserve">
+    <value>Кроссовок</value>
+  </data>
+  <data name="shopping-bag" xml:space="preserve">
+    <value>Сумка для покупок</value>
+  </data>
+  <data name="shopping-cart" xml:space="preserve">
+    <value>Тележка</value>
+  </data>
+  <data name="sofa" xml:space="preserve">
+    <value>Диван</value>
+  </data>
+  <data name="soup" xml:space="preserve">
+    <value>Суп</value>
+  </data>
+  <data name="steering-wheel" xml:space="preserve">
+    <value>Руль</value>
+  </data>
+  <data name="stethoscope" xml:space="preserve">
+    <value>Стетоскоп</value>
+  </data>
+  <data name="tag" xml:space="preserve">
+    <value>Ценник</value>
+  </data>
+  <data name="horse-toy" xml:space="preserve">
+    <value>Игрушечная лошадка</value>
+  </data>
+  <data name="test-pipe" xml:space="preserve">
+    <value>Пробирка</value>
+  </data>
+  <data name="ticket" xml:space="preserve">
+    <value>Билет</value>
+  </data>
+  <data name="tool" xml:space="preserve">
+    <value>Гаечный ключ</value>
+  </data>
+  <data name="tools-kitchen-2" xml:space="preserve">
+    <value>Нож и вилка</value>
+  </data>
+  <data name="train" xml:space="preserve">
+    <value>Поезд</value>
+  </data>
+  <data name="trending-up" xml:space="preserve">
+    <value>График роста</value>
+  </data>
+  <data name="truck-delivery" xml:space="preserve">
+    <value>Грузовик доставки</value>
+  </data>
+  <data name="users" xml:space="preserve">
+    <value>Люди</value>
+  </data>
+  <data name="wallet" xml:space="preserve">
+    <value>Кошелёк</value>
+  </data>
+  <data name="wash-machine" xml:space="preserve">
+    <value>Стиральная машина</value>
+  </data>
+  <data name="wifi" xml:space="preserve">
+    <value>Wi-Fi</value>
+  </data>
+</root>

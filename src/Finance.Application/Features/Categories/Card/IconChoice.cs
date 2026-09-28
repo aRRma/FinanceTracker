@@ -1,4 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Finance.Application.Infrastructure;
+using Finance.Application.Texts;
 
 namespace Finance.Application.Features.Categories.Card;
 
@@ -29,5 +31,13 @@ public sealed partial class IconChoice : ObservableObject
     /// Значок выбран — в сетке он помечен цветом действия.
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Description))]
     public partial bool IsSelected { get; set; }
+
+    /// <summary>
+    /// Что прочтёт озвучка: название значка, а у выбранного — ещё и что он выбран.
+    /// Цвет выбранного незрячему ничего не скажет.
+    /// </summary>
+    public string Description =>
+        IsSelected ? string.Format(UiCulture.Current, UiTexts.IconChosen, IconNames.Of(Key)) : IconNames.Of(Key);
 }

@@ -43,8 +43,14 @@ public static class RuleTexts
 
     /// <summary>
     /// Собирает текст с подстановками. Значение <see cref="RuleText"/> среди них
-    /// разворачивается в свой текст — так в предложение попадает подпись предмета проверки.
+    /// разворачивается в свой текст — так в предложение попадает подпись предмета проверки,
+    /// а дата пишется словами, как на экране: «3 февраля 2026».
     /// </summary>
+    /// <remarks>
+    /// Шаблон даты живёт здесь, а не в ресурсе, по той же причине, что и на экране:
+    /// порядок дня и месяца — правило языка, а не слова предложения. С датой экрана
+    /// его сверяет прикладной тест, домену прикладной формат недоступен.
+    /// </remarks>
     /// <param name="text">Ключ текста.</param>
     /// <param name="arguments">Подставляемые значения.</param>
     public static string Format(RuleText text, params ReadOnlySpan<object?> arguments)
@@ -53,7 +59,12 @@ public static class RuleTexts
 
         for (int i = 0; i < arguments.Length; i++)
         {
-            resolved[i] = arguments[i] is RuleText nested ? Of(nested) : arguments[i];
+            resolved[i] = arguments[i] switch
+            {
+                RuleText nested => Of(nested),
+                DateOnly date => date.ToString("d MMMM yyyy", Culture),
+                var other => other,
+            };
         }
 
         return string.Format(Culture, Of(text), resolved);

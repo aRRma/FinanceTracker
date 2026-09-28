@@ -413,7 +413,6 @@ public sealed partial class ReportTests
 
         Assert.Equal(ReportMonth.Of(given.Today), model.Month);
         Assert.Equal(CategoryKind.Expense, model.Kind);
-        Assert.Equal(0, model.KindIndex);
     }
 
     /// <summary>

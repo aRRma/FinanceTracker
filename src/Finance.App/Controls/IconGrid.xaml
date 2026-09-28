@@ -19,7 +19,8 @@
 
     <VerticalStackLayout Spacing="10">
 
-        <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
+        <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}"
+              SemanticProperties.Description="{Binding SelectedDescription}">
             <Grid.GestureRecognizers>
                 <TapGestureRecognizer Command="{Binding ToggleCommand}" />
             </Grid.GestureRecognizers>
@@ -34,8 +35,10 @@
                     BindableLayout.ItemsSource="{Binding Choices}">
             <BindableLayout.ItemTemplate>
                 <DataTemplate x:DataType="card:IconChoice">
-                    <!-- Ячейка не меньше зоны касания, значок в её центре -->
-                    <Grid WidthRequest="56" HeightRequest="{StaticResource TouchTarget}">
+                    <!-- Ячейка не меньше зоны касания, значок в её центре. Озвучка
+                         читает название: контур без подписи для неё пуст -->
+                    <Grid WidthRequest="56" HeightRequest="{StaticResource TouchTarget}"
+                          SemanticProperties.Description="{Binding Description}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnIconTapped" />
                         </Grid.GestureRecognizers>

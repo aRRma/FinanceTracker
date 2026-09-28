@@ -48,12 +48,6 @@ public sealed partial class AccountPickerViewModel : ObservableObject
     public partial string Title { get; private set; } = UiTexts.PickAccountTitle;
 
     /// <summary>
-    /// Идёт чтение.
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsBusy { get; set; }
-
-    /// <summary>
     /// Читает счета к выбору: закрытые не предлагаются — записать на них нечего.
     /// </summary>
     /// <param name="selected">Счёт, стоящий в форме сейчас, — он помечен галочкой.</param>
@@ -69,34 +63,25 @@ public sealed partial class AccountPickerViewModel : ObservableObject
         _forTarget = forTarget;
         Title = forTarget ? UiTexts.PickAccountTarget : UiTexts.PickAccountSource;
 
-        IsBusy = true;
+        // ConfigureAwait(false) здесь недопустим: следом наполняются
+        // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
+        IReadOnlyList<AccountListItem> accounts = await _accounts.ReadAsync(cancellationToken);
 
-        try
+        Sections.Clear();
+
+        IEnumerable<AccountListItem> offered = accounts
+            .Where(account => !account.IsClosed && account.Key != excluded);
+
+        foreach (IGrouping<Currency, AccountListItem> group in offered.GroupBy(account => account.Balance.Currency))
         {
-            // ConfigureAwait(false) здесь недопустим: следом наполняются
-            // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-            IReadOnlyList<AccountListItem> accounts = await _accounts.ReadAsync(cancellationToken);
+            // Накопления в конце раздела: их выбирают редко, а сверху ждут то,
+            // чем платят каждый день
+            IEnumerable<AccountPickerRow> rows = group
+                .OrderBy(static account => account.ExcludedFromTotals)
+                .ThenBy(static account => account.SortOrder)
+                .Select(account => Row(account, selected));
 
-            Sections.Clear();
-
-            IEnumerable<AccountListItem> offered = accounts
-                .Where(account => !account.IsClosed && account.Key != excluded);
-
-            foreach (IGrouping<Currency, AccountListItem> group in offered.GroupBy(account => account.Balance.Currency))
-            {
-                // Накопления в конце раздела: их выбирают редко, а сверху ждут то,
-                // чем платят каждый день
-                IEnumerable<AccountPickerRow> rows = group
-                    .OrderBy(static account => account.ExcludedFromTotals)
-                    .ThenBy(static account => account.SortOrder)
-                    .Select(account => Row(account, selected));
-
-                Sections.Add(new AccountPickerSection(group.Key.SectionTitle, rows));
-            }
-        }
-        finally
-        {
-            IsBusy = false;
+            Sections.Add(new AccountPickerSection(group.Key.SectionTitle, rows));
         }
     }
 

@@ -733,4 +733,10 @@
   <data name="IconLabel" xml:space="preserve">
     <value>Значок</value>
   </data>
+  <data name="IconCurrent" xml:space="preserve">
+    <value>Значок: {0}</value>
+  </data>
+  <data name="IconChosen" xml:space="preserve">
+    <value>{0}, выбран</value>
+  </data>
 </root>

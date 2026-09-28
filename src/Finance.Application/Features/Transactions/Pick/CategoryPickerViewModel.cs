@@ -73,12 +73,6 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
     public partial string Title { get; private set; } = UiTexts.PickCategoryTitle;
 
     /// <summary>
-    /// Идёт чтение.
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsBusy { get; set; }
-
-    /// <summary>
     /// Набранное в поиске. Пока поле пусто, группы стоят как их оставили;
     /// с первой же буквой показываются подходящие подкатегории всех групп.
     /// </summary>
@@ -117,69 +111,60 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
         Title = kind is CategoryKind.Expense ? UiTexts.PickCategoryExpense : UiTexts.PickCategoryIncome;
         _selected = selected;
 
-        IsBusy = true;
+        // Два чтения независимы и идут разом: у каждого запроса свой контекст,
+        // а последовательно экран ждал бы сумму двух обращений к базе
+        Task<IReadOnlyList<CategoryListItem>> categoriesTask = _categories.ReadAsync(cancellationToken);
+        Task<IReadOnlyList<FrequentCategory>> frequentTask =
+            _frequent.ReadAsync(kind, FrequentCount, cancellationToken);
 
-        try
+        // ConfigureAwait(false) здесь недопустим: следом наполняются
+        // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
+        await Task.WhenAll(categoriesTask, frequentTask);
+
+        IReadOnlyList<CategoryListItem> all = await categoriesTask;
+        IReadOnlyList<FrequentCategory> frequent = await frequentTask;
+
+        Frequent.Clear();
+
+        foreach (FrequentCategory item in frequent)
         {
-            // Два чтения независимы и идут разом: у каждого запроса свой контекст,
-            // а последовательно экран ждал бы сумму двух обращений к базе
-            Task<IReadOnlyList<CategoryListItem>> categoriesTask = _categories.ReadAsync(cancellationToken);
-            Task<IReadOnlyList<FrequentCategory>> frequentTask =
-                _frequent.ReadAsync(kind, FrequentCount, cancellationToken);
-
-            // ConfigureAwait(false) здесь недопустим: следом наполняются
-            // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-            await Task.WhenAll(categoriesTask, frequentTask);
-
-            IReadOnlyList<CategoryListItem> all = await categoriesTask;
-            IReadOnlyList<FrequentCategory> frequent = await frequentTask;
-
-            Frequent.Clear();
-
-            foreach (FrequentCategory item in frequent)
-            {
-                // Приглушения в панели нет: сюда попадает только то, чем и правда
-                // пользуются, и «Прочее» здесь такая же рабочая подкатегория
-                Frequent.Add(new CategoryPickerLine(
-                    item.Key,
-                    item.Icon,
-                    item.Name,
-                    isGroup: false,
-                    count: 0,
-                    isProtected: false,
-                    item.Key == selected));
-            }
-
-            _branches.Clear();
-            _expanded.Clear();
-
-            // Дети раскладываются по группам одним проходом, а не проходом по всему справочнику на каждую группу
-            ILookup<Guid?, CategoryListItem> byParent = all.ToLookup(static item => item.ParentKey);
-
-            foreach (CategoryListItem group in all.Where(item => item.IsGroup && item.Accepts(kind)))
-            {
-                CategoryListItem[] children = [.. byParent[group.Key]];
-
-                _branches.Add(new Branch(group, children));
-
-                // Группа выбранной подкатегории открыта сразу: иначе непонятно,
-                // где стоит текущий выбор, и его приходится искать вслепую
-                if (selected is { } key && Array.Exists(children, child => child.Key == key))
-                {
-                    _expanded.Add(group.Key);
-                }
-            }
-
-            Rebuild();
-
-            IsLoaded = true;
-
-            OnPropertyChanged(nameof(IsFrequentVisible));
+            // Приглушения в панели нет: сюда попадает только то, чем и правда
+            // пользуются, и «Прочее» здесь такая же рабочая подкатегория
+            Frequent.Add(new CategoryPickerLine(
+                item.Key,
+                item.Icon,
+                item.Name,
+                isGroup: false,
+                count: 0,
+                isProtected: false,
+                item.Key == selected));
         }
-        finally
+
+        _branches.Clear();
+        _expanded.Clear();
+
+        // Дети раскладываются по группам одним проходом, а не проходом по всему справочнику на каждую группу
+        ILookup<Guid?, CategoryListItem> byParent = all.ToLookup(static item => item.ParentKey);
+
+        foreach (CategoryListItem group in all.Where(item => item.IsGroup && item.Accepts(kind)))
         {
-            IsBusy = false;
+            CategoryListItem[] children = [.. byParent[group.Key]];
+
+            _branches.Add(new Branch(group, children));
+
+            // Группа выбранной подкатегории открыта сразу: иначе непонятно,
+            // где стоит текущий выбор, и его приходится искать вслепую
+            if (selected is { } key && Array.Exists(children, child => child.Key == key))
+            {
+                _expanded.Add(group.Key);
+            }
         }
+
+        Rebuild();
+
+        IsLoaded = true;
+
+        OnPropertyChanged(nameof(IsFrequentVisible));
     }
 
     /// <summary>

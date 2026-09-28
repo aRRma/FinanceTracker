@@ -77,12 +77,6 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
     public partial bool IsEmpty { get; private set; }
 
     /// <summary>
-    /// Идёт чтение.
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsBusy { get; private set; }
-
-    /// <summary>
     /// Уровень прочитан хотя бы раз. До этого сказать «операций нет» нельзя:
     /// пустое состояние мигнуло бы и сменилось списком операций.
     /// </summary>
@@ -110,37 +104,25 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
         // и строки более раннего запроса легли бы поверх более свежих
         int generation = ++_generation;
 
-        IsBusy = true;
+        // Название — из справочника: он читается целиком и весь помещается
+        // в памяти, и заводить ради одного поля четвёртый запрос незачем.
+        // Оба чтения независимы и идут разом: у каждого свой контекст
+        Task<IReadOnlyList<ReportTransaction>> itemsTask = _report.ReadTransactionsAsync(subcategoryKey, month, cancellationToken);
+        Task<IReadOnlyList<CategoryListItem>> categoriesTask = _categories.ReadAsync(cancellationToken);
 
-        try
+        // ConfigureAwait(false) здесь недопустим: дальше наполняются
+        // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
+        await Task.WhenAll(itemsTask, categoriesTask);
+
+        IReadOnlyList<ReportTransaction> items = await itemsTask;
+        IReadOnlyList<CategoryListItem> categories = await categoriesTask;
+
+        if (generation != _generation)
         {
-            // Название — из справочника: он читается целиком и весь помещается
-            // в памяти, и заводить ради одного поля четвёртый запрос незачем.
-            // Оба чтения независимы и идут разом: у каждого свой контекст
-            Task<IReadOnlyList<ReportTransaction>> itemsTask = _report.ReadTransactionsAsync(subcategoryKey, month, cancellationToken);
-            Task<IReadOnlyList<CategoryListItem>> categoriesTask = _categories.ReadAsync(cancellationToken);
-
-            // ConfigureAwait(false) здесь недопустим: дальше наполняются
-            // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-            await Task.WhenAll(itemsTask, categoriesTask);
-
-            IReadOnlyList<ReportTransaction> items = await itemsTask;
-            IReadOnlyList<CategoryListItem> categories = await categoriesTask;
-
-            if (generation != _generation)
-            {
-                return;
-            }
-
-            Rebuild(items, categories);
+            return;
         }
-        finally
-        {
-            if (generation == _generation)
-            {
-                IsBusy = false;
-            }
-        }
+
+        Rebuild(items, categories);
     }
 
     private void Rebuild(IReadOnlyList<ReportTransaction> items, IReadOnlyList<CategoryListItem> categories)

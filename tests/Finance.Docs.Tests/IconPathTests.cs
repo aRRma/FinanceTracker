@@ -1,10 +1,11 @@
 using System.Text.Json;
+using System.Xml.Linq;
 using Microsoft.Maui.Graphics;
 
 namespace Finance.Docs.Tests;
 
 /// <summary>
-/// Сверка набора ключей значков с их контурами. Ключи лежат в одном файле,
+/// Сверка набора ключей значков с их контурами и названиями. Ключи лежат в одном файле,
 /// контуры — в другом: ключ без контура нарисовался бы запасным значком молча,
 /// и в сетке выбора появились бы неотличимые «прочие».
 /// </summary>
@@ -25,6 +26,27 @@ public sealed class IconPathTests
             .ToArray();
 
         Assert.Empty(missing);
+    }
+
+    /// <summary>
+    /// Названия для озвучки заведены ровно на ключи набора. Значок без названия
+    /// озвучка прочла бы латинским ключом, а название удалённого значка — мёртвая строка.
+    /// </summary>
+    [Fact]
+    public void Названия_значков_совпадают_с_набором()
+    {
+        HashSet<string> names = XDocument.Load(Path.Combine(Repository.Root, "src/Finance.Application/Texts/IconNames.resx"))
+            .Root!
+            .Elements("data")
+            .Select(static element => element.Attribute("name")!.Value)
+            .ToHashSet(StringComparer.Ordinal);
+
+        string[] unnamed = [.. LoadedKeys.Value.Where(key => !names.Contains(key))];
+        string[] stale = [.. names.Where(name => !LoadedKeys.Value.Contains(name))];
+
+        Assert.True(
+            unnamed.Length is 0 && stale.Length is 0,
+            $"без названия: {string.Join(", ", unnamed)}\nназвание без значка: {string.Join(", ", stale)}");
     }
 
     /// <summary>

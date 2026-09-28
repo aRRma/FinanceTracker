@@ -17,8 +17,6 @@ namespace Finance.Application.Features.Categories.Card;
 /// </summary>
 public sealed partial class GroupViewModel : ObservableObject, IFormModel
 {
-    private static readonly CategoryKind[] KindOrder = [CategoryKind.Expense, CategoryKind.Income];
-
     private readonly ICategoriesQuery _categories;
     private readonly ISaveCategoryHandler _handler;
 
@@ -102,15 +100,6 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     /// Сохранять можно: предыдущее сохранение не идёт.
     /// </summary>
     public bool CanSave => !IsSaving;
-
-    /// <summary>
-    /// Выбранный вид — номером в переключателе.
-    /// </summary>
-    public int KindIndex
-    {
-        get => Array.IndexOf(KindOrder, Kind);
-        set => Kind = KindOrder[Math.Clamp(value, 0, KindOrder.Length - 1)];
-    }
 
     /// <summary>
     /// Вид уже заперт: группа существует, и её подкатегории им пользуются.
@@ -287,7 +276,6 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
 
     partial void OnKindChanged(CategoryKind value)
     {
-        OnPropertyChanged(nameof(KindIndex));
         OnPropertyChanged(nameof(KindCaption));
         OnPropertyChanged(nameof(PreviewCaption));
     }
@@ -303,7 +291,6 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
         OnPropertyChanged(nameof(Title));
         OnPropertyChanged(nameof(AcceptsAnyKindCaption));
         OnPropertyChanged(nameof(AcceptsAnyKindHintVisible));
-        OnPropertyChanged(nameof(KindIndex));
         OnPropertyChanged(nameof(KindLocked));
         OnPropertyChanged(nameof(KindEditable));
         OnPropertyChanged(nameof(KindCaption));

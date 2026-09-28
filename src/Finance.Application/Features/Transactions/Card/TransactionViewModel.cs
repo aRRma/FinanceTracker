@@ -22,9 +22,6 @@ namespace Finance.Application.Features.Transactions.Card;
 /// </summary>
 public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 {
-    private static readonly TransactionKind[] KindOrder =
-        [TransactionKind.Expense, TransactionKind.Income, TransactionKind.Transfer];
-
     // Значки невыбранных полей — ключи набора значков интерфейса
     private const string NoAccountIcon = "wallet";
     private const string NoCategoryIcon = "tag";
@@ -99,7 +96,6 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// Вид операции. По умолчанию расход — он записывается чаще всего.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(KindIndex))]
     [NotifyPropertyChangedFor(nameof(IsTransfer))]
     [NotifyPropertyChangedFor(nameof(IsNotTransfer))]
     [NotifyPropertyChangedFor(nameof(SourceLabel))]
@@ -107,15 +103,6 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     [NotifyPropertyChangedFor(nameof(AmountHero))]
     [NotifyPropertyChangedFor(nameof(AmountTone))]
     public partial TransactionKind Kind { get; set; } = TransactionKind.Expense;
-
-    /// <summary>
-    /// Вид номером в переключателе.
-    /// </summary>
-    public int KindIndex
-    {
-        get => Array.IndexOf(KindOrder, Kind);
-        set => Kind = KindOrder[Math.Clamp(value, 0, KindOrder.Length - 1)];
-    }
 
     /// <summary>
     /// Перевод: второй счёт есть, категории и места нет.

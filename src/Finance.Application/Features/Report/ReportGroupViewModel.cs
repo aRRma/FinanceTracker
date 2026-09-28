@@ -74,12 +74,6 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
     public partial bool IsEmpty { get; private set; }
 
     /// <summary>
-    /// Идёт чтение.
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsBusy { get; private set; }
-
-    /// <summary>
     /// Уровень прочитан хотя бы раз. До этого сказать «операций группы нет» нельзя:
     /// пустое состояние мигнуло бы и сменилось списком подкатегорий.
     /// </summary>
@@ -109,36 +103,24 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
         // и строки более раннего запроса легли бы поверх более свежих
         int generation = ++_generation;
 
-        IsBusy = true;
+        // Оба чтения независимы и идут разом: у каждого свой контекст,
+        // а последовательно экран ждал бы сумму двух обращений к базе
+        Task<IReadOnlyList<ReportTotal>> groupsTask = _report.ReadGroupsAsync(month, cancellationToken);
+        Task<IReadOnlyList<ReportTotal>> rowsTask = _report.ReadSubcategoriesAsync(groupKey, month, cancellationToken);
 
-        try
+        // ConfigureAwait(false) здесь недопустим: дальше наполняются
+        // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
+        await Task.WhenAll(groupsTask, rowsTask);
+
+        IReadOnlyList<ReportTotal> groups = await groupsTask;
+        IReadOnlyList<ReportTotal> rows = await rowsTask;
+
+        if (generation != _generation)
         {
-            // Оба чтения независимы и идут разом: у каждого свой контекст,
-            // а последовательно экран ждал бы сумму двух обращений к базе
-            Task<IReadOnlyList<ReportTotal>> groupsTask = _report.ReadGroupsAsync(month, cancellationToken);
-            Task<IReadOnlyList<ReportTotal>> rowsTask = _report.ReadSubcategoriesAsync(groupKey, month, cancellationToken);
-
-            // ConfigureAwait(false) здесь недопустим: дальше наполняются
-            // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-            await Task.WhenAll(groupsTask, rowsTask);
-
-            IReadOnlyList<ReportTotal> groups = await groupsTask;
-            IReadOnlyList<ReportTotal> rows = await rowsTask;
-
-            if (generation != _generation)
-            {
-                return;
-            }
-
-            Rebuild(groups, rows);
+            return;
         }
-        finally
-        {
-            if (generation == _generation)
-            {
-                IsBusy = false;
-            }
-        }
+
+        Rebuild(groups, rows);
     }
 
     private void Rebuild(IReadOnlyList<ReportTotal> groups, IReadOnlyList<ReportTotal> rows)

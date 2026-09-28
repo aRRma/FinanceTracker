@@ -147,7 +147,7 @@ public sealed class CategoryScreenTests
         Assert.True(model.ShowPreview);
 
         model.Name = "Еда";
-        model.KindIndex = 1;
+        model.Kind = CategoryKind.Income;
 
         Assert.True(await model.SaveAsync(), model.Error);
 
@@ -242,6 +242,23 @@ public sealed class CategoryScreenTests
         Assert.Equal("basket", model.Icon.Selected);
         Assert.Equal("Расход", model.KindCaption);
         Assert.False(model.CanDelete);
+    }
+
+    /// <summary>
+    /// Сетку значков озвучка читает названиями, выбранный — с пометкой: цвет,
+    /// которым он выделен, незрячему ничего не говорит. Заодно видно, что ресурс
+    /// названий вшит под тем именем, под которым его ищут.
+    /// </summary>
+    [Fact]
+    public void Значки_озвучиваются_названиями()
+    {
+        IconPicker picker = new(IconCatalog.Embedded());
+
+        picker.Pick("basket");
+
+        Assert.Equal("Значок: Корзина", picker.SelectedDescription);
+        Assert.Equal("Корзина, выбран", picker.Choices.Single(static choice => choice.Key == "basket").Description);
+        Assert.Equal("Автобус", picker.Choices.Single(static choice => choice.Key == "bus").Description);
     }
 
     /// <summary>

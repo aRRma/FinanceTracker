@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
+using Finance.Application.Texts;
 
 namespace Finance.Application.Features.Categories.Card;
 
@@ -37,7 +38,13 @@ public sealed partial class IconPicker : ObservableObject
     /// Выбранный значок.
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SelectedDescription))]
     public partial string Selected { get; private set; }
+
+    /// <summary>
+    /// Что прочтёт озвучка на строке поля: подпись и название выбранного значка.
+    /// </summary>
+    public string SelectedDescription => string.Format(UiCulture.Current, UiTexts.IconCurrent, IconNames.Of(Selected));
 
     /// <summary>
     /// Сетка значков раскрыта.

@@ -41,12 +41,6 @@ public sealed partial class PlacePickerViewModel : ObservableObject
     public ObservableCollection<PlacePickerRow> Rows { get; } = [];
 
     /// <summary>
-    /// Идёт чтение.
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsBusy { get; set; }
-
-    /// <summary>
     /// Набранное в поиске — оно же имя нового места.
     /// </summary>
     [ObservableProperty]
@@ -101,22 +95,13 @@ public sealed partial class PlacePickerViewModel : ObservableObject
         _current = current ?? string.Empty;
         CanClear = _current.Length > 0;
 
-        IsBusy = true;
+        // ConfigureAwait(false) здесь недопустим: следом наполняются
+        // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
+        _all = await _places.ReadAsync(cancellationToken);
 
-        try
-        {
-            // ConfigureAwait(false) здесь недопустим: следом наполняются
-            // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-            _all = await _places.ReadAsync(cancellationToken);
+        Rebuild();
 
-            Rebuild();
-
-            IsLoaded = true;
-        }
-        finally
-        {
-            IsBusy = false;
-        }
+        IsLoaded = true;
     }
 
     /// <summary>

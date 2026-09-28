@@ -59,15 +59,17 @@ public sealed class TransactionRulesTests
     [Trait("Инвариант", nameof(Invariant.TransactionNotBeforeAccountOpened))]
     public void Операция_раньше_открытия_счёта_списания_отвергается()
     {
-        Account card = Given.Account(openedOn: Given.Today);
+        Account card = Given.Account("Карта", openedOn: new DateOnly(2026, 2, 3));
         Transaction expense = Transaction.Create(
             TransactionKind.Expense, card.Key, Given.Rubles(100m), null, null, Groceries.Key, null,
-            Given.Today.AddDays(-1), null, Given.Today, Given.NowUtc);
+            new DateOnly(2026, 2, 2), null, Given.Today, Given.NowUtc);
 
         DomainException error = Assert.Throws<DomainException>(
             () => TransactionRules.EnsureValid(expense, card, null, Groceries, Food));
 
         Assert.Equal(Invariant.TransactionNotBeforeAccountOpened, error.Invariant);
+        // Дата пишется словами, как на экране, а не числом 2026-02-03
+        Assert.Equal("Дата операции 2 февраля 2026 раньше открытия счёта «Карта» (3 февраля 2026)", error.Message);
     }
 
     [Fact]

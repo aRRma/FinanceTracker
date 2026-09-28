@@ -15,8 +15,6 @@ namespace Finance.Application.Features.Report;
 /// </summary>
 public sealed partial class ReportViewModel : ScreenViewModel
 {
-    private static readonly CategoryKind[] KindOrder = [CategoryKind.Expense, CategoryKind.Income];
-
     private readonly IReportQuery _report;
     private readonly IClock _clock;
 
@@ -119,15 +117,6 @@ public sealed partial class ReportViewModel : ScreenViewModel
     public partial string EmptyHint { get; private set; } = UiTexts.ReportEmptyOtherMonth;
 
     /// <summary>
-    /// Выбранный вид — номером в переключателе.
-    /// </summary>
-    public int KindIndex
-    {
-        get => Array.IndexOf(KindOrder, Kind);
-        set => Kind = KindOrder[Math.Clamp(value, 0, KindOrder.Length - 1)];
-    }
-
-    /// <summary>
     /// Вперёд идти есть куда: показан не текущий месяц. Считается от часов на каждом
     /// обращении, а не запоминается: приложение живёт дольше суток, и запомненный
     /// ответ остался бы прежним после полуночи первого числа.
@@ -222,8 +211,6 @@ public sealed partial class ReportViewModel : ScreenViewModel
         Total = signed.DisplaySigned;
         IsTotalExpense = signed.Amount < 0m;
         IsEmpty = Rows.Count is 0;
-
-        OnPropertyChanged(nameof(KindIndex));
     }
 
     /// <summary>

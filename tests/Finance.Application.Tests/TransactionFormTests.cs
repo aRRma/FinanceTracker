@@ -251,7 +251,7 @@ public sealed class TransactionFormTests
         Guid cash = await fixture.AccountAsync("Наличные");
 
         TransactionViewModel model = await NewAsync(fixture);
-        model.KindIndex = 2;
+        model.Kind = TransactionKind.Transfer;
         model.SourceAccount = model.Accounts.Single(option => option.Key == card);
         model.TargetAccount = model.TargetAccounts.Single(option => option.Key == cash);
 
@@ -261,29 +261,6 @@ public sealed class TransactionFormTests
         Assert.Null(model.TargetAccount);
         Assert.Equal(UiTexts.CommonChoose, model.TargetAccountCaption);
         Assert.DoesNotContain(model.TargetAccounts, option => option.Key == cash);
-    }
-
-    /// <summary>
-    /// Номер вида с переключателя за пределами списка прижимается к краю,
-    /// а не роняет форму.
-    /// </summary>
-    [Fact]
-    public async Task Номер_вида_за_пределами_прижимается_к_краю()
-    {
-        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
-        await fixture.AccountAsync("Карта");
-
-        TransactionViewModel model = await NewAsync(fixture);
-
-        model.KindIndex = 99;
-
-        Assert.Equal(TransactionKind.Transfer, model.Kind);
-        Assert.Equal(UiTexts.TransactionSourceTransfer, model.SourceLabel);
-
-        model.KindIndex = -1;
-
-        Assert.Equal(TransactionKind.Expense, model.Kind);
-        Assert.Equal(UiTexts.TransactionSourceSimple, model.SourceLabel);
     }
 
     private static async Task AssertRefusedAsync(TransactionFixture fixture, TransactionViewModel model, string reason)
