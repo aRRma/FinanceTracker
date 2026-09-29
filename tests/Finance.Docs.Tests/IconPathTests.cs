@@ -11,8 +11,6 @@ namespace Finance.Docs.Tests;
 /// </summary>
 public sealed class IconPathTests
 {
-    private static readonly Lazy<IReadOnlyList<string>> LoadedKeys = new(LoadKeys);
-
     private static readonly Lazy<IReadOnlyDictionary<string, string>> LoadedPaths = new(LoadPaths);
 
     /// <summary>
@@ -21,7 +19,7 @@ public sealed class IconPathTests
     [Fact]
     public void У_каждого_значка_набора_есть_контур()
     {
-        string[] missing = LoadedKeys.Value
+        string[] missing = Repository.IconKeys
             .Where(key => !LoadedPaths.Value.ContainsKey(key))
             .ToArray();
 
@@ -41,8 +39,8 @@ public sealed class IconPathTests
             .Select(static element => element.Attribute("name")!.Value)
             .ToHashSet(StringComparer.Ordinal);
 
-        string[] unnamed = [.. LoadedKeys.Value.Where(key => !names.Contains(key))];
-        string[] stale = [.. names.Where(name => !LoadedKeys.Value.Contains(name))];
+        string[] unnamed = [.. Repository.IconKeys.Where(key => !names.Contains(key))];
+        string[] stale = [.. names.Where(name => !Repository.IconKeys.Contains(name))];
 
         Assert.True(
             unnamed.Length is 0 && stale.Length is 0,
@@ -83,10 +81,10 @@ public sealed class IconPathTests
     [Fact]
     public void Разбор_что_то_нашёл()
     {
-        Assert.NotEmpty(LoadedKeys.Value);
+        Assert.NotEmpty(Repository.IconKeys);
         Assert.True(
-            LoadedPaths.Value.Count >= LoadedKeys.Value.Count,
-            $"контуров {LoadedPaths.Value.Count}, ключей набора {LoadedKeys.Value.Count}");
+            LoadedPaths.Value.Count >= Repository.IconKeys.Count,
+            $"контуров {LoadedPaths.Value.Count}, ключей набора {Repository.IconKeys.Count}");
     }
 
     /// <summary>
@@ -94,16 +92,6 @@ public sealed class IconPathTests
     /// </summary>
     [Fact]
     public void Контур_перевода_есть() => Assert.True(LoadedPaths.Value.ContainsKey("swap"));
-
-    private static IReadOnlyList<string> LoadKeys()
-    {
-        using JsonDocument document = JsonDocument.Parse(File.ReadAllText(Repository.Icons));
-
-        return document.RootElement.GetProperty("icons")
-            .EnumerateArray()
-            .Select(static key => key.GetString()!)
-            .ToArray();
-    }
 
     private static IReadOnlyDictionary<string, string> LoadPaths()
     {

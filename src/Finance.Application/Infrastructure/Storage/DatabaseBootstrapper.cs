@@ -140,8 +140,7 @@ public sealed class DatabaseBootstrapper
         }
         catch (Exception error) when (error is not OperationCanceledException)
         {
-            // Схема ещё не тронута, но накатывать её без копии нельзя:
-            // сообщение то же, что при неудачной миграции, — данные целы
+            // Схема ещё не тронута, но накатывать её без копии нельзя — данные целы
             throw new DatabaseMigrationException(
                 UiTexts.DatabaseBackupFailed,
                 error);

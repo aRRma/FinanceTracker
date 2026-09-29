@@ -2,7 +2,6 @@ using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Categories.Card;
 using Finance.Application.Features.Report;
 using Finance.Application.Features.Transactions.Card;
-using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Domain.Enums;
@@ -49,8 +48,7 @@ internal sealed class TransactionFixture : IAsyncDisposable
 
     public static async Task<TransactionFixture> CreateAsync()
     {
-        TestDatabase database = await TestDatabase.CreateAsync();
-        await database.Resolve<DatabaseInitializer>().InitializeAsync();
+        TestDatabase database = await TestDatabase.CreateWithPresetAsync();
 
         await using FinanceDbContext context = await database.Contexts.CreateDbContextAsync();
 
@@ -175,6 +173,20 @@ internal sealed class TransactionFixture : IAsyncDisposable
     /// </summary>
     public Task<IReadOnlyList<ReportTotal>> ReportAsync(ReportMonth? month = null) =>
         Database.Resolve<IReportQuery>().ReadGroupsAsync(month ?? ReportMonth.Of(Today));
+
+    /// <summary>
+    /// Метка изменения операции прямо из базы: по ней видно, тронула ли правка
+    /// справочника строки операций.
+    /// </summary>
+    public async Task<DateTimeOffset> StampAsync(Guid transaction)
+    {
+        await using FinanceDbContext context = await Database.Contexts.CreateDbContextAsync();
+
+        return await context.Transactions
+            .Where(row => row.Key == transaction)
+            .Select(row => row.UpdatedAtUtc)
+            .SingleAsync();
+    }
 
     public ValueTask DisposeAsync() => Database.DisposeAsync();
 

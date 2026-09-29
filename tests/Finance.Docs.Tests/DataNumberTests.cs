@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using Finance.Application.Infrastructure.Initialization;
 
@@ -14,8 +13,6 @@ public sealed partial class DataNumberTests
     private static readonly Lazy<Preset> Loaded = new(
         static () => Preset.Parse(File.ReadAllText(Repository.Preset)));
 
-    private static readonly Lazy<IReadOnlyList<string>> LoadedIcons = new(LoadIcons);
-
     /// <summary>
     /// Числа документации сходятся с данными.
     /// </summary>
@@ -26,8 +23,8 @@ public sealed partial class DataNumberTests
         [
             (Groups(), Loaded.Value.Groups.Count, "групп"),
             (Subcategories(), Loaded.Value.Groups.Sum(static group => group.Subcategories.Count), "подкатегорий"),
-            (Icons(), LoadedIcons.Value.Count, "значков"),
-            (Keys(), LoadedIcons.Value.Count, "ключей значков"),
+            (Icons(), Repository.IconKeys.Count, "значков"),
+            (Keys(), Repository.IconKeys.Count, "ключей значков"),
             (ScreenCount(), Screens.InMockups.Count, "экранов"),
         ];
 
@@ -44,26 +41,18 @@ public sealed partial class DataNumberTests
     }
 
     /// <summary>
-    /// Число экранов прописью проверяется тоже: «тридцать экранов» устаревает так же,
-    /// как «30 экранов», а цифру в нём не найти.
+    /// Число экранов прописью проверяется тоже: «тридцать два экрана» устаревает так же,
+    /// как «32 экрана», а цифру в нём не найти. Числа меньше десяти не разбираются:
+    /// «два экрана» в прозе — почти всегда часть макетов, а не их общее число.
     /// </summary>
     [Fact]
     public void Число_экранов_прописью_совпадает_с_макетами()
     {
-        (string Word, int Value)[] words =
-        [
-            ("двадцать", 20),
-            ("двадцать два", 22),
-            ("двадцать две", 22),
-            ("тринадцать", 13),
-        ];
-
         string[] stale = Documents.Lines(Documents.All())
             .Where(static line => !line.Text.Contains("lint:ignore", StringComparison.Ordinal))
-            .SelectMany(line => words
-                .Where(word => word.Value != Screens.InMockups.Count
-                    && Regex.IsMatch(Tags().Replace(line.Text, " "), $@"\b{word.Word}\s+экран", RegexOptions.IgnoreCase))
-                .Select(word => $"{line}: «{word.Word} экранов» — фактически {Screens.InMockups.Count}"))
+            .SelectMany(static line => ScreenCountInWords().Matches(Tags().Replace(line.Text, " "))
+                .Where(static match => FromWords(match.Groups["count"].Value) != Screens.InMockups.Count)
+                .Select(match => $"{line}: «{match.Value.Trim()}» — фактически {Screens.InMockups.Count}"))
             .Order(StringComparer.Ordinal)
             .ToArray();
 
@@ -76,7 +65,7 @@ public sealed partial class DataNumberTests
     [Fact]
     public void Ключи_значков_не_повторяются()
     {
-        string[] duplicates = LoadedIcons.Value
+        string[] duplicates = Repository.IconKeys
             .GroupBy(static icon => icon, StringComparer.Ordinal)
             .Where(static bucket => bucket.Count() > 1)
             .Select(static bucket => bucket.Key)
@@ -94,11 +83,14 @@ public sealed partial class DataNumberTests
     public void Разбор_что_то_нашёл()
     {
         Assert.NotEmpty(Loaded.Value.Groups);
-        Assert.NotEmpty(LoadedIcons.Value);
+        Assert.NotEmpty(Repository.IconKeys);
         Assert.NotEmpty(Screens.InMockups);
         Assert.Matches(Groups(), "13 групп");
         Assert.Matches(ScreenCount(), "30 экранов");
         Assert.False(Groups().IsMatch("ADR-13 групп"), "хвост идентификатора не число документации");
+        Assert.Equal(32, FromWords(ScreenCountInWords().Match("Тридцать два экрана").Groups["count"].Value));
+        Assert.Equal(13, FromWords(ScreenCountInWords().Match("тринадцать экранов").Groups["count"].Value));
+        Assert.DoesNotMatch(ScreenCountInWords(), "два экрана");
     }
 
     /// <summary>
@@ -122,13 +114,21 @@ public sealed partial class DataNumberTests
     [GeneratedRegex(@"(?<![-\d])(?<count>\d+)\s+экран")]
     private static partial Regex ScreenCount();
 
-    private static IReadOnlyList<string> LoadIcons()
-    {
-        using JsonDocument document = JsonDocument.Parse(File.ReadAllText(Repository.Icons));
+    [GeneratedRegex(
+        @"(?<!\w)(?<count>(?:двадцать|тридцать|сорок|пятьдесят)(?:\s+(?:один|одна|два|две|три|четыре|пять|шесть|семь|восемь|девять))?|десять|\w+надцать)\s+экран",
+        RegexOptions.IgnoreCase)]
+    private static partial Regex ScreenCountInWords();
 
-        return document.RootElement.GetProperty("icons")
-            .EnumerateArray()
-            .Select(static icon => icon.GetString()!)
-            .ToArray();
-    }
+    private static readonly Dictionary<string, int> NumberWords = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["один"] = 1, ["одна"] = 1, ["два"] = 2, ["две"] = 2, ["три"] = 3, ["четыре"] = 4,
+        ["пять"] = 5, ["шесть"] = 6, ["семь"] = 7, ["восемь"] = 8, ["девять"] = 9,
+        ["десять"] = 10, ["одиннадцать"] = 11, ["двенадцать"] = 12, ["тринадцать"] = 13,
+        ["четырнадцать"] = 14, ["пятнадцать"] = 15, ["шестнадцать"] = 16, ["семнадцать"] = 17,
+        ["восемнадцать"] = 18, ["девятнадцать"] = 19,
+        ["двадцать"] = 20, ["тридцать"] = 30, ["сорок"] = 40, ["пятьдесят"] = 50,
+    };
+
+    private static int FromWords(string words) =>
+        words.Split(' ', StringSplitOptions.RemoveEmptyEntries).Sum(static word => NumberWords[word]);
 }

@@ -233,17 +233,9 @@ public sealed partial class FrequentCategoriesTests
     [GeneratedRegex("\"transactions\" AS \"(\\w+)\"")]
     private static partial Regex TransactionsAlias();
 
-    private static CategoryPickerViewModel Picker(TransactionFixture fixture) => new(
-        fixture.Database.Resolve<ICategoriesQuery>(),
-        fixture.Database.Resolve<IFrequentCategoriesQuery>(),
-        fixture.Database.Resolve<TransactionPicks>());
+    private static CategoryPickerViewModel Picker(TransactionFixture fixture) =>
+        fixture.Database.Resolve<CategoryPickerViewModel>();
 
-    private static TransactionViewModel Form(TransactionFixture fixture) => new(
-        fixture.Database.Resolve<ITransactionFormQuery>(),
-        fixture.Database.Resolve<ITransactionCardQuery>(),
-        fixture.Database.Resolve<ISaveTransactionHandler>(),
-        fixture.Database.Resolve<IDeleteTransactionHandler>(),
-        fixture.Database.Resolve<IAccountsQuery>(),
-        fixture.Database.Resolve<IClock>(),
-        fixture.Database.Resolve<TransactionPicks>());
+    private static TransactionViewModel Form(TransactionFixture fixture) =>
+        fixture.Database.Resolve<TransactionViewModel>();
 }

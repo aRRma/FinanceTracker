@@ -1,12 +1,12 @@
 using Finance.Application.Features.Categories.Card;
 using Finance.Application.Features.Transactions.Card;
-using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
 using Finance.Domain.Enums;
 using Finance.Domain.Errors;
 using Microsoft.EntityFrameworkCore;
+using static Finance.Application.Tests.CategorySetup;
 
 namespace Finance.Application.Tests;
 
@@ -176,7 +176,7 @@ public sealed class CategoriesTests
     [Fact]
     public async Task Перенос_в_служебную_группу_отвергается()
     {
-        await using TestDatabase database = await CreateSeededAsync();
+        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
 
         IReadOnlyList<CategoryListItem> preset = await ReadAsync(database);
 
@@ -202,7 +202,7 @@ public sealed class CategoriesTests
     [Fact]
     public async Task Подкатегория_в_служебную_группу_не_заводится()
     {
-        await using TestDatabase database = await CreateSeededAsync();
+        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
 
         CategoryListItem service = ServiceGroupOf(await ReadAsync(database));
 
@@ -258,7 +258,7 @@ public sealed class CategoriesTests
     [Fact]
     public async Task Служебные_группы_показываются_последними()
     {
-        await using TestDatabase database = await CreateSeededAsync();
+        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
 
         IReadOnlyList<CategoryListItem> groups = [.. (await ReadAsync(database)).Where(item => item.IsGroup)];
 
@@ -317,11 +317,11 @@ public sealed class CategoriesTests
         Guid account = await fixture.AccountAsync("Карта", 1000m);
         Guid transaction = await fixture.SaveAsync(fixture.Expense(account, 100m));
 
-        DateTimeOffset before = await StampAsync(fixture, transaction);
+        DateTimeOffset before = await fixture.StampAsync(transaction);
 
         await fixture.Database.Resolve<IDeleteSubcategoryHandler>().HandleAsync(fixture.ExpenseCategory);
 
-        Assert.True(await StampAsync(fixture, transaction) > before, "метка изменения операции не обновилась");
+        Assert.True(await fixture.StampAsync(transaction) > before, "метка изменения операции не обновилась");
     }
 
     /// <summary>
@@ -367,7 +367,7 @@ public sealed class CategoriesTests
     }
 
     /// <summary>
-    /// Опустевшая группа остаётся в списке: удаления групп в приложении нет.
+    /// Опустевшая группа остаётся в справочнике: удаления групп в приложении нет.
     /// </summary>
     [Fact]
     public async Task Группа_не_удаляется()
@@ -472,35 +472,8 @@ public sealed class CategoriesTests
         await fixture.Database.Resolve<ICategoryDeletionQuery>().ReadAsync(key)
         ?? throw new InvalidOperationException($"Подкатегория {key} не читается");
 
-    private static async Task<DateTimeOffset> StampAsync(TransactionFixture fixture, Guid transaction)
-    {
-        await using FinanceDbContext context = await fixture.Database.Contexts.CreateDbContextAsync();
-
-        return await context.Transactions
-            .Where(row => row.Key == transaction)
-            .Select(row => row.UpdatedAtUtc)
-            .SingleAsync();
-    }
-
-    private static async Task<TestDatabase> CreateSeededAsync()
-    {
-        TestDatabase database = await TestDatabase.CreateAsync();
-        await database.Resolve<DatabaseInitializer>().InitializeAsync();
-
-        return database;
-    }
-
     private static CategoryListItem ServiceGroupOf(IReadOnlyList<CategoryListItem> categories) =>
         categories.Single(item => item.IsGroup && item.Role is CategoryRole.Service);
-
-    private static SaveCategoryCommand Group(string name, CategoryKind kind) =>
-        new() { Name = name, Icon = "basket", Kind = kind };
-
-    private static SaveCategoryCommand Subcategory(Guid parentKey, string name) =>
-        new() { ParentKey = parentKey, Name = name, Icon = "basket" };
-
-    private static Task<Guid> SaveAsync(TestDatabase database, SaveCategoryCommand command) =>
-        database.Resolve<ISaveCategoryHandler>().HandleAsync(command);
 
     private static Task<IReadOnlyList<CategoryListItem>> ReadAsync(TestDatabase database) =>
         database.Resolve<ICategoriesQuery>().ReadAsync();

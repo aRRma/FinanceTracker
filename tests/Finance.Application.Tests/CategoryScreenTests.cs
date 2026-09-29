@@ -4,6 +4,7 @@ using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Texts;
 using Finance.Domain.Enums;
+using static Finance.Application.Tests.CategorySetup;
 
 namespace Finance.Application.Tests;
 
@@ -286,8 +287,7 @@ public sealed class CategoryScreenTests
     [Fact]
     public async Task В_списке_групп_только_группы_того_же_вида()
     {
-        await using TestDatabase database = await TestDatabase.CreateAsync();
-        await database.Resolve<Finance.Application.Infrastructure.Initialization.DatabaseInitializer>().InitializeAsync();
+        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
 
         IReadOnlyList<CategoryListItem> categories = await database.Resolve<ICategoriesQuery>().ReadAsync();
         CategoryListItem taxi = categories.Single(item => item.Name == "Такси");
@@ -376,39 +376,19 @@ public sealed class CategoryScreenTests
     }
 
     private static CategoriesViewModel Catalog(TestDatabase database) =>
-        new(database.Resolve<ICategoriesQuery>(), database.Resolve<IChangeNotifier>());
+        database.Resolve<CategoriesViewModel>();
 
     private static GroupViewModel GroupCard(TestDatabase database) =>
-        new(
-            database.Resolve<ICategoriesQuery>(),
-            database.Resolve<ISaveCategoryHandler>(),
-            database.Resolve<IconCatalog>());
+        database.Resolve<GroupViewModel>();
 
     private static SubcategoryViewModel SubcategoryCard(TestDatabase database) =>
-        new(
-            database.Resolve<ICategoriesQuery>(),
-            database.Resolve<ISaveCategoryHandler>(),
-            database.Resolve<ICategoryDeletionQuery>(),
-            database.Resolve<IDeleteSubcategoryHandler>(),
-            database.Resolve<IconCatalog>());
-
-    private static SaveCategoryCommand Group(string name, CategoryKind kind) =>
-        new() { Name = name, Icon = "basket", Kind = kind };
-
-    private static SaveCategoryCommand Subcategory(Guid parentKey, string name) =>
-        new() { ParentKey = parentKey, Name = name, Icon = "basket" };
-
-    private static Task<Guid> SaveAsync(TestDatabase database, SaveCategoryCommand command) =>
-        database.Resolve<ISaveCategoryHandler>().HandleAsync(command);
+        database.Resolve<SubcategoryViewModel>();
 
     /// <summary>
     /// Считает походы в базу: утверждение «список не перечитывается» иначе не проверить.
     /// </summary>
-    private sealed class CountingCategories : ICategoriesQuery
+    private sealed class CountingCategories(ICategoriesQuery inner) : ICategoriesQuery
     {
-        private readonly ICategoriesQuery _inner;
-
-        public CountingCategories(ICategoriesQuery inner) => _inner = inner;
 
         public int Reads { get; private set; }
 
@@ -416,7 +396,7 @@ public sealed class CategoryScreenTests
         {
             Reads++;
 
-            return _inner.ReadAsync(cancellationToken);
+            return inner.ReadAsync(cancellationToken);
         }
     }
 }

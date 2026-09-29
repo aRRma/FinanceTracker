@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Finance.Docs.Tests;
 
 /// <summary>
@@ -17,6 +19,23 @@ internal static class Repository
     public static string Icons => Path.Combine(Root, "data", "icons.json");
 
     public static string IconPaths => Path.Combine(Root, "data", "icon-paths.json");
+
+    /// <summary>
+    /// Ключи набора значков в порядке файла, с повторами, если они есть: их ищет отдельная проверка.
+    /// </summary>
+    public static IReadOnlyList<string> IconKeys => LoadedIconKeys.Value;
+
+    private static readonly Lazy<IReadOnlyList<string>> LoadedIconKeys = new(LoadIconKeys);
+
+    private static IReadOnlyList<string> LoadIconKeys()
+    {
+        using JsonDocument document = JsonDocument.Parse(File.ReadAllText(Icons));
+
+        return document.RootElement.GetProperty("icons")
+            .EnumerateArray()
+            .Select(static icon => icon.GetString()!)
+            .ToArray();
+    }
 
     private static string FindRoot()
     {

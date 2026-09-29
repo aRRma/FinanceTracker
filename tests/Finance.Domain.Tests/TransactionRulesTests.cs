@@ -198,20 +198,23 @@ public sealed class TransactionRulesTests
 
     /// <summary>
     /// Универсальная группа принимает оба вида: возврат в магазине ложится в ту же
-    /// статью, где лежит трата, и вычитается из неё в отчёте.
+    /// статью, где лежит трата, и вычитается из неё в отчёте. Правило симметрично —
+    /// доходная универсальная группа так же принимает расход.
     /// </summary>
-    [Fact]
+    [Theory]
+    [InlineData(CategoryKind.Expense, TransactionKind.Income)]
+    [InlineData(CategoryKind.Income, TransactionKind.Expense)]
     [Trait("Инвариант", nameof(Invariant.CategoryKindMatchesTransaction))]
-    public void Доход_в_универсальной_расходной_категории_принимается()
+    public void Чужой_вид_в_универсальной_группе_принимается(CategoryKind groupKind, TransactionKind kind)
     {
         Account card = Given.Account();
-        Category shopping = Given.Group("Покупки", CategoryKind.Expense, acceptsAnyKind: true);
-        Category pharmacy = Given.Subcategory(shopping, "Аптека");
-        Transaction refund = Transaction.Create(
-            TransactionKind.Income, card.Key, Given.Rubles(100m), null, null, pharmacy.Key, null,
+        Category group = Given.Group("Покупки", groupKind, acceptsAnyKind: true);
+        Category subcategory = Given.Subcategory(group, "Аптека");
+        Transaction transaction = Transaction.Create(
+            kind, card.Key, Given.Rubles(100m), null, null, subcategory.Key, null,
             Given.Today, null, Given.Today, Given.NowUtc);
 
-        TransactionRules.EnsureValid(refund, card, null, pharmacy, shopping);
+        TransactionRules.EnsureValid(transaction, card, null, subcategory, group);
     }
 
     /// <summary>

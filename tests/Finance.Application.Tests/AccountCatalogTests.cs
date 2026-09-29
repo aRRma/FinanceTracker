@@ -4,6 +4,7 @@ using Finance.Application.Infrastructure;
 using Finance.Application.Texts;
 using Finance.Domain.Enums;
 using Finance.Domain.Values;
+using static Finance.Application.Tests.AccountSetup;
 
 namespace Finance.Application.Tests;
 
@@ -12,8 +13,6 @@ namespace Finance.Application.Tests;
 /// </summary>
 public sealed class AccountCatalogTests
 {
-    private static readonly DateOnly OpenedOn = new(2026, 1, 1);
-
     /// <summary>
     /// Счёт попадает в раздел по признакам, а не по порядку: заблокированный — в заблокированные,
     /// даже если он скрытый, скрытый действующий — в накопления.
@@ -78,8 +77,21 @@ public sealed class AccountCatalogTests
         Assert.True(cashRow.IsOpen);
 
         Assert.False(depositRow.IsNegative);
-        Assert.NotEqual(cashRow.Icon, depositRow.Icon);
+        Assert.Equal(AccountIcon.For(AccountType.Cash, excludedFromTotals: false), cashRow.Icon);
+        Assert.Equal(AccountIcon.For(AccountType.Cash, excludedFromTotals: true), depositRow.Icon);
     }
+
+    /// <summary>
+    /// Значок счёта выводится из типа, но признак «скрытый» сильнее: накопления
+    /// узнаются по значку, а не по разделу.
+    /// </summary>
+    [Theory]
+    [InlineData(AccountType.Cash, false, "cash")]
+    [InlineData(AccountType.Card, false, "credit-card")]
+    [InlineData(AccountType.Cash, true, "building-bank")]
+    [InlineData(AccountType.Card, true, "building-bank")]
+    public void Значок_счёта_выводится_из_типа_и_признака(AccountType type, bool excludedFromTotals, string icon) =>
+        Assert.Equal(icon, AccountIcon.For(type, excludedFromTotals));
 
     /// <summary>
     /// Перетащенный счёт встаёт на место того, на который его бросили, и порядок
@@ -135,19 +147,4 @@ public sealed class AccountCatalogTests
 
         return model;
     }
-
-    private static SaveAccountCommand Command(string name) =>
-        new()
-        {
-            Name = name,
-            Type = AccountType.Cash,
-            Currency = Currency.RUB,
-            OpeningBalance = 0m,
-            OpenedOn = OpenedOn,
-            ExcludedFromTotals = false,
-            IsClosed = false
-        };
-
-    private static Task<Guid> SaveAsync(TestDatabase database, SaveAccountCommand command) =>
-        database.Resolve<ISaveAccountHandler>().HandleAsync(command);
 }

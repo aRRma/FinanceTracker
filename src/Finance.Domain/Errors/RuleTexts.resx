@@ -92,7 +92,7 @@
     <value>Сумма зачисления бывает только у перевода</value>
   </data>
   <data name="TransferAccountsDiffer" xml:space="preserve">
-    <value>Перевод на тот же счёт не имеет смысла: счёт списания и счёт зачисления обязаны различаться</value>
+    <value>Счёт списания и счёт зачисления обязаны различаться</value>
   </data>
   <data name="SameCurrencyTransferAmountsEqual" xml:space="preserve">
     <value>Перевод внутри одной валюты обязан совпадать по суммам: {0} и {1}</value>
@@ -116,10 +116,10 @@
     <value>{0} {1} в будущем: сегодня {2}</value>
   </data>
   <data name="NameEmpty" xml:space="preserve">
-    <value>Имя ({0}) не может быть пустым</value>
+    <value>Название ({0}) не может быть пустым</value>
   </data>
   <data name="NameTaken" xml:space="preserve">
-    <value>Имя «{0}» уже занято ({1})</value>
+    <value>Название «{0}» уже занято ({1})</value>
   </data>
   <data name="CurrencyFixedOnceUsed" xml:space="preserve">
     <value>Валюта счёта «{0}» не меняется: по нему уже есть операции</value>
@@ -134,7 +134,7 @@
     <value>Категория «{0}» не удаляется: она приёмник группы или служебная</value>
   </data>
   <data name="GroupNotDeleted" xml:space="preserve">
-    <value>Группа «{0}» не удаляется: опустевшая группа остаётся в списке</value>
+    <value>Группа «{0}» не удаляется: опустевшая группа остаётся в справочнике</value>
   </data>
   <data name="ProtectedCategoryNotMoved" xml:space="preserve">
     <value>Категория «{0}» не переносится: она приёмник группы или служебная</value>

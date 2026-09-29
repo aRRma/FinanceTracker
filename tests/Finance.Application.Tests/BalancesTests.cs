@@ -6,6 +6,7 @@ using Finance.Application.Infrastructure.Storage;
 using Finance.Domain.Entities;
 using Finance.Domain.Enums;
 using Finance.Domain.Values;
+using static Finance.Application.Tests.AccountSetup;
 
 namespace Finance.Application.Tests;
 
@@ -14,10 +15,6 @@ namespace Finance.Application.Tests;
 /// </summary>
 public sealed class BalancesTests
 {
-    private static readonly DateOnly OpenedOn = new(2026, 1, 1);
-    private static readonly DateOnly Today = new(2026, 8, 25);
-    private static readonly DateTimeOffset NowUtc = new(2026, 8, 25, 9, 30, 0, TimeSpan.Zero);
-
     /// <summary>
     /// Минус на счёте помечен признаком, а не только знаком в тексте: экран красит
     /// такой баланс смысловым цветом, и различать его по минусу в строке нельзя.
@@ -158,40 +155,9 @@ public sealed class BalancesTests
             inner.ReadOneAsync(key, cancellationToken);
     }
 
-    private static BalancesViewModel Model(TestDatabase database) => new(
-        database.Resolve<IAccountsQuery>(),
-        database.Resolve<IChangeNotifier>());
+    private static BalancesViewModel Model(TestDatabase database) =>
+        database.Resolve<BalancesViewModel>();
 
     private static AccountTile Tile(CurrencySection section, Guid key) =>
         section.Spendable.Concat(section.Savings).Single(tile => tile.Key == key);
-
-    private static SaveAccountCommand Command(string name, decimal openingBalance, bool excludedFromTotals = false) =>
-        new()
-        {
-            Name = name,
-            Type = AccountType.Cash,
-            Currency = Currency.RUB,
-            OpeningBalance = openingBalance,
-            OpenedOn = OpenedOn,
-            ExcludedFromTotals = excludedFromTotals,
-            IsClosed = false
-        };
-
-    private static Task<Guid> SaveAsync(TestDatabase database, SaveAccountCommand command) =>
-        database.Resolve<ISaveAccountHandler>().HandleAsync(command);
-
-    private static async Task AddAsync(TestDatabase database, Transaction transaction)
-    {
-        await using FinanceDbContext context = await database.Contexts.CreateDbContextAsync();
-
-        context.Transactions.Add(transaction.ToRow());
-
-        await context.SaveChangesAsync();
-    }
-
-    private static Transaction Expense(Guid account, decimal amount) =>
-        Transaction.Create(
-            TransactionKind.Expense, account, Money.Create(amount, Currency.RUB),
-            targetAccountKey: null, targetAmount: null, categoryKey: Guid.CreateVersion7(),
-            placeKey: null, occurredOn: Today, note: null, Today, NowUtc);
 }

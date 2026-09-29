@@ -1,3 +1,4 @@
+using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,18 @@ internal sealed class TestDatabase : IAsyncDisposable
     {
         TestDatabase database = CreateUnprepared(applyTheme, applicationVersion);
         await database.Resolve<DatabaseBootstrapper>().InitializeAsync();
+
+        return database;
+    }
+
+    /// <summary>
+    /// Создаёт базу с накатанной схемой и стартовым набором — как после первого запуска.
+    /// </summary>
+    /// <param name="applicationVersion">Версия приложения для экрана «О программе».</param>
+    public static async Task<TestDatabase> CreateWithPresetAsync(string? applicationVersion = null)
+    {
+        TestDatabase database = await CreateAsync(applicationVersion: applicationVersion);
+        await database.Resolve<DatabaseInitializer>().InitializeAsync();
 
         return database;
     }

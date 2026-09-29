@@ -181,7 +181,7 @@ public enum Invariant
     ServiceGroupClosedToMoves = 30,
 
     /// <summary>
-    /// Группа не удаляется: опустевшая остаётся в списке.
+    /// Группа не удаляется: опустевшая остаётся в справочнике.
     /// </summary>
     GroupNotDeleted = 31,
 

@@ -20,7 +20,8 @@ public sealed class PresetTests
     private static readonly Lazy<Preset> Loaded = new(
         static () => Preset.Parse(File.ReadAllText(Repository.Preset)));
 
-    private static readonly Lazy<IReadOnlySet<string>> LoadedIcons = new(LoadIcons);
+    private static readonly Lazy<IReadOnlySet<string>> LoadedIcons = new(
+        static () => Repository.IconKeys.ToHashSet(StringComparer.Ordinal));
 
     private static Preset Set => Loaded.Value;
 
@@ -244,14 +245,5 @@ public sealed class PresetTests
 
         Assert.NotEqual(json, broken);
         Assert.Throws<JsonException>(() => Preset.Parse(broken));
-    }
-
-    private static IReadOnlySet<string> LoadIcons()
-    {
-        using JsonDocument document = JsonDocument.Parse(File.ReadAllText(Repository.Icons));
-        return document.RootElement.GetProperty("icons")
-            .EnumerateArray()
-            .Select(icon => icon.GetString()!)
-            .ToHashSet(StringComparer.Ordinal);
     }
 }

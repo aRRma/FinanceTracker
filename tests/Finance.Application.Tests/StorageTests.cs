@@ -121,6 +121,32 @@ public sealed class StorageTests
     }
 
     /// <summary>
+    /// Момент лежит текстом одной длины с нулевым смещением: только так порядок текста
+    /// совпадает с порядком времени, и лента сортируется по моменту записи в базе.
+    /// </summary>
+    [Fact]
+    public async Task Момент_хранится_текстом_в_UTC_одной_длины()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+        await GivenAccountAsync(database);
+
+        Assert.Equal("TEXT", await ColumnTypeAsync(database, "accounts", "created_at_utc"));
+        Assert.Equal(
+            "2026-08-25 09:30:00.0000000+00:00",
+            await ScalarAsync<string>(database, "SELECT created_at_utc FROM accounts"));
+
+        // По местным часам «раньше» записано бо́льшим текстом: сохранись смещение,
+        // сортировка текста поставила бы этот момент позже
+        Func<DateTimeOffset, string> toText = new UtcMomentConverter().ConvertToProviderExpression.Compile();
+        string earlier = toText(new DateTimeOffset(2026, 8, 25, 23, 0, 0, TimeSpan.FromHours(3)));
+        string later = toText(new DateTimeOffset(2026, 8, 25, 21, 0, 0, 5, TimeSpan.Zero));
+
+        Assert.Equal("2026-08-25 20:00:00.0000000+00:00", earlier);
+        Assert.Equal(earlier.Length, later.Length);
+        Assert.True(string.CompareOrdinal(earlier, later) < 0, $"{earlier} не раньше {later}");
+    }
+
+    /// <summary>
     /// Мягко удалённое исчезает с экранов, но остаётся в базе.
     /// </summary>
     [Fact]

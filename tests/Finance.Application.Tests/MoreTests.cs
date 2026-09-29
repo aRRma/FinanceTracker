@@ -20,8 +20,7 @@ public sealed class MoreTests
     [Fact]
     public async Task Подписи_считают_счета_места_и_категории()
     {
-        await using TestDatabase database = await TestDatabase.CreateAsync();
-        await database.Resolve<DatabaseInitializer>().InitializeAsync();
+        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
 
         Preset preset = Preset.Embedded();
 
@@ -51,8 +50,7 @@ public sealed class MoreTests
     [Fact]
     public async Task Подписи_настроек_называют_тему_пояс_и_версию()
     {
-        await using TestDatabase database = await TestDatabase.CreateAsync(applicationVersion: "1.0");
-        await database.Resolve<DatabaseInitializer>().InitializeAsync();
+        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync(applicationVersion: "1.0");
 
         MoreViewModel model = new(
             database.Resolve<IAccountsQuery>(),

@@ -226,22 +226,16 @@ public sealed class PlaceScreenTests
     }
 
     private static PlacesViewModel Catalog(TransactionFixture fixture) =>
-        new(fixture.Database.Resolve<IPlacesQuery>(), fixture.Database.Resolve<IChangeNotifier>());
+        fixture.Database.Resolve<PlacesViewModel>();
 
     private static PlaceViewModel Card(TransactionFixture fixture) =>
-        new(
-            fixture.Database.Resolve<IPlacesQuery>(),
-            fixture.Database.Resolve<IRenamePlaceHandler>(),
-            fixture.Database.Resolve<IDeletePlaceHandler>());
+        fixture.Database.Resolve<PlaceViewModel>();
 
     /// <summary>
     /// Считает походы в базу: утверждение «список не перечитывается» иначе не проверить.
     /// </summary>
-    private sealed class CountingPlaces : IPlacesQuery
+    private sealed class CountingPlaces(IPlacesQuery inner) : IPlacesQuery
     {
-        private readonly IPlacesQuery _inner;
-
-        public CountingPlaces(IPlacesQuery inner) => _inner = inner;
 
         public int Reads { get; private set; }
 
@@ -249,7 +243,7 @@ public sealed class PlaceScreenTests
         {
             Reads++;
 
-            return _inner.ReadAsync(cancellationToken);
+            return inner.ReadAsync(cancellationToken);
         }
     }
 }

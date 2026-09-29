@@ -38,10 +38,19 @@ public sealed class VocabularyTests
         (Pattern(@"\bвтор\w+\s+сумм"), "«сумма зачисления»"),
         (Pattern("counter_(account|amount)"), "target_account или target_amount"),
         (Pattern(@"\bзасе[вя]\w*"), "«инициализация базы»"),
+        (Pattern(@"\bаналитик\w*"), "«отчёт»"),
+        (Pattern(@"\bиконо?к\w*"), "«значок»"),
+        (Pattern(@"\bтип\w*\s+операци"), "«вид операции»"),
+        (Pattern(@"\bзакрыт\w*\s+сч[её]т"), "«заблокированный счёт»"),
+        (Pattern(@"\bтаймзон\w*"), "«часовой пояс»"),
+        (Pattern(@"\bбэкап\w*"), "«резервная копия»"),
+        (Pattern(@"\bкошел(?:[её]к|ьк)\w*"), "«счёт»"),
+        (Pattern(@"\bцифров\w+\s+клавиатур"), "«клавиатура суммы»"),
     ];
 
     /// <summary>
-    /// Документы зовут понятия словами из словаря.
+    /// Документы, макеты и тексты интерфейса зовут понятия словами из словаря:
+    /// экран, макет и документ говорят об одном и том же одинаково.
     /// </summary>
     [Fact]
     public void Запрещённых_слов_в_документации_нет()
@@ -69,15 +78,39 @@ public sealed class VocabularyTests
         Assert.NotEmpty(examined);
         Assert.DoesNotContain(examined, static file => Path.GetFileName(file) == "CONTEXT.md");
         Assert.Contains(examined, static file => Path.GetFileName(file) == "CLAUDE.md");
+        Assert.Contains(examined, static file => Path.GetFileName(file) == "UiTexts.resx");
+        Assert.Contains(examined, static file => file == Documents.Mockups);
         Assert.Contains(Banned, static pair => pair.Wrong.IsMatch("контрагенты"));
+        Assert.Contains(Banned, static pair => pair.Wrong.IsMatch("расчёт аналитики"));
     }
 
+    /// <summary>
+    /// Запрет держит словоформы, а не одну начальную: беглая гласная и мягкий знак
+    /// («иконок», «кошелька») выпадали из выражения, написанного по именительному падежу.
+    /// </summary>
+    [Theory]
+    [InlineData("иконок")]
+    [InlineData("кошелька")]
+    [InlineData("кошелёк")]
+    [InlineData("аналитики")]
+    [InlineData("типы операций")]
+    [InlineData("закрытого счета")]
+    [InlineData("цифровой клавиатурой")]
+    public void Словоформы_запрещённых_слов_ловятся(string wrong) =>
+        Assert.Contains(Banned, pair => pair.Wrong.IsMatch(wrong));
+
     // Словарь перечисляет запрещённые слова по делу, а решения объясняют, почему
-    // от них отказались, — цитата в них законна
+    // от них отказались, — цитата в них законна. Прототип собирается из макетов
+    // и подписей сборщика и проверяется через них
     private static IEnumerable<string> Checked() =>
-        Documents.MarkdownFiles.Where(static file =>
-            Path.GetFileName(file) != "CONTEXT.md"
-            && Path.GetDirectoryName(file) != Documents.Decisions);
+        Documents.MarkdownFiles
+            .Where(static file =>
+                Path.GetFileName(file) != "CONTEXT.md"
+                && Path.GetDirectoryName(file) != Documents.Decisions)
+            .Append(Documents.Mockups)
+            .Append(Documents.Builder)
+            .Append(Path.Combine(Repository.Root, "src", "Finance.Application", "Texts", "UiTexts.resx"))
+            .Append(Path.Combine(Repository.Root, "src", "Finance.Domain", "Errors", "RuleTexts.resx"));
 
     private static Regex Pattern(string wrong) => new(wrong, RegexOptions.IgnoreCase);
 }

@@ -9,6 +9,7 @@ using Finance.Domain.Enums;
 using Finance.Domain.Errors;
 using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
+using static Finance.Application.Tests.AccountSetup;
 
 namespace Finance.Application.Tests;
 
@@ -17,8 +18,6 @@ namespace Finance.Application.Tests;
 /// </summary>
 public sealed class AccountsTests
 {
-    private static readonly DateOnly OpenedOn = new(2026, 1, 1);
-
     /// <summary>
     /// Заведённый счёт виден в списке со своим начальным остатком.
     /// </summary>
@@ -322,7 +321,7 @@ public sealed class AccountsTests
         Guid empty = await SaveAsync(database, Command("Пустая", 0m));
         await AddAsync(database, Expense(used, 100m));
 
-        DateOnly today = database.Resolve<Finance.Application.Infrastructure.IClock>().Today;
+        DateOnly today = database.Resolve<IClock>().Today;
         AccountViewModel model = Model(database);
 
         await model.LoadAsync(used);
@@ -368,25 +367,8 @@ public sealed class AccountsTests
         Assert.Null(await database.Resolve<IAccountCardQuery>().ReadAsync(Guid.CreateVersion7()));
     }
 
-    private static SaveAccountCommand Command(string name, decimal openingBalance) =>
-        new()
-        {
-            Name = name,
-            Type = AccountType.Cash,
-            Currency = Currency.RUB,
-            OpeningBalance = openingBalance,
-            OpenedOn = OpenedOn,
-            ExcludedFromTotals = false,
-            IsClosed = false
-        };
-
-    private static AccountViewModel Model(TestDatabase database) => new(
-        database.Resolve<IAccountCardQuery>(),
-        database.Resolve<ISaveAccountHandler>(),
-        database.Resolve<Finance.Application.Infrastructure.IClock>());
-
-    private static Task<Guid> SaveAsync(TestDatabase database, SaveAccountCommand command) =>
-        database.Resolve<ISaveAccountHandler>().HandleAsync(command);
+    private static AccountViewModel Model(TestDatabase database) =>
+        database.Resolve<AccountViewModel>();
 
     private static Money Balance(IReadOnlyList<AccountListItem> accounts, Guid key) =>
         accounts.Single(account => account.Key == key).Balance;
@@ -397,39 +379,4 @@ public sealed class AccountsTests
 
         return card!.IsClosed;
     }
-
-    private static async Task AddAsync(TestDatabase database, Transaction transaction)
-    {
-        await using FinanceDbContext context = await database.Contexts.CreateDbContextAsync();
-
-        context.Transactions.Add(transaction.ToRow());
-
-        await context.SaveChangesAsync();
-    }
-
-    private static Transaction Expense(Guid account, decimal amount) =>
-        Transaction.Create(
-            TransactionKind.Expense, account, Money.Create(amount, Currency.RUB),
-            targetAccountKey: null, targetAmount: null, categoryKey: Guid.CreateVersion7(),
-            placeKey: null, occurredOn: Today, note: null, Today, NowUtc);
-
-    private static Transaction Income(Guid account, decimal amount) =>
-        Transaction.Create(
-            TransactionKind.Income, account, Money.Create(amount, Currency.RUB),
-            targetAccountKey: null, targetAmount: null, categoryKey: Guid.CreateVersion7(),
-            placeKey: null, occurredOn: Today, note: null, Today, NowUtc);
-
-    private static Transaction Transfer(Guid from, Guid to, decimal amount) =>
-        Transaction.Create(
-            TransactionKind.Transfer, from, Money.Create(amount, Currency.RUB),
-            targetAccountKey: to, targetAmount: Money.Create(amount, Currency.RUB), categoryKey: null,
-            placeKey: null, occurredOn: Today, note: null, Today, NowUtc);
-
-    // Фиксированная, а не из часов: тест не должен зависеть от того,
-    // в какую сторону от полуночи по UTC его запустили
-    private static DateOnly Today => new(2026, 8, 25);
-
-    // Метка создания и удаления операций в проверках не участвует, но и она
-    // не берётся из часов: исход теста не должен зависеть от момента запуска
-    private static DateTimeOffset NowUtc => new(2026, 8, 25, 9, 30, 0, TimeSpan.Zero);
 }

@@ -63,8 +63,7 @@ public sealed class ServiceGroupMergeTests
     [Fact]
     public async Task Служебная_группа_остаётся_одна_и_принимает_оба_вида()
     {
-        await using TestDatabase database = await TestDatabase.CreateAsync();
-        await database.Resolve<DatabaseInitializer>().InitializeAsync();
+        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
 
         IReadOnlyList<CategoryListItem> categories = await database.Resolve<ICategoriesQuery>().ReadAsync();
 

@@ -179,12 +179,6 @@ public sealed class UnsavedFormTests
         Assert.True(model.IsDirty);
     }
 
-    private static TransactionViewModel Transaction(TransactionFixture fixture) => new(
-        fixture.Database.Resolve<ITransactionFormQuery>(),
-        fixture.Database.Resolve<ITransactionCardQuery>(),
-        fixture.Database.Resolve<ISaveTransactionHandler>(),
-        fixture.Database.Resolve<IDeleteTransactionHandler>(),
-        fixture.Database.Resolve<IAccountsQuery>(),
-        fixture.Database.Resolve<IClock>(),
-        fixture.Database.Resolve<TransactionPicks>());
+    private static TransactionViewModel Transaction(TransactionFixture fixture) =>
+        fixture.Database.Resolve<TransactionViewModel>();
 }

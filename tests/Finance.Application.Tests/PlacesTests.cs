@@ -92,7 +92,7 @@ public sealed class PlacesTests
         Guid transaction = await fixture.SaveAsync(fixture.Expense(account, 100m, place: "Пятерочка"));
 
         PlaceListItem place = Assert.Single(await fixture.Database.Resolve<IPlacesQuery>().ReadAsync());
-        DateTimeOffset stampBefore = await TransactionStampAsync(fixture, transaction);
+        DateTimeOffset stampBefore = await fixture.StampAsync(transaction);
 
         await fixture.Database.Resolve<IRenamePlaceHandler>().HandleAsync(place.Key, "  Пятёрочка  ");
 
@@ -101,7 +101,7 @@ public sealed class PlacesTests
         // Имя хранится обрезанным, а метка операции не сдвинулась: правилось место,
         // а не операция, и будущему обмену незачем видеть её изменённой
         Assert.Equal("Пятёрочка", card.PlaceName);
-        Assert.Equal(stampBefore, await TransactionStampAsync(fixture, transaction));
+        Assert.Equal(stampBefore, await fixture.StampAsync(transaction));
     }
 
     /// <summary>
@@ -160,14 +160,14 @@ public sealed class PlacesTests
         Guid transaction = await fixture.SaveAsync(fixture.Expense(account, 100m, place: "Пятёрочка"));
 
         PlaceListItem place = Assert.Single(await fixture.Database.Resolve<IPlacesQuery>().ReadAsync());
-        DateTimeOffset stampBefore = await TransactionStampAsync(fixture, transaction);
+        DateTimeOffset stampBefore = await fixture.StampAsync(transaction);
 
         await fixture.Database.Resolve<IDeletePlaceHandler>().HandleAsync(place.Key);
 
         TransactionCard card = (await fixture.Database.Resolve<ITransactionCardQuery>().ReadAsync(transaction))!;
 
         Assert.Null(card.PlaceName);
-        Assert.Equal(stampBefore, await TransactionStampAsync(fixture, transaction));
+        Assert.Equal(stampBefore, await fixture.StampAsync(transaction));
         Assert.Equal(Money.Create(900m, Currency.RUB), await fixture.BalanceAsync(account));
 
         // Ссылка на месте, надгробие проставлено: физического удаления не было
@@ -249,12 +249,5 @@ public sealed class PlacesTests
         await using FinanceDbContext context = await fixture.Database.Contexts.CreateDbContextAsync();
 
         return await context.Categories.Where(row => row.Key == key).Select(row => row.Name).SingleAsync();
-    }
-
-    private static async Task<DateTimeOffset> TransactionStampAsync(TransactionFixture fixture, Guid key)
-    {
-        await using FinanceDbContext context = await fixture.Database.Contexts.CreateDbContextAsync();
-
-        return await context.Transactions.Where(row => row.Key == key).Select(row => row.UpdatedAtUtc).SingleAsync();
     }
 }

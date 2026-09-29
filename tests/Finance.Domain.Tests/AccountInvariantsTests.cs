@@ -137,21 +137,26 @@ public sealed class AccountInvariantsTests
         Assert.Equal(first, place.DeletedAtUtc);
     }
 
-    [Fact]
+    /// <summary>
+    /// Предел одинаков по обе стороны нуля: начальный остаток бывает и отрицательным.
+    /// </summary>
+    [Theory]
+    [InlineData(1)]
+    [InlineData(-1)]
     [Trait("Инвариант", nameof(Invariant.AmountWithinLimit))]
-    public void Начальный_остаток_сверх_предела_отвергается()
+    public void Начальный_остаток_сверх_предела_отвергается(int sign)
     {
         DomainException error = Assert.Throws<DomainException>(
-            () => Given.Account(openingBalance: Money.Limit + 0.01m));
+            () => Given.Account(openingBalance: sign * (Money.Limit + 0.01m)));
 
         Assert.Equal(Invariant.AmountWithinLimit, error.Invariant);
     }
 
     [Fact]
     [Trait("Инвариант", nameof(Invariant.AmountWithinLimit))]
-    public void Отрицательный_начальный_остаток_допустим()
+    public void Отрицательный_начальный_остаток_до_предела_допустим()
     {
-        Account account = Given.Account(openingBalance: -1000m);
+        Account account = Given.Account(openingBalance: -Money.Limit);
 
         Assert.True(account.OpeningBalance.IsNegative);
     }

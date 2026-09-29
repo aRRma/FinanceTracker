@@ -753,7 +753,7 @@ public sealed partial class ReportTests
         await slow;
 
         Assert.Equal(ReportMonth.Of(monthBefore), model.Month);
-        Assert.Contains("700,00", model.Total, StringComparison.Ordinal);
+        Assert.Equal(Money.Restore(-700m, Currency.RUB).DisplaySigned, model.Total);
     }
 
     /// <summary>

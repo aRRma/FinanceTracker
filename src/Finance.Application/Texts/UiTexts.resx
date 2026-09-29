@@ -205,7 +205,7 @@
     <value>Скрытый</value>
   </data>
   <data name="AccountExcludeHint" xml:space="preserve">
-    <value>Счёт не участвует в расчёте аналитики</value>
+    <value>Счёт не входит в итоги и отчёт</value>
   </data>
   <data name="AccountClosedLabel" xml:space="preserve">
     <value>Заблокированный</value>
@@ -239,13 +239,10 @@
     <value>Добавить счёт</value>
   </data>
   <data name="BalancesEmptyTitle" xml:space="preserve">
-    <value>Заведите первый счёт</value>
+    <value>Добавьте первый счёт</value>
   </data>
   <data name="BalancesEmptyHint" xml:space="preserve">
     <value>Категории уже созданы — останется записать первую операцию.</value>
-  </data>
-  <data name="BalancesCreateAccount" xml:space="preserve">
-    <value>Создать счёт</value>
   </data>
   <data name="BalancesAddTransaction" xml:space="preserve">
     <value>+  Операция</value>
@@ -261,7 +258,7 @@
     <value>Операций пока нет</value>
   </data>
   <data name="FeedEmptyHint" xml:space="preserve">
-    <value>Первая запись появится здесь сразу после сохранения.</value>
+    <value>Первая операция появится здесь сразу после сохранения.</value>
   </data>
   <data name="FeedAddTransactionHint" xml:space="preserve">
     <value>Записать операцию</value>
@@ -362,7 +359,7 @@
     <value>Накопления</value>
   </data>
   <data name="TransactionCurrencyChanged" xml:space="preserve">
-    <value>Изменится валюта операции.</value>
+    <value>Изменится валюта операции</value>
   </data>
   <data name="PickCategoryTitle" xml:space="preserve">
     <value>Категория</value>
@@ -664,13 +661,13 @@
   </data>
   <!-- Сбои, которые видит пользователь -->
   <data name="DatabaseCreateFailed" xml:space="preserve">
-    <value>Не удалось создать базу. Данных ещё не было, терять нечего</value>
+    <value>Не удалось создать базу. Данных ещё не было, терять нечего.</value>
   </data>
   <data name="DatabaseMigrateFailed" xml:space="preserve">
-    <value>Не удалось обновить схему базы. База возвращена из резервной копии; верните предыдущую версию приложения — данные целы</value>
+    <value>Не удалось обновить схему базы. База возвращена из резервной копии; верните предыдущую версию приложения — данные целы.</value>
   </data>
   <data name="DatabaseBackupFailed" xml:space="preserve">
-    <value>Не удалось снять резервную копию перед обновлением схемы; схема не тронута, данные целы</value>
+    <value>Не удалось сделать резервную копию перед обновлением схемы. Схема не тронута, данные целы.</value>
   </data>
   <data name="ErrorActionFailedTitle" xml:space="preserve">
     <value>Не удалось выполнить действие</value>

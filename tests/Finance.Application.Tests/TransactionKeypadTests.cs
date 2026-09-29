@@ -368,6 +368,6 @@ public sealed class TransactionKeypadTests
         save ?? fixture.Database.Resolve<ISaveTransactionHandler>(),
         fixture.Database.Resolve<IDeleteTransactionHandler>(),
         fixture.Database.Resolve<IAccountsQuery>(),
-        fixture.Database.Resolve<Finance.Application.Infrastructure.IClock>(),
+        fixture.Database.Resolve<IClock>(),
         fixture.Database.Resolve<TransactionPicks>());
 }

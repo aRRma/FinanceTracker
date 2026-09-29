@@ -1,5 +1,6 @@
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Storage;
+using Finance.Application.Texts;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -129,7 +130,7 @@ public sealed class DatabaseBootstrapperTests
         DatabaseMigrationException error = await Assert.ThrowsAsync<DatabaseMigrationException>(
             () => database.Resolve<DatabaseBootstrapper>().InitializeAsync());
 
-        Assert.Contains("схема не тронута", error.Message, StringComparison.Ordinal);
+        Assert.Equal(UiTexts.DatabaseBackupFailed, error.Message);
         Assert.Equal("прежняя копия", await File.ReadAllTextAsync(database.Location.BackupPath));
     }
 

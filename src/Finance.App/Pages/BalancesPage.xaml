@@ -136,7 +136,7 @@
                    Style="{StaticResource TitleLabel}" />
             <Label Text="{x:Static texts:UiTexts.BalancesEmptyHint}"
                    HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
-            <Button Text="{x:Static texts:UiTexts.BalancesCreateAccount}" Clicked="OnCreateAccount" AutomationId="CreateFirstAccount" />
+            <Button Text="{x:Static texts:UiTexts.BalancesAddAccount}" Clicked="OnCreateAccount" AutomationId="CreateFirstAccount" />
         </VerticalStackLayout>
 
         <!-- Пока счетов нет, записывать операцию некуда — кнопки нет. С подписью,

@@ -302,8 +302,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <p>32 экрана: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
 <p>Все экраны одного размера — 330 × 690: экран Samsung Galaxy S25 Ultra (480 × 1040 логических пикселей) под строкой состояния, уменьшенный в 480/330 раза. Нижняя панель и клавиатура прижаты к низу, содержимое длиннее экрана обрезается, как на устройстве.</p>
 <p>Изменения пятой итерации: макеты сверены с приложением и перерисованы по нему. Группы строк — карточками на фоне страницы; значки — контуры Tabler из набора приложения; суммы с валютой в каждой строке; форма операции — в две карточки, дата чипами «Сегодня / Вчера / …», сохранение в шапке; карточки справочников сохраняются кнопкой под формой, значок выбирается сеткой на месте; отчёт — с переключателем видов своим цветом. B-04 стал системным календарём, C-01 — отказом без категории: ошибка «дата раньше открытия» до формы не доходит, дату при смене счёта форма сдвигает сама и сообщает об этом. Названия категорий — из стартового набора.</p>
-<p>Изменения четвёртой итерации: экраны названы по действию пользователя и связаны со сценариями; добавлены C-08 (удалить место) и D-07 (переименовать группу); у счёта появился признак «закрыт», в справочнике счетов — раздел закрытых; с формы перевода убрано место, с общей ленты — поиск, из справочника мест — создание; на форме ввода видны место и дата.</p>
-<p>Изменения третьей итерации: обмен между устройствами вынесен за MVP — экраны C-04 и C-05 сохранены как отложенные, значок обмена убран с главного экрана; добавлен раздел E «Отчёт» и четвёртая вкладка; подытог накоплений упразднён, признак счёта переименован в «скрыть из расчётов»; дорисованы C-07 (удаление операции) и D-06 (оформление).</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
 </header>
 
@@ -325,7 +323,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="lbl"><span>Накопления</span></div>
     <div class="note" style="margin-top:-4px">Скрыты</div>
     <div class="card">
-      <div class="row"><svg class="ic"><use href="#i-building-bank"/></svg><div class="g"><div class="t dim">Копилка на отпуск</div></div><span class="num">250 000,00 ₽</span></div>
+      <div class="row"><svg class="ic"><use href="#i-building-bank"/></svg><div class="g"><div class="t dim">Вклад на отпуск</div></div><span class="num">250 000,00 ₽</span></div>
     </div>
     <div class="lbl" style="margin-top:4px"><span>Евро</span><span>Доступно</span></div>
     <div class="total">1 240,00 €</div>
@@ -352,7 +350,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="hd"><h2>Операции</h2></div>
   <div class="date"><span>25 августа</span><span>-6 250,00 ₽</span></div>
   <div class="row fr"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка · Карта основная</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
-  <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Перевод</div><div class="s">Карта основная → Копилка на отпуск</div></div><span class="num">-5 000,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Перевод</div><div class="s">Карта основная → Вклад на отпуск</div></div><span class="num">-5 000,00 ₽</span></div></div>
   <div class="date"><span>24 августа</span><span class="pos">+89 540,00 ₽</span></div>
   <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Аванс · Карта основная</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-train"/></svg><div class="g"><div><div class="t">Общественный транспорт</div><div class="s">Транспорт · Наличные</div></div><span class="num neg">-140,00 ₽</span></div></div>
@@ -376,7 +374,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="balrow"><span>Баланс</span><b>71 920,50 ₽</b></div>
   <div class="date"><span>25 августа</span><span>-6 250,00 ₽</span></div>
   <div class="row fr"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
-  <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Копилка на отпуск</div><div class="s">Перевод</div></div><span class="num">-5 000,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Вклад на отпуск</div><div class="s">Перевод</div></div><span class="num">-5 000,00 ₽</span></div></div>
   <div class="date"><span>24 августа</span><span class="pos">+89 680,00 ₽</span></div>
   <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Аванс</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-coffee"/></svg><div class="g"><div><div class="t">Кофе</div><div class="s">Еда</div></div><span class="num neg">-320,00 ₽</span></div></div>
@@ -467,7 +465,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="row"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div class="t">Наличные</div></div><span class="num">12 400,00 ₽</span></div>
     <div class="row sel"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта основная</div></div><span class="num">71 920,50 ₽</span><svg class="ic acc"><use href="#i-check"/></svg></div>
     <div class="row"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта кредитная</div></div><span class="num neg">-1 890,00 ₽</span></div>
-    <div class="row"><svg class="ic"><use href="#i-building-bank"/></svg><div class="g"><div class="t">Копилка на отпуск</div><div class="s">Накопления</div></div><span class="num">250 000,00 ₽</span></div>
+    <div class="row"><svg class="ic"><use href="#i-building-bank"/></svg><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Накопления</div></div><span class="num">250 000,00 ₽</span></div>
     <div class="lbl" style="padding:10px 11px 6px;margin:0"><span>Евро</span></div>
     <div class="row"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта евро</div></div><span class="num">1 240,00 €</span></div>
   </div>
@@ -540,7 +538,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="amt"><span class="expr"></span><span class="v">5 000,00 ₽</span></div>
       <div class="cells">
         <div class="fld"><span class="ico"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Откуда</span><span class="v">Карта основная</span></span></div>
-        <div class="fld"><span class="ico"><svg class="ic"><use href="#i-building-bank"/></svg></span><span><span class="k">Куда</span><span class="v">Копилка на отпуск</span></span></div>
+        <div class="fld"><span class="ico"><svg class="ic"><use href="#i-building-bank"/></svg></span><span><span class="k">Куда</span><span class="v">Вклад на отпуск</span></span></div>
       </div>
     </div>
     <div class="card">
@@ -563,7 +561,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-06</span><b>Перевести между валютами</b><span class="uc">UC-10</span><em>Обе суммы вводятся вручную: курса в приложении нет. Вторая сумма появляется под первой, в той же карточке, и подписана «Зачисление»; набираемая подсвечена. Разница между суммами и есть фактический курс сделки.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-06</span><b>Перевести между валютами</b><span class="uc">UC-10</span><em>Обе суммы вводятся вручную: курса в приложении нет. Сумма зачисления появляется под суммой, в той же карточке, и подписана «Зачисление»; набираемая подсвечена. Разница между суммами и есть фактический курс сделки.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Новая операция</h2><b class="save">Сохранить</b></div>
   <div class="body">
@@ -688,7 +686,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     </div>
     <div class="empty" style="padding:22px 11px">
       <h3>Операций пока нет</h3>
-      <p>Первая запись появится здесь сразу после сохранения.</p>
+      <p>Первая операция появится здесь сразу после сохранения.</p>
       <div class="btn">Добавить операцию</div>
     </div>
   </div>
@@ -749,9 +747,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="phone">
   <div class="hd"><h2>Балансы</h2></div>
   <div class="empty" style="padding-top:190px">
-    <h3>Заведите первый счёт</h3>
+    <h3>Добавьте первый счёт</h3>
     <p>Категории уже созданы — останется записать первую операцию.</p>
-    <div class="btn">Создать счёт</div>
+    <div class="btn">Добавить счёт</div>
   </div>
   <nav class="nav">
     <a class="on"><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
@@ -849,7 +847,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     </div>
     <div class="lbl"><span>Накопления</span></div>
     <div class="card">
-      <div class="row"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><svg class="ic"><use href="#i-building-bank"/></svg><div class="g"><div class="t">Копилка на отпуск</div><div class="s">Карта · RUB</div></div><span class="num">250 000,00 ₽</span></div>
+      <div class="row"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><svg class="ic"><use href="#i-building-bank"/></svg><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Карта · RUB</div></div><span class="num">250 000,00 ₽</span></div>
     </div>
     <div class="lbl"><span>Заблокированные</span></div>
     <div class="card">
@@ -879,7 +877,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     </div>
     <div class="card form">
       <div class="swrow"><span>Скрытый</span><span class="sw2"><i></i></span></div>
-      <div class="note">Счёт не участвует в расчёте аналитики</div>
+      <div class="note">Счёт не входит в итоги и отчёт</div>
       <div class="dv"></div>
       <div class="swrow"><span>Заблокированный</span><span class="sw2" id="d2close"><i></i></span></div>
       <div class="note">Заблокированный счёт не показывается на главном экране и не предлагается в выборе</div>

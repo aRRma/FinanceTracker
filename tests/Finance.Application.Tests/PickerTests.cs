@@ -326,27 +326,17 @@ public sealed class PickerTests
         Assert.Single(await given.Database.Resolve<IPlacesQuery>().ReadAsync());
     }
 
-    private static TransactionViewModel Form(TransactionFixture fixture) => new(
-        fixture.Database.Resolve<ITransactionFormQuery>(),
-        fixture.Database.Resolve<ITransactionCardQuery>(),
-        fixture.Database.Resolve<ISaveTransactionHandler>(),
-        fixture.Database.Resolve<IDeleteTransactionHandler>(),
-        fixture.Database.Resolve<IAccountsQuery>(),
-        fixture.Database.Resolve<IClock>(),
-        fixture.Database.Resolve<TransactionPicks>());
+    private static TransactionViewModel Form(TransactionFixture fixture) =>
+        fixture.Database.Resolve<TransactionViewModel>();
 
-    private static AccountPickerViewModel AccountPicker(TransactionFixture fixture) => new(
-        fixture.Database.Resolve<IAccountsQuery>(),
-        fixture.Database.Resolve<TransactionPicks>());
+    private static AccountPickerViewModel AccountPicker(TransactionFixture fixture) =>
+        fixture.Database.Resolve<AccountPickerViewModel>();
 
-    private static CategoryPickerViewModel CategoryPicker(TransactionFixture fixture) => new(
-        fixture.Database.Resolve<ICategoriesQuery>(),
-        fixture.Database.Resolve<IFrequentCategoriesQuery>(),
-        fixture.Database.Resolve<TransactionPicks>());
+    private static CategoryPickerViewModel CategoryPicker(TransactionFixture fixture) =>
+        fixture.Database.Resolve<CategoryPickerViewModel>();
 
-    private static PlacePickerViewModel PlacePicker(TransactionFixture fixture) => new(
-        fixture.Database.Resolve<IPlacesQuery>(),
-        fixture.Database.Resolve<TransactionPicks>());
+    private static PlacePickerViewModel PlacePicker(TransactionFixture fixture) =>
+        fixture.Database.Resolve<PlacePickerViewModel>();
 
     private static AccountPickerRow Row(AccountPickerViewModel picker, Guid account) =>
         picker.Sections.SelectMany(section => section).First(row => row.Key == account);

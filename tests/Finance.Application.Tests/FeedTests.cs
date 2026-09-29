@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
 using Finance.Application.Features.Feed;
 using Finance.Application.Features.Places.Card;
+using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
@@ -124,7 +125,7 @@ public sealed class FeedTests
         Guid cash = await given.AccountAsync("Наличные");
         Guid key = await given.SaveAsync(given.Expense(cash, 10m));
 
-        await given.Database.Resolve<Features.Transactions.Card.IDeleteTransactionHandler>().HandleAsync(key);
+        await given.Database.Resolve<IDeleteTransactionHandler>().HandleAsync(key);
 
         Assert.Empty((await given.FeedAsync()).Items);
     }
