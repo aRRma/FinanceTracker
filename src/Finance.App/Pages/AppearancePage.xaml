@@ -26,7 +26,7 @@
                 <VerticalStackLayout BindableLayout.ItemsSource="{Binding Options}">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="appearance:ThemeOption">
-                            <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
+                            <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto"
                                   MinimumHeightRequest="{StaticResource TouchTarget}">
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnThemeTapped" />
@@ -40,15 +40,11 @@
                                     </DataTrigger>
                                 </Grid.Triggers>
 
-                                <controls:Icon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Margin="0,0,12,0"
-                                               Key="{Binding Icon}" />
+                                <controls:Icon Grid.Column="0" Margin="0,0,12,0" Key="{Binding Icon}" />
 
-                                <Label Grid.Column="1" Grid.Row="0" Text="{Binding Caption}" />
-                                <Label Grid.Column="1" Grid.Row="1" Text="{Binding Hint}"
-                                       IsVisible="{Binding HasHint}"
-                                       Style="{StaticResource SecondaryLabel}" />
+                                <Label Grid.Column="1" Text="{Binding Caption}" VerticalOptions="Center" />
 
-                                <controls:Icon Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Key="check"
+                                <controls:Icon Grid.Column="2" Key="check"
                                                IsVisible="{Binding IsSelected}"
                                                SemanticProperties.Description="{x:Static texts:UiTexts.CommonSelected}"
                                                Style="{StaticResource AccentIcon}" />
@@ -57,9 +53,6 @@
                     </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
             </Border>
-
-            <Label Text="{x:Static texts:UiTexts.AppearanceHint}"
-                   Style="{StaticResource SecondaryLabel}" />
 
         </VerticalStackLayout>
     </ScrollView>

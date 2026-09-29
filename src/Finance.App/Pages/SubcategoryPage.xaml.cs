@@ -64,7 +64,7 @@ public partial class SubcategoryPage : DataPage
     // и подтверждать его вслепую нельзя
     private async Task DeleteAsync()
     {
-        string prompt = await _model.DeletePromptAsync();
+        string? prompt = await _model.DeletePromptAsync();
 
         if (!await DisplayAlertAsync(
             string.Format(UiCulture.Current, UiTexts.SubcategoryDeleteConfirmTitle, _model.Name),

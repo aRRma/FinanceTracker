@@ -158,7 +158,7 @@
     <value>У служебной группы «{0}» приёмника нет: удалять в ней нечего</value>
   </data>
   <data name="ClosedAccountNotInNewTransaction" xml:space="preserve">
-    <value>Счёт «{0}» закрыт и в новой операции использован быть не может</value>
+    <value>Счёт «{0}» заблокирован и в новой операции использован быть не может</value>
   </data>
   <data name="TransactionNotBeforeAccountOpened" xml:space="preserve">
     <value>Дата операции {0} раньше открытия счёта «{1}» ({2})</value>

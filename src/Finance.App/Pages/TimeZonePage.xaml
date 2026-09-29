@@ -15,15 +15,11 @@
     x:DataType="zones:TimeZoneViewModel"
     Title="{x:Static texts:UiTexts.TimeZoneTitle}">
 
-    <Grid RowDefinitions="Auto,Auto,*">
+    <Grid RowDefinitions="Auto,*">
 
         <SearchBar Grid.Row="0" Text="{Binding Filter}" Placeholder="{x:Static texts:UiTexts.TimeZoneSearchPlaceholder}" />
 
-        <Label Grid.Row="1" Padding="16,8"
-               Text="{x:Static texts:UiTexts.TimeZoneHint}"
-               Style="{StaticResource SecondaryLabel}" />
-
-        <CollectionView Grid.Row="2" ItemsSource="{Binding Zones}" SelectionMode="None">
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Zones}" SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="zones:TimeZoneOption">
                     <Grid Padding="16,10" ColumnDefinitions="*,Auto,Auto"
@@ -50,15 +46,13 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
 
-            <!-- Пустое состояние — внутри списка: соседом в той же ячейке оно оказалось бы
-                 под ним, и пустой список перехватывал бы касания поверх текста -->
-            <CollectionView.EmptyView>
-                <ContentView>
-                    <Label Padding="16,24" IsVisible="{Binding IsFilteredOut}"
-                           Text="{x:Static texts:UiTexts.TimeZoneNotFound}"
-                           Style="{StaticResource SecondaryLabel}" />
-                </ContentView>
-            </CollectionView.EmptyView>
+            <!-- Подвалом, а не пустым состоянием списка: строка «Как в системе» стоит
+                 в списке всегда, и пустым он не бывает — пустое состояние не показалось бы никогда -->
+            <CollectionView.Footer>
+                <Label Padding="16,24" IsVisible="{Binding IsFilteredOut}"
+                       Text="{x:Static texts:UiTexts.CommonNothingFound}"
+                       Style="{StaticResource SecondaryLabel}" />
+            </CollectionView.Footer>
         </CollectionView>
 
     </Grid>

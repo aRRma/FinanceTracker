@@ -29,11 +29,7 @@
                         <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
                         <Entry Text="{Binding Name}" Placeholder="{x:Static texts:UiTexts.GroupNamePlaceholder}" />
 
-                        <BoxView Style="{StaticResource Divider}" />
-
                         <controls:IconGrid BindingContext="{Binding Icon}" />
-
-                        <BoxView Style="{StaticResource Divider}" />
 
                         <Label Text="{x:Static texts:UiTexts.CommonKind}" Style="{StaticResource CaptionLabel}" />
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="6" IsVisible="{Binding KindEditable}"
@@ -46,8 +42,6 @@
                         <Label Text="{x:Static texts:UiTexts.GroupKindHint}"
                                Style="{StaticResource CaptionLabel}" />
 
-                        <BoxView Style="{StaticResource Divider}" />
-
                         <!-- Универсальность запирается вместе с видом: выключить её
                              у группы, куда уже записали возвраты, значит оставить их
                              вне правил, а вычищать такие операции задним числом некому -->
@@ -58,7 +52,7 @@
                             <Switch Grid.Column="1" IsToggled="{Binding AcceptsAnyKind}" VerticalOptions="Center" />
                         </Grid>
                         <Label Text="{Binding AcceptsAnyKindCaption}" IsVisible="{Binding KindLocked}" />
-                        <Label Text="{x:Static texts:UiTexts.GroupAcceptsAnyKindHint}"
+                        <Label Text="{Binding AcceptsAnyKindHint}"
                                IsVisible="{Binding AcceptsAnyKindHintVisible}"
                                Style="{StaticResource CaptionLabel}" />
                     </VerticalStackLayout>

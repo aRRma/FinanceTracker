@@ -40,12 +40,12 @@ public sealed record AccountListItem
     public required DateOnly OpenedOn { get; init; }
 
     /// <summary>
-    /// «Скрыть из расчётов»: счёт не входит в «доступно к тратам» и в итоги дня.
+    /// «Скрытый»: счёт не входит в «доступно к тратам» и в итоги дня.
     /// </summary>
     public required bool ExcludedFromTotals { get; init; }
 
     /// <summary>
-    /// «Счёт закрыт»: выведен из употребления, но лента и отчёт не меняются.
+    /// «Счёт заблокирован»: выведен из употребления, но лента и отчёт не меняются.
     /// </summary>
     public required bool IsClosed { get; init; }
 

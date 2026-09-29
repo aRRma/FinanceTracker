@@ -11,7 +11,7 @@ namespace Finance.Application.Features.Balances;
 /// <param name="Name">Наименование счёта.</param>
 /// <param name="Balance">Баланс, уже отформатированный.</param>
 /// <param name="IsNegative">Баланс отрицателен: его показывают смысловым цветом.</param>
-/// <param name="IsSavings">Счёт скрыт из расчётов: строка приглушена, в подытог не входит.</param>
+/// <param name="IsSavings">Счёт скрыт: строка приглушена, в подытог не входит.</param>
 public sealed record AccountTile(
     Guid Key,
     string Icon,

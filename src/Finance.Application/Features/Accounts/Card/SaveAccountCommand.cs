@@ -39,12 +39,12 @@ public sealed record SaveAccountCommand
     public required DateOnly OpenedOn { get; init; }
 
     /// <summary>
-    /// «Скрыть из расчётов».
+    /// «Скрытый».
     /// </summary>
     public required bool ExcludedFromTotals { get; init; }
 
     /// <summary>
-    /// «Счёт закрыт». Обратимо, ненулевой баланс закрытию не мешает.
+    /// «Счёт заблокирован». Обратимо, ненулевой баланс блокировке не мешает.
     /// </summary>
     public required bool IsClosed { get; init; }
 }

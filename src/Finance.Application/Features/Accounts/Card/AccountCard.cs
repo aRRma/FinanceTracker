@@ -41,18 +41,18 @@ public sealed record AccountCard
     public required DateOnly OpenedOn { get; init; }
 
     /// <summary>
-    /// «Скрыть из расчётов».
+    /// «Скрытый».
     /// </summary>
     public required bool ExcludedFromTotals { get; init; }
 
     /// <summary>
-    /// «Счёт закрыт».
+    /// «Счёт заблокирован».
     /// </summary>
     public required bool IsClosed { get; init; }
 
     /// <summary>
     /// Текущий баланс. Нужен карточке ради одного вопроса: остались ли на счёте
-    /// деньги в момент закрытия — тогда закрытие подтверждается отдельно.
+    /// деньги в момент блокировки — тогда блокировка подтверждается отдельно.
     /// </summary>
     public required Money Balance { get; init; }
 

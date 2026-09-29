@@ -2,6 +2,7 @@ using Finance.Application.Features.Categories.Card;
 using Finance.Application.Features.Categories.Catalog;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
+using Finance.Application.Texts;
 using Finance.Domain.Enums;
 
 namespace Finance.Application.Tests;
@@ -184,6 +185,24 @@ public sealed class CategoryScreenTests
     }
 
     /// <summary>
+    /// Пояснение универсальности говорит словами вида группы: у расходной
+    /// вычитаются возвраты, у доходной — расходы.
+    /// </summary>
+    [Fact]
+    public async Task Пояснение_универсальности_следует_виду_группы()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        GroupViewModel model = GroupCard(database);
+
+        Assert.Equal(UiTexts.GroupAcceptsAnyKindHint, model.AcceptsAnyKindHint);
+
+        model.Kind = CategoryKind.Income;
+
+        Assert.Equal(UiTexts.GroupAcceptsAnyKindHintIncome, model.AcceptsAnyKindHint);
+    }
+
+    /// <summary>
     /// Занятое имя показывается текстом рядом с формой, а не роняет экран.
     /// </summary>
     [Fact]
@@ -304,11 +323,11 @@ public sealed class CategoryScreenTests
         SubcategoryViewModel model = SubcategoryCard(fixture.Database);
         await model.LoadAsync(fixture.ExpenseCategory, group: null);
 
-        string prompt = await model.DeletePromptAsync();
+        string? prompt = await model.DeletePromptAsync();
 
+        Assert.NotNull(prompt);
         Assert.Contains("2 операции перейдут", prompt, StringComparison.Ordinal);
         Assert.Contains("Прочее", prompt, StringComparison.Ordinal);
-        Assert.Contains("балансы останутся прежними", prompt, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -325,7 +344,7 @@ public sealed class CategoryScreenTests
         SubcategoryViewModel model = SubcategoryCard(database);
         await model.LoadAsync(products, group: null);
 
-        Assert.Equal("Операций в ней нет. Отменить удаление будет нельзя.", await model.DeletePromptAsync());
+        Assert.Null(await model.DeletePromptAsync());
         Assert.True(await model.DeleteAsync(), model.Error);
 
         Assert.DoesNotContain(await database.Resolve<ICategoriesQuery>().ReadAsync(), item => item.Key == products);

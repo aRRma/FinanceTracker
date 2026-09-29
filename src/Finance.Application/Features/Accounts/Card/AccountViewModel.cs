@@ -20,7 +20,7 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     private readonly ISaveAccountHandler _handler;
     private readonly IClock _clock;
 
-    // Как счёт записан: закрыт ли и сколько на нём. По ним видно, закрывают ли
+    // Как счёт записан: заблокирован ли и сколько на нём. По ним видно, блокируют ли
     // счёт именно этой правкой и остаются ли на нём деньги
     private bool _savedClosed;
     private Money? _balance;
@@ -124,20 +124,20 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
 
     /// <summary>
     /// Позднее сегодняшнего дня календарь не пускает: операций в будущем нет.
+    /// А если по счёту уже есть операции — позднее первой из них: такую дату
+    /// домен всё равно отверг бы, и лучше не предлагать её вовсе.
     /// </summary>
-    public DateTime LatestOpeningDate => _clock.Today.ToDateTime(TimeOnly.MinValue);
+    public DateTime LatestOpeningDate =>
+        (EarliestTransactionOn is { } earliest && earliest < _clock.Today ? earliest : _clock.Today)
+            .ToDateTime(TimeOnly.MinValue);
 
     /// <summary>
-    /// Пояснение, почему дату открытия дальше не сдвинуть.
+    /// Почему дату открытия дальше не сдвинуть. Показывается при открытии календаря:
+    /// погашенные дни иначе выглядели бы ошибкой.
     /// </summary>
     public string? OpenedOnHint => EarliestTransactionOn is { } earliest
-        ? string.Format(UiCulture.Current, UiTexts.AccountOpenedOnLimit, earliest)
+        ? string.Format(UiCulture.Current, UiTexts.AccountOpenedOnLimit, DateText.DayWithYearIfOther(earliest, _clock.Today))
         : null;
-
-    /// <summary>
-    /// Пояснение к дате открытия есть — его стоит показать.
-    /// </summary>
-    public bool HasOpenedOnHint => OpenedOnHint is not null;
 
     /// <summary>
     /// Правило нарушено — сообщение показывается рядом с формой.
@@ -157,13 +157,13 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     public partial DateOnly OpenedOn { get; set; }
 
     /// <summary>
-    /// «Скрыть из расчётов».
+    /// «Скрытый».
     /// </summary>
     [ObservableProperty]
     public partial bool ExcludedFromTotals { get; set; }
 
     /// <summary>
-    /// «Счёт закрыт».
+    /// «Счёт заблокирован».
     /// </summary>
     [ObservableProperty]
     public partial bool IsClosed { get; set; }
@@ -217,8 +217,8 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     public string Title => Key is null ? UiTexts.AccountTitleNew : UiTexts.AccountTitleExisting;
 
     /// <summary>
-    /// Предупреждение перед закрытием счёта с деньгами; пусто — подтверждать нечего.
-    /// Домен закрытию с остатком не мешает, но молча увести деньги из «доступно
+    /// Предупреждение перед блокировкой счёта с деньгами; пусто — подтверждать нечего.
+    /// Домен блокировке с остатком не мешает, но молча увести деньги из «доступно
     /// к тратам» нельзя: пользователь мог забыть перевести остаток.
     /// </summary>
     public string? ClosingWarning =>
@@ -273,7 +273,7 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
         OnPropertyChanged(nameof(CurrencyEditable));
         OnPropertyChanged(nameof(OpenedOnDate));
         OnPropertyChanged(nameof(OpenedOnHint));
-        OnPropertyChanged(nameof(HasOpenedOnHint));
+        OnPropertyChanged(nameof(LatestOpeningDate));
     }
 
     /// <summary>

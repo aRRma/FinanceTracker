@@ -79,7 +79,7 @@ public sealed class SaveAccountHandler : ISaveAccountHandler
             _clock.Today,
             _clock.NowUtc);
 
-        // Закрытым счёт заводят только правкой: заводить сразу закрытый нечего
+        // Заблокированным счёт заводят только правкой: заводить сразу заблокированный нечего
         if (command.IsClosed)
         {
             account.Close();

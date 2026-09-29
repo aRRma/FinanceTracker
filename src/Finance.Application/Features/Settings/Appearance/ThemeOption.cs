@@ -3,7 +3,7 @@ using Finance.Application.Infrastructure.Settings;
 namespace Finance.Application.Features.Settings.Appearance;
 
 /// <summary>
-/// Строка выбора темы: название, пояснение и признак выбранной.
+/// Строка выбора темы: название, значок и признак выбранной.
 /// </summary>
 public sealed record ThemeOption
 {
@@ -23,17 +23,7 @@ public sealed record ThemeOption
     public required string Icon { get; init; }
 
     /// <summary>
-    /// Пояснение под названием. Пусто у тех строк, которым нечего пояснять.
-    /// </summary>
-    public required string? Hint { get; init; }
-
-    /// <summary>
     /// Строка выбрана сейчас — у неё стоит галочка.
     /// </summary>
     public required bool IsSelected { get; init; }
-
-    /// <summary>
-    /// Пояснению есть чем быть — строке нужна вторая строка.
-    /// </summary>
-    public bool HasHint => Hint is not null;
 }

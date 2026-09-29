@@ -28,8 +28,8 @@ public static class TransactionRules
     /// <param name="categoryGroup">Группа подкатегории: вид хранится на ней.</param>
     /// <param name="previous">
     /// Состояние той же операции до правки; <c>null</c> означает новую. По нему видно,
-    /// какие счета уже были задействованы: закрытый счёт запрещён только в новой операции
-    /// и при смене счёта, а уже записанные операции закрытого счёта правятся свободно.
+    /// какие счета уже были задействованы: заблокированный счёт запрещён только в новой операции
+    /// и при смене счёта, а уже записанные операции заблокированного счёта правятся свободно.
     /// </param>
     public static void EnsureValid(
         Transaction transaction,
@@ -42,7 +42,7 @@ public static class TransactionRules
         ArgumentNullException.ThrowIfNull(transaction);
         ArgumentNullException.ThrowIfNull(sourceAccount);
 
-        // Чужое прежнее состояние молча снимает запрет на закрытый счёт: его счета
+        // Чужое прежнее состояние молча снимает запрет на заблокированный счёт: его счета
         // сошли бы за «уже задействованные» в операции, которая их впервые видит
         if (previous is not null && previous.Key != transaction.Key)
         {
@@ -63,7 +63,7 @@ public static class TransactionRules
 
     /// <summary>
     /// Всё, что проверяется про один счёт операции: тот ли он, в его ли валюте сумма,
-    /// не закрыт ли он и не раньше ли операция его открытия.
+    /// не заблокирован ли он и не раньше ли операция его открытия.
     /// </summary>
     private static void EnsureAccountFits(
         Transaction transaction,

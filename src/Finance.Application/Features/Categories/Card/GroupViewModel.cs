@@ -131,6 +131,15 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     public bool AcceptsAnyKindHintVisible => KindEditable || AcceptsAnyKind;
 
     /// <summary>
+    /// Пояснение универсальности словами вида группы: у расходной вычитаются
+    /// возвраты, у доходной — расходы. Общая фраза на оба вида была бы неверна
+    /// для одного из них.
+    /// </summary>
+    public string AcceptsAnyKindHint => Kind is CategoryKind.Income
+        ? UiTexts.GroupAcceptsAnyKindHintIncome
+        : UiTexts.GroupAcceptsAnyKindHint;
+
+    /// <summary>
     /// Заголовок экрана.
     /// </summary>
     public string Title => Key is null ? UiTexts.GroupTitleNew : UiTexts.GroupTitleExisting;
@@ -278,6 +287,7 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     {
         OnPropertyChanged(nameof(KindCaption));
         OnPropertyChanged(nameof(PreviewCaption));
+        OnPropertyChanged(nameof(AcceptsAnyKindHint));
     }
 
     partial void OnAcceptsAnyKindChanged(bool value)

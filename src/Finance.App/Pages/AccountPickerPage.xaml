@@ -16,7 +16,7 @@
     Title="{Binding Title}"
     Shell.TabBarIsVisible="False">
 
-    <Grid RowDefinitions="*,Auto">
+    <Grid RowDefinitions="*">
 
         <CollectionView Grid.Row="0" ItemsSource="{Binding Sections}" IsGrouped="True" SelectionMode="None">
 
@@ -66,10 +66,6 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-
-        <Label Grid.Row="1" Padding="16,8,16,16"
-               Text="{x:Static texts:UiTexts.PickAccountCurrencyHint}"
-               Style="{StaticResource CaptionLabel}" />
 
     </Grid>
 

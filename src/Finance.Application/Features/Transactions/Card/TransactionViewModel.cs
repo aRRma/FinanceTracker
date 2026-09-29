@@ -454,24 +454,55 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Раньше открытия счёта календарь не пускает; у перевода — позднейшего из двух.
     /// </summary>
-    public DateTime EarliestDate
+    public DateTime EarliestDate => Earliest().ToDateTime(TimeOnly.MinValue);
+
+    /// <summary>
+    /// Смена счёта поменяла в форме то, чего пользователь не трогал: дату или валюту.
+    /// Сообщение показывается коротко и не требует ответа: без него операция молча
+    /// ушла бы другим днём или в другой валюте.
+    /// </summary>
+    public event Action<string>? Notified;
+
+    /// <summary>
+    /// Раньше какого дня операцию записать нельзя. Счёта нет — граница общая для всех дат.
+    /// </summary>
+    private DateOnly Earliest()
     {
-        get
+        DateOnly earliest = Dates.Earliest;
+
+        if (SourceAccount is { } source && source.OpenedOn > earliest)
         {
-            DateOnly earliest = Dates.Earliest;
-
-            if (SourceAccount is { } source && source.OpenedOn > earliest)
-            {
-                earliest = source.OpenedOn;
-            }
-
-            if (IsTransfer && TargetAccount is { } target && target.OpenedOn > earliest)
-            {
-                earliest = target.OpenedOn;
-            }
-
-            return earliest.ToDateTime(TimeOnly.MinValue);
+            earliest = source.OpenedOn;
         }
+
+        if (IsTransfer && TargetAccount is { } target && target.OpenedOn > earliest)
+        {
+            earliest = target.OpenedOn;
+        }
+
+        return earliest;
+    }
+
+    /// <summary>
+    /// Смена счёта могла оставить дату раньше его открытия. Дата переносится здесь,
+    /// до того как календарь узнает новую границу: иначе её молча сдвинул бы он сам.
+    /// Имени счёта в сообщении нет: счёт пользователь только что выбрал сам, а длинное
+    /// имя не влезло бы в две строки всплывающего сообщения.
+    /// </summary>
+    private void KeepDateAfterOpening()
+    {
+        DateOnly earliest = Earliest();
+
+        if (OccurredOn >= earliest)
+        {
+            return;
+        }
+
+        OccurredOn = earliest;
+        Notified?.Invoke(string.Format(
+            UiCulture.Current,
+            UiTexts.TransactionDateMoved,
+            DateText.DayWithYearIfOther(earliest, _clock.Today)));
     }
 
     /// <summary>
@@ -538,7 +569,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
                 Kind = wantedKind;
             }
 
-            // Закрытый последний счёт не подставляется: он не предлагается
+            // Заблокированный последний счёт не подставляется: он не предлагается
             // и в выборе, а подставленный молча привёл бы к отказу при сохранении
             Guid? preset = accountKey ?? form.LastAccountKey;
             SourceAccount = preset is { } wanted ? Find(wanted) : null;
@@ -872,12 +903,13 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
             ActiveAmount = AmountField.Source;
         }
 
+        KeepDateAfterOpening();
         OnPropertyChanged(nameof(NeedsTargetAmount));
         OnPropertyChanged(nameof(EarliestDate));
     }
 
     /// <summary>
-    /// Счета к выбору: открытые, плюс закрытые, на которых уже стоит правимая операция.
+    /// Счета к выбору: открытые, плюс заблокированные, на которых уже стоит правимая операция.
     /// </summary>
     private void FillAccounts(TransactionCard? card)
     {
@@ -916,16 +948,32 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Смена счёта списания перестраивает список зачисления: счёт, ставший счётом
     /// списания, обязан уйти из выбора, а если он там уже стоял — сброситься.
+    /// Валюта операции — валюта счёта списания, и её смена сообщается: сумма
+    /// осталась прежним числом, но значит уже другие деньги. Подстановка счёта
+    /// при открытии формы не сообщается — прежнего счёта у неё нет. Счёт, открытый
+    /// позже даты и в другой валюте, даёт два сообщения подряд намеренно: это две
+    /// разные правки формы, и склеенная фраза не влезла бы во всплывающее сообщение.
     /// </summary>
-    partial void OnSourceAccountChanged(AccountOption? value)
+    partial void OnSourceAccountChanged(AccountOption? oldValue, AccountOption? newValue)
     {
-        if (value is { } source && TargetAccount is { } target && target.Key == source.Key)
+        if (newValue is { } source && TargetAccount is { } target && target.Key == source.Key)
         {
             TargetAccount = null;
         }
 
         FillTargetAccounts();
+        KeepDateAfterOpening();
+
+        if (oldValue is { } previous && newValue is { } current && previous.Currency != current.Currency)
+        {
+            Notified?.Invoke(UiTexts.TransactionCurrencyChanged);
+        }
     }
+
+    /// <summary>
+    /// Счёт зачисления тоже ограничивает дату перевода.
+    /// </summary>
+    partial void OnTargetAccountChanged(AccountOption? value) => KeepDateAfterOpening();
 
     /// <summary>
     /// Подкатегории вида операции. У перевода список пуст — категории у него нет.

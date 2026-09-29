@@ -102,7 +102,7 @@ public enum Invariant
     NoteWithinLimit = 15,
 
     /// <summary>
-    /// Закрытый счёт не попадает в новую операцию и не подставляется при правке.
+    /// Заблокированный счёт не попадает в новую операцию и не подставляется при правке.
     /// </summary>
     ClosedAccountNotInNewTransaction = 16,
 

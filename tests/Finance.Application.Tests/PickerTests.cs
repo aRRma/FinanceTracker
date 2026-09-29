@@ -103,10 +103,10 @@ public sealed class PickerTests
     }
 
     /// <summary>
-    /// Закрытый счёт не предлагается: записывать на него нечего.
+    /// Заблокированный счёт не предлагается: записывать на него нечего.
     /// </summary>
     [Fact]
-    public async Task Закрытый_счёт_не_предлагается()
+    public async Task Заблокированный_счёт_не_предлагается()
     {
         await using TransactionFixture given = await TransactionFixture.CreateAsync();
 

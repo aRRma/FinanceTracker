@@ -189,12 +189,13 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
     public string DeleteTitle => string.Format(UiCulture.Current, UiTexts.PlaceDeleteConfirmTitle, _savedName);
 
     /// <summary>
-    /// Текст подтверждения удаления. Называет число операций, которые останутся
-    /// без места: по нему видно, то ли это место, а строки операций не правятся.
+    /// Текст подтверждения удаления. Есть операции — предупреждает, сколько их
+    /// останется без места: по числу видно, то ли это место. Операций нет —
+    /// текста нет вовсе, хватает заголовка с вопросом.
     /// </summary>
-    public string DeletePrompt =>
+    public string? DeletePrompt =>
         _transactionCount is 0
-            ? UiTexts.PlaceDeleteEmpty
+            ? null
             : string.Format(
                 UiCulture.Current,
                 UiTexts.PlaceDeletePrompt,

@@ -224,7 +224,7 @@ public sealed class AccountInvariantsTests
     }
 
     [Fact]
-    public void Закрытие_счёта_обратимо_и_баланс_ему_не_мешает()
+    public void Блокировка_счёта_обратима_и_баланс_ей_не_мешает()
     {
         Account account = Given.Account(openingBalance: 12_345m);
 

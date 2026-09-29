@@ -6,7 +6,7 @@ namespace Finance.Application.Features.Transactions.Pick;
 /// <param name="Key">Ключ счёта.</param>
 /// <param name="Icon">Ключ значка: наличные, карта или накопления.</param>
 /// <param name="Name">Наименование.</param>
-/// <param name="Caption">Подпись под названием: «Накопления» у скрытых из расчётов, иначе пусто.</param>
+/// <param name="Caption">Подпись под названием: «Накопления» у скрытых, иначе пусто.</param>
 /// <param name="Balance">Баланс, уже отформатированный.</param>
 /// <param name="IsNegative">Баланс отрицателен — показывается смысловым цветом.</param>
 /// <param name="IsSelected">Этот счёт сейчас и стоит в форме.</param>

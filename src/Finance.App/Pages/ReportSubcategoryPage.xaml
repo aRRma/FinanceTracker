@@ -62,12 +62,6 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
 
-            <CollectionView.Footer>
-                <Label Padding="16,12,16,24"
-                       Text="{x:Static texts:UiTexts.ReportSubcategoryHint}"
-                       Style="{StaticResource CaptionLabel}" />
-            </CollectionView.Footer>
-
             <!-- Пустое состояние — внутри списка: соседом в той же ячейке оно оказалось бы
                  под ним, и пустой список перехватывал бы касания поверх текста -->
             <CollectionView.EmptyView>

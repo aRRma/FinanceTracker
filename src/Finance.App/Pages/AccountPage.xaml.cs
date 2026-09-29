@@ -44,13 +44,31 @@ public partial class AccountPage : DataPage
     private void OnSave(object? sender, EventArgs e) => Guarded.Run(SaveAsync);
 
     /// <summary>
-    /// Закрытие счёта с деньгами подтверждается отдельно: домен его не запрещает,
+    /// Погашенное поле валюты само ничего не объясняет, поэтому касание по нему
+    /// говорит, почему валюту не сменить.
+    /// </summary>
+    private void OnLockedCurrencyTapped(object? sender, TappedEventArgs e) => Notice.Show(UiTexts.AccountCurrencyLocked);
+
+    /// <summary>
+    /// Календарь гасит дни после первой операции по счёту. Сообщение объясняет
+    /// это в ту минуту, когда погашенные дни видны.
+    /// </summary>
+    private void OnOpenedOnPickerOpened(object? sender, DatePickerOpenedEventArgs e)
+    {
+        if (_model.OpenedOnHint is { } hint)
+        {
+            Notice.Show(hint);
+        }
+    }
+
+    /// <summary>
+    /// Блокировка счёта с деньгами подтверждается отдельно: домен её не запрещает,
     /// а остаток молча уходит из «доступно к тратам».
     /// </summary>
     private async Task SaveAsync()
     {
         if (_model.ClosingWarning is { } warning
-            && !await DisplayAlertAsync(UiTexts.AccountCloseConfirmTitle, warning, UiTexts.CommonClose, UiTexts.CommonCancel))
+            && !await DisplayAlertAsync(UiTexts.AccountCloseConfirmTitle, warning, UiTexts.AccountCloseConfirm, UiTexts.CommonCancel))
         {
             return;
         }

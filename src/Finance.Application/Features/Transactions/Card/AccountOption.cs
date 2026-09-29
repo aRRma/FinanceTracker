@@ -14,8 +14,8 @@ namespace Finance.Application.Features.Transactions.Card;
 /// <param name="Currency">Валюта — вместе со счётом меняется валюта суммы.</param>
 /// <param name="Balance">Баланс на сейчас.</param>
 /// <param name="OpenedOn">Дата открытия — раньше неё дата операции недоступна.</param>
-/// <param name="IsClosed">Счёт закрыт: в выборе не предлагается, но в уже записанной операции остаётся.</param>
-/// <param name="IsSavings">Счёт скрыт из расчётов: в выборе стоит отдельным разделом «Накопления».</param>
+/// <param name="IsClosed">Счёт заблокирован: в выборе не предлагается, но в уже записанной операции остаётся.</param>
+/// <param name="IsSavings">Счёт скрыт: в выборе стоит отдельным разделом «Накопления».</param>
 public sealed record AccountOption(
     Guid Key,
     string Icon,

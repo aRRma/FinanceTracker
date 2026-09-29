@@ -11,11 +11,11 @@ namespace Finance.Application.Infrastructure;
 public static class AccountIcon
 {
     /// <summary>
-    /// Ключ значка для счёта. Признак «скрыть из расчётов» сильнее типа: у накоплений
+    /// Ключ значка для счёта. Признак «скрытый» сильнее типа: у накоплений
     /// значок свой, а не карты или наличных, — так их видно в списке сразу.
     /// </summary>
     /// <param name="type">Тип счёта.</param>
-    /// <param name="excludedFromTotals">Счёт скрыт из расчётов — это накопления.</param>
+    /// <param name="excludedFromTotals">Счёт скрыт — это накопления.</param>
     public static string For(AccountType type, bool excludedFromTotals) => (type, excludedFromTotals) switch
     {
         (_, true) => "building-bank",

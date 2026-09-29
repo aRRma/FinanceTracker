@@ -14,7 +14,7 @@ namespace Finance.Application.Features.Accounts.Catalog;
 /// <param name="Caption">Подпись под названием: тип и валюта.</param>
 /// <param name="Balance">Баланс, уже отформатированный.</param>
 /// <param name="IsNegative">Баланс отрицателен.</param>
-/// <param name="IsClosed">Счёт закрыт — показан в отдельном разделе и погашенным.</param>
+/// <param name="IsClosed">Счёт заблокирован — показан в отдельном разделе и погашенным.</param>
 public sealed record AccountRowItem(
     Guid Key,
     string Icon,

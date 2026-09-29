@@ -263,6 +263,123 @@ public sealed class TransactionFormTests
         Assert.DoesNotContain(model.TargetAccounts, option => option.Key == cash);
     }
 
+    /// <summary>
+    /// Дата раньше открытия нового счёта переносится на день открытия, и форма
+    /// говорит об этом: молча операция ушла бы другим днём. Счёт, открытый раньше
+    /// даты, её не трогает и ничего не сообщает.
+    /// </summary>
+    [Fact]
+    public async Task Смена_счёта_переносит_дату_на_открытие_и_сообщает()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        Guid card = await fixture.AccountAsync("Карта");
+        DateOnly opened = fixture.Today.AddDays(-5);
+        Guid deposit = await fixture.AccountAsync("Вклад", openedOn: opened);
+
+        TransactionViewModel model = await NewAsync(fixture);
+        List<string> notices = [];
+        model.Notified += notices.Add;
+
+        model.SourceAccount = model.Accounts.Single(option => option.Key == card);
+        model.OccurredOnDate = fixture.Today.AddDays(-14).ToDateTime(TimeOnly.MinValue);
+
+        model.SourceAccount = model.Accounts.Single(option => option.Key == deposit);
+
+        Assert.Equal(opened, model.OccurredOn);
+        Assert.Equal(
+            [string.Format(UiCulture.Current, UiTexts.TransactionDateMoved, DateText.DayWithYearIfOther(opened, fixture.Today))],
+            notices);
+
+        model.SourceAccount = model.Accounts.Single(option => option.Key == card);
+
+        Assert.Equal(opened, model.OccurredOn);
+        Assert.Single(notices);
+    }
+
+    /// <summary>
+    /// У перевода дату ограничивает и счёт зачисления: выбор его тоже переносит дату и сообщает.
+    /// </summary>
+    [Fact]
+    public async Task Счёт_зачисления_переносит_дату_перевода()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        Guid card = await fixture.AccountAsync("Карта");
+        DateOnly opened = fixture.Today.AddDays(-5);
+        Guid deposit = await fixture.AccountAsync("Вклад", openedOn: opened);
+
+        TransactionViewModel model = await NewAsync(fixture);
+        List<string> notices = [];
+        model.Notified += notices.Add;
+
+        model.Kind = TransactionKind.Transfer;
+        model.SourceAccount = model.Accounts.Single(option => option.Key == card);
+        model.OccurredOnDate = fixture.Today.AddDays(-14).ToDateTime(TimeOnly.MinValue);
+
+        model.TargetAccount = model.TargetAccounts.Single(option => option.Key == deposit);
+
+        Assert.Equal(opened, model.OccurredOn);
+        Assert.Equal(
+            [string.Format(UiCulture.Current, UiTexts.TransactionDateMoved, DateText.DayWithYearIfOther(opened, fixture.Today))],
+            notices);
+    }
+
+    /// <summary>
+    /// Смена счёта на счёт в другой валюте сообщается: набранное число осталось,
+    /// а деньги уже другие. Счёт в той же валюте ничего не сообщает.
+    /// </summary>
+    [Fact]
+    public async Task Смена_валюты_счёта_сообщается()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        Guid card = await fixture.AccountAsync("Карта");
+        Guid cash = await fixture.AccountAsync("Наличные");
+        Guid euros = await fixture.AccountAsync("Валютный", currency: Currency.EUR);
+
+        TransactionViewModel model = await NewAsync(fixture);
+        model.SourceAccount = model.Accounts.Single(option => option.Key == card);
+        List<string> notices = [];
+        model.Notified += notices.Add;
+
+        model.SourceAccount = model.Accounts.Single(option => option.Key == cash);
+
+        Assert.Empty(notices);
+
+        model.SourceAccount = model.Accounts.Single(option => option.Key == euros);
+
+        Assert.Equal([UiTexts.TransactionCurrencyChanged], notices);
+    }
+
+    /// <summary>
+    /// Открытие формы ничего не сообщает: и правка записанной операции, и новая
+    /// операция со счётом в другой валюте. Сообщения — о том, что поменял
+    /// пользователь, а при загрузке он ещё ничего не трогал.
+    /// </summary>
+    [Fact]
+    public async Task Открытие_формы_ничего_не_сообщает()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        Guid card = await fixture.AccountAsync("Карта", openedOn: fixture.Today.AddDays(-5));
+        Guid euros = await fixture.AccountAsync("Валютный", currency: Currency.EUR);
+        Guid expense = await fixture.SaveAsync(fixture.Expense(card, 100m));
+
+        List<string> notices = [];
+
+        TransactionViewModel existing = fixture.Database.Resolve<TransactionViewModel>();
+        existing.Notified += notices.Add;
+        await existing.LoadAsync(expense);
+
+        TransactionViewModel fromFeed = fixture.Database.Resolve<TransactionViewModel>();
+        fromFeed.Notified += notices.Add;
+        await fromFeed.LoadAsync(key: null, accountKey: euros);
+
+        Assert.Empty(notices);
+        Assert.Equal(euros, fromFeed.SourceAccount?.Key);
+    }
+
     private static async Task AssertRefusedAsync(TransactionFixture fixture, TransactionViewModel model, string reason)
     {
         Assert.False(await model.SaveAsync());

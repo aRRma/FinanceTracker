@@ -266,20 +266,19 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
     }
 
     /// <summary>
-    /// Текст подтверждения удаления. Называет число операций и приёмник: переезд
-    /// необратим, а по числу видно, та ли это подкатегория.
+    /// Текст подтверждения удаления. Есть операции — предупреждает, сколько их
+    /// и куда они переедут: переезд необратим. Операций нет — текста нет вовсе,
+    /// хватает заголовка с вопросом.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    public async Task<string> DeletePromptAsync(CancellationToken cancellationToken = default)
+    /// <returns>Текст предупреждения или <c>null</c>, если переезжать нечему.</returns>
+    public async Task<string?> DeletePromptAsync(CancellationToken cancellationToken = default)
     {
-        if (Key is not { } key || await _deletion.ReadAsync(key, cancellationToken) is not { } deletion)
+        if (Key is not { } key
+            || await _deletion.ReadAsync(key, cancellationToken) is not { } deletion
+            || deletion.TransactionCount is 0)
         {
-            return UiTexts.SubcategoryDeleteIrreversible;
-        }
-
-        if (deletion.TransactionCount is 0)
-        {
-            return UiTexts.SubcategoryDeleteEmpty;
+            return null;
         }
 
         string operations = Plural.Of(

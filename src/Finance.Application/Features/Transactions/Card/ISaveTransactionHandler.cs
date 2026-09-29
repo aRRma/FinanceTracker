@@ -10,6 +10,6 @@ public interface ISaveTransactionHandler
     /// </summary>
     /// <param name="command">Что введено в форме.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
-    /// <exception cref="Finance.Domain.Errors.DomainException">Нарушено доменное правило: закрытый счёт, дата раньше открытия, категория не того вида и подобное.</exception>
+    /// <exception cref="Finance.Domain.Errors.DomainException">Нарушено доменное правило: заблокированный счёт, дата раньше открытия, категория не того вида и подобное.</exception>
     Task<Guid> HandleAsync(SaveTransactionCommand command, CancellationToken cancellationToken = default);
 }

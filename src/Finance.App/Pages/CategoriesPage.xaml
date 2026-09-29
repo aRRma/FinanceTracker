@@ -94,7 +94,7 @@
                 <CollectionView.EmptyView>
                     <ContentView>
                         <Label Padding="16,24" IsVisible="{Binding IsEmpty}"
-                               Text="{x:Static texts:UiTexts.CategoriesEmpty}"
+                               Text="{x:Static texts:UiTexts.CommonNothingFound}"
                                Style="{StaticResource SecondaryLabel}" />
                     </ContentView>
                 </CollectionView.EmptyView>

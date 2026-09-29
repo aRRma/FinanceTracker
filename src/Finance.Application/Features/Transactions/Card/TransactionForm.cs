@@ -9,7 +9,7 @@ namespace Finance.Application.Features.Transactions.Card;
 public sealed record TransactionForm
 {
     /// <summary>
-    /// Все счета, включая закрытые: закрытый нужен, когда правится его старая операция.
+    /// Все счета, включая заблокированные: заблокированный нужен, когда правится его старая операция.
     /// </summary>
     public required IReadOnlyList<AccountOption> Accounts { get; init; }
 

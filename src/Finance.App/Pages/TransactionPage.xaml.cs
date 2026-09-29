@@ -30,6 +30,9 @@ public partial class TransactionPage : DataPage
 
         _model = model;
         BindingContext = model;
+
+        // Модель живёт ровно столько, сколько страница, и отписываться не от чего
+        model.Notified += Notice.Show;
     }
 
     /// <summary>

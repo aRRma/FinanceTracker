@@ -3,6 +3,7 @@ using Finance.Application.Features.Accounts.Catalog;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
+using Finance.Application.Texts;
 using Finance.Domain.Entities;
 using Finance.Domain.Enums;
 using Finance.Domain.Errors;
@@ -12,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Finance.Application.Tests;
 
 /// <summary>
-/// Счета: заведение, правка, закрытие, порядок и баланс в списке.
+/// Счета: заведение, правка, блокировка, порядок и баланс в списке.
 /// </summary>
 public sealed class AccountsTests
 {
@@ -262,10 +263,10 @@ public sealed class AccountsTests
     }
 
     /// <summary>
-    /// Закрытие обратимо, и ненулевой баланс ему не мешает.
+    /// Блокировка обратима, и ненулевой баланс ей не мешает.
     /// </summary>
     [Fact]
-    public async Task Счёт_закрывается_и_открывается_обратно()
+    public async Task Счёт_блокируется_и_открывается_обратно()
     {
         await using TestDatabase database = await TestDatabase.CreateAsync();
 
@@ -279,11 +280,11 @@ public sealed class AccountsTests
     }
 
     /// <summary>
-    /// Закрытие счёта с деньгами требует подтверждения; с нулевым балансом и у уже
-    /// закрытого счёта подтверждать нечего.
+    /// Блокировка счёта с деньгами требует подтверждения; с нулевым балансом и у уже
+    /// заблокированного счёта подтверждать нечего.
     /// </summary>
     [Fact]
-    public async Task Закрытие_счёта_с_деньгами_предупреждает()
+    public async Task Блокировка_счёта_с_деньгами_предупреждает()
     {
         await using TestDatabase database = await TestDatabase.CreateAsync();
 
@@ -305,6 +306,36 @@ public sealed class AccountsTests
         await model.LoadAsync(closed);
         Assert.True(model.IsClosed);
         Assert.Null(model.ClosingWarning);
+    }
+
+    /// <summary>
+    /// Календарь даты открытия не предлагает дней после первой операции по счёту,
+    /// а сообщение при его открытии называет этот день словами. Счёт без операций
+    /// ограничен только сегодняшним днём и ничего не объясняет.
+    /// </summary>
+    [Fact]
+    public async Task Дата_открытия_ограничена_первой_операцией()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        Guid used = await SaveAsync(database, Command("Карта", 1_000m));
+        Guid empty = await SaveAsync(database, Command("Пустая", 0m));
+        await AddAsync(database, Expense(used, 100m));
+
+        DateOnly today = database.Resolve<Finance.Application.Infrastructure.IClock>().Today;
+        AccountViewModel model = Model(database);
+
+        await model.LoadAsync(used);
+
+        Assert.Equal(Today.ToDateTime(TimeOnly.MinValue), model.LatestOpeningDate);
+        Assert.Equal(
+            string.Format(UiCulture.Current, UiTexts.AccountOpenedOnLimit, DateText.DayWithYearIfOther(Today, today)),
+            model.OpenedOnHint);
+
+        await model.LoadAsync(empty);
+
+        Assert.Equal(today.ToDateTime(TimeOnly.MinValue), model.LatestOpeningDate);
+        Assert.Null(model.OpenedOnHint);
     }
 
     /// <summary>

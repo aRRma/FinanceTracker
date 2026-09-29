@@ -62,7 +62,7 @@
                                    Text="{x:Static texts:UiTexts.PlacesEmpty}"
                                    Style="{StaticResource SecondaryLabel}" />
                             <Label Padding="16,24" IsVisible="{Binding IsFilteredOut}"
-                                   Text="{x:Static texts:UiTexts.PlacesNotFound}"
+                                   Text="{x:Static texts:UiTexts.CommonNothingFound}"
                                    Style="{StaticResource SecondaryLabel}" />
                         </VerticalStackLayout>
                     </ContentView>

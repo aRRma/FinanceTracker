@@ -27,11 +27,7 @@
                         <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
                         <Entry Text="{Binding Name}" Placeholder="{x:Static texts:UiTexts.SubcategoryNamePlaceholder}" />
 
-                        <BoxView Style="{StaticResource Divider}" />
-
                         <controls:IconGrid BindingContext="{Binding Icon}" />
-
-                        <BoxView Style="{StaticResource Divider}" />
 
                         <Label Text="{x:Static texts:UiTexts.SubcategoryGroupLabel}" Style="{StaticResource CaptionLabel}" />
                         <!-- Только группы того же вида: перенос в чужой вид перевернул бы
@@ -40,12 +36,8 @@
                                 ItemDisplayBinding="{Binding Name, x:DataType=card:CategoryGroupOption}"
                                 SelectedItem="{Binding Group}" Title="{x:Static texts:UiTexts.SubcategoryChooseGroup}" />
 
-                        <BoxView Style="{StaticResource Divider}" />
-
                         <Label Text="{x:Static texts:UiTexts.CommonKind}" Style="{StaticResource CaptionLabel}" />
                         <Label Text="{Binding KindCaption}" />
-                        <Label Text="{x:Static texts:UiTexts.SubcategoryKindHint}"
-                               Style="{StaticResource CaptionLabel}" />
                     </VerticalStackLayout>
                 </Border>
 

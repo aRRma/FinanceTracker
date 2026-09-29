@@ -77,7 +77,7 @@ public sealed partial class BalancesViewModel : ScreenViewModel
             return;
         }
 
-        // Закрытый счёт с главного экрана уходит целиком: он выведен
+        // Заблокированный счёт с главного экрана уходит целиком: он выведен
         // из употребления, а лента и отчёт его сохраняют
         AccountListItem[] visible = accounts.Where(static account => !account.IsClosed).ToArray();
 
@@ -88,8 +88,8 @@ public sealed partial class BalancesViewModel : ScreenViewModel
             Sections.Add(section);
         }
 
-        // Пусто — когда счетов нет вовсе, а не когда все они закрыты:
-        // иначе закрытие последнего счёта выглядело бы как первый запуск
+        // Пусто — когда счетов нет вовсе, а не когда все они заблокированы:
+        // иначе блокировка последнего счёта выглядела бы как первый запуск
         IsEmpty = accounts.Count == 0;
         IsLoaded = true;
     }

@@ -12,7 +12,7 @@ namespace Finance.Application.Features.Transactions.Card;
 
 /// <summary>
 /// Записывает и правит операцию. Счета и категорию читает сам и подаёт домену
-/// параметром: решение о закрытом счёте, дате раньше открытия и виде категории
+/// параметром: решение о заблокированном счёте, дате раньше открытия и виде категории
 /// остаётся за <see cref="TransactionRules"/>, а в хранилище домен не ходит.
 /// </summary>
 public sealed class SaveTransactionHandler : ISaveTransactionHandler
@@ -139,7 +139,7 @@ public sealed class SaveTransactionHandler : ISaveTransactionHandler
             ?? throw new InvalidOperationException(Faults.TransactionNotFound(key));
 
         // Два экземпляра из одной строки: один правится, другой остаётся снимком
-        // «как было» — по нему домен отличает уже задействованный закрытый счёт
+        // «как было» — по нему домен отличает уже задействованный заблокированный счёт
         // от подставленного впервые. Валюты прежних счетов читаются один раз на оба
         (Currency previousSource, Currency? previousTarget) = await TransactionSides
             .CurrenciesAsync(context, row, cancellationToken)

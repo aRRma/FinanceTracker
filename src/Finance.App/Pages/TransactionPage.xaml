@@ -263,12 +263,6 @@
                             </Grid>
                         </Grid>
 
-                        <VerticalStackLayout IsVisible="{Binding IsTransfer}">
-                            <BoxView Style="{StaticResource Divider}" />
-                            <Label Padding="14,6,14,8" Text="{x:Static texts:UiTexts.TransactionTransferHint}"
-                                   Style="{StaticResource CaptionLabel}" />
-                        </VerticalStackLayout>
-
                     </VerticalStackLayout>
                 </Border>
 

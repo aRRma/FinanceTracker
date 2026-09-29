@@ -65,12 +65,12 @@ public sealed class Account : Entity
     public DateOnly OpenedOn { get; private set; }
 
     /// <summary>
-    /// «Скрыть из расчётов»: счёт не входит ни в «доступно к тратам», ни в итог дня, ни в отчёт.
+    /// «Скрытый»: счёт не входит ни в «доступно к тратам», ни в итог дня, ни в отчёт.
     /// </summary>
     public bool ExcludedFromTotals { get; private set; }
 
     /// <summary>
-    /// «Счёт закрыт»: выведен из употребления. Обратимо. Даты закрытия нет —
+    /// «Счёт заблокирован»: выведен из употребления. Обратимо. Даты блокировки нет —
     /// она ничем не используется, а лишнее поле пришлось бы поддерживать при обмене.
     /// </summary>
     public bool IsClosed { get; private set; }
@@ -88,7 +88,7 @@ public sealed class Account : Entity
     /// <param name="currency">Валюта счёта.</param>
     /// <param name="openingBalance">Начальный остаток.</param>
     /// <param name="openedOn">Дата открытия.</param>
-    /// <param name="excludedFromTotals">«Скрыть из расчётов».</param>
+    /// <param name="excludedFromTotals">«Скрытый».</param>
     /// <param name="sortOrder">Место на главном экране.</param>
     /// <param name="today">Локальная дата пользователя, не дата в UTC.</param>
     /// <param name="nowUtc">Момент создания.</param>
@@ -212,17 +212,17 @@ public sealed class Account : Entity
     }
 
     /// <summary>
-    /// Помечает счёт признаком «скрыть из расчётов» или снимает его.
+    /// Помечает счёт признаком «скрытый» или снимает его.
     /// </summary>
     public void SetExcludedFromTotals(bool excluded) => ExcludedFromTotals = excluded;
 
     /// <summary>
-    /// Закрывает счёт. Ненулевой баланс закрытию не мешает.
+    /// Блокирует счёт. Ненулевой баланс блокировке не мешает.
     /// </summary>
     public void Close() => IsClosed = true;
 
     /// <summary>
-    /// Открывает закрытый счёт обратно.
+    /// Снимает блокировку со счёта.
     /// </summary>
     public void Reopen() => IsClosed = false;
 

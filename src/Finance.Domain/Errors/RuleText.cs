@@ -168,7 +168,7 @@ public enum RuleText
     ServiceGroupHasNoReceiver = 30,
 
     /// <summary>
-    /// Закрытый счёт указан в новой операции.
+    /// Заблокированный счёт указан в новой операции.
     /// </summary>
     ClosedAccountNotInNewTransaction = 31,
 

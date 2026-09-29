@@ -6,7 +6,7 @@ using Finance.Application.Infrastructure.Queries;
 namespace Finance.Application.Features.Accounts.Catalog;
 
 /// <summary>
-/// Справочник счетов: три раздела — доступные к тратам, накопления и закрытые.
+/// Справочник счетов: три раздела — доступные к тратам, накопления и заблокированные.
 /// Порядок внутри первых двух задаётся перетаскиванием.
 /// </summary>
 public sealed partial class AccountsViewModel : ScreenViewModel
@@ -43,12 +43,12 @@ public sealed partial class AccountsViewModel : ScreenViewModel
     public ObservableCollection<AccountRowItem> Spendable { get; } = [];
 
     /// <summary>
-    /// Накопления — счета со «скрыть из расчётов».
+    /// Накопления — счета с признаком «скрытый».
     /// </summary>
     public ObservableCollection<AccountRowItem> Savings { get; } = [];
 
     /// <summary>
-    /// Закрытые счета. Остаются в справочнике, ленте и отчёте.
+    /// Заблокированные счета. Остаются в справочнике, ленте и отчёте.
     /// </summary>
     public ObservableCollection<AccountRowItem> Closed { get; } = [];
 
@@ -59,7 +59,7 @@ public sealed partial class AccountsViewModel : ScreenViewModel
     public bool HasSavings => Savings.Count > 0;
 
     /// <summary>
-    /// В справочнике есть закрытые счета.
+    /// В справочнике есть заблокированные счета.
     /// </summary>
     public bool HasClosed => Closed.Count > 0;
 
@@ -110,7 +110,7 @@ public sealed partial class AccountsViewModel : ScreenViewModel
     /// Переставляет перетащенный счёт на место другого и сохраняет порядок.
     /// Переезд между разделами не выполняется: раздел — это признак счёта,
     /// а не позиция в списке, и менять его перетаскиванием значило бы молча
-    /// снимать «скрыть из расчётов».
+    /// снимать «скрытый».
     /// </summary>
     /// <param name="dragged">Счёт, который тащили.</param>
     /// <param name="target">Счёт, на который его бросили.</param>

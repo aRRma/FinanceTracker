@@ -101,6 +101,9 @@
   <data name="CommonSearchByName" xml:space="preserve">
     <value>Поиск по названию</value>
   </data>
+  <data name="CommonNothingFound" xml:space="preserve">
+    <value>Ничего не нашлось</value>
+  </data>
   <!-- Виды операций и категорий -->
   <data name="KindExpense" xml:space="preserve">
     <value>Расход</value>
@@ -159,13 +162,13 @@
     <value>Накопления</value>
   </data>
   <data name="AccountsClosed" xml:space="preserve">
-    <value>Закрытые</value>
+    <value>Заблокированные</value>
   </data>
   <data name="AccountsDragHint" xml:space="preserve">
     <value>Перетащить</value>
   </data>
   <data name="AccountsClosedHint" xml:space="preserve">
-    <value>Счёт закрыт</value>
+    <value>Счёт заблокирован</value>
   </data>
   <!-- Карточка счёта -->
   <data name="AccountTitleNew" xml:space="preserve">
@@ -196,25 +199,28 @@
     <value>Дата открытия</value>
   </data>
   <data name="AccountOpenedOnLimit" xml:space="preserve">
-    <value>Не позже {0:dd.MM.yyyy} — этим днём есть операция</value>
+    <value>Не позже {0} — дня первой операции</value>
   </data>
   <data name="AccountExcludeLabel" xml:space="preserve">
-    <value>Скрыть из расчётов</value>
+    <value>Скрытый</value>
   </data>
   <data name="AccountExcludeHint" xml:space="preserve">
-    <value>Счёт не входит ни в «доступно к тратам», ни в итоги дня, ни в отчёт</value>
+    <value>Счёт не участвует в расчёте аналитики</value>
   </data>
   <data name="AccountClosedLabel" xml:space="preserve">
-    <value>Счёт закрыт</value>
+    <value>Заблокированный</value>
   </data>
   <data name="AccountClosedHint" xml:space="preserve">
-    <value>Закрытый счёт не показывается на главном экране и не предлагается в выборе. Лента и отчёт не меняются</value>
+    <value>Заблокированный счёт не показывается на главном экране и не предлагается в выборе</value>
   </data>
   <data name="AccountCloseConfirmTitle" xml:space="preserve">
-    <value>Закрыть счёт?</value>
+    <value>Заблокировать счёт?</value>
+  </data>
+  <data name="AccountCloseConfirm" xml:space="preserve">
+    <value>Заблокировать</value>
   </data>
   <data name="AccountClosingWarning" xml:space="preserve">
-    <value>На счёте {0}. После закрытия они не войдут в «доступно к тратам», а перевести их будет некуда — закрытый счёт в выборе не предлагается.</value>
+    <value>Внимание: на счёте ещё {0}.</value>
   </data>
   <!-- Балансы -->
   <data name="BalancesTitle" xml:space="preserve">
@@ -227,7 +233,7 @@
     <value>Накопления</value>
   </data>
   <data name="BalancesExcluded" xml:space="preserve">
-    <value>Скрыты из расчётов</value>
+    <value>Скрыты</value>
   </data>
   <data name="BalancesAddAccount" xml:space="preserve">
     <value>Добавить счёт</value>
@@ -297,9 +303,6 @@
   <data name="TransactionTargetAmount" xml:space="preserve">
     <value>Зачисление</value>
   </data>
-  <data name="TransactionTransferHint" xml:space="preserve">
-    <value>Перевод не попадает ни в доходы, ни в расходы</value>
-  </data>
   <data name="TransactionCategory" xml:space="preserve">
     <value>Категория</value>
   </data>
@@ -314,6 +317,9 @@
   </data>
   <data name="TransactionCalendarHint" xml:space="preserve">
     <value>Выбрать дату в календаре</value>
+  </data>
+  <data name="TransactionDateMoved" xml:space="preserve">
+    <value>Дата перенесена на {0} — день открытия счёта</value>
   </data>
   <data name="TransactionNotePlaceholder" xml:space="preserve">
     <value>Заметка — необязательно</value>
@@ -355,8 +361,8 @@
   <data name="PickAccountSavings" xml:space="preserve">
     <value>Накопления</value>
   </data>
-  <data name="PickAccountCurrencyHint" xml:space="preserve">
-    <value>Валюта суммы изменится вместе со счётом.</value>
+  <data name="TransactionCurrencyChanged" xml:space="preserve">
+    <value>Изменится валюта операции.</value>
   </data>
   <data name="PickCategoryTitle" xml:space="preserve">
     <value>Категория</value>
@@ -366,9 +372,6 @@
   </data>
   <data name="PickCategoryIncome" xml:space="preserve">
     <value>Категория дохода</value>
-  </data>
-  <data name="PickCategoryEmpty" xml:space="preserve">
-    <value>Ни одна категория не подходит под набранные буквы.</value>
   </data>
   <data name="PickCategoryFrequent" xml:space="preserve">
     <value>Частые</value>
@@ -383,7 +386,7 @@
     <value>Создать «{0}»</value>
   </data>
   <data name="PickPlaceEmpty" xml:space="preserve">
-    <value>Мест пока нет. Наберите название — оно заведётся вместе с операцией.</value>
+    <value>Мест пока нет. Наберите название — оно создастся вместе с операцией.</value>
   </data>
   <!-- Справочник категорий -->
   <data name="CategoriesTitle" xml:space="preserve">
@@ -391,9 +394,6 @@
   </data>
   <data name="CategoriesExpandHint" xml:space="preserve">
     <value>Развернуть группу</value>
-  </data>
-  <data name="CategoriesEmpty" xml:space="preserve">
-    <value>Ничего не нашлось. Заведите группу кнопкой «+» — подкатегория «Прочее» создастся сама.</value>
   </data>
   <data name="CategoryOther" xml:space="preserve">
     <value>Прочее</value>
@@ -415,13 +415,16 @@
     <value>Еда</value>
   </data>
   <data name="GroupKindHint" xml:space="preserve">
-    <value>Вид задаётся при создании и не меняется: его наследуют все подкатегории</value>
+    <value>Основной вид операций группы — его наследуют подкатегории</value>
   </data>
   <data name="GroupAcceptsAnyKindTitle" xml:space="preserve">
     <value>Принимает оба вида</value>
   </data>
   <data name="GroupAcceptsAnyKindHint" xml:space="preserve">
-    <value>Возврат, кэшбэк и правка расхождения лягут в ту же статью, где лежит трата, и вычтутся из неё в отчёте. Задаётся при создании и не меняется</value>
+    <value>Возвраты и кэшбэк вычтутся из расходов группы</value>
+  </data>
+  <data name="GroupAcceptsAnyKindHintIncome" xml:space="preserve">
+    <value>Расходы вычтутся из доходов группы</value>
   </data>
   <data name="GroupAcceptsAnyKind" xml:space="preserve">
     <value>Принимает расходы и доходы</value>
@@ -460,20 +463,11 @@
   <data name="SubcategoryChooseGroup" xml:space="preserve">
     <value>Выбрать группу</value>
   </data>
-  <data name="SubcategoryKindHint" xml:space="preserve">
-    <value>Вид наследуется от группы и не меняется</value>
-  </data>
   <data name="SubcategoryDelete" xml:space="preserve">
     <value>Удалить подкатегорию</value>
   </data>
   <data name="SubcategoryDeleteConfirmTitle" xml:space="preserve">
     <value>Удалить «{0}»?</value>
-  </data>
-  <data name="SubcategoryDeleteIrreversible" xml:space="preserve">
-    <value>Отменить удаление будет нельзя.</value>
-  </data>
-  <data name="SubcategoryDeleteEmpty" xml:space="preserve">
-    <value>Операций в ней нет. Отменить удаление будет нельзя.</value>
   </data>
   <data name="SubcategoryMovingOne" xml:space="preserve">
     <value>операция перейдёт</value>
@@ -485,17 +479,14 @@
     <value>операций перейдут</value>
   </data>
   <data name="SubcategoryDeletePrompt" xml:space="preserve">
-    <value>{0} в «{1} · {2}». Суммы и даты не изменятся, балансы останутся прежними.</value>
+    <value>Внимание: {0} в «{1} · {2}».</value>
   </data>
   <!-- Справочник мест и карточка места -->
   <data name="PlacesTitle" xml:space="preserve">
     <value>Места</value>
   </data>
   <data name="PlacesEmpty" xml:space="preserve">
-    <value>Мест пока нет. Они заводятся из формы операции и накапливаются сами — заходить сюда стоит, когда захочется навести порядок.</value>
-  </data>
-  <data name="PlacesNotFound" xml:space="preserve">
-    <value>Ни одно место не подходит под набранные буквы.</value>
+    <value>Мест пока нет. Они появятся, когда вы укажете место в операции.</value>
   </data>
   <data name="PlaceTitle" xml:space="preserve">
     <value>Место</value>
@@ -524,9 +515,6 @@
   <data name="PlaceDeleteConfirmTitle" xml:space="preserve">
     <value>Удалить «{0}»?</value>
   </data>
-  <data name="PlaceDeleteEmpty" xml:space="preserve">
-    <value>Операций с этим местом нет. Отменить удаление будет нельзя.</value>
-  </data>
   <data name="PlaceStayingOne" xml:space="preserve">
     <value>операция останется</value>
   </data>
@@ -537,7 +525,7 @@
     <value>операций останутся</value>
   </data>
   <data name="PlaceDeletePrompt" xml:space="preserve">
-    <value>{0} без места. Суммы, даты и балансы не изменятся.</value>
+    <value>Внимание: {0} без места.</value>
   </data>
   <!-- Отчёт -->
   <data name="ReportTitle" xml:space="preserve">
@@ -550,28 +538,22 @@
     <value>Следующий месяц</value>
   </data>
   <data name="ReportHint" xml:space="preserve">
-    <value>Переводы между своими счетами в отчёт не входят: деньги не потрачены, а переложены. Счета, скрытые из расчётов, тоже не учитываются.</value>
+    <value>Переводы между своими счетами в отчёт не входят</value>
   </data>
-  <data name="ReportEmptyExpense" xml:space="preserve">
-    <value>В этом месяце трат не было</value>
-  </data>
-  <data name="ReportEmptyIncome" xml:space="preserve">
-    <value>В этом месяце доходов не было</value>
+  <data name="ReportEmptyTitle" xml:space="preserve">
+    <value>В этом месяце операций не было</value>
   </data>
   <data name="ReportEmptyOtherMonth" xml:space="preserve">
     <value>Выберите другой месяц стрелками вверху.</value>
   </data>
   <data name="ReportEmptyCurrency" xml:space="preserve">
-    <value>В отчёт входят только рублёвые счета без признака «скрыть из расчётов». Операции по остальным счетам видны в ленте.</value>
+    <value>Нет операций по счетам.</value>
   </data>
   <data name="ReportGroupEmptyTitle" xml:space="preserve">
-    <value>В этом месяце операций группы нет</value>
+    <value>Операций больше нет</value>
   </data>
   <data name="ReportGroupEmptyHint" xml:space="preserve">
-    <value>Они переехали или удалены. Вернитесь к отчёту.</value>
-  </data>
-  <data name="ReportSubcategoryHint" xml:space="preserve">
-    <value>Строка открывает ту же карточку операции, что и лента.</value>
+    <value>Вернитесь к отчёту.</value>
   </data>
   <data name="ReportSubcategoryEmptyTitle" xml:space="preserve">
     <value>В этом месяце операций нет</value>
@@ -638,12 +620,6 @@
   <data name="AppearanceTheme" xml:space="preserve">
     <value>Тема</value>
   </data>
-  <data name="AppearanceHint" xml:space="preserve">
-    <value>Настройка хранится только на этом устройстве и никуда не передаётся</value>
-  </data>
-  <data name="AppearanceSystemHint" xml:space="preserve">
-    <value>Следует настройке телефона</value>
-  </data>
   <data name="ThemeLight" xml:space="preserve">
     <value>Светлая</value>
   </data>
@@ -658,12 +634,6 @@
   </data>
   <data name="TimeZoneSearchPlaceholder" xml:space="preserve">
     <value>Поиск по названию зоны</value>
-  </data>
-  <data name="TimeZoneHint" xml:space="preserve">
-    <value>Пояс решает, какой день считается сегодняшним. Сами операции он не меняет.</value>
-  </data>
-  <data name="TimeZoneNotFound" xml:space="preserve">
-    <value>Ни одна зона не подходит под набранные буквы.</value>
   </data>
   <data name="TimeZoneSystem" xml:space="preserve">
     <value>Как в системе</value>
@@ -715,13 +685,13 @@
     <value>База не обновилась</value>
   </data>
   <data name="LeaveWithoutSavingTitle" xml:space="preserve">
-    <value>Уйти без сохранения?</value>
+    <value>Выйти без сохранения?</value>
   </data>
   <data name="LeaveWithoutSavingPrompt" xml:space="preserve">
-    <value>Набранное не сохранится.</value>
+    <value>Данные не сохранятся.</value>
   </data>
   <data name="LeaveWithoutSavingConfirm" xml:space="preserve">
-    <value>Уйти</value>
+    <value>Выйти</value>
   </data>
   <data name="LeaveWithoutSavingCancel" xml:space="preserve">
     <value>Остаться</value>

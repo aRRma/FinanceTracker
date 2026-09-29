@@ -87,17 +87,16 @@ public sealed partial class AppearanceViewModel : ScreenViewModel
     {
         Options.Clear();
 
-        Options.Add(Option(Theme.System, "world", UiTexts.AppearanceSystemHint));
-        Options.Add(Option(Theme.Light, "sun", hint: null));
-        Options.Add(Option(Theme.Dark, "moon", hint: null));
+        Options.Add(Option(Theme.System, "world"));
+        Options.Add(Option(Theme.Light, "sun"));
+        Options.Add(Option(Theme.Dark, "moon"));
     }
 
-    private ThemeOption Option(Theme theme, string icon, string? hint) => new()
+    private ThemeOption Option(Theme theme, string icon) => new()
     {
         Theme = theme,
         Caption = theme.Caption,
         Icon = icon,
-        Hint = hint,
         IsSelected = theme == Current
     };
 

@@ -301,7 +301,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <h1>Макеты экранов — итерация 5</h1>
 <p>32 экрана: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
 <p>Все экраны одного размера — 330 × 690: экран Samsung Galaxy S25 Ultra (480 × 1040 логических пикселей) под строкой состояния, уменьшенный в 480/330 раза. Нижняя панель и клавиатура прижаты к низу, содержимое длиннее экрана обрезается, как на устройстве.</p>
-<p>Изменения пятой итерации: макеты сверены с приложением и перерисованы по нему. Группы строк — карточками на фоне страницы; значки — контуры Tabler из набора приложения; суммы с валютой в каждой строке; форма операции — в две карточки, дата чипами «Сегодня / Вчера / …», сохранение в шапке; карточки справочников сохраняются кнопкой под формой, значок выбирается сеткой на месте; отчёт — с переключателем видов своим цветом. B-04 стал системным календарём, C-01 — отказом без категории: ошибка «дата раньше открытия» до формы не доходит, дату при смене счёта форма сдвигает сама. Названия категорий — из стартового набора.</p>
+<p>Изменения пятой итерации: макеты сверены с приложением и перерисованы по нему. Группы строк — карточками на фоне страницы; значки — контуры Tabler из набора приложения; суммы с валютой в каждой строке; форма операции — в две карточки, дата чипами «Сегодня / Вчера / …», сохранение в шапке; карточки справочников сохраняются кнопкой под формой, значок выбирается сеткой на месте; отчёт — с переключателем видов своим цветом. B-04 стал системным календарём, C-01 — отказом без категории: ошибка «дата раньше открытия» до формы не доходит, дату при смене счёта форма сдвигает сама и сообщает об этом. Названия категорий — из стартового набора.</p>
 <p>Изменения четвёртой итерации: экраны названы по действию пользователя и связаны со сценариями; добавлены C-08 (удалить место) и D-07 (переименовать группу); у счёта появился признак «закрыт», в справочнике счетов — раздел закрытых; с формы перевода убрано место, с общей ленты — поиск, из справочника мест — создание; на форме ввода видны место и дата.</p>
 <p>Изменения третьей итерации: обмен между устройствами вынесен за MVP — экраны C-04 и C-05 сохранены как отложенные, значок обмена убран с главного экрана; добавлен раздел E «Отчёт» и четвёртая вкладка; подытог накоплений упразднён, признак счёта переименован в «скрыть из расчётов»; дорисованы C-07 (удаление операции) и D-06 (оформление).</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
@@ -311,7 +311,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-01</span><b>Посмотреть, сколько доступно</b><span class="uc">UC-02</span><em>Валюта и «доступно» в одну строку, итог под ними. Накопления — своей карточкой без подытога: счёт, скрытый из расчётов, не попадает и в отдельную сумму. Отрицательный баланс — смысловым цветом, без предупреждений. Кнопка операции подписана: строка «Добавить счёт» тоже начинается с плюса.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-01</span><b>Посмотреть, сколько доступно</b><span class="uc">UC-02</span><em>Валюта и «доступно» в одну строку, итог под ними. Накопления — своей карточкой без подытога: скрытый счёт не попадает и в отдельную сумму. Отрицательный баланс — смысловым цветом, без предупреждений. Кнопка операции подписана: строка «Добавить счёт» тоже начинается с плюса.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Балансы</h2></div>
   <div class="body">
@@ -323,7 +323,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="row" id="a1-credit"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта кредитная</div></div><span class="num neg">-1 890,00 ₽</span></div>
     </div>
     <div class="lbl"><span>Накопления</span></div>
-    <div class="note" style="margin-top:-4px">Скрыты из расчётов</div>
+    <div class="note" style="margin-top:-4px">Скрыты</div>
     <div class="card">
       <div class="row"><svg class="ic"><use href="#i-building-bank"/></svg><div class="g"><div class="t dim">Копилка на отпуск</div></div><span class="num">250 000,00 ₽</span></div>
     </div>
@@ -459,7 +459,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-02</span><b>Выбрать счёт</b><span class="uc">UC-01 UC-04</span><em>Балансы показаны прямо в списке: выбирая счёт для расхода, вы обычно и хотите знать, хватит ли на нём денег. Выбранный — плашкой и галочкой; закрытые не предлагаются.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-02</span><b>Выбрать счёт</b><span class="uc">UC-01 UC-04</span><em>Балансы показаны прямо в списке: выбирая счёт для расхода, вы обычно и хотите знать, хватит ли на нём денег. Выбранный — плашкой и галочкой; заблокированные не предлагаются.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт списания</h2></div>
   <div class="list">
@@ -471,7 +471,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="lbl" style="padding:10px 11px 6px;margin:0"><span>Евро</span></div>
     <div class="row"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта евро</div></div><span class="num">1 240,00 €</span></div>
   </div>
-  <div class="note" style="position:absolute;left:0;right:0;bottom:0;padding:6px 11px 12px">Валюта суммы изменится вместе со счётом.</div>
 </div>
 </figure>
 
@@ -543,7 +542,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
         <div class="fld"><span class="ico"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Откуда</span><span class="v">Карта основная</span></span></div>
         <div class="fld"><span class="ico"><svg class="ic"><use href="#i-building-bank"/></svg></span><span><span class="k">Куда</span><span class="v">Копилка на отпуск</span></span></div>
       </div>
-      <div class="hint">Перевод не попадает ни в доходы, ни в расходы</div>
     </div>
     <div class="card">
       <div class="row"><svg class="ic"><use href="#i-calendar"/></svg><span class="t" style="flex:1">Сегодня</span><div class="chips"><b class="chip on">Сегодня</b><b class="chip">Вчера</b><b class="chip">…</b></div></div>
@@ -577,7 +575,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
         <div class="fld"><span class="ico"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Откуда</span><span class="v">Карта евро</span></span></div>
         <div class="fld"><span class="ico"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Куда</span><span class="v">Карта основная</span></span></div>
       </div>
-      <div class="hint">Перевод не попадает ни в доходы, ни в расходы</div>
     </div>
     <div class="card">
       <div class="row"><svg class="ic"><use href="#i-calendar"/></svg><span class="t" style="flex:1">Сегодня</span><div class="chips"><b class="chip on">Сегодня</b><b class="chip">Вчера</b><b class="chip">…</b></div></div>
@@ -617,7 +614,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-01</span><b>Сохранить без категории</b><span class="uc">UC-01</span><em>Сохранение не гаснет, пока нет категории: по касанию карточка над клавиатурой называет, чего не хватает, — внизу экрана она видна всегда, подводить к ней прокруткой не нужно. Дата раньше открытия счёта сюда не доходит: календарь её не предлагает, а при смене счёта форма сама сдвигает дату на день открытия.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-01</span><b>Сохранить без категории</b><span class="uc">UC-01</span><em>Сохранение не гаснет, пока нет категории: по касанию карточка над клавиатурой называет, чего не хватает, — внизу экрана она видна всегда, подводить к ней прокруткой не нужно. Дата раньше открытия счёта сюда не доходит: календарь её не предлагает, а при смене счёта форма сама сдвигает дату на день открытия и говорит об этом всплывающим сообщением.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Новая операция</h2><b class="save">Сохранить</b></div>
   <div class="body">
@@ -657,13 +654,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="body">
     <div class="card form">
       <div class="fld"><span class="k">Название</span><span class="v">Такси</span></div>
-      <div class="dv"></div>
       <div class="icorow"><span>Значок</span><svg class="ic acc"><use href="#i-car"/></svg></div>
-      <div class="dv"></div>
       <div class="fld"><span class="k">Группа</span><span class="v">Транспорт</span></div>
-      <div class="dv"></div>
       <div class="fld"><span class="k">Вид</span><span class="v plain">Расход</span></div>
-      <div class="note">Вид наследуется от группы и не меняется</div>
     </div>
     <div class="btn">Сохранить</div>
     <div class="btn danger">Удалить подкатегорию</div>
@@ -677,7 +670,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="veil">
     <div class="dlg">
       <h4>Удалить «Такси»?</h4>
-      <p>37 операций перейдут в «Транспорт · Прочее». Суммы и даты не изменятся, балансы останутся прежними.</p>
+      <p>Внимание: 37 операций перейдут в «Транспорт · Прочее».</p>
       <div class="acts"><b class="no">Отмена</b><b class="yes">Удалить</b></div>
     </div>
   </div>
@@ -830,7 +823,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="veil">
     <div class="dlg">
       <h4>Удалить «Пятерочка»?</h4>
-      <p>3 операции останутся без места. Суммы, даты и балансы не изменятся.</p>
+      <p>Внимание: 3 операции останутся без места.</p>
       <div class="acts"><b class="no">Отмена</b><b class="yes">Удалить</b></div>
     </div>
   </div>
@@ -843,7 +836,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-01</span><b>Упорядочить счета</b><span class="uc">UC-15 UC-13 UC-21</span><em>Порядок задаётся перетаскиванием за всю строку, ручка слева только говорит об этом. Раздел накоплений появляется от признака счёта, а не от его типа; пустые разделы не показываются. Закрытый счёт вместо ручки помечен замком — его не переставляют.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-01</span><b>Упорядочить счета</b><span class="uc">UC-15 UC-13 UC-21</span><em>Порядок задаётся перетаскиванием за всю строку, ручка слева только говорит об этом. Раздел накоплений появляется от признака счёта, а не от его типа; пустые разделы не показываются. Заблокированный счёт вместо ручки помечен замком — его не переставляют.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счета</h2><span class="tool">+</span></div>
   <div class="body">
@@ -858,7 +851,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="card">
       <div class="row"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><svg class="ic"><use href="#i-building-bank"/></svg><div class="g"><div class="t">Копилка на отпуск</div><div class="s">Карта · RUB</div></div><span class="num">250 000,00 ₽</span></div>
     </div>
-    <div class="lbl"><span>Закрытые</span></div>
+    <div class="lbl"><span>Заблокированные</span></div>
     <div class="card">
       <div class="row" id="d1-closed"><svg class="ic mut"><use href="#i-lock"/></svg><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта старая</div><div class="s">Карта · RUB</div></div><span class="num">0,00 ₽</span></div>
     </div>
@@ -873,29 +866,23 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-02</span><b>Изменить счёт</b><span class="uc">UC-14 UC-13 UC-21</span><em>Валюта заперта: по счёту есть операции. Каждое ограничение объяснено рядом с полем, а не всплывает при сохранении. Закрытие счёта с деньгами подтверждается отдельным вопросом с суммой остатка. Сохранение — кнопкой под формой.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-02</span><b>Изменить счёт</b><span class="uc">UC-14 UC-13 UC-21</span><em>Валюта заперта: по счёту есть операции. Каждое ограничение объяснено рядом с полем, а не всплывает при сохранении. Блокировка счёта с деньгами подтверждается отдельным вопросом с суммой остатка. Сохранение — кнопкой под формой.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт</h2></div>
   <div class="body">
     <div class="card form">
       <div class="fld"><span class="k">Название</span><span class="v">Карта основная</span></div>
-      <div class="dv"></div>
       <div class="fld"><span class="k">Тип</span><span class="v">Карта</span></div>
-      <div class="dv"></div>
       <div class="fld"><span class="k">Валюта</span><span class="v lock">Рубль ₽</span></div>
-      <div class="note">Валюта не меняется: по счёту уже есть операции</div>
-      <div class="dv"></div>
       <div class="fld"><span class="k">Начальный остаток</span><span class="v">14500</span></div>
-      <div class="dv"></div>
       <div class="fld"><span class="k">Дата открытия</span><span class="v">01.01.2026</span></div>
-      <div class="note">Не позже 03.01.2026 — этим днём есть операция</div>
     </div>
     <div class="card form">
-      <div class="swrow"><span>Скрыть из расчётов</span><span class="sw2"><i></i></span></div>
-      <div class="note">Счёт не входит ни в «доступно к тратам», ни в итоги дня, ни в отчёт</div>
+      <div class="swrow"><span>Скрытый</span><span class="sw2"><i></i></span></div>
+      <div class="note">Счёт не участвует в расчёте аналитики</div>
       <div class="dv"></div>
-      <div class="swrow"><span>Счёт закрыт</span><span class="sw2" id="d2close"><i></i></span></div>
-      <div class="note">Закрытый счёт не показывается на главном экране и не предлагается в выборе. Лента и отчёт не меняются</div>
+      <div class="swrow"><span>Заблокированный</span><span class="sw2" id="d2close"><i></i></span></div>
+      <div class="note">Заблокированный счёт не показывается на главном экране и не предлагается в выборе</div>
     </div>
     <div class="btn">Сохранить</div>
   </div>
@@ -948,15 +935,12 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="body">
     <div class="card form">
       <div class="fld"><span class="k">Название</span><span class="v">Питомцы</span></div>
-      <div class="dv"></div>
       <div class="icorow"><span>Значок</span><svg class="ic acc"><use href="#i-paw"/></svg></div>
-      <div class="dv"></div>
       <div class="fld"><span class="k">Вид</span></div>
       <div class="seg"><b class="on">Расход</b><b>Доход</b></div>
-      <div class="note">Вид задаётся при создании и не меняется: его наследуют все подкатегории</div>
-      <div class="dv"></div>
+      <div class="note">Основной вид операций группы — его наследуют подкатегории</div>
       <div class="swrow"><span>Принимает оба вида</span><span class="sw2 on"><i></i></span></div>
-      <div class="note">Возврат, кэшбэк и правка расхождения лягут в ту же статью, где лежит трата, и вычтутся из неё в отчёте. Задаётся при создании и не меняется</div>
+      <div class="note">Возвраты и кэшбэк вычтутся из расходов группы</div>
     </div>
     <div class="lbl"><span>Будет создано</span></div>
     <div class="card form" style="gap:2px">
@@ -1007,11 +991,10 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="body">
     <div class="lbl"><span>Тема</span></div>
     <div class="card">
-      <div class="row sel"><svg class="ic"><use href="#i-world"/></svg><div class="g"><div class="t">Как в системе</div><div class="s">Следует настройке телефона</div></div><svg class="ic acc"><use href="#i-check"/></svg></div>
+      <div class="row sel"><svg class="ic"><use href="#i-world"/></svg><div class="g"><div class="t">Как в системе</div></div><svg class="ic acc"><use href="#i-check"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-sun"/></svg><div class="g"><div class="t">Светлая</div></div></div>
       <div class="row"><svg class="ic"><use href="#i-moon"/></svg><div class="g"><div class="t">Тёмная</div></div></div>
     </div>
-    <div class="note dim">Настройка хранится только на этом устройстве и никуда не передаётся</div>
   </div>
   <nav class="nav">
     <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
@@ -1029,14 +1012,11 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="body">
     <div class="card form">
       <div class="fld"><span class="k">Название</span><span class="v">Еда</span></div>
-      <div class="dv"></div>
       <div class="icorow"><span>Значок</span><svg class="ic acc"><use href="#i-tools-kitchen-2"/></svg></div>
-      <div class="dv"></div>
       <div class="fld"><span class="k">Вид</span><span class="v plain">Расход</span></div>
-      <div class="note">Вид задаётся при создании и не меняется: его наследуют все подкатегории</div>
-      <div class="dv"></div>
+      <div class="note">Основной вид операций группы — его наследуют подкатегории</div>
       <div class="t" style="font-size:13.5px">Принимает расходы и доходы</div>
-      <div class="note">Возврат, кэшбэк и правка расхождения лягут в ту же статью, где лежит трата, и вычтутся из неё в отчёте. Задаётся при создании и не меняется</div>
+      <div class="note">Возвраты и кэшбэк вычтутся из расходов группы</div>
     </div>
     <div class="lbl"><span>Подкатегории</span></div>
     <div class="card">
@@ -1065,7 +1045,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Часовой пояс</h2></div>
   <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span>Поиск по названию зоны</span></div>
-  <div class="note dim" style="padding:7px 11px">Пояс решает, какой день считается сегодняшним. Сами операции он не меняет.</div>
   <div class="list">
     <div class="row sel"><div class="g"><div class="t">Как в системе</div></div><span class="s">UTC+03:00</span><svg class="ic acc"><use href="#i-check"/></svg></div>
     <div class="row"><div class="g"><div class="t">Europe/Kaliningrad</div></div><span class="s">UTC+02:00</span></div>
@@ -1132,7 +1111,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="prog"><i style="width:7%"></i></div>
   <div class="row rrow"><svg class="ic"><use href="#i-stethoscope"/></svg><div class="g"><div class="t">Здоровье</div></div><span class="num neg">-4 240,00 ₽</span><span class="share">5%</span></div>
   <div class="prog"><i style="width:5%"></i></div>
-  <div class="note" style="padding:8px 11px">Переводы между своими счетами в отчёт не входят: деньги не потрачены, а переложены. Счета, скрытые из расчётов, тоже не учитываются.</div>
+  <div class="note" style="padding:8px 11px">Переводы между своими счетами в отчёт не входят</div>
   <nav class="nav">
     <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
     <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
@@ -1181,7 +1160,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="row rrow"><div class="g"><div class="t">Яндекс Еда</div><div class="s">24 августа · Карта основная</div></div><span class="num neg">-1 140,00 ₽</span></div>
   <div class="row rrow"><div class="g"><div class="t">Самокат</div><div class="s">19 августа · Карта основная</div></div><span class="num neg">-620,00 ₽</span></div>
   <div class="row rrow"><div class="g"><div class="t">Купер</div><div class="s">12 августа · Наличные</div></div><span class="num neg">-540,00 ₽</span></div>
-  <div class="note" style="padding:8px 11px">Строка открывает ту же карточку операции, что и лента.</div>
   <nav class="nav">
     <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
     <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
@@ -1192,7 +1170,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">E-04</span><b>Открыть месяц без операций</b><span class="uc">UC-19</span><em>Пустое состояние вместо списка нулей: шесть строк по нулю рублей читаются как ошибка расчёта, а не как отсутствие трат. Если операции месяца есть, но в суммы не вошли — валютные или скрытые из расчётов, — подсказка называет это правило, а не советует сменить месяц.</em></figcaption>
+<figcaption class="cap"><span class="sid">E-04</span><b>Открыть месяц без операций</b><span class="uc">UC-19</span><em>Пустое состояние вместо списка нулей: шесть строк по нулю рублей читаются как ошибка расчёта, а не как отсутствие трат. Если операции месяца есть, но в суммы не вошли — валютные или скрытые, — подсказка называет это правило, а не советует сменить месяц.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Отчёт</h2></div>
   <div class="body" style="gap:8px">
@@ -1200,7 +1178,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="month"><span class="ibtn"><svg class="ic back"><use href="#i-chevron-right"/></svg></span><b>Февраль 2026</b><span class="ibtn"><svg class="ic"><use href="#i-chevron-right"/></svg></span></div>
   </div>
   <div class="empty" style="padding-top:120px">
-    <h3>В этом месяце трат не было</h3>
+    <h3>В этом месяце операций не было</h3>
     <p>Выберите другой месяц стрелками вверху.</p>
   </div>
   <nav class="nav">

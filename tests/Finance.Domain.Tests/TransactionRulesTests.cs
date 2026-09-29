@@ -98,7 +98,7 @@ public sealed class TransactionRulesTests
 
     [Fact]
     [Trait("Инвариант", nameof(Invariant.ClosedAccountNotInNewTransaction))]
-    public void Закрытый_счёт_в_новой_операции_отвергается()
+    public void Заблокированный_счёт_в_новой_операции_отвергается()
     {
         Account closed = Given.Account(closed: true);
         Transaction expense = Given.Expense(closed, Groceries);
@@ -111,7 +111,7 @@ public sealed class TransactionRulesTests
 
     [Fact]
     [Trait("Инвариант", nameof(Invariant.ClosedAccountNotInNewTransaction))]
-    public void Уже_записанная_операция_закрытого_счёта_правится_свободно()
+    public void Уже_записанная_операция_заблокированного_счёта_правится_свободно()
     {
         Account closed = Given.Account(closed: true);
         Transaction expense = Given.Expense(closed, Groceries);
@@ -124,7 +124,7 @@ public sealed class TransactionRulesTests
     public void Прежнее_состояние_от_другой_операции_отвергается()
     {
         // Ошибка вызывающего кода: подай сюда чужую операцию — и её счета сошли бы
-        // за «уже задействованные», сняв запрет на закрытый счёт
+        // за «уже задействованные», сняв запрет на заблокированный счёт
         Account closed = Given.Account(closed: true);
         Transaction expense = Given.Expense(closed, Groceries);
         Transaction alien = Given.Expense(closed, Groceries);
@@ -135,7 +135,7 @@ public sealed class TransactionRulesTests
 
     [Fact]
     [Trait("Инвариант", nameof(Invariant.ClosedAccountNotInNewTransaction))]
-    public void Смена_счёта_на_закрытый_отвергается()
+    public void Смена_счёта_на_заблокированный_отвергается()
     {
         Account open = Given.Account("Карта");
         Account closed = Given.Account("Старый", closed: true);

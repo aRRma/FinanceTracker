@@ -60,8 +60,8 @@ public sealed class PlaceScreenTests
 
     /// <summary>
     /// Пустой справочник и справочник, из которого отбор ничего не выбрал, — разные
-    /// состояния: в первом подсказывают, откуда берутся места, во втором — что
-    /// набранные буквы никому не подошли.
+    /// состояния: в первом подсказывают, откуда берутся места, во втором говорят,
+    /// что ничего не нашлось.
     /// </summary>
     [Fact]
     public async Task Пустой_справочник_и_пустой_отбор_различаются()
@@ -136,7 +136,7 @@ public sealed class PlaceScreenTests
         Assert.Equal("Пятёрочка", model.Name);
         Assert.StartsWith("2 операции · чаще всего «", model.UsageCaption, StringComparison.Ordinal);
         Assert.Equal("Удалить «Пятёрочка»?", model.DeleteTitle);
-        Assert.Equal("2 операции останутся без места. Суммы, даты и балансы не изменятся.", model.DeletePrompt);
+        Assert.Equal("Внимание: 2 операции останутся без места.", model.DeletePrompt);
     }
 
     /// <summary>
@@ -181,7 +181,7 @@ public sealed class PlaceScreenTests
 
         Assert.Equal(0, place.TransactionCount);
         Assert.Equal("Место ещё не использовано ни в одной операции", model.UsageCaption);
-        Assert.Equal("Операций с этим местом нет. Отменить удаление будет нельзя.", model.DeletePrompt);
+        Assert.Null(model.DeletePrompt);
     }
 
     /// <summary>

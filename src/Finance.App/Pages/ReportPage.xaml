@@ -126,7 +126,7 @@
                     <ContentView>
                         <VerticalStackLayout IsVisible="{Binding IsEmpty}" Padding="32" Spacing="12"
                                              VerticalOptions="Center" HorizontalOptions="Center">
-                            <Label Text="{Binding EmptyTitle}" HorizontalTextAlignment="Center"
+                            <Label Text="{x:Static texts:UiTexts.ReportEmptyTitle}" HorizontalTextAlignment="Center"
                                    Style="{StaticResource TitleLabel}" />
                             <Label Text="{Binding EmptyHint}"
                                    HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />

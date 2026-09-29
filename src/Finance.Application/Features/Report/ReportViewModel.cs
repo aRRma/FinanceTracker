@@ -60,7 +60,6 @@ public sealed partial class ReportViewModel : ScreenViewModel
     /// Какой вид показан.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(EmptyTitle))]
     public partial CategoryKind Kind { get; set; } = CategoryKind.Expense;
 
     /// <summary>
@@ -84,7 +83,7 @@ public sealed partial class ReportViewModel : ScreenViewModel
     public partial bool IsEmpty { get; private set; }
 
     /// <summary>
-    /// Отчёт прочитан хотя бы раз. До этого сказать «трат не было» нельзя:
+    /// Отчёт прочитан хотя бы раз. До этого сказать «операций не было» нельзя:
     /// пустое состояние мигнуло бы и сменилось списком групп.
     /// </summary>
     [ObservableProperty]
@@ -100,13 +99,6 @@ public sealed partial class ReportViewModel : ScreenViewModel
     /// Шапка переключателя месяцев: «Август 2026».
     /// </summary>
     public string MonthTitle => Month.Title;
-
-    /// <summary>
-    /// Заголовок пустого состояния — свой для каждого вида.
-    /// </summary>
-    public string EmptyTitle => Kind is CategoryKind.Expense
-        ? UiTexts.ReportEmptyExpense
-        : UiTexts.ReportEmptyIncome;
 
     /// <summary>
     /// Подпись пустого состояния. Когда операции месяца есть, но в суммы не вошли,
@@ -215,7 +207,7 @@ public sealed partial class ReportViewModel : ScreenViewModel
 
     /// <summary>
     /// Места не в списке: их на первых уровнях не показывают. Счета — обязательно:
-    /// снятый признак «скрыть из расчётов» меняет каждое число экрана.
+    /// снятый признак «скрытый» меняет каждое число экрана.
     /// </summary>
     protected override DataChange Watched =>
         DataChange.Transactions | DataChange.Categories | DataChange.Accounts;

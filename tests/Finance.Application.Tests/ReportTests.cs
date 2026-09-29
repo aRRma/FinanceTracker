@@ -4,6 +4,7 @@ using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
+using Finance.Application.Texts;
 using Finance.Domain.Enums;
 using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
@@ -32,10 +33,10 @@ public sealed partial class ReportTests
     }
 
     /// <summary>
-    /// Расход по скрытому из расчётов счёту не меняет ни сумму группы, ни итог; по обычному — меняет.
+    /// Расход по скрытому счёту не меняет ни сумму группы, ни итог; по обычному — меняет.
     /// </summary>
     [Fact]
-    public async Task Счёт_скрытый_из_расчётов_в_отчёт_не_входит()
+    public async Task Счёт_скрытый_в_отчёт_не_входит()
     {
         await using TransactionFixture given = await TransactionFixture.CreateAsync();
 
@@ -456,7 +457,6 @@ public sealed partial class ReportTests
         Assert.True(model.IsEmpty);
         Assert.False(model.HasItems);
         Assert.Empty(model.Rows);
-        Assert.Equal("В этом месяце трат не было", model.EmptyTitle);
 
         model.Kind = CategoryKind.Income;
 
@@ -464,25 +464,25 @@ public sealed partial class ReportTests
     }
 
     /// <summary>
-    /// Пустой отчёт при валютном счёте объясняет правило, а не советует листать месяцы:
-    /// операции есть, в ленте видны, и пустота без объяснения выглядела бы поломкой.
+    /// Пустой отчёт при валютном счёте не советует листать месяцы: операции
+    /// в этом месяце есть, просто по счетам, которые в отчёт не входят.
     /// </summary>
     [Fact]
-    public async Task Пустой_отчёт_объясняет_почему_валютный_счёт_не_вошёл()
+    public async Task Пустой_отчёт_при_валютном_счёте_не_советует_листать()
     {
         await using TransactionFixture given = await TransactionFixture.CreateAsync();
 
         Guid euro = await given.AccountAsync("Карта евро", 1_000m, Currency.EUR);
 
         ReportViewModel before = await LoadedModelAsync(given);
-        Assert.Contains("другой месяц", before.EmptyHint, StringComparison.Ordinal);
+        Assert.Equal(UiTexts.ReportEmptyOtherMonth, before.EmptyHint);
 
         await given.SaveAsync(given.Expense(euro, 48m));
 
         ReportViewModel after = await LoadedModelAsync(given);
 
         Assert.True(after.IsEmpty);
-        Assert.Contains("рублёвые счета", after.EmptyHint, StringComparison.Ordinal);
+        Assert.Equal(UiTexts.ReportEmptyCurrency, after.EmptyHint);
     }
 
     /// <summary>

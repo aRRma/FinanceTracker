@@ -26,30 +26,28 @@
                         <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
                         <Entry Text="{Binding Name}" Placeholder="{x:Static texts:UiTexts.AccountNamePlaceholder}" />
 
-                        <BoxView Style="{StaticResource Divider}" />
-
                         <Label Text="{x:Static texts:UiTexts.AccountTypeLabel}" Style="{StaticResource CaptionLabel}" />
                         <Picker ItemsSource="{Binding TypeNames}" SelectedIndex="{Binding TypeIndex}" />
 
-                        <BoxView Style="{StaticResource Divider}" />
-
                         <Label Text="{x:Static texts:UiTexts.AccountCurrencyLabel}" Style="{StaticResource CaptionLabel}" />
-                        <Picker ItemsSource="{Binding CurrencyNames}" SelectedIndex="{Binding CurrencyIndex}"
-                                IsEnabled="{Binding CurrencyEditable}" />
-                        <Label Text="{x:Static texts:UiTexts.AccountCurrencyLocked}"
-                               Style="{StaticResource CaptionLabel}" IsVisible="{Binding CurrencyLocked}" />
-
-                        <BoxView Style="{StaticResource Divider}" />
+                        <!-- Погашенный список касание не пропускает к родителю, поэтому
+                             объяснение ловит прозрачная накладка поверх него -->
+                        <Grid>
+                            <Picker ItemsSource="{Binding CurrencyNames}" SelectedIndex="{Binding CurrencyIndex}"
+                                    IsEnabled="{Binding CurrencyEditable}" />
+                            <ContentView IsVisible="{Binding CurrencyLocked}" BackgroundColor="Transparent">
+                                <ContentView.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnLockedCurrencyTapped" />
+                                </ContentView.GestureRecognizers>
+                            </ContentView>
+                        </Grid>
 
                         <Label Text="{x:Static texts:UiTexts.AccountOpeningBalanceLabel}" Style="{StaticResource CaptionLabel}" />
                         <Entry Text="{Binding OpeningBalance}" Keyboard="Numeric" />
 
-                        <BoxView Style="{StaticResource Divider}" />
-
                         <Label Text="{x:Static texts:UiTexts.AccountOpenedOnLabel}" Style="{StaticResource CaptionLabel}" />
-                        <DatePicker Date="{Binding OpenedOnDate}" MaximumDate="{Binding LatestOpeningDate}" />
-                        <Label Text="{Binding OpenedOnHint}" Style="{StaticResource CaptionLabel}"
-                               IsVisible="{Binding HasOpenedOnHint}" />
+                        <DatePicker Date="{Binding OpenedOnDate}" MaximumDate="{Binding LatestOpeningDate}"
+                                    Opened="OnOpenedOnPickerOpened" />
                     </VerticalStackLayout>
                 </Border>
 

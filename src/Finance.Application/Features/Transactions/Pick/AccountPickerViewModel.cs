@@ -48,7 +48,7 @@ public sealed partial class AccountPickerViewModel : ObservableObject
     public partial string Title { get; private set; } = UiTexts.PickAccountTitle;
 
     /// <summary>
-    /// Читает счета к выбору: закрытые не предлагаются — записать на них нечего.
+    /// Читает счета к выбору: заблокированные не предлагаются — записать на них нечего.
     /// </summary>
     /// <param name="selected">Счёт, стоящий в форме сейчас, — он помечен галочкой.</param>
     /// <param name="excluded">Счёт, которого в списке быть не должно: списание при выборе «Куда».</param>

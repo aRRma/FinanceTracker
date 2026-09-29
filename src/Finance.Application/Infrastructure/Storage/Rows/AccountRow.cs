@@ -35,12 +35,12 @@ internal sealed class AccountRow : EntityRow
     public required DateOnly OpenedOn { get; set; }
 
     /// <summary>
-    /// «Скрыть из расчётов».
+    /// «Скрытый».
     /// </summary>
     public required bool ExcludedFromTotals { get; set; }
 
     /// <summary>
-    /// «Счёт закрыт».
+    /// «Счёт заблокирован».
     /// </summary>
     public required bool IsClosed { get; set; }
 
