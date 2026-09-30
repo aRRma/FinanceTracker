@@ -102,10 +102,16 @@ internal static class Documents
     // Каталоги сборки и служебные каталоги полны чужих документов: без отсева
     // проверки пошли бы по файлам пакетов и падали бы на чужом тексте.
     // Worktree Claude Code в .claude/worktrees — полная копия репозитория:
-    // каждый идентификатор в нём нашёлся бы определённым дважды.
+    // каждый идентификатор в нём нашёлся бы определённым дважды. Путь берётся
+    // от корня репозитория: сам запуск из worktree лежит под тем же каталогом,
+    // и по полному пути отсеялся бы весь репозиторий.
     // artifacts и apk-builds — рабочие папки вне git (снимки, выгрузки, сборки):
     // на чистой копии их нет, и проверка, упавшая на них, падала бы только здесь
-    private static bool Foreign(string file) =>
-        file.Split('/', '\\').Any(static part => part is ".git" or "bin" or "obj" or "node_modules" or "artifacts" or "apk-builds")
-        || file.Replace('\\', '/').Contains("/.claude/worktrees/", StringComparison.Ordinal);
+    private static bool Foreign(string file)
+    {
+        string relative = Path.GetRelativePath(Repository.Root, file).Replace('\\', '/');
+
+        return relative.Split('/').Any(static part => part is ".git" or "bin" or "obj" or "node_modules" or "artifacts" or "apk-builds")
+            || relative.StartsWith(".claude/worktrees/", StringComparison.Ordinal);
+    }
 }

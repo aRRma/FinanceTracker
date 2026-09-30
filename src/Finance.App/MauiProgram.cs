@@ -30,6 +30,8 @@ public static class MauiProgram
             // Фигуру своего типа MAUI не находит: обработчики фигур записаны
             // поимённо, и без этой строки любой экран со значком падает при открытии
             .ConfigureMauiHandlers(handlers => handlers.AddHandler<Icon, ShapeViewHandler>())
+            // Свой обработчик вкладок: без него каждый переход красит шапку чёрным
+            .ConfigureMauiHandlers(handlers => handlers.AddHandler<Shell, FinanceShellRenderer>())
             // FitLabel подбирает кегль по ширине: сумма в двенадцать разрядов при крупном
             // масштабе экрана иначе не помещается в строку. Прямой размер текста, который
             // MAUI ставит по FontSize, платформа при включённом автоподборе не применяет,

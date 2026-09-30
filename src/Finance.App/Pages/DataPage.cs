@@ -1,6 +1,8 @@
 using Finance.Application.Texts;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
+using AndroidX.Core.View;
+using AView = Android.Views.View;
 
 namespace Finance.App.Pages;
 
@@ -148,6 +150,45 @@ public abstract class DataPage : ContentPage
         }
 
         await Navigator.GoAsync("..");
+    }
+
+    /// <inheritdoc />
+    protected override void OnHandlerChanging(HandlerChangingEventArgs args)
+    {
+        base.OnHandlerChanging(args);
+
+        if (args.OldHandler?.PlatformView is AView old)
+        {
+            old.LayoutChange -= OnPlatformLayoutChange;
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnHandlerChanged()
+    {
+        base.OnHandlerChanged();
+
+        if (Handler?.PlatformView is AView view)
+        {
+            view.LayoutChange -= OnPlatformLayoutChange;
+            view.LayoutChange += OnPlatformLayoutChange;
+        }
+    }
+
+    /// <summary>
+    /// MAUI считает отступ под системные полосы по месту страницы на экране, но
+    /// только когда отступы раздаются, а смена высоты страницы их не раздаёт.
+    /// Страница, ушедшая под форму без панели вкладок, растягивалась до низа
+    /// экрана и получала отступ под жестовую полосу, а вернувшись над панелью,
+    /// так с ним и оставалась: «+ Операция» стояла выше на высоту полосы.
+    /// Поэтому смена высоты раздаёт отступы заново — уже по новому месту.
+    /// </summary>
+    private static void OnPlatformLayoutChange(object? sender, AView.LayoutChangeEventArgs e)
+    {
+        if (sender is AView view && e.Bottom - e.Top != e.OldBottom - e.OldTop)
+        {
+            ViewCompat.RequestApplyInsets(view);
+        }
     }
 
     /// <inheritdoc />

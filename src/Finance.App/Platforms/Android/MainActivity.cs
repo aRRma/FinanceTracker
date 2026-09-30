@@ -74,8 +74,8 @@ public class MainActivity : MauiAppCompatActivity
     }
 
     /// <summary>
-    /// Строка состояния — цветом шапки, значки на ней тёмные на светлой и светлые
-    /// на тёмной. Ресурсом это не задать: тема, выбранная в настройках, ночной
+    /// Строка состояния — цветом шапки, значки на ней и на панели навигации тёмные
+    /// на светлой и светлые на тёмной. Ресурсом это не задать: тема, выбранная в настройках, ночной
     /// режим платформы не переключает, и <c>values-night</c> её не увидит. Цвет
     /// берётся из палитры приложения, чтобы шапка и строка над ней не разошлись.
     /// </summary>
@@ -98,6 +98,12 @@ public class MainActivity : MauiAppCompatActivity
         WindowInsetsControllerCompat? controller = WindowCompat.GetInsetsController(window, decor);
 
         controller?.AppearanceLightStatusBars = !night;
+
+        // Трёхкнопочная панель навигации: своей подложки для контраста у неё нет —
+        // система рисовала светлую и в тёмной теме приложения, — под кнопками видна
+        // панель вкладок или подложка окна, а значки красятся по теме, как на строке состояния
+        window.NavigationBarContrastEnforced = false;
+        controller?.AppearanceLightNavigationBars = !night;
     }
 
     /// <summary>

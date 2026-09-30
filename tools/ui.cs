@@ -91,9 +91,15 @@ internal sealed partial class Ui
           db <sql>             запрос к базе приложения (копия файлов базы, WAL учтён)
           crash                падения из журнала: Java и .NET
           shot [файл]          снимок экрана, по умолчанию artifacts/shot.png — только для вёрстки
+          edges                нижние края прокручиваемых областей и кнопок Add*/Save* — запоминаются
+          same                 края снова и сверка с последним edges: сдвиг — ошибка (устаревший отступ снизу)
+          transit <цель|back>  переход под замедленной вдесятеро анимацией: кадры подряд, полоса под строкой
+                               состояния не должна чернеть; анимации после выключаются
         """;
 
     private readonly string _adb = Sdk("platform-tools", "adb.exe");
+
+    private string? _edges;
 
     public async Task RunAsync(string command, Queue<string> queue)
     {
@@ -116,13 +122,16 @@ internal sealed partial class Ui
             case "db": await QueryAsync(Take(queue, command)); break;
             case "crash": await CrashAsync(); break;
             case "shot": await ShotAsync(queue.Count > 0 && !IsCommand(queue.Peek()) ? queue.Dequeue() : "artifacts/shot.png"); break;
+            case "edges": _edges = await EdgesAsync(); Console.WriteLine($"края: {_edges}"); break;
+            case "same": await SameEdgesAsync(); break;
+            case "transit": await TransitAsync(Take(queue, command)); break;
             default: throw new UiException($"неизвестная команда «{command}». Справка: dotnet tools/ui.cs -- help");
         }
     }
 
     private static bool IsCommand(string word) =>
         word is "boot" or "run" or "start" or "stop" or "shortcut" or "dump" or "tap" or "tap2" or "hold"
-            or "wait" or "gone" or "text" or "key" or "swipe" or "db" or "crash" or "shot";
+            or "wait" or "gone" or "text" or "key" or "swipe" or "db" or "crash" or "shot" or "edges" or "same" or "transit";
 
     private static string Take(Queue<string> queue, string command) =>
         queue.Count > 0 ? queue.Dequeue() : throw new UiException($"команде {command} нужен аргумент");
@@ -212,7 +221,9 @@ internal sealed partial class Ui
         Console.WriteLine($"приложение на экране через {clock.Elapsed.TotalSeconds:0.0} с");
     }
 
-    private async Task<List<UiNode>> DumpAsync()
+    private async Task<List<UiNode>> DumpAsync() => Parse(await DumpXmlAsync());
+
+    private async Task<string> DumpXmlAsync()
     {
         for (int attempt = 1; ; attempt++)
         {
@@ -222,7 +233,7 @@ internal sealed partial class Ui
             if (end >= 0)
             {
                 // После XML uiautomator дописывает строку «UI hierchary dumped to: /dev/tty»
-                return Parse(raw[..(end + "</hierarchy>".Length)]);
+                return raw[..(end + "</hierarchy>".Length)];
             }
 
             if (attempt is 3)
@@ -531,6 +542,134 @@ internal sealed partial class Ui
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(file))!);
         await File.WriteAllBytesAsync(file, await AdbBytesAsync("exec-out", "screencap", "-p"));
         Console.WriteLine($"снимок: {file}");
+    }
+
+    /// <summary>
+    /// Нижние края прокручиваемых областей и кнопок Add*/Save*. Устаревший отступ снизу
+    /// (страница вернулась из-под экрана без панели вкладок) подписей не меняет — dump
+    /// его не видит, — а края поднимает на высоту системной полосы.
+    /// </summary>
+    private async Task<string> EdgesAsync()
+    {
+        List<string> edges = [];
+
+        foreach (XElement node in XDocument.Parse(await DumpXmlAsync()).Descendants("node"))
+        {
+            string kind = Attribute(node, "class");
+            string id = Attribute(node, "resource-id") is { } rid && rid.IndexOf(":id/", StringComparison.Ordinal) is var at and >= 0 ? rid[(at + 4)..] : string.Empty;
+            bool scroll = Attribute(node, "scrollable") is "true" || kind.EndsWith("RecyclerView", StringComparison.Ordinal) || kind.EndsWith("ScrollView", StringComparison.Ordinal);
+
+            if (scroll || id.StartsWith("Add", StringComparison.Ordinal) || id.StartsWith("Save", StringComparison.Ordinal))
+            {
+                string name = id.Length > 0 ? $"#{id}" : kind[(kind.LastIndexOf('.') + 1)..];
+                edges.Add($"{name} {Number(BoundsPattern().Match(Attribute(node, "bounds")), 4)}");
+            }
+        }
+
+        return string.Join(" | ", edges);
+    }
+
+    private async Task SameEdgesAsync()
+    {
+        string was = _edges ?? throw new UiException("same сверяет с прошлым edges, а его в этой цепочке не было");
+        string now = await EdgesAsync();
+
+        if (now != was)
+        {
+            throw new UiException($"края сдвинулись — устаревший отступ снизу?\n  было: {was}\n  стало: {now}");
+        }
+
+        Console.WriteLine($"края на месте: {now}");
+    }
+
+    /// <summary>
+    /// Переход под замедленной вдесятеро анимацией и снимки подряд. На время анимированного
+    /// перехода Shell заливает область страниц чёрным, и сквозь прозрачную шапку это видно
+    /// полосой под строкой состояния. С выключенными анимациями, как их ставит boot,
+    /// заливки нет вовсе — поэтому переход и замедляется, а не снимается как есть.
+    /// </summary>
+    private async Task TransitAsync(string target)
+    {
+        (int x, int y, string what) = target is "back" ? (0, 0, "назад") : await LocateAsync(target);
+
+        int black = 0;
+        string darkest = string.Empty;
+        int darkestSum = int.MaxValue;
+
+        await AnimationsAsync("10");
+
+        try
+        {
+            await AdbAsync("shell", target is "back" ? "input keyevent 4" : $"input tap {x} {y}");
+
+            for (int frame = 0; frame < 8; frame++)
+            {
+                (int r, int g, int b) = StripColor(await AdbBytesAsync("exec-out", "screencap"));
+
+                if (r + g + b < 30)
+                {
+                    black++;
+                }
+
+                if (r + g + b < darkestSum)
+                {
+                    darkestSum = r + g + b;
+                    darkest = $"{r},{g},{b}";
+                }
+            }
+        }
+        finally
+        {
+            // Сбой снимка не должен оставить эмулятор с анимацией вдесятеро медленнее
+            await AnimationsAsync("0");
+        }
+
+        // Замедленный переход ещё доигрывает: следующая команда цепочки ждала бы его
+        await Task.Delay(1500);
+
+        if (black > 0)
+        {
+            throw new UiException($"переход «{what}»: полоса под строкой состояния чёрная на {black} кадрах из 8");
+        }
+
+        Console.WriteLine($"переход «{what}»: чёрных кадров нет, самый тёмный цвет полосы {darkest}");
+    }
+
+    private async Task AnimationsAsync(string scale) =>
+        await AdbAsync("shell", $"settings put global window_animation_scale {scale}; settings put global transition_animation_scale {scale}; settings put global animator_duration_scale {scale}");
+
+    /// <summary>
+    /// Средний цвет полосы под строкой состояния из сырого снимка screencap: заголовок —
+    /// ширина, высота, формат и (с Android 9) цветовое пространство, дальше RGBA построчно.
+    /// Размер заголовка выводится из длины: так он не зависит от версии системы.
+    /// </summary>
+    private static (int R, int G, int B) StripColor(byte[] raw)
+    {
+        int width = raw.Length >= 8 ? BitConverter.ToInt32(raw, 0) : 0;
+        int height = raw.Length >= 8 ? BitConverter.ToInt32(raw, 4) : 0;
+        int header = raw.Length - (width * height * 4);
+
+        if (width <= 0 || height < 200 || header is < 8 or > 64)
+        {
+            throw new UiException($"снимок screencap не разобран: {raw.Length} байт, {width}×{height}");
+        }
+
+        long r = 0, g = 0, b = 0, n = 0;
+
+        // Полоса высотой в строку состояния посередине экрана: по краям — значки и часы
+        for (int y = 5; y < height / 20; y += 5)
+        {
+            for (int x = width * 3 / 8; x < width * 5 / 8; x += 10)
+            {
+                int at = header + (((y * width) + x) * 4);
+                r += raw[at];
+                g += raw[at + 1];
+                b += raw[at + 2];
+                n++;
+            }
+        }
+
+        return ((int)(r / n), (int)(g / n), (int)(b / n));
     }
 
     private async Task<string> SerialAsync() =>
