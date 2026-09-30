@@ -301,10 +301,10 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 
 <div class="wrap">
 <header class="masthead">
-<h1>Макеты экранов — итерация 5</h1>
+<h1>Макеты экранов</h1>
 <p>32 экрана: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
 <p>Все экраны одного размера — 330 × 690: экран Samsung Galaxy S25 Ultra (480 × 1040 логических пикселей) под строкой состояния, уменьшенный в 480/330 раза. Нижняя панель и клавиатура прижаты к низу, содержимое длиннее экрана обрезается, как на устройстве.</p>
-<p>Изменения пятой итерации: макеты сверены с приложением и перерисованы по нему. Группы строк — карточками на фоне страницы; значки — контуры Tabler из набора приложения; суммы с валютой в каждой строке; форма операции — в две карточки, дата чипами «Сегодня / Вчера / …», сохранение в шапке; карточки справочников сохраняются кнопкой под формой, значок выбирается сеткой на месте; отчёт — с переключателем видов своим цветом. B-04 стал системным календарём, C-01 — отказом без категории: ошибка «дата раньше открытия» до формы не доходит, дату при смене счёта форма сдвигает сама и сообщает об этом. Названия категорий — из стартового набора.</p>
+<p>Правдой считается приложение: макет сверяется с ним и правится в той же задаче, что и экран. Значки — контуры Tabler из набора приложения, названия категорий — из стартового набора.</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
 </header>
 
@@ -712,7 +712,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="note dim">Первый обмен передаёт всю накопленную историю. Дальше будут отправляться только изменения.</div>
     <div class="card">
       <div class="row"><svg class="ic" style="color:var(--pos)"><use href="#i-check"/></svg><div class="g"><div class="t">Счета</div></div><span class="num dim">5</span></div>
-      <div class="row"><svg class="ic" style="color:var(--pos)"><use href="#i-check"/></svg><div class="g"><div class="t">Категории</div></div><span class="num dim">74</span></div>
+      <div class="row"><svg class="ic" style="color:var(--pos)"><use href="#i-check"/></svg><div class="g"><div class="t">Категории</div></div><span class="num dim">85</span></div>
       <div class="row"><svg class="ic acc"><use href="#h-sync"/></svg><div class="g"><div class="t">Операции</div></div><span class="num dim">1 176 / 1 954</span></div>
     </div>
     <div class="note">Порядок отправки задан ссылками: счета и категории уходят раньше операций</div>
@@ -1157,7 +1157,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Доставка еды</h2></div>
   <div class="body" style="gap:4px">
-    <div class="note dim" style="font-size:12px" id="e3-cap">август 2026 · 8 операций</div>
+    <div class="note dim" style="font-size:12px" id="e3-cap">август 2026 · 4 операции</div>
     <div class="total neg" id="e3-total">-3 190,00 ₽</div>
   </div>
   <div class="row rrow" id="e3-samokat"><div class="g"><div class="t">Самокат</div><div class="s">28 августа · Карта основная</div></div><span class="num neg">-890,00 ₽</span></div>

@@ -29,7 +29,7 @@
 | Отчёт | `FR-RPT-*` в [requirements/03-functional.md](requirements/03-functional.md), экраны `E-01…E-04`, сценарий UC-19 |
 | Схема, миграции, индексы | [requirements/02-domain.md](requirements/02-domain.md), `NFR-01…NFR-08` и `NFR-26` в [requirements/05-quality.md](requirements/05-quality.md), `TECH-*` в [architecture.md](architecture.md) |
 | Инициализация базы | [requirements/04-preset.md](requirements/04-preset.md), [preset-rationale.md](preset-rationale.md), [data/preset.json](../data/preset.json) |
-| Темы, цвета, значки | `NFR-21…NFR-25` в [requirements/05-quality.md](requirements/05-quality.md), переключатель темы в [ui/mockups.html](ui/mockups.html) — эталон палитр |
+| Темы, цвета, значки | `NFR-21…NFR-25` в [requirements/05-quality.md](requirements/05-quality.md), переключатель темы в [ui/mockups.html](ui/mockups.html) — эталон палитр; перечень значков — [data/icons.json](../data/icons.json), контуры — [data/icon-paths.json](../data/icon-paths.json), значки макетов собирает `dotnet tools/mockup_icons.cs` |
 | Как назвать новое понятие | [../CONTEXT.md](../CONTEXT.md) — сначала словарь, потом код |
 | Перенос истории из Wallet | [ADR-0014](adr/0014-wallet-import-one-shot-through-domain-path.md) |
 | Сборка, тесты, эмулятор, экраны, тексты | навыки в `.claude/skills/` — список и когда какой загружать в [../CLAUDE.md](../CLAUDE.md) |
@@ -40,8 +40,7 @@
 - [adr/](adr/) — решения, которые дорого пересматривать, с обоснованием и отвергнутыми вариантами. Требование говорит «что», ADR — «почему»; имя файла — суть решения, ссылка на него — `ADR-NNNN`
 - [uncovered.md](uncovered.md) — функциональные требования без сценария и причина у каждого
 - [preset-rationale.md](preset-rationale.md) — почему стартовый набор категорий именно такой. Обоснование, не спецификация
-- [../tasks/README.md](../tasks/README.md) — долгие задачи со своим состоянием: у каждой своя папка с описанием, этапами, скриптами и данными
-- [design/audit-2026-09.md](design/audit-2026-09.md) — аудит интерфейса собранного приложения и открытые пункты. Наброски направлений оформления — [design/explorations.html](design/explorations.html), форма операции — [design/transaction-form.html](design/transaction-form.html): эскизы, а не эталон, в проверки макетов не входят. Раздавать их из корня репозитория (`dotnet tools/serve.cs -- . 8778`), иначе не найдутся шрифты и контуры значков
+- [../tasks/README.md](../tasks/README.md) — как вести долгую задачу со своим состоянием: папка на задачу, закрытая уходит в архив вне репозитория
 - [ui/prototype.html](ui/prototype.html) — интерактивный прототип, динамика сценариев. Собирается из макетов скриптом `tools/build_prototype.py`, руками не правится
 - [../PLAN.md](../PLAN.md) — этапы и чеклисты
 
