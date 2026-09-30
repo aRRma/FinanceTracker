@@ -31,7 +31,7 @@
 | Инициализация базы | [requirements/04-preset.md](requirements/04-preset.md), [preset-rationale.md](preset-rationale.md), [data/preset.json](../data/preset.json) |
 | Темы, цвета, значки | `NFR-21…NFR-25` в [requirements/05-quality.md](requirements/05-quality.md), переключатель темы в [ui/mockups.html](ui/mockups.html) — эталон палитр |
 | Как назвать новое понятие | [../CONTEXT.md](../CONTEXT.md) — сначала словарь, потом код |
-| Перенос истории из Wallet | [../tasks/wallet-import/README.md](../tasks/wallet-import/README.md), [ADR-0014](adr/0014-wallet-import-one-shot-through-domain-path.md) |
+| Перенос истории из Wallet | [ADR-0014](adr/0014-wallet-import-one-shot-through-domain-path.md) |
 | Сборка, тесты, эмулятор, экраны, тексты | навыки в `.claude/skills/` — список и когда какой загружать в [../CLAUDE.md](../CLAUDE.md) |
 
 ## Остальные документы
