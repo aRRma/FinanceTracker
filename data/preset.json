@@ -1,5 +1,5 @@
 {
-  "presetVersion": 1,
+  "presetVersion": 2,
   "namespace": "6f1b2c40-9a3d-5e77-8c21-4b0e7d5a9f13",
   "seededAtUtc": "2000-01-01T00:00:00Z",
   "note": "Ключи и namespace не меняются никогда: из них выводятся UUIDv5 идентификаторы категорий.",
@@ -106,7 +106,7 @@
       "subcategories": [
         {
           "key": "shopping.marketplace",
-          "name": "Маркетплейсы и техника",
+          "name": "Маркетплейсы",
           "icon": "device-laptop",
           "role": "normal",
           "id": "3f6e625e-b7fb-5104-84c3-8f7d3e66a9b3"
@@ -140,6 +140,27 @@
           "id": "7da71347-8f8d-5627-8d1f-3a9695cec51b"
         },
         {
+          "key": "shopping.photo",
+          "name": "Фото, фотосессии",
+          "icon": "camera",
+          "role": "normal",
+          "id": "5e82db05-95b8-5cfb-b14d-682da3feeca2"
+        },
+        {
+          "key": "shopping.stationery",
+          "name": "Канцелярия, рукоделие",
+          "icon": "pencil",
+          "role": "normal",
+          "id": "444be09f-42c2-52a8-b787-24ce9f5410ee"
+        },
+        {
+          "key": "shopping.cosmetics",
+          "name": "Косметика",
+          "icon": "basket",
+          "role": "normal",
+          "id": "320c334d-9c54-5444-aa0b-93bf0d66c3bb"
+        },
+        {
           "key": "shopping.other",
           "name": "Прочее",
           "icon": "dots",
@@ -159,14 +180,14 @@
       "subcategories": [
         {
           "key": "kids.classes",
-          "name": "Кружки и секции",
-          "icon": "ball-football",
+          "name": "Развитие, секции",
+          "icon": "book",
           "role": "normal",
           "id": "c58937f3-945a-56bb-8bca-66a95aa49543"
         },
         {
           "key": "kids.goods",
-          "name": "Детские товары",
+          "name": "Детские магазины",
           "icon": "horse-toy",
           "role": "normal",
           "id": "175d2442-c544-5307-81ef-4ef7ff1b3b70"
@@ -180,7 +201,7 @@
         },
         {
           "key": "kids.allowance",
-          "name": "Карманные и на счёт",
+          "name": "Детям на счёт",
           "icon": "wallet",
           "role": "normal",
           "id": "3c199f90-cb1b-5ced-811b-dc3247404aa0"
@@ -212,7 +233,7 @@
       "subcategories": [
         {
           "key": "transport.travel",
-          "name": "Самолёт и поезд",
+          "name": "Самолёт",
           "icon": "plane",
           "role": "normal",
           "id": "92cebeeb-ea33-55ff-bdf7-60a90ef01c19"
@@ -226,10 +247,31 @@
         },
         {
           "key": "transport.public",
-          "name": "Общественный транспорт",
-          "icon": "train",
+          "name": "Метро, автобус",
+          "icon": "bus",
           "role": "normal",
           "id": "a91fce50-80e1-546d-b840-6860b5a83ca2"
+        },
+        {
+          "key": "transport.train",
+          "name": "Поезд",
+          "icon": "train",
+          "role": "normal",
+          "id": "e875af81-b759-5b54-9f0f-a0813b6da4e2"
+        },
+        {
+          "key": "transport.commuter_train",
+          "name": "Электричка",
+          "icon": "ticket",
+          "role": "normal",
+          "id": "a6a21979-51e7-585e-98ae-d040bac2733e"
+        },
+        {
+          "key": "transport.scooter",
+          "name": "Самокат",
+          "icon": "scooter",
+          "role": "normal",
+          "id": "ba96dadb-adb7-5768-9ebf-073a3b57fcfd"
         },
         {
           "key": "transport.other",
@@ -264,18 +306,18 @@
           "id": "c414ee6a-edac-5203-a2e9-49dfe3f8b614"
         },
         {
-          "key": "car.insurance",
-          "name": "Страховка и налоги",
-          "icon": "shield-check",
-          "role": "normal",
-          "id": "c7d3c308-f2e2-5e34-ab7c-e8fe8fde497a"
-        },
-        {
           "key": "car.parking",
           "name": "Парковка",
           "icon": "parking",
           "role": "normal",
           "id": "369669be-241a-594f-a369-bd478602b8f0"
+        },
+        {
+          "key": "car.rental",
+          "name": "Аренда",
+          "icon": "key",
+          "role": "normal",
+          "id": "b5d729a9-4931-555d-a409-3b49784a7932"
         },
         {
           "key": "car.other",
@@ -297,7 +339,7 @@
       "subcategories": [
         {
           "key": "health.doctor",
-          "name": "Врачи",
+          "name": "Доктор",
           "icon": "stethoscope",
           "role": "normal",
           "id": "9399b97e-6ae6-508a-b9f2-565376a0570a"
@@ -322,6 +364,27 @@
           "icon": "test-pipe",
           "role": "normal",
           "id": "202e2c99-0550-5952-af5f-954308d776a1"
+        },
+        {
+          "key": "health.beauty",
+          "name": "Красота",
+          "icon": "flower",
+          "role": "normal",
+          "id": "1951027e-ad10-5af4-81c6-12b9782d8927"
+        },
+        {
+          "key": "health.spa",
+          "name": "Массаж, спа",
+          "icon": "massage",
+          "role": "normal",
+          "id": "dd458e2a-d1e8-5a6a-8e53-e2f9a3d6a7f4"
+        },
+        {
+          "key": "health.hospital",
+          "name": "Больница, процедуры",
+          "icon": "pill",
+          "role": "normal",
+          "id": "be6715cb-4232-5c50-a56d-5dd848a6e521"
         },
         {
           "key": "health.other",
@@ -356,32 +419,11 @@
           "id": "b52990d4-ad65-55e0-a573-c5c76b073e79"
         },
         {
-          "key": "leisure.charity",
-          "name": "Благотворительность",
-          "icon": "heart-handshake",
-          "role": "normal",
-          "id": "4b9761a6-3724-5e1a-944d-b21bb79cc126"
-        },
-        {
           "key": "leisure.sport",
           "name": "Бассейн и спорт",
           "icon": "barbell",
           "role": "normal",
           "id": "68e4bf63-4adc-508f-ba3a-5aeebab8827e"
-        },
-        {
-          "key": "leisure.photo",
-          "name": "Фотосессии",
-          "icon": "camera",
-          "role": "normal",
-          "id": "11c0943c-df4a-5502-b93a-05dbbaf66127"
-        },
-        {
-          "key": "leisure.spa",
-          "name": "Массаж и спа",
-          "icon": "massage",
-          "role": "normal",
-          "id": "6bc1167d-ee15-57f3-8589-c339580018c8"
         },
         {
           "key": "leisure.cinema",
@@ -428,6 +470,13 @@
           "icon": "wifi",
           "role": "normal",
           "id": "b3574472-20fb-567b-b1c5-dd9b562c25fb"
+        },
+        {
+          "key": "digital.games",
+          "name": "Игры",
+          "icon": "device-gamepad",
+          "role": "normal",
+          "id": "17dffc1e-9f7c-507b-99a6-27e5ceef06bd"
         },
         {
           "key": "digital.other",
@@ -483,6 +532,27 @@
           "id": "e88af86f-ba97-5c32-bada-b857b89209c6"
         },
         {
+          "key": "finance.charity",
+          "name": "Благотворительность",
+          "icon": "heart-handshake",
+          "role": "normal",
+          "id": "84a197af-f21a-5ee0-b7df-965a88689540"
+        },
+        {
+          "key": "finance.postage",
+          "name": "Почта, доставка",
+          "icon": "truck-delivery",
+          "role": "normal",
+          "id": "24c255dc-2f05-5d6c-b1fa-558bcde7ec9b"
+        },
+        {
+          "key": "finance.investments",
+          "name": "Инвестиции",
+          "icon": "trending-up",
+          "role": "normal",
+          "id": "8e11594e-ae63-5ee1-8141-34a747a3e57c"
+        },
+        {
           "key": "finance.other",
           "name": "Прочее",
           "icon": "dots",
@@ -505,13 +575,6 @@
           "icon": "cash",
           "role": "normal",
           "id": "10bb615c-9e65-5847-9a61-8d40ed2a72bd"
-        },
-        {
-          "key": "income.family",
-          "name": "Поступления от близких",
-          "icon": "users",
-          "role": "normal",
-          "id": "8068a39b-61e1-58fb-8195-a64943160ce3"
         },
         {
           "key": "income.gifts",
@@ -540,6 +603,20 @@
           "icon": "tag",
           "role": "normal",
           "id": "e8bec7b5-3e93-5dee-9c92-a95de9f4dcb3"
+        },
+        {
+          "key": "income.benefits",
+          "name": "Пособия",
+          "icon": "heart-handshake",
+          "role": "normal",
+          "id": "c8eb43d2-ee31-55fc-9c01-e495773bd62a"
+        },
+        {
+          "key": "income.rental",
+          "name": "Сдача и аренда",
+          "icon": "key",
+          "role": "normal",
+          "id": "2c2f7c9a-c7d4-57ee-8a76-a4e9b56bd9dd"
         },
         {
           "key": "income.other",

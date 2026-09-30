@@ -13,7 +13,7 @@
 | `FR-ACC-*` `FR-CAT-*` `FR-TRX-*` `FR-PAY-*` `FR-BAL-*` `FR-LED-*` `FR-RPT-*` `FR-SET-*` | [requirements/03-functional.md](requirements/03-functional.md) | Что приложение умеет делать |
 | `SEED-*` | [requirements/04-preset.md](requirements/04-preset.md) | Инициализация базы: стартовые категории |
 | `NFR-*` | [requirements/05-quality.md](requirements/05-quality.md) | Производительность, надёжность, время, оформление |
-| `SYN-*` `FR-SYN-*` | [requirements/06-sync-deferred.md](requirements/06-sync-deferred.md) | **Вне MVP.** Обмен между устройствами |
+| `SYN-*` | [requirements/06-sync-deferred.md](requirements/06-sync-deferred.md); `FR-SYN-*` — в конце [requirements/03-functional.md](requirements/03-functional.md) | **Вне MVP.** Обмен между устройствами |
 | `TECH-*` | [architecture.md](architecture.md) | Состав проектов, слои, стек, ловушки реализации |
 | `UC-*` | [use-cases.md](use-cases.md) | Сценарии использования |
 | `A-*` `B-*` `C-*` `D-*` `E-*` | [ui/mockups.html](ui/mockups.html) | Экраны: каркас · ввод · состояния · справочники · отчёт |
@@ -27,24 +27,24 @@
 | Доменные типы, инварианты, фабрики | [requirements/02-domain.md](requirements/02-domain.md), [architecture.md](architecture.md) |
 | Экран или форма ввода | [requirements/03-functional.md](requirements/03-functional.md), [use-cases.md](use-cases.md), нужный экран в [ui/mockups.html](ui/mockups.html) |
 | Отчёт | `FR-RPT-*` в [requirements/03-functional.md](requirements/03-functional.md), экраны `E-01…E-04`, сценарий UC-19 |
-| Схема, миграции, индексы | [requirements/02-domain.md](requirements/02-domain.md), `NFR-01…NFR-08` в [requirements/05-quality.md](requirements/05-quality.md), `TECH-*` в [architecture.md](architecture.md) |
+| Схема, миграции, индексы | [requirements/02-domain.md](requirements/02-domain.md), `NFR-01…NFR-08` и `NFR-26` в [requirements/05-quality.md](requirements/05-quality.md), `TECH-*` в [architecture.md](architecture.md) |
 | Инициализация базы | [requirements/04-preset.md](requirements/04-preset.md), [preset-rationale.md](preset-rationale.md), [data/preset.json](../data/preset.json) |
-| Темы и цвета | `NFR-21…NFR-25` в [requirements/05-quality.md](requirements/05-quality.md), переключатель темы в [ui/mockups.html](ui/mockups.html) — эталон палитр |
+| Темы, цвета, значки | `NFR-21…NFR-25` в [requirements/05-quality.md](requirements/05-quality.md), переключатель темы в [ui/mockups.html](ui/mockups.html) — эталон палитр |
 | Как назвать новое понятие | [../CONTEXT.md](../CONTEXT.md) — сначала словарь, потом код |
+| Перенос истории из Wallet | [../tasks/wallet-import/README.md](../tasks/wallet-import/README.md), [ADR-0014](adr/0014-wallet-import-one-shot-through-domain-path.md) |
+| Сборка, тесты, эмулятор, экраны, тексты | навыки в `.claude/skills/` — список и когда какой загружать в [../CLAUDE.md](../CLAUDE.md) |
 
 ## Остальные документы
 
 - [decisions.md](decisions.md) — что сознательно не делается, чем рискуем, что ещё не решено
-- [adr/](adr/) — решения, которые дорого пересматривать, с обоснованием и отвергнутыми вариантами. Требование говорит «что», ADR — «почему»:
-  - ADR-0001 справочник мест назван `Place`, отраслевое имя отвергнуто · ADR-0002 идентификаторы UUIDv7 с клиента, в SQLite текстом · ADR-0003 поля обмена и мягкое удаление до появления обмена · ADR-0004 деньги `decimal` с валютой в типе, суммы по валютам не существует · ADR-0005 два уровня категорий, место вместо третьего · ADR-0006 детерминированные ключи стартового набора и давняя метка времени · ADR-0007 MVP на одном устройстве, сервер без доменной логики · ADR-0008 слайсы по функциям вне MAUI, без посредника и репозиториев · ADR-0009 календарные даты без времени · ADR-0010 начальный остаток — поле счёта · ADR-0011 деньги хранятся целыми копейками · ADR-0012 текст в ресурсах, культура параметром · ADR-0013 универсальная группа принимает оба вида, возврат вычитается из расхода
+- [adr/](adr/) — решения, которые дорого пересматривать, с обоснованием и отвергнутыми вариантами. Требование говорит «что», ADR — «почему»; имя файла — суть решения, ссылка на него — `ADR-NNNN`
+- [uncovered.md](uncovered.md) — функциональные требования без сценария и причина у каждого
 - [preset-rationale.md](preset-rationale.md) — почему стартовый набор категорий именно такой. Обоснование, не спецификация
-- [../tasks/README.md](../tasks/README.md) — долгие задачи со своим состоянием: у каждой своя папка с описанием, этапами, скриптами и данными. Сейчас их две: перенос из стороннего приложения Wallet и работы по схеме базы
-- [design/audit-2026-09.md](design/audit-2026-09.md) — аудит интерфейса собранного приложения: находки по экранам и что с ними делать. Наброски трёх направлений оформления — [design/explorations.html](design/explorations.html), по четыре экрана в светлой и тёмной теме; в проверки макетов не входят, это эскизы, а не эталон. Форма операции после перестройки — [design/transaction-form.html](design/transaction-form.html): выбранный вариант «Б» в двух палитрах видов, взята первая
+- [../tasks/README.md](../tasks/README.md) — долгие задачи со своим состоянием: у каждой своя папка с описанием, этапами, скриптами и данными
+- [design/audit-2026-09.md](design/audit-2026-09.md) — аудит интерфейса собранного приложения и открытые пункты. Наброски направлений оформления — [design/explorations.html](design/explorations.html), форма операции — [design/transaction-form.html](design/transaction-form.html): эскизы, а не эталон, в проверки макетов не входят. Раздавать их из корня репозитория (`dotnet tools/serve.cs -- . 8778`), иначе не найдутся шрифты и контуры значков
 - [ui/prototype.html](ui/prototype.html) — интерактивный прототип, динамика сценариев. Собирается из макетов скриптом `tools/build_prototype.py`, руками не правится
 - [../PLAN.md](../PLAN.md) — этапы и чеклисты
 
 ## Границы MVP
 
-Одно устройство одного пользователя, без сети. Обмен с сервером отложен целиком — [requirements/06-sync-deferred.md](requirements/06-sync-deferred.md) сохранён потому, что поля схемы под него заведены сразу, и переделывать базу задним числом не придётся.
-
-Отчёт о расходах и доходах по группам за месяц, наоборот, в MVP входит.
+Что входит в MVP и что нет — [requirements/01-scope.md](requirements/01-scope.md). Обмен с сервером отложен целиком, но [requirements/06-sync-deferred.md](requirements/06-sync-deferred.md) сохранён: поля схемы под него заведены сразу.

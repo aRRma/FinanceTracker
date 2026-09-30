@@ -35,8 +35,8 @@ public sealed class PresetTests
     public void Набор_разобран_целиком()
     {
         Assert.Equal(12, Set.Groups.Count);
-        Assert.Equal(62, Set.Groups.Sum(group => group.Subcategories.Count));
-        Assert.Equal(74, Set.All().Count());
+        Assert.Equal(73, Set.Groups.Sum(group => group.Subcategories.Count));
+        Assert.Equal(85, Set.All().Count());
         Assert.NotEqual(Guid.Empty, Set.Namespace);
         Assert.All(Set.All(), category => Assert.NotEqual(Guid.Empty, category.Id));
     }
@@ -236,7 +236,7 @@ public sealed class PresetTests
     /// <param name="spoiled">Чем он заменяется.</param>
     [Theory]
     [InlineData("\"key\": \"food\",", "\"key\": \"food\", \"kidn\": \"expense\",")]
-    [InlineData("\"presetVersion\": 1,", "")]
+    [InlineData("\"presetVersion\": 2,", "")]
     [InlineData("\"kind\": \"expense\"", "\"kind\": \"expens\"")]
     public void Испорченный_набор_не_разбирается(string original, string spoiled)
     {

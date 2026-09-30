@@ -14,6 +14,7 @@ using Finance.Application.Features.Settings.Appearance;
 using Finance.Application.Features.Settings.TimeZones;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
+using Finance.Application.Features.WalletImport;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
@@ -125,6 +126,7 @@ public static class FinanceServices
         services.AddSingleton<IDeleteTransactionHandler, DeleteTransactionHandler>();
         services.AddSingleton<IReportQuery, ReportQuery>();
         services.AddSingleton<IFrequentCategoriesQuery, FrequentCategoriesQuery>();
+        services.AddSingleton<IWalletImportHandler, WalletImportHandler>();
 
         // Один на приложение: сюда экран выбора кладёт решение, а форма операции
         // забирает его при возвращении. Экраны при этом живут порознь
@@ -152,5 +154,6 @@ public static class FinanceServices
         services.AddTransient<AppearanceViewModel>();
         services.AddTransient<TimeZoneViewModel>();
         services.AddTransient<AboutViewModel>();
+        services.AddTransient<WalletImportViewModel>();
     }
 }

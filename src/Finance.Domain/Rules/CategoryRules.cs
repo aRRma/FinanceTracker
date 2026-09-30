@@ -89,8 +89,8 @@ public static class CategoryRules
         EnsureBelongsToGroup(subcategory, currentGroup, nameof(currentGroup));
 
         // Служебная группа замкнута на своей единственной подкатегории: приёмника
-        // ей не положено, а из отчёта она исключена, поэтому переехавшая
-        // категория пропала бы из него молча
+        // ей не положено, а переехавшая категория оказалась бы в отчёте
+        // под служебной группой
         DomainException.ThrowIf(
             newGroup.Role is CategoryRole.Service,
             Invariant.ServiceGroupClosedToMoves,
