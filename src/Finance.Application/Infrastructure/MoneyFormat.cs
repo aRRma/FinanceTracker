@@ -10,6 +10,14 @@ namespace Finance.Application.Infrastructure;
 /// </summary>
 public static class MoneyFormat
 {
+    /// <summary>
+    /// Число в формате сумм, но без знака валюты: так форма операции показывает
+    /// набранное, пока счёт не выбран и валюты ещё нет.
+    /// </summary>
+    /// <param name="amount">Число.</param>
+    /// <returns>Число с разрядами и двумя знаками после запятой: <c>82 430,50</c>.</returns>
+    public static string Number(decimal amount) => amount.ToString("N", UiCulture.Money);
+
     extension(Currency currency)
     {
         /// <summary>

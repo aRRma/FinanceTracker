@@ -33,9 +33,18 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     private readonly IAccountsQuery _accounts;
     private readonly IClock _clock;
     private readonly TransactionPicks _picks;
+    private readonly IChangeNotifier _changes;
 
     private IReadOnlyList<AccountOption> _allAccounts = [];
     private IReadOnlyList<CategoryOption> _allCategories = [];
+
+    // Правимая операция: её счета остаются в выборе, даже заблокированные
+    private TransactionCard? _editing;
+
+    // Номер изменения счетов, с которым прочитан список, и поле, ждущее счёт,
+    // заведённый из формы: true — счёт зачисления, false — списания
+    private long _accountsVersion;
+    private bool? _awaitedAccountIsTarget;
 
     private Snapshot _saved;
 
@@ -49,6 +58,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <param name="accounts">Балансы счетов — для текста подтверждения удаления.</param>
     /// <param name="clock">Часы: «сегодня» пользователя.</param>
     /// <param name="picks">Выбор, вернувшийся с экрана выбора счёта, категории или места.</param>
+    /// <param name="changes">Номера изменений данных — узнать, заведён ли счёт, пока форма ждала.</param>
     public TransactionViewModel(
         ITransactionFormQuery form,
         ITransactionCardQuery card,
@@ -56,7 +66,8 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         IDeleteTransactionHandler delete,
         IAccountsQuery accounts,
         IClock clock,
-        TransactionPicks picks)
+        TransactionPicks picks,
+        IChangeNotifier changes)
     {
         ArgumentNullException.ThrowIfNull(form);
         ArgumentNullException.ThrowIfNull(card);
@@ -65,6 +76,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         ArgumentNullException.ThrowIfNull(accounts);
         ArgumentNullException.ThrowIfNull(clock);
         ArgumentNullException.ThrowIfNull(picks);
+        ArgumentNullException.ThrowIfNull(changes);
 
         _form = form;
         _card = card;
@@ -73,6 +85,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         _accounts = accounts;
         _clock = clock;
         _picks = picks;
+        _changes = changes;
 
         OccurredOn = clock.Today;
     }
@@ -197,7 +210,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Главная цифра формы: итог в валюте счёта списания со знаком вида — расход
     /// с минусом, доход с плюсом, перевод без знака, как в ленте. Пустое поле
-    /// показывает ноль в валюте: главная цифра формы не должна пропадать.
+    /// показывает ноль: главная цифра формы не должна пропадать. Пока счёт не выбран,
+    /// валюты нет и число идёт без её знака — пустое место вместо набранного
+    /// читалось бы как неработающая клавиатура.
     /// Пока действие не закрыто, вместо итога — подсказка про «=»: считать за
     /// пользователя раньше, чем он попросил, значит показывать не тот итог,
     /// который он набирает, а минус вида перед выражением читался бы вычитанием.
@@ -207,7 +222,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Каким тоном показана главная цифра формы.
     /// </summary>
-    public AmountTone AmountTone => Tone(Amount, SourceAccount?.Currency, Kind);
+    public AmountTone AmountTone => Tone(Amount, Kind);
 
     /// <summary>
     /// Сумма зачисления крупно. Знака у неё нет: зачисление бывает только у перевода.
@@ -217,16 +232,16 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Каким тоном показана сумма зачисления.
     /// </summary>
-    public AmountTone TargetAmountTone => Tone(TargetAmount, TargetAccount?.Currency, TransactionKind.Transfer);
+    public AmountTone TargetAmountTone => Tone(TargetAmount, TransactionKind.Transfer);
 
     /// <summary>
-    /// Сохранять есть что: счёт выбран и суммы набраны до конца. Кнопка сохранения
-    /// на панели заголовка гаснет, а не отказывает после нажатия. Незакрытое
-    /// действие сохранению не мешает: записывается тот же итог, что показала бы «=».
+    /// Сохранять есть что: суммы набраны до конца. Без набранной суммы кнопка
+    /// сохранения гаснет, а невыбранный счёт или категория её не гасят: погашенная
+    /// кнопка не говорит, чего не хватает, а нажатие называет это.
+    /// Незакрытое действие сохранению не мешает: записывается тот же итог, что показала бы «=».
     /// </summary>
     public bool CanSave =>
         !IsSaving
-        && SourceAccount is not null
         && AmountExpression.TryEvaluate(Amount, out decimal amount)
         && amount > 0m
         && (!NeedsTargetAmount
@@ -260,7 +275,25 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     [NotifyPropertyChangedFor(nameof(CanSave))]
     [NotifyPropertyChangedFor(nameof(SourceAccountCaption))]
     [NotifyPropertyChangedFor(nameof(SourceAccountIcon))]
+    [NotifyPropertyChangedFor(nameof(HasSourceAccount))]
     public partial AccountOption? SourceAccount { get; set; }
+
+    /// <summary>
+    /// Счёт списания выбран. Иначе поле отмечено как обязательное: без счёта
+    /// операцию не записать, а подставить нечего — счетов нет или все заблокированы.
+    /// </summary>
+    public bool HasSourceAccount => SourceAccount is not null;
+
+    /// <summary>
+    /// Выбирать счёт не из чего: открытых счетов нет. Касание поля ведёт тогда
+    /// сразу в карточку нового счёта, а не на пустой экран выбора.
+    /// </summary>
+    public bool NeedsNewAccount => Accounts.Count is 0;
+
+    /// <summary>
+    /// Счёт зачисления выбирать не из чего: кроме счёта списания, открытых счетов нет.
+    /// </summary>
+    public bool NeedsNewTargetAccount => TargetAccounts.Count is 0;
 
     /// <summary>
     /// Счёт зачисления — у перевода.
@@ -299,14 +332,17 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     public partial string PlaceName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Счёт списания в строке-поле: название, пока не выбран — приглашение выбрать.
+    /// Счёт списания в строке-поле: название, пока не выбран — приглашение выбрать,
+    /// а если выбирать не из чего — добавить.
     /// </summary>
-    public string SourceAccountCaption => SourceAccount?.Name ?? UiTexts.CommonChoose;
+    public string SourceAccountCaption =>
+        SourceAccount?.Name ?? (NeedsNewAccount ? UiTexts.TransactionAccountAdd : UiTexts.CommonChoose);
 
     /// <summary>
     /// Счёт зачисления в строке-поле.
     /// </summary>
-    public string TargetAccountCaption => TargetAccount?.Name ?? UiTexts.CommonChoose;
+    public string TargetAccountCaption =>
+        TargetAccount?.Name ?? (NeedsNewTargetAccount ? UiTexts.TransactionAccountAdd : UiTexts.CommonChoose);
 
     /// <summary>
     /// Подкатегория в строке-поле: только выбранное название, без группы —
@@ -457,9 +493,10 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     public DateTime EarliestDate => Earliest().ToDateTime(TimeOnly.MinValue);
 
     /// <summary>
-    /// Смена счёта поменяла в форме то, чего пользователь не трогал: дату или валюту.
-    /// Сообщение показывается коротко и не требует ответа: без него операция молча
-    /// ушла бы другим днём или в другой валюте.
+    /// Смена счёта поменяла в форме то, чего пользователь не трогал: дату или валюту,
+    /// либо сохранение не состоялось — не выбран счёт или категория. Сообщение
+    /// показывается коротко и не требует ответа: без него операция молча ушла бы
+    /// другим днём или в другой валюте, а нажатие «Сохранить» ничего бы не сделало.
     /// </summary>
     public event Action<string>? Notified;
 
@@ -528,6 +565,10 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         TransactionKind? kind = null,
         CancellationToken cancellationToken = default)
     {
+        // Номер берётся до чтения: счёт, заведённый во время чтения, даст номер
+        // новее, и на возврате список перечитается ещё раз, а не потеряет его
+        _accountsVersion = _changes.VersionOf(DataChange.Accounts);
+
         // ConfigureAwait(false) здесь недопустим: следом наполняются привязанные
         // коллекции, а их правка вне потока интерфейса роняет разметку
         TransactionForm form = await _form.ReadAsync(cancellationToken);
@@ -537,6 +578,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
         TransactionCard? card = key is { } existing ? await _card.ReadAsync(existing, cancellationToken) : null;
 
+        _editing = card;
         Key = card?.Key;
         OnPropertyChanged(nameof(IsExisting));
         OnPropertyChanged(nameof(Title));
@@ -595,9 +637,13 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
         Error = null;
 
+        // Невыбранное поле — счёт или категория — называется всплывающим
+        // сообщением, а не карточкой над клавиатурой: правило не нарушено, поле
+        // и так отмечено, и сообщение лишь отвечает на нажатие, которое ничего
+        // не сделало. Карточка остаётся нарушенным правилам и недобранной сумме
         if (SourceAccount is not { } source)
         {
-            Error = UiTexts.TransactionChooseAccount;
+            Notified?.Invoke(NeedsNewAccount ? UiTexts.TransactionAddAccountFirst : UiTexts.TransactionChooseAccount);
 
             return false;
         }
@@ -625,14 +671,16 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
         if (IsTransfer && TargetAccount is null)
         {
-            Error = UiTexts.TransactionChooseTargetAccount;
+            Notified?.Invoke(NeedsNewTargetAccount
+                ? UiTexts.TransactionAddTargetAccountFirst
+                : UiTexts.TransactionChooseTargetAccount);
 
             return false;
         }
 
         if (IsNotTransfer && Category is null)
         {
-            Error = UiTexts.TransactionChooseCategory;
+            Notified?.Invoke(UiTexts.TransactionChooseCategory);
 
             return false;
         }
@@ -883,6 +931,59 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     }
 
     /// <summary>
+    /// Форма уходит заводить счёт: выбирать не из чего. Заведённый счёт встанет
+    /// в то поле, ради которого уходили, — набранная сумма при этом остаётся.
+    /// </summary>
+    /// <param name="target">Счёт нужен для зачисления перевода, а не для списания.</param>
+    public void AwaitNewAccount(bool target) => _awaitedAccountIsTarget = target;
+
+    /// <summary>
+    /// Забирает счёт, заведённый, пока форма ждала: перечитывает список счетов и ставит
+    /// новый счёт в ждавшее поле. Форма при возврате не перечитывается целиком —
+    /// стёрлось бы набранное, — а без перечитывания нового счёта нет в её списке.
+    /// Вернулись без нового счёта — ничего не меняется.
+    /// </summary>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    public async Task TakeNewAccountAsync(CancellationToken cancellationToken = default)
+    {
+        bool? target = _awaitedAccountIsTarget;
+        _awaitedAccountIsTarget = null;
+
+        long version = _changes.VersionOf(DataChange.Accounts);
+
+        if (target is not { } forTarget || version == _accountsVersion)
+        {
+            return;
+        }
+
+        _accountsVersion = version;
+
+        HashSet<Guid> known = [.. _allAccounts.Select(static account => account.Key)];
+
+        // ConfigureAwait(false) недопустим: следом правятся привязанные коллекции
+        TransactionForm form = await _form.ReadAsync(cancellationToken);
+
+        _allAccounts = form.Accounts;
+        FillAccounts(_editing);
+
+        AccountOption? added = Accounts.FirstOrDefault(account => !known.Contains(account.Key));
+
+        if (added is null)
+        {
+            return;
+        }
+
+        if (!forTarget)
+        {
+            SourceAccount = added;
+        }
+        else if (IsTransfer && TargetAccounts.Contains(added))
+        {
+            TargetAccount = added;
+        }
+    }
+
+    /// <summary>
     /// Смена вида стирает то, чего у нового вида не бывает: категорию и место
     /// у перевода, второй счёт у дохода и расхода. Скрытого состояния «до возврата
     /// прежнего вида» нет намеренно — оно уехало бы в базу незамеченным.
@@ -926,6 +1027,8 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
             }
         }
 
+        OnPropertyChanged(nameof(NeedsNewAccount));
+        OnPropertyChanged(nameof(SourceAccountCaption));
         FillTargetAccounts();
     }
 
@@ -943,6 +1046,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
                 TargetAccounts.Add(account);
             }
         }
+
+        OnPropertyChanged(nameof(NeedsNewTargetAccount));
+        OnPropertyChanged(nameof(TargetAccountCaption));
     }
 
     /// <summary>
@@ -1021,28 +1127,30 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         return null;
     }
 
-    private static string Preview(string expression, Currency? currency) =>
-        currency is not { } known ? string.Empty
-        : expression.Length is 0 ? Money.Restore(0m, known).Display
-        : AmountInput.HasOperation(expression) ? string.Empty
-        : AmountExpression.TryEvaluate(expression, out decimal value) ? Money.Restore(value, known).Display
-        : string.Empty;
-
     // Знак вида ставится только ненулевому итогу: «−0,00 ₽» читался бы как долг
-    private static string Hero(string expression, Currency? currency, TransactionKind kind) =>
-        AmountInput.HasOperation(expression) ? UiTexts.TransactionPressEquals
-        : currency is not { } known || !AmountExpression.TryEvaluate(expression, out decimal value) || value is 0m
-            ? Preview(expression, currency)
-        : kind switch
+    private static string Hero(string expression, Currency? currency, TransactionKind kind)
+    {
+        if (AmountInput.HasOperation(expression))
         {
-            TransactionKind.Expense => Money.Restore(-value, known).DisplaySigned,
-            TransactionKind.Income => Money.Restore(value, known).DisplaySigned,
-            _ => Money.Restore(value, known).Display,
-        };
+            return UiTexts.TransactionPressEquals;
+        }
+
+        decimal value = 0m;
+
+        if (expression.Length > 0 && !AmountExpression.TryEvaluate(expression, out value))
+        {
+            return string.Empty;
+        }
+
+        decimal signed = kind is TransactionKind.Expense && value > 0m ? -value : value;
+        string shown = currency is { } known ? Money.Restore(signed, known).Display : MoneyFormat.Number(signed);
+
+        return kind is TransactionKind.Income && value > 0m ? $"+{shown}" : shown;
+    }
 
     // Незакрытое действие тона не получает: итог тогда скрыт, на его месте подсказка
-    private static AmountTone Tone(string expression, Currency? currency, TransactionKind kind) =>
-        currency is null || !AmountExpression.TryEvaluate(expression, out decimal value) || value is 0m
+    private static AmountTone Tone(string expression, TransactionKind kind) =>
+        !AmountExpression.TryEvaluate(expression, out decimal value) || value is 0m
             ? AmountTone.Placeholder
         : kind switch
         {

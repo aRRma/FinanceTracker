@@ -163,6 +163,13 @@
                             у счёта — его типа, у категории — самой подкатегории на плашке
                             цвета вида. У перевода справа вместо категории — счёт зачисления.
                         -->
+                        <!--
+                            Незаполненное обязательное поле — тихая метка: кольцо цветом
+                            действия вокруг значка, точка у подписи и подпись тем же цветом.
+                            Рамка и заливка отвергнуты: категория пуста на каждой новой
+                            операции, и громкая подсветка встречала бы каждый раз. Чего
+                            не хватает при сохранении, называет всплывающее сообщение.
+                        -->
                         <Grid ColumnDefinitions="*,1,*">
                             <Grid Grid.Column="0" Padding="12,8" ColumnDefinitions="Auto,*" ColumnSpacing="10"
                                   MinimumHeightRequest="58">
@@ -170,11 +177,43 @@
                                     <TapGestureRecognizer Tapped="OnPickAccount" />
                                 </Grid.GestureRecognizers>
                                 <Border Grid.Column="0" Style="{StaticResource FieldBadge}">
-                                    <controls:Icon Key="{Binding SourceAccountIcon}" HorizontalOptions="Center" />
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding HasSourceAccount}" Value="False">
+                                            <Setter Property="BackgroundColor"
+                                                    Value="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}" />
+                                            <Setter Property="Stroke"
+                                                    Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                            <Setter Property="StrokeThickness" Value="1.5" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <controls:Icon Key="{Binding SourceAccountIcon}" HorizontalOptions="Center">
+                                        <controls:Icon.Triggers>
+                                            <DataTrigger TargetType="controls:Icon" Binding="{Binding HasSourceAccount}" Value="False">
+                                                <Setter Property="Stroke"
+                                                        Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                            </DataTrigger>
+                                        </controls:Icon.Triggers>
+                                    </controls:Icon>
                                 </Border>
                                 <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                    <Label Text="{Binding SourceLabel}" Style="{StaticResource CaptionLabel}" />
-                                    <Label Text="{Binding SourceAccountCaption}" Style="{StaticResource FieldValue}" />
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label Text="{Binding SourceLabel}" Style="{StaticResource CaptionLabel}" />
+                                        <BoxView Style="{StaticResource RequiredDot}">
+                                            <BoxView.Triggers>
+                                                <DataTrigger TargetType="BoxView" Binding="{Binding HasSourceAccount}" Value="False">
+                                                    <Setter Property="IsVisible" Value="True" />
+                                                </DataTrigger>
+                                            </BoxView.Triggers>
+                                        </BoxView>
+                                    </HorizontalStackLayout>
+                                    <Label Text="{Binding SourceAccountCaption}" Style="{StaticResource FieldValue}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding HasSourceAccount}" Value="False">
+                                                <Setter Property="TextColor"
+                                                        Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
                                 </VerticalStackLayout>
                             </Grid>
 
@@ -188,6 +227,13 @@
                                 </Grid.GestureRecognizers>
                                 <Border Grid.Column="0" Style="{StaticResource FieldBadge}">
                                     <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding HasCategory}" Value="False">
+                                            <Setter Property="BackgroundColor"
+                                                    Value="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}" />
+                                            <Setter Property="Stroke"
+                                                    Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                            <Setter Property="StrokeThickness" Value="1.5" />
+                                        </DataTrigger>
                                         <MultiTrigger TargetType="Border">
                                             <MultiTrigger.Conditions>
                                                 <BindingCondition Binding="{Binding HasCategory}" Value="True" />
@@ -207,6 +253,10 @@
                                     </Border.Triggers>
                                     <controls:Icon Key="{Binding CategoryIcon}" HorizontalOptions="Center">
                                         <controls:Icon.Triggers>
+                                            <DataTrigger TargetType="controls:Icon" Binding="{Binding HasCategory}" Value="False">
+                                                <Setter Property="Stroke"
+                                                        Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                            </DataTrigger>
                                             <MultiTrigger TargetType="controls:Icon">
                                                 <MultiTrigger.Conditions>
                                                     <BindingCondition Binding="{Binding HasCategory}" Value="True" />
@@ -227,7 +277,16 @@
                                     </controls:Icon>
                                 </Border>
                                 <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                    <Label Text="{x:Static texts:UiTexts.TransactionCategory}" Style="{StaticResource CaptionLabel}" />
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label Text="{x:Static texts:UiTexts.TransactionCategory}" Style="{StaticResource CaptionLabel}" />
+                                        <BoxView Style="{StaticResource RequiredDot}">
+                                            <BoxView.Triggers>
+                                                <DataTrigger TargetType="BoxView" Binding="{Binding HasCategory}" Value="False">
+                                                    <Setter Property="IsVisible" Value="True" />
+                                                </DataTrigger>
+                                            </BoxView.Triggers>
+                                        </BoxView>
+                                    </HorizontalStackLayout>
                                     <Label Text="{Binding CategoryCaption}" Style="{StaticResource FieldValue}">
                                         <Label.Triggers>
                                             <!-- Невыбранная категория подписана цветом действия:
@@ -247,10 +306,35 @@
                                     <TapGestureRecognizer Tapped="OnPickTargetAccount" />
                                 </Grid.GestureRecognizers>
                                 <Border Grid.Column="0" Style="{StaticResource FieldBadge}">
-                                    <controls:Icon Key="{Binding TargetAccountIcon}" HorizontalOptions="Center" />
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding HasTargetAccount}" Value="False">
+                                            <Setter Property="BackgroundColor"
+                                                    Value="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}" />
+                                            <Setter Property="Stroke"
+                                                    Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                            <Setter Property="StrokeThickness" Value="1.5" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <controls:Icon Key="{Binding TargetAccountIcon}" HorizontalOptions="Center">
+                                        <controls:Icon.Triggers>
+                                            <DataTrigger TargetType="controls:Icon" Binding="{Binding HasTargetAccount}" Value="False">
+                                                <Setter Property="Stroke"
+                                                        Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                            </DataTrigger>
+                                        </controls:Icon.Triggers>
+                                    </controls:Icon>
                                 </Border>
                                 <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                    <Label Text="{x:Static texts:UiTexts.TransactionTarget}" Style="{StaticResource CaptionLabel}" />
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label Text="{x:Static texts:UiTexts.TransactionTarget}" Style="{StaticResource CaptionLabel}" />
+                                        <BoxView Style="{StaticResource RequiredDot}">
+                                            <BoxView.Triggers>
+                                                <DataTrigger TargetType="BoxView" Binding="{Binding HasTargetAccount}" Value="False">
+                                                    <Setter Property="IsVisible" Value="True" />
+                                                </DataTrigger>
+                                            </BoxView.Triggers>
+                                        </BoxView>
+                                    </HorizontalStackLayout>
                                     <Label Text="{Binding TargetAccountCaption}" Style="{StaticResource FieldValue}">
                                         <Label.Triggers>
                                             <DataTrigger TargetType="Label" Binding="{Binding HasTargetAccount}" Value="False">

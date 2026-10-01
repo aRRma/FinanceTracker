@@ -322,7 +322,16 @@
     <value>Заметка — необязательно</value>
   </data>
   <data name="TransactionChooseAccount" xml:space="preserve">
-    <value>Выберите счёт</value>
+    <value>Выберите счёт для операции</value>
+  </data>
+  <data name="TransactionAddAccountFirst" xml:space="preserve">
+    <value>Сначала добавьте счёт</value>
+  </data>
+  <data name="TransactionAddTargetAccountFirst" xml:space="preserve">
+    <value>Сначала добавьте второй счёт</value>
+  </data>
+  <data name="TransactionAccountAdd" xml:space="preserve">
+    <value>Добавить</value>
   </data>
   <data name="TransactionAmountIncomplete" xml:space="preserve">
     <value>Сумма введена не полностью</value>

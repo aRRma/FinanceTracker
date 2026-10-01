@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Личный трекер финансов — прототип</title>
 <!-- СГЕНЕРИРОВАНО из mockups.html скриптом tools/build_prototype.py. Руками не править. -->
-<!-- отпечатки источников: mockups.html=ab4833a343b221f4c3a1433d848625e91ca2caa804ac38d1406918598d6661c7 build_prototype.py=de6155045356871d3e62873c6e5c3824969b663cf8acf532e245ce173086022e -->
+<!-- отпечатки источников: mockups.html=e3ed34a558b78167aa3b21e212202c927fcc33e275a1ea3816fe9fc583ffb2da build_prototype.py=de6155045356871d3e62873c6e5c3824969b663cf8acf532e245ce173086022e -->
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -145,6 +145,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .cells .v{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cells .v.ask{color:var(--acc)}
 .ico{width:25px;height:25px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--sunk)}
+/* Незаполненное обязательное поле — тихая метка: кольцо у значка, точка у подписи */
+.fld.req .ico{background:var(--card);box-shadow:inset 0 0 0 1.2px var(--acc);color:var(--acc)}
+.fld.req .k::after{content:"";display:inline-block;width:4px;height:4px;border-radius:2px;background:var(--acc);margin-left:4px;vertical-align:1px}
 .ico .ic{width:15px;height:15px}
 .ico.exp{background:var(--negbg)}
 .ico.exp .ic{color:var(--neg)}
@@ -164,7 +167,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .kp b{background:var(--card);display:flex;align-items:center;justify-content:center;height:37px;font-size:17px;font-weight:400}
 .kp .ops b{background:none;height:auto;color:var(--acc);font-size:15px}
 .kp .ic{color:var(--ink)}
-.errcard{position:absolute;left:11px;right:11px;bottom:160px;background:var(--negbg);border:1px solid var(--neg);border-radius:10px;padding:7px 10px;font-size:12px;color:var(--neg)}
+.toast{position:absolute;left:50%;transform:translateX(-50%);bottom:40px;white-space:nowrap;background:var(--sunk);border:1px solid var(--line2);border-radius:18px;padding:7px 14px;font-size:12px;color:var(--ink);box-shadow:0 2px 8px var(--veil)}
 
 /* Карточки справочников: подпись над полем, поле с подчёркиванием, сохранение — кнопкой под формой */
 .form{padding:8px 10px;display:flex;flex-direction:column;gap:6px}
@@ -478,7 +481,7 @@ body{padding:0}
       <div class="amt"><span class="expr"></span><span class="v exp">-1 590,00 ₽</span></div>
       <div class="cells">
         <div class="fld"><span class="ico"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Счёт</span><span class="v">Карта основная</span></span></div>
-        <div class="fld"><span class="ico"><svg class="ic"><use href="#i-tag"/></svg></span><span><span class="k">Категория</span><span class="v ask">Выбрать</span></span></div>
+        <div class="fld req"><span class="ico"><svg class="ic"><use href="#i-tag"/></svg></span><span><span class="k">Категория</span><span class="v ask">Выбрать</span></span></div>
       </div>
     </div>
     <div class="card">
@@ -654,7 +657,7 @@ body{padding:0}
       <div class="amt"><span class="expr"></span><span class="v exp">-1 250,00 ₽</span></div>
       <div class="cells">
         <div class="fld"><span class="ico"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Счёт</span><span class="v">Карта основная</span></span></div>
-        <div class="fld"><span class="ico"><svg class="ic"><use href="#i-tag"/></svg></span><span><span class="k">Категория</span><span class="v ask">Выбрать</span></span></div>
+        <div class="fld req"><span class="ico"><svg class="ic"><use href="#i-tag"/></svg></span><span><span class="k">Категория</span><span class="v ask">Выбрать</span></span></div>
       </div>
     </div>
     <div class="card">
@@ -663,7 +666,7 @@ body{padding:0}
       <div class="row"><svg class="ic"><use href="#i-pencil"/></svg><span class="entry ph">Заметка — необязательно</span></div>
     </div>
   </div>
-  <div class="errcard">Выберите категорию</div>
+  <div class="toast">Выберите категорию</div>
   <div class="kp">
     <div class="nums">
       <b>7</b><b>8</b><b>9</b>

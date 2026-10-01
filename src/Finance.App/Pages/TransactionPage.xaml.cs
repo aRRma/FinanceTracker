@@ -67,15 +67,16 @@ public partial class TransactionPage : DataPage
     private void OnPickDate(object? sender, TappedEventArgs e) => Calendar.IsOpen = true;
 
     /// <summary>
-    /// Забирает выбор со своего экрана. Форма при возврате не перечитывается —
-    /// набранная сумма должна пережить поход за счётом, — и это единственное место,
-    /// где она узнаёт о выбранном.
+    /// Забирает выбор со своего экрана и счёт, заведённый из формы. Форма при
+    /// возврате не перечитывается — набранная сумма должна пережить поход за
+    /// счётом, — и это единственное место, где она узнаёт о выбранном.
     /// </summary>
     protected override void OnAppearing()
     {
         base.OnAppearing();
 
         _model.ApplyPicks();
+        Guarded.Run(() => _model.TakeNewAccountAsync());
     }
 
     /// <summary>
@@ -125,15 +126,43 @@ public partial class TransactionPage : DataPage
         }
     }
 
-    private void OnPickAccount(object? sender, TappedEventArgs e) =>
+    /// <summary>
+    /// Выбирать не из чего — поле ведёт сразу в карточку нового счёта, а не на
+    /// пустой экран выбора, где завести счёт нечем.
+    /// </summary>
+    private void OnPickAccount(object? sender, TappedEventArgs e)
+    {
+        if (_model.NeedsNewAccount)
+        {
+            AddAccount(target: false);
+
+            return;
+        }
+
         Navigator.Go($"{Routes.PickAccount}?selected={_model.SourceAccount?.Key}");
+    }
 
     /// <summary>
     /// Счёт списания в список «Куда» не попадает: перевод на себя запрещён доменом,
     /// и предлагать его значило бы рассказывать о запрете уже после сохранения.
     /// </summary>
-    private void OnPickTargetAccount(object? sender, TappedEventArgs e) =>
+    private void OnPickTargetAccount(object? sender, TappedEventArgs e)
+    {
+        if (_model.NeedsNewTargetAccount)
+        {
+            AddAccount(target: true);
+
+            return;
+        }
+
         Navigator.Go($"{Routes.PickAccount}?selected={_model.TargetAccount?.Key}&excluded={_model.SourceAccount?.Key}&target=1");
+    }
+
+    private void AddAccount(bool target)
+    {
+        _model.AwaitNewAccount(target);
+        Navigator.Go(Routes.Account);
+    }
 
     private void OnPickCategory(object? sender, TappedEventArgs e) =>
         Navigator.Go($"{Routes.PickCategory}?kind={_model.CategoryKind}&selected={_model.Category?.Key}");

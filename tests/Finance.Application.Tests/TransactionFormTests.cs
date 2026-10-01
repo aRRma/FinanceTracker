@@ -15,17 +15,167 @@ namespace Finance.Application.Tests;
 public sealed class TransactionFormTests
 {
     /// <summary>
-    /// Без счёта сохранять не на что: форма называет, чего не хватает, и ничего не пишет.
+    /// Без единого счёта сохранять не на что: кнопка не гаснет, а нажатие просит
+    /// сначала добавить счёт — всплывающим сообщением, не карточкой правила.
     /// </summary>
     [Fact]
-    public async Task Без_счёта_называет_причину()
+    public async Task Без_счетов_просит_добавить_счёт()
     {
         await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
 
         TransactionViewModel model = await NewAsync(fixture);
         model.Amount = "100";
+        model.Category = Option(model, fixture.ExpenseCategory);
 
-        await AssertRefusedAsync(fixture, model, UiTexts.TransactionChooseAccount);
+        Assert.True(model.NeedsNewAccount);
+        Assert.False(model.HasSourceAccount);
+        Assert.True(model.CanSave);
+
+        await AssertNoticedAsync(fixture, model, UiTexts.TransactionAddAccountFirst);
+    }
+
+    /// <summary>
+    /// Счета есть, но не выбран: нажатие просит выбрать счёт. Так бывает, когда
+    /// последний использованный счёт заблокирован, а другие счета заведены после.
+    /// </summary>
+    [Fact]
+    public async Task Невыбранный_счёт_называется_при_сохранении()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        await fixture.AccountAsync("Карта");
+
+        TransactionViewModel model = await FilledExpenseAsync(fixture, amount: "100");
+        model.SourceAccount = null;
+
+        Assert.False(model.NeedsNewAccount);
+        Assert.Equal(UiTexts.CommonChoose, model.SourceAccountCaption);
+        Assert.True(model.CanSave);
+
+        await AssertNoticedAsync(fixture, model, UiTexts.TransactionChooseAccount);
+    }
+
+    /// <summary>
+    /// Заблокированный счёт в выбор не попадает, и если других нет, форма считает,
+    /// что счетов нет: выбирать не из чего, поле предлагает добавить новый.
+    /// </summary>
+    [Fact]
+    public async Task Только_заблокированные_счета_считаются_отсутствием_счетов()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        await fixture.CloseAsync(await fixture.AccountAsync("Карта"));
+
+        TransactionViewModel model = await NewAsync(fixture);
+
+        Assert.Null(model.SourceAccount);
+        Assert.True(model.NeedsNewAccount);
+        Assert.Equal(UiTexts.TransactionAccountAdd, model.SourceAccountCaption);
+    }
+
+    /// <summary>
+    /// Без счёта набранная сумма видна — без знака валюты, но со знаком и цветом
+    /// вида: пустое место вместо неё читалось бы как неработающая клавиатура.
+    /// </summary>
+    [Fact]
+    public async Task Без_счёта_сумма_видна_без_валюты()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        TransactionViewModel model = await NewAsync(fixture);
+
+        Assert.Equal(MoneyFormat.Number(0m), model.AmountHero);
+        Assert.Equal(AmountTone.Placeholder, model.AmountTone);
+
+        model.PressKey("1");
+        model.PressKey("5");
+        model.PressKey("0");
+
+        Assert.Equal(MoneyFormat.Number(-150m), model.AmountHero);
+        Assert.Equal(AmountTone.Expense, model.AmountTone);
+        Assert.DoesNotContain(Currency.RUB.Symbol, model.AmountHero, StringComparison.Ordinal);
+
+        model.Kind = TransactionKind.Income;
+
+        Assert.Equal($"+{MoneyFormat.Number(150m)}", model.AmountHero);
+        Assert.Equal(AmountTone.Income, model.AmountTone);
+
+        model.Kind = TransactionKind.Transfer;
+
+        Assert.Equal(MoneyFormat.Number(150m), model.AmountHero);
+        Assert.Equal(AmountTone.Plain, model.AmountTone);
+    }
+
+    /// <summary>
+    /// Счёт, заведённый из формы, встаёт в поле, ради которого уходили, а набранное
+    /// остаётся: форма перечитывает только список счетов.
+    /// </summary>
+    [Fact]
+    public async Task Заведённый_из_формы_счёт_встаёт_в_поле()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        TransactionViewModel model = await NewAsync(fixture);
+        model.Amount = "150";
+
+        model.AwaitNewAccount(target: false);
+        Guid card = await fixture.AccountAsync("Карта");
+        await model.TakeNewAccountAsync();
+
+        Assert.Equal(card, model.SourceAccount?.Key);
+        Assert.False(model.NeedsNewAccount);
+        Assert.Equal("150", model.Amount);
+        Assert.Equal(Money.Restore(-150m, Currency.RUB).DisplaySigned, model.AmountHero);
+    }
+
+    /// <summary>
+    /// У перевода с одним счётом зачислять некуда: поле «Куда» предлагает добавить
+    /// счёт, нажатие «Сохранить» просит второй счёт, а заведённый встаёт в «Куда».
+    /// </summary>
+    [Fact]
+    public async Task Заведённый_из_формы_счёт_встаёт_в_зачисление()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        Guid card = await fixture.AccountAsync("Карта");
+
+        TransactionViewModel model = await NewAsync(fixture);
+        model.Kind = TransactionKind.Transfer;
+        model.Amount = "100";
+
+        Assert.True(model.NeedsNewTargetAccount);
+        Assert.Equal(UiTexts.TransactionAccountAdd, model.TargetAccountCaption);
+
+        await AssertNoticedAsync(fixture, model, UiTexts.TransactionAddTargetAccountFirst);
+
+        model.AwaitNewAccount(target: true);
+        Guid cash = await fixture.AccountAsync("Наличные");
+        await model.TakeNewAccountAsync();
+
+        Assert.Equal(card, model.SourceAccount?.Key);
+        Assert.Equal(cash, model.TargetAccount?.Key);
+        Assert.True(await model.SaveAsync(), model.Error);
+    }
+
+    /// <summary>
+    /// Вернулись из карточки счёта без сохранения — форма как была. Счёт, заведённый
+    /// не по просьбе формы, в поле сам не встаёт.
+    /// </summary>
+    [Fact]
+    public async Task Без_нового_счёта_форма_не_меняется()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        TransactionViewModel model = await NewAsync(fixture);
+
+        model.AwaitNewAccount(target: false);
+        await model.TakeNewAccountAsync();
+
+        Assert.Null(model.SourceAccount);
+        Assert.Empty(model.Accounts);
+
+        await fixture.AccountAsync("Карта");
+        await model.TakeNewAccountAsync();
+
+        Assert.Null(model.SourceAccount);
+        Assert.Empty(model.Accounts);
     }
 
     /// <summary>
@@ -55,7 +205,7 @@ public sealed class TransactionFormTests
         TransactionViewModel model = await NewAsync(fixture);
         model.Amount = "100";
 
-        await AssertRefusedAsync(fixture, model, UiTexts.TransactionChooseCategory);
+        await AssertNoticedAsync(fixture, model, UiTexts.TransactionChooseCategory);
     }
 
     /// <summary>
@@ -66,12 +216,15 @@ public sealed class TransactionFormTests
     {
         await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
         await fixture.AccountAsync("Карта");
+        await fixture.AccountAsync("Наличные");
 
         TransactionViewModel model = await NewAsync(fixture);
         model.Kind = TransactionKind.Transfer;
         model.Amount = "100";
 
-        await AssertRefusedAsync(fixture, model, UiTexts.TransactionChooseTargetAccount);
+        Assert.False(model.NeedsNewTargetAccount);
+
+        await AssertNoticedAsync(fixture, model, UiTexts.TransactionChooseTargetAccount);
     }
 
     /// <summary>
@@ -384,6 +537,20 @@ public sealed class TransactionFormTests
     {
         Assert.False(await model.SaveAsync());
         Assert.Equal(reason, model.Error);
+        Assert.False(model.IsSaving);
+        Assert.Empty((await fixture.FeedAsync()).Items);
+    }
+
+    private static async Task AssertNoticedAsync(TransactionFixture fixture, TransactionViewModel model, string notice)
+    {
+        List<string> notices = [];
+        model.Notified += notices.Add;
+
+        Assert.False(await model.SaveAsync());
+        model.Notified -= notices.Add;
+
+        Assert.Equal([notice], notices);
+        Assert.False(model.HasError);
         Assert.False(model.IsSaving);
         Assert.Empty((await fixture.FeedAsync()).Items);
     }

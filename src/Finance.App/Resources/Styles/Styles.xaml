@@ -173,6 +173,22 @@
         <Setter Property="VerticalOptions" Value="Center" />
     </Style>
 
+    <!--
+        Точка у подписи незаполненного обязательного поля под суммой. Видна только
+        вместе с кольцом у значка: поле ждёт выбора. Рамка вокруг поля и залитый
+        значок отвергнуты — категория пуста на каждой новой операции, и громкая
+        подсветка встречала бы пользователя каждый раз.
+    -->
+    <Style x:Key="RequiredDot" TargetType="BoxView">
+        <Setter Property="Color"
+                Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+        <Setter Property="WidthRequest" Value="6" />
+        <Setter Property="HeightRequest" Value="6" />
+        <Setter Property="CornerRadius" Value="3" />
+        <Setter Property="VerticalOptions" Value="Center" />
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+
     <!-- Подпись и значение поля под суммой -->
     <Style x:Key="FieldValue" TargetType="Label">
         <Setter Property="FontFamily" Value="OpenSansSemibold" />
