@@ -12,8 +12,9 @@
 или в [../docs/decisions.md](../docs/decisions.md), а папка уходит в архив вне репозитория:
 в материалах задачи бывают личные данные.
 
-Открытые: [первый отзыв клиента](first-client-feedback/README.md) — разбор двенадцати пунктов
-и план исправлений. Закрытые: перенос истории из Wallet — итог в
+Открытые: [исправления по первому отзыву клиента](client-feedback-fixes/README.md) — решения и
+план работ тремя ветками; [первый отзыв клиента](first-client-feedback/README.md) — разбор
+двенадцати пунктов и сделанный этап 1, закрывается вместе с исправлениями. Закрытые: перенос истории из Wallet — итог в
 [ADR-0014](../docs/adr/0014-wallet-import-one-shot-through-domain-path.md); разбор схемы
 базы — открытое перенесено в [../docs/decisions.md](../docs/decisions.md) и «Особенности
 реализации» [../docs/architecture.md](../docs/architecture.md).
