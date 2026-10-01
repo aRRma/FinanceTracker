@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Личный трекер финансов — прототип</title>
 <!-- СГЕНЕРИРОВАНО из mockups.html скриптом tools/build_prototype.py. Руками не править. -->
-<!-- отпечатки источников: mockups.html=4986f168ce35c2e60b3dfebd27f8f7634c4eeddc28a307ce4de163fa5b64f394 build_prototype.py=de6155045356871d3e62873c6e5c3824969b663cf8acf532e245ce173086022e -->
+<!-- отпечатки источников: mockups.html=cfc0d6be76f524a441fd2ddf05fe085951162db17c4a49470f98f3ecff812fa4 build_prototype.py=de6155045356871d3e62873c6e5c3824969b663cf8acf532e245ce173086022e -->
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -107,6 +107,8 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .row.fr>.ic{margin-top:10px}
 .row.fr .g{display:flex;align-items:center;gap:9px;padding:6px 11px 6px 0;border-bottom:1px solid var(--line)}
 .row.fr .g>div{flex:1;min-width:0}
+/* Заметка — третьей строкой, мельче и тише подписи: в подписи она вытесняла бы группу и счёт */
+.row.fr .n{font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .balrow{display:flex;justify-content:space-between;align-items:center;padding:8px 11px;font-size:12px;color:var(--ink2)}
 .balrow b{font-size:13.5px;font-weight:600;color:var(--ink)}
 
@@ -408,7 +410,7 @@ body{padding:0}
   <div class="row fr"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка · Карта основная</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Перевод</div><div class="s">Карта основная → Вклад на отпуск</div></div><span class="num">-5 000,00 ₽</span></div></div>
   <div class="date"><span>24 августа</span><span class="pos">+89 540,00 ₽</span></div>
-  <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Аванс · Карта основная</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Доход · Карта основная</div><div class="n">Аванс</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-bus"/></svg><div class="g"><div><div class="t">Метро, автобус</div><div class="s">Транспорт · Наличные</div></div><span class="num neg">-140,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-coffee"/></svg><div class="g"><div><div class="t">Кофе</div><div class="s">Еда · Карта основная</div></div><span class="num neg">-320,00 ₽</span></div></div>
   <div class="date"><span>23 августа</span><span></span></div>
@@ -431,11 +433,11 @@ body{padding:0}
   <div class="row fr"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Вклад на отпуск</div><div class="s">Перевод</div></div><span class="num">-5 000,00 ₽</span></div></div>
   <div class="date"><span>24 августа</span><span class="pos">+89 680,00 ₽</span></div>
-  <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Аванс</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Доход</div><div class="n">Аванс</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-coffee"/></svg><div class="g"><div><div class="t">Кофе</div><div class="s">Еда</div></div><span class="num neg">-320,00 ₽</span></div></div>
   <div class="date"><span>22 августа</span><span>-1 935,00 ₽</span></div>
   <div class="row fr"><svg class="ic"><use href="#i-pill"/></svg><div class="g"><div><div class="t">Аптека</div><div class="s">Покупки</div></div><span class="num neg">-1 890,00 ₽</span></div></div>
-  <div class="row fr"><svg class="ic"><use href="#i-adjustments"/></svg><div class="g"><div><div class="t">Разница</div><div class="s">Пересчёт наличных</div></div><span class="num neg">-45,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-adjustments"/></svg><div class="g"><div><div class="t">Разница</div><div class="s">Служебное</div><div class="n">Пересчёт наличных</div></div><span class="num neg">-45,00 ₽</span></div></div>
   <div class="fab">+</div>
   <nav class="nav">
     <a class="on"><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>

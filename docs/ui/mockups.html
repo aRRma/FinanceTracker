@@ -105,6 +105,8 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .row.fr>.ic{margin-top:10px}
 .row.fr .g{display:flex;align-items:center;gap:9px;padding:6px 11px 6px 0;border-bottom:1px solid var(--line)}
 .row.fr .g>div{flex:1;min-width:0}
+/* Заметка — третьей строкой, мельче и тише подписи: в подписи она вытесняла бы группу и счёт */
+.row.fr .n{font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .balrow{display:flex;justify-content:space-between;align-items:center;padding:8px 11px;font-size:12px;color:var(--ink2)}
 .balrow b{font-size:13.5px;font-weight:600;color:var(--ink)}
 
@@ -351,14 +353,14 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-02</span><b>Просмотреть операции по всем счетам</b><span class="uc">UC-06</span><em>Общая лента. Счёт дописан в подпись, потому что при просмотре всех операций он перестаёт быть очевидным из контекста. Перевод — одной строкой со стороны списания, подписан «откуда → куда». Итог дня — в рублях по учитываемым счетам: валютный день итога не имеет.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-02</span><b>Просмотреть операции по всем счетам</b><span class="uc">UC-06</span><em>Общая лента. Счёт дописан в подпись, потому что при просмотре всех операций он перестаёт быть очевидным из контекста. Заметка — третьей строкой, мельче: в подписи она вытесняла группу и обрезала счёт. Перевод — одной строкой со стороны списания, подписан «откуда → куда». Итог дня — в рублях по учитываемым счетам: валютный день итога не имеет.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Операции</h2></div>
   <div class="date"><span>25 августа</span><span>-6 250,00 ₽</span></div>
   <div class="row fr"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка · Карта основная</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Перевод</div><div class="s">Карта основная → Вклад на отпуск</div></div><span class="num">-5 000,00 ₽</span></div></div>
   <div class="date"><span>24 августа</span><span class="pos">+89 540,00 ₽</span></div>
-  <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Аванс · Карта основная</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Доход · Карта основная</div><div class="n">Аванс</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-bus"/></svg><div class="g"><div><div class="t">Метро, автобус</div><div class="s">Транспорт · Наличные</div></div><span class="num neg">-140,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-coffee"/></svg><div class="g"><div><div class="t">Кофе</div><div class="s">Еда · Карта основная</div></div><span class="num neg">-320,00 ₽</span></div></div>
   <div class="date"><span>23 августа</span><span></span></div>
@@ -374,7 +376,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-03</span><b>Просмотреть ленту счёта</b><span class="uc">UC-06</span><em>Баланс — строкой под шапкой, а не карточкой: четверть первого экрана под одно число не уходит. Подпись строки — заметка, иначе место, иначе группа. Лента открыта с балансов, поэтому подсвечена их вкладка.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-03</span><b>Просмотреть ленту счёта</b><span class="uc">UC-06</span><em>Баланс — строкой под шапкой, а не карточкой: четверть первого экрана под одно число не уходит. Подпись строки — место, иначе группа; заметка — своей строкой ниже. Лента открыта с балансов, поэтому подсвечена их вкладка.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Карта основная</h2></div>
   <div class="balrow"><span>Баланс</span><b>71 920,50 ₽</b></div>
@@ -382,11 +384,11 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="row fr"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Вклад на отпуск</div><div class="s">Перевод</div></div><span class="num">-5 000,00 ₽</span></div></div>
   <div class="date"><span>24 августа</span><span class="pos">+89 680,00 ₽</span></div>
-  <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Аванс</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Доход</div><div class="n">Аванс</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-coffee"/></svg><div class="g"><div><div class="t">Кофе</div><div class="s">Еда</div></div><span class="num neg">-320,00 ₽</span></div></div>
   <div class="date"><span>22 августа</span><span>-1 935,00 ₽</span></div>
   <div class="row fr"><svg class="ic"><use href="#i-pill"/></svg><div class="g"><div><div class="t">Аптека</div><div class="s">Покупки</div></div><span class="num neg">-1 890,00 ₽</span></div></div>
-  <div class="row fr"><svg class="ic"><use href="#i-adjustments"/></svg><div class="g"><div><div class="t">Разница</div><div class="s">Пересчёт наличных</div></div><span class="num neg">-45,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-adjustments"/></svg><div class="g"><div><div class="t">Разница</div><div class="s">Служебное</div><div class="n">Пересчёт наличных</div></div><span class="num neg">-45,00 ₽</span></div></div>
   <div class="fab">+</div>
   <nav class="nav">
     <a class="on"><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>

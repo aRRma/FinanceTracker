@@ -6,11 +6,12 @@ using Finance.Domain.Enums;
 namespace Finance.Application.Features.Feed;
 
 /// <summary>
-/// Строка ленты на экране: заголовок, подпись, сумма со знаком.
+/// Строка ленты на экране: заголовок, подпись, заметка третьей строкой, сумма со знаком.
 /// </summary>
 /// <param name="Key">Ключ операции — по нему открывается карточка.</param>
-/// <param name="Title">Подкатегория; у перевода — второй счёт в ленте счёта, заметка или «Перевод» в общей ленте.</param>
-/// <param name="Caption">Подпись под заголовком: заметка, место или группа, в общей ленте ещё и счёт; у перевода в общей ленте — «откуда → куда».</param>
+/// <param name="Title">Подкатегория; у перевода — второй счёт в ленте счёта или «Перевод» в общей ленте.</param>
+/// <param name="Caption">Подпись под заголовком: место или группа, в общей ленте ещё и счёт; у перевода в общей ленте — «откуда → куда».</param>
+/// <param name="Note">Заметка или пусто — своей строкой под подписью.</param>
 /// <param name="Amount">Сумма со знаком, уже отформатированная.</param>
 /// <param name="IsPositive">Сумма положительна — доход или зачисление показывают смысловым цветом.</param>
 /// <param name="IsExpense">
@@ -22,6 +23,7 @@ public sealed record FeedRowItem(
     Guid Key,
     string Title,
     string Caption,
+    string Note,
     string Amount,
     bool IsPositive,
     bool IsExpense,
@@ -30,10 +32,15 @@ public sealed record FeedRowItem(
     private const string TransferIcon = "swap";
 
     /// <summary>
-    /// Собирает строку экрана из строки ленты. Подписью служит заметка, если она есть,
-    /// иначе место, иначе группа: заметка — единственное, чего не вывести из названия
-    /// подкатегории. В общей ленте к подписи добавляется счёт — вне ленты счёта
-    /// он перестаёт быть очевидным из контекста.
+    /// Заметка есть — под подписью её третья строка.
+    /// </summary>
+    public bool HasNote => Note.Length > 0;
+
+    /// <summary>
+    /// Собирает строку экрана из строки ленты. Подпись — место, иначе группа, а в общей
+    /// ленте ещё и счёт: вне ленты счёта он перестаёт быть очевидным из контекста.
+    /// Заметка — своей строкой под подписью, а не вместо её части: в одной строке
+    /// длинная заметка вытесняла группу и обрезала счёт в конце.
     /// </summary>
     /// <param name="item">Строка ленты из базы.</param>
     /// <param name="showAccount">Добавлять ли счёт в подпись — да в общей ленте.</param>
@@ -41,15 +48,18 @@ public sealed record FeedRowItem(
     {
         ArgumentNullException.ThrowIfNull(item);
 
+        string note = item.Note ?? string.Empty;
+
         // В общей ленте перевод виден со стороны списания, и его второй счёт
-        // в заголовке без стрелки не говорит, куда ушли деньги: заголовком идёт
-        // заметка, а подпись показывает направление целиком
+        // в заголовке без стрелки не говорит, куда ушли деньги: подпись
+        // показывает направление целиком
         if (item.Kind is TransactionKind.Transfer && showAccount)
         {
             return new FeedRowItem(
                 item.Key,
-                item.Note ?? UiTexts.KindTransfer,
+                UiTexts.KindTransfer,
                 $"{item.AccountName} → {item.Title}",
+                note,
                 item.Amount.DisplaySigned,
                 item.Amount.IsPositive,
                 IsExpense: false,
@@ -57,8 +67,8 @@ public sealed record FeedRowItem(
         }
 
         string? detail = item.Kind is TransactionKind.Transfer
-            ? item.Note ?? UiTexts.KindTransfer
-            : item.Note ?? item.Place ?? item.Group;
+            ? UiTexts.KindTransfer
+            : item.Place ?? item.Group;
 
         string caption = (detail, showAccount) switch
         {
@@ -72,6 +82,7 @@ public sealed record FeedRowItem(
             item.Key,
             item.Title,
             caption,
+            note,
             item.Amount.DisplaySigned,
             item.Amount.IsPositive,
             item.Kind is TransactionKind.Expense,

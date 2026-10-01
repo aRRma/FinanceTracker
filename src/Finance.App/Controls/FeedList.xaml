@@ -52,7 +52,7 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="feed:FeedRowItem">
-                    <Grid Padding="16,10,16,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto"
+                    <Grid Padding="16,10,16,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto,Auto"
                           MinimumHeightRequest="{StaticResource TouchTarget}"
                           BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}">
                         <Grid.GestureRecognizers>
@@ -63,8 +63,13 @@
                         <Label Grid.Column="1" Grid.Row="0" Text="{Binding Title}" LineBreakMode="TailTruncation" />
                         <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}" LineBreakMode="TailTruncation"
                                Style="{StaticResource SecondaryLabel}" />
+                        <!-- Заметка — своей строкой под подписью, мельче и тише: в одной строке
+                             с подписью длинная заметка вытесняла группу и срезала счёт -->
+                        <Label Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Note}"
+                               IsVisible="{Binding HasNote}" LineBreakMode="TailTruncation"
+                               Style="{StaticResource CaptionLabel}" />
                         <!-- Разделитель — под строкой, от текста до правого края -->
-                        <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource Divider}" Margin="0,10,0,0" />
+                        <BoxView Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource Divider}" Margin="0,10,0,0" />
                         <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Amount}"
                                VerticalOptions="Center" Style="{StaticResource AmountLabel}">
                             <Label.Triggers>

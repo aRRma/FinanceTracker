@@ -1,0 +1,96 @@
+using Finance.Application.Features.Feed;
+using Finance.Application.Infrastructure.Queries;
+using Finance.Application.Texts;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
+
+namespace Finance.Application.Tests;
+
+/// <summary>
+/// Подпись строки ленты: что стоит под заголовком и где заметка. Сборка строки —
+/// чистая функция от строки ленты, база ей не нужна.
+/// </summary>
+public sealed class FeedRowTests
+{
+    private const string LongNote = "Продукты на всю неделю в большом гипермаркете у дома";
+
+    /// <summary>
+    /// Заметка — своей строкой: группа и счёт в подписи остаются при любой её длине.
+    /// В одной строке длинная заметка вытесняла группу и срезала счёт в конце.
+    /// </summary>
+    [Fact]
+    public void Заметка_не_вытесняет_группу_и_счёт()
+    {
+        FeedRowItem row = FeedRowItem.From(Expense(note: LongNote), showAccount: true);
+
+        Assert.Equal("Еда · Карта", row.Caption);
+        Assert.Equal(LongNote, row.Note);
+        Assert.True(row.HasNote);
+    }
+
+    /// <summary>
+    /// Без заметки третьей строки нет, подпись та же.
+    /// </summary>
+    [Fact]
+    public void Без_заметки_третьей_строки_нет()
+    {
+        FeedRowItem row = FeedRowItem.From(Expense(note: null), showAccount: true);
+
+        Assert.Equal("Еда · Карта", row.Caption);
+        Assert.False(row.HasNote);
+    }
+
+    /// <summary>
+    /// В ленте счёта счёт в подписи не повторяется, место стоит вместо группы.
+    /// </summary>
+    [Fact]
+    public void В_ленте_счёта_подпись_без_счёта_и_место_вместо_группы()
+    {
+        FeedRowItem row = FeedRowItem.From(Expense(note: LongNote, place: "Пятёрочка"), showAccount: false);
+
+        Assert.Equal("Пятёрочка", row.Caption);
+        Assert.Equal(LongNote, row.Note);
+    }
+
+    /// <summary>
+    /// У перевода в общей ленте заголовок — «Перевод», подпись — направление,
+    /// заметка — третьей строкой, а не вместо заголовка.
+    /// </summary>
+    [Fact]
+    public void Заметка_перевода_идёт_третьей_строкой()
+    {
+        FeedItem transfer = Expense(note: LongNote) with
+        {
+            Kind = TransactionKind.Transfer,
+            Title = "Наличные",
+            Group = null
+        };
+
+        FeedRowItem common = FeedRowItem.From(transfer, showAccount: true);
+
+        Assert.Equal(UiTexts.KindTransfer, common.Title);
+        Assert.Equal("Карта → Наличные", common.Caption);
+        Assert.Equal(LongNote, common.Note);
+
+        FeedRowItem own = FeedRowItem.From(transfer, showAccount: false);
+
+        Assert.Equal("Наличные", own.Title);
+        Assert.Equal(UiTexts.KindTransfer, own.Caption);
+        Assert.Equal(LongNote, own.Note);
+    }
+
+    private static FeedItem Expense(string? note, string? place = null) => new()
+    {
+        Key = Guid.CreateVersion7(),
+        Kind = TransactionKind.Expense,
+        OccurredOn = new DateOnly(2026, 9, 15),
+        Amount = Money.Create(-250m, Currency.RUB),
+        AccountKey = Guid.CreateVersion7(),
+        AccountName = "Карта",
+        Title = "Продукты",
+        Group = "Еда",
+        Place = place,
+        Note = note,
+        Icon = "shopping-cart"
+    };
+}
