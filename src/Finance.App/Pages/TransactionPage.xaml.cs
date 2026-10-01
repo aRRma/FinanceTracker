@@ -128,18 +128,16 @@ public partial class TransactionPage : DataPage
 
     /// <summary>
     /// Выбирать не из чего — поле ведёт сразу в карточку нового счёта, а не на
-    /// пустой экран выбора, где завести счёт нечем.
+    /// пустой экран выбора. Иначе открывается выбор, и форма заранее ждёт новый
+    /// счёт: с экрана выбора его можно завести, и карточка вернётся прямо сюда.
     /// </summary>
     private void OnPickAccount(object? sender, TappedEventArgs e)
     {
-        if (_model.NeedsNewAccount)
-        {
-            AddAccount(target: false);
+        _model.AwaitNewAccount(target: false);
 
-            return;
-        }
-
-        Navigator.Go($"{Routes.PickAccount}?selected={_model.SourceAccount?.Key}");
+        Navigator.Go(_model.NeedsNewAccount
+            ? Routes.Account
+            : $"{Routes.PickAccount}?kind={_model.Kind}&selected={_model.SourceAccount?.Key}");
     }
 
     /// <summary>
@@ -148,20 +146,11 @@ public partial class TransactionPage : DataPage
     /// </summary>
     private void OnPickTargetAccount(object? sender, TappedEventArgs e)
     {
-        if (_model.NeedsNewTargetAccount)
-        {
-            AddAccount(target: true);
+        _model.AwaitNewAccount(target: true);
 
-            return;
-        }
-
-        Navigator.Go($"{Routes.PickAccount}?selected={_model.TargetAccount?.Key}&excluded={_model.SourceAccount?.Key}&target=1");
-    }
-
-    private void AddAccount(bool target)
-    {
-        _model.AwaitNewAccount(target);
-        Navigator.Go(Routes.Account);
+        Navigator.Go(_model.NeedsNewTargetAccount
+            ? Routes.Account
+            : $"{Routes.PickAccount}?kind={_model.Kind}&selected={_model.TargetAccount?.Key}&excluded={_model.SourceAccount?.Key}&target=1");
     }
 
     private void OnPickCategory(object? sender, TappedEventArgs e) =>

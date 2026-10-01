@@ -16,9 +16,22 @@
     Title="{Binding Title}"
     Shell.TabBarIsVisible="False">
 
-    <Grid RowDefinitions="*">
+    <Grid RowDefinitions="Auto,*">
 
-        <CollectionView Grid.Row="0" ItemsSource="{Binding Sections}" IsGrouped="True" SelectionMode="None">
+        <!-- Нужного счёта нет — заводится отсюда же, не бросая форму. Строка над
+             списком, а не под ним: под длинным списком её пришлось бы искать -->
+        <Grid Grid.Row="0" Padding="16,10" ColumnDefinitions="Auto,*" ColumnSpacing="12"
+              MinimumHeightRequest="{StaticResource TouchTarget}">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnNewAccount" />
+            </Grid.GestureRecognizers>
+
+            <controls:Icon Grid.Column="0" Key="plus" Style="{StaticResource AccentIcon}" />
+            <Label Grid.Column="1" Text="{x:Static texts:UiTexts.PickAccountNew}" VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+        </Grid>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Sections}" IsGrouped="True" SelectionMode="None">
 
             <CollectionView.GroupHeaderTemplate>
                 <DataTemplate x:DataType="pick:AccountPickerSection">

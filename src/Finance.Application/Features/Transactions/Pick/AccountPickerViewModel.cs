@@ -42,7 +42,9 @@ public sealed partial class AccountPickerViewModel : ObservableObject
     public ObservableCollection<AccountPickerSection> Sections { get; } = [];
 
     /// <summary>
-    /// Заголовок экрана: у перевода выбирают не просто счёт, а сторону.
+    /// Заголовок экрана: у перевода выбирают не просто счёт, а сторону — списания
+    /// или зачисления. У расхода и дохода сторона одна, и «счёт списания» у дохода
+    /// читался бы ошибкой: деньги на него приходят.
     /// </summary>
     [ObservableProperty]
     public partial string Title { get; private set; } = UiTexts.PickAccountTitle;
@@ -50,18 +52,22 @@ public sealed partial class AccountPickerViewModel : ObservableObject
     /// <summary>
     /// Читает счета к выбору: заблокированные не предлагаются — записать на них нечего.
     /// </summary>
+    /// <param name="kind">Вид операции в форме — от него зависит заголовок.</param>
     /// <param name="selected">Счёт, стоящий в форме сейчас, — он помечен галочкой.</param>
     /// <param name="excluded">Счёт, которого в списке быть не должно: списание при выборе «Куда».</param>
     /// <param name="forTarget">Выбирается счёт зачисления перевода.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     public async Task LoadAsync(
+        TransactionKind kind,
         Guid? selected,
         Guid? excluded,
         bool forTarget,
         CancellationToken cancellationToken = default)
     {
         _forTarget = forTarget;
-        Title = forTarget ? UiTexts.PickAccountTarget : UiTexts.PickAccountSource;
+        Title = kind is not TransactionKind.Transfer ? UiTexts.PickAccountTitle
+            : forTarget ? UiTexts.PickAccountTarget
+            : UiTexts.PickAccountSource;
 
         // ConfigureAwait(false) здесь недопустим: следом наполняются
         // привязанные коллекции, а их правка вне потока интерфейса роняет разметку

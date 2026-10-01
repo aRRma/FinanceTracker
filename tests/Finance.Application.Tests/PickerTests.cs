@@ -2,6 +2,7 @@ using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
+using Finance.Application.Texts;
 using Finance.Domain.Enums;
 
 namespace Finance.Application.Tests;
@@ -31,7 +32,7 @@ public sealed class PickerTests
         form.PressKey("1");
 
         AccountPickerViewModel picker = AccountPicker(given);
-        await picker.LoadAsync(selected: rubles, excluded: null, forTarget: false);
+        await picker.LoadAsync(TransactionKind.Expense, selected: rubles, excluded: null, forTarget: false);
 
         picker.Pick(Row(picker, euros));
         form.ApplyPicks();
@@ -58,7 +59,7 @@ public sealed class PickerTests
         await form.LoadAsync(key: null);
 
         AccountPickerViewModel picker = AccountPicker(given);
-        await picker.LoadAsync(selected: null, excluded: null, forTarget: false);
+        await picker.LoadAsync(TransactionKind.Expense, selected: null, excluded: null, forTarget: false);
 
         picker.Pick(Row(picker, cash));
         form.ApplyPicks();
@@ -90,7 +91,7 @@ public sealed class PickerTests
         form.SourceAccount = form.Accounts.First(account => account.Key == card);
 
         AccountPickerViewModel picker = AccountPicker(given);
-        await picker.LoadAsync(selected: null, excluded: card, forTarget: true);
+        await picker.LoadAsync(TransactionKind.Transfer, selected: null, excluded: card, forTarget: true);
 
         Guid[] offered = [.. picker.Sections.SelectMany(section => section).Select(row => row.Key)];
 
@@ -115,7 +116,7 @@ public sealed class PickerTests
         await given.CloseAsync(old);
 
         AccountPickerViewModel picker = AccountPicker(given);
-        await picker.LoadAsync(selected: null, excluded: null, forTarget: false);
+        await picker.LoadAsync(TransactionKind.Expense, selected: null, excluded: null, forTarget: false);
 
         Assert.DoesNotContain(old, picker.Sections.SelectMany(section => section).Select(row => row.Key));
     }
@@ -132,10 +133,63 @@ public sealed class PickerTests
         await given.AccountAsync("Валютный", 500m, Currency.EUR);
 
         AccountPickerViewModel picker = AccountPicker(given);
-        await picker.LoadAsync(selected: null, excluded: null, forTarget: false);
+        await picker.LoadAsync(TransactionKind.Expense, selected: null, excluded: null, forTarget: false);
 
         Assert.Equal(2, picker.Sections.Count);
         Assert.Equal(["Рубли", "Евро"], picker.Sections.Select(section => section.Title));
+    }
+
+    /// <summary>
+    /// Заголовок называет сторону только у перевода: у дохода «счёт списания»
+    /// читался бы ошибкой — деньги на него приходят.
+    /// </summary>
+    [Theory]
+    [InlineData(TransactionKind.Expense, false)]
+    [InlineData(TransactionKind.Income, false)]
+    [InlineData(TransactionKind.Transfer, false)]
+    [InlineData(TransactionKind.Transfer, true)]
+    public async Task Заголовок_выбора_зависит_от_вида(TransactionKind kind, bool forTarget)
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+        await given.AccountAsync("Карта", 1000m);
+
+        AccountPickerViewModel picker = AccountPicker(given);
+        await picker.LoadAsync(kind, selected: null, excluded: null, forTarget: forTarget);
+
+        string expected = kind is not TransactionKind.Transfer ? UiTexts.PickAccountTitle
+            : forTarget ? UiTexts.PickAccountTarget
+            : UiTexts.PickAccountSource;
+
+        Assert.Equal(expected, picker.Title);
+    }
+
+    /// <summary>
+    /// Счёт, заведённый с экрана выбора, встаёт в форму вместо стоявшего: форма,
+    /// открывая выбор, уже ждёт новый счёт. Возврат с выбора без нового счёта
+    /// стоявший не трогает.
+    /// </summary>
+    [Fact]
+    public async Task Счёт_заведённый_с_выбора_встаёт_в_форму()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+        Guid card = await given.AccountAsync("Карта", 1000m);
+
+        TransactionViewModel form = Form(given);
+        await form.LoadAsync(key: null);
+        form.PressKey("7");
+
+        form.AwaitNewAccount(target: false);
+        await form.TakeNewAccountAsync();
+
+        Assert.Equal(card, form.SourceAccount?.Key);
+
+        form.AwaitNewAccount(target: false);
+        Guid cash = await given.AccountAsync("Наличные");
+        form.ApplyPicks();
+        await form.TakeNewAccountAsync();
+
+        Assert.Equal(cash, form.SourceAccount?.Key);
+        Assert.Equal("7", form.Amount);
     }
 
     /// <summary>

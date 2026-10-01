@@ -64,9 +64,9 @@ public static class Routes
     public const string Transaction = "transactions/transaction";
 
     /// <summary>
-    /// Выбор счёта для формы операции. Параметры: <c>selected</c> — счёт, стоящий в форме,
-    /// <c>excluded</c> — счёт, которого в списке быть не должно, <c>target</c> — выбирается
-    /// счёт зачисления перевода.
+    /// Выбор счёта для формы операции. Параметры: <c>kind</c> — вид операции, <c>selected</c> —
+    /// счёт, стоящий в форме, <c>excluded</c> — счёт, которого в списке быть не должно,
+    /// <c>target</c> — выбирается счёт зачисления перевода.
     /// </summary>
     public const string PickAccount = "transactions/pick-account";
 

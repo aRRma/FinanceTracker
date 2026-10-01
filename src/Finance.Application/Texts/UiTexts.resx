@@ -364,6 +364,9 @@
   <data name="PickAccountSource" xml:space="preserve">
     <value>Счёт списания</value>
   </data>
+  <data name="PickAccountNew" xml:space="preserve">
+    <value>Новый счёт</value>
+  </data>
   <data name="PickAccountSavings" xml:space="preserve">
     <value>Накопления</value>
   </data>
