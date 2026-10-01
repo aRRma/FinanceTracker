@@ -122,6 +122,15 @@ public abstract class DataPage : ContentPage
     /// </summary>
     protected override bool OnBackButtonPressed()
     {
+        // При выделении «назад» снимает его, а не уводит с экрана: так закрывают
+        // режим в любом списке Android, и ушедший потерял бы отметки без вопроса
+        if (BindingContext is ISelectionModel { IsSelecting: true } selection)
+        {
+            selection.EndSelection();
+
+            return true;
+        }
+
         if (BindingContext is IFormModel { IsDirty: true })
         {
             Guarded.Run(LeaveAsync);
@@ -195,6 +204,13 @@ public abstract class DataPage : ContentPage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+
+        // Смена вкладки и уход на другой экран выделение снимают: вернувшийся
+        // застал бы отметки, о которых забыл, и удалил бы лишнее одним нажатием
+        if (BindingContext is ISelectionModel selection)
+        {
+            selection.EndSelection();
+        }
 
         if (BindingContext is IScreenModel screen)
         {

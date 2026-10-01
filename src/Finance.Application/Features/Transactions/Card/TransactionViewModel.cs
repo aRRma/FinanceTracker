@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain.Entities;
 using Finance.Domain.Enums;
@@ -29,8 +30,8 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     private readonly ITransactionFormQuery _form;
     private readonly ITransactionCardQuery _card;
     private readonly ISaveTransactionHandler _save;
-    private readonly IDeleteTransactionHandler _delete;
-    private readonly IAccountsQuery _accounts;
+    private readonly IDeleteTransactionsHandler _delete;
+    private readonly ITransactionDeletionQuery _deletion;
     private readonly IClock _clock;
     private readonly TransactionPicks _picks;
     private readonly IChangeNotifier _changes;
@@ -55,7 +56,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <param name="card">Чтение операции для правки.</param>
     /// <param name="save">Запись и правка операции.</param>
     /// <param name="delete">Удаление операции.</param>
-    /// <param name="accounts">Балансы счетов — для текста подтверждения удаления.</param>
+    /// <param name="deletion">Последствия удаления — для текста подтверждения.</param>
     /// <param name="clock">Часы: «сегодня» пользователя.</param>
     /// <param name="picks">Выбор, вернувшийся с экрана выбора счёта, категории или места.</param>
     /// <param name="changes">Номера изменений данных — узнать, заведён ли счёт, пока форма ждала.</param>
@@ -63,8 +64,8 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         ITransactionFormQuery form,
         ITransactionCardQuery card,
         ISaveTransactionHandler save,
-        IDeleteTransactionHandler delete,
-        IAccountsQuery accounts,
+        IDeleteTransactionsHandler delete,
+        ITransactionDeletionQuery deletion,
         IClock clock,
         TransactionPicks picks,
         IChangeNotifier changes)
@@ -73,7 +74,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         ArgumentNullException.ThrowIfNull(card);
         ArgumentNullException.ThrowIfNull(save);
         ArgumentNullException.ThrowIfNull(delete);
-        ArgumentNullException.ThrowIfNull(accounts);
+        ArgumentNullException.ThrowIfNull(deletion);
         ArgumentNullException.ThrowIfNull(clock);
         ArgumentNullException.ThrowIfNull(picks);
         ArgumentNullException.ThrowIfNull(changes);
@@ -82,7 +83,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         _card = card;
         _save = save;
         _delete = delete;
-        _accounts = accounts;
+        _deletion = deletion;
         _clock = clock;
         _picks = picks;
         _changes = changes;
@@ -726,58 +727,13 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     }
 
     /// <summary>
-    /// Текст подтверждения удаления. Называет последствие — каким станет баланс
-    /// счёта, — иначе пользователь подтверждает вслепую и проверяет результат потом.
+    /// Последствия удаления для диалога подтверждения: каким станет баланс счёта.
+    /// Читаются по записанной операции, а не по полям: поля могли уже поправить,
+    /// а удаляется операция в том виде, в каком она записана. Пусто — операция новая.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    public async Task<string> DeletePromptAsync(CancellationToken cancellationToken = default)
-    {
-        if (Key is null)
-        {
-            return UiTexts.TransactionDeleteIrreversible;
-        }
-
-        IReadOnlyList<AccountListItem> accounts = await _accounts.ReadAsync(cancellationToken);
-
-        // Балансы после удаления — из сохранённых сумм, а не из поля: поле могли
-        // уже поправить, а удаляется операция в том виде, в каком она записана
-        TransactionCard? card = await _card.ReadAsync(Key.Value, cancellationToken);
-
-        if (card is null)
-        {
-            return UiTexts.TransactionDeleteIrreversible;
-        }
-
-        List<string> consequences = [];
-
-        Money? sourceBalance = BalanceOf(accounts, card.SourceAccountKey);
-
-        if (sourceBalance is { } current)
-        {
-            decimal delta = card.Kind is TransactionKind.Income ? -card.Amount : card.Amount;
-            Money after = Money.Restore(current.Amount + delta, current.Currency);
-
-            // Название берётся у записанного счёта, а не у выбранного в форме:
-            // счёт в поле могли уже сменить, а удаляется операция как записана,
-            // и подпись разошлась бы с числом рядом с ней
-            string name = accounts.First(account => account.Key == card.SourceAccountKey).Name;
-
-            consequences.Add(string.Format(UiCulture.Current, UiTexts.TransactionBalanceAfter, name, after.Display));
-        }
-
-        if (card.TargetAccountKey is { } targetKey && card.TargetAmount is { } targetAmount
-            && BalanceOf(accounts, targetKey) is { } targetBalance)
-        {
-            Money after = Money.Restore(targetBalance.Amount - targetAmount, targetBalance.Currency);
-            string name = accounts.First(account => account.Key == targetKey).Name;
-
-            consequences.Add(string.Format(UiCulture.Current, UiTexts.TransactionBalanceAfter, name, after.Display));
-        }
-
-        consequences.Add(UiTexts.TransactionDeleteIrreversible);
-
-        return string.Join(' ', consequences);
-    }
+    public async Task<TransactionDeletion?> DeletePromptAsync(CancellationToken cancellationToken = default) =>
+        Key is { } key ? await _deletion.ReadAsync([key], cancellationToken) : null;
 
     /// <summary>
     /// Удаляет операцию. Подтверждение уже получено экраном.
@@ -797,7 +753,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
         try
         {
-            await _delete.HandleAsync(key, cancellationToken);
+            await _delete.HandleAsync([key], cancellationToken);
 
             done = true;
 
@@ -1114,19 +1070,6 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     }
 
     private AccountOption? Find(Guid key) => Accounts.FirstOrDefault(account => account.Key == key);
-
-    private static Money? BalanceOf(IReadOnlyList<AccountListItem> accounts, Guid key)
-    {
-        foreach (AccountListItem account in accounts)
-        {
-            if (account.Key == key)
-            {
-                return account.Balance;
-            }
-        }
-
-        return null;
-    }
 
     // Знак вида ставится только ненулевому итогу: «−0,00 ₽» читался бы как долг
     private static string Hero(string expression, Currency? currency, TransactionKind kind)

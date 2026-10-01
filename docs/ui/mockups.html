@@ -107,6 +107,17 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .row.fr .g>div{flex:1;min-width:0}
 /* Заметка — третьей строкой, мельче и тише подписи: в подписи она вытесняла бы группу и счёт */
 .row.fr .n{font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Выделение в ленте: панель над списком, отмеченная строка — бледным фоном действия и знаком на месте значка */
+.selbar{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px 0 11px;background:var(--card)}
+.selbar b{flex:1;font-size:13.5px;font-weight:600}
+.selbar .del{color:var(--neg);font-size:12px;font-weight:600}
+.row.fr.sel{background:var(--accbg)}
+.row.fr.sel>.ic{color:var(--acc)}
+.row.fr.sel .n{color:var(--ink2)}
+/* Смахнутая влево строка: под ней «Удалить» */
+.swiped{display:flex;overflow:hidden}
+.swiped .row.fr{flex:0 0 100%;margin-left:-66px}
+.swiped .rm{flex:0 0 66px;display:flex;align-items:center;justify-content:center;background:var(--neg);color:var(--onacc);font-size:11.5px;font-weight:600}
 .balrow{display:flex;justify-content:space-between;align-items:center;padding:8px 11px;font-size:12px;color:var(--ink2)}
 .balrow b{font-size:13.5px;font-weight:600;color:var(--ink)}
 
@@ -269,6 +280,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5l10 -10"/></symbol>
 <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6l6 -6"/></symbol>
 <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6"/></symbol>
+<symbol id="i-circle-check" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M9 12l2 2 M11 14l4 -4"/></symbol>
 <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M3 14c.83 .642 2.077 1.017 3.5 1c1.423 .017 2.67 -.358 3.5 -1c.83 -.642 2.077 -1.017 3.5 -1c1.423 -.017 2.67 .358 3.5 1 M8 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2 M12 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2 M3 10h14v5a6 6 0 0 1 -6 6h-2a6 6 0 0 1 -6 -6v-5 M16.746 16.726a3 3 0 1 0 .252 -5.555"/></symbol>
 <symbol id="i-coins" viewBox="0 0 24 24"><path d="M9 14c0 1.657 2.686 3 6 3s6 -1.343 6 -3s-2.686 -3 -6 -3s-6 1.343 -6 3 M9 14v4c0 1.656 2.686 3 6 3s6 -1.344 6 -3v-4 M3 6c0 1.072 1.144 2.062 3 2.598s4.144 .536 6 0c1.856 -.536 3 -1.526 3 -2.598c0 -1.072 -1.144 -2.062 -3 -2.598s-4.144 -.536 -6 0c-1.856 .536 -3 1.526 -3 2.598 M3 6v10c0 .888 .772 1.45 2 2 M3 11c0 .888 .772 1.45 2 2"/></symbol>
 <symbol id="i-credit-card" viewBox="0 0 24 24"><path d="M3 8a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-8 M3 10h18 M7 15h.01 M11 15h2"/></symbol>
@@ -303,12 +315,13 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12 M20 12v4h-4a2 2 0 0 1 0 -4h4"/></symbol>
 <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M12 18l.01 0 M9.172 15.172a4 4 0 0 1 5.656 0 M6.343 12.343a8 8 0 0 1 11.314 0 M3.515 9.515c4.686 -4.687 12.284 -4.687 17 0"/></symbol>
 <symbol id="i-world" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M3.6 9h16.8 M3.6 15h16.8 M11.5 3a17 17 0 0 0 0 18 M12.5 3a17 17 0 0 1 0 18"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6l-12 12 M6 6l12 12"/></symbol>
 </defs></svg>
 
 <div class="wrap">
 <header class="masthead">
 <h1>Макеты экранов</h1>
-<p>32 экрана: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
+<p>33 экрана: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
 <p>Все экраны одного размера — 330 × 690: экран Samsung Galaxy S25 Ultra (480 × 1040 логических пикселей) под строкой состояния, уменьшенный в 480/330 раза. Нижняя панель и клавиатура прижаты к низу, содержимое длиннее экрана обрезается, как на устройстве.</p>
 <p>Правдой считается приложение: макет сверяется с ним и правится в той же задаче, что и экран. Значки — контуры Tabler из набора приложения, названия категорий — из стартового набора.</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
@@ -377,7 +390,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-03</span><b>Просмотреть ленту счёта</b><span class="uc">UC-06</span><em>Баланс — строкой под шапкой, а не карточкой: четверть первого экрана под одно число не уходит. Подпись строки — место, иначе группа; группа, чьё название повторяет подкатегорию («Без категории»), не пишется второй раз. Заметка — своей строкой ниже. Лента открыта с балансов, поэтому подсвечена их вкладка. Карандаш в шапке открывает карточку счёта [D-02].</em></figcaption>
+<figcaption class="cap"><span class="sid">A-03</span><b>Просмотреть ленту счёта</b><span class="uc">UC-06</span><em>Баланс — строкой под шапкой, а не карточкой: четверть первого экрана под одно число не уходит. Подпись строки — место, иначе группа; группа, чьё название повторяет подкатегорию («Без категории»), не пишется второй раз. Заметка — своей строкой ниже. Лента открыта с балансов, поэтому подсвечена их вкладка. Карандаш в шапке открывает карточку счёта [D-02]. Строка «Кофе» смахнута влево: под ней «Удалить» с тем же подтверждением, что в карточке [C-07]. Кнопка «+» уходит за край, пока ленту листают вниз, и возвращается при прокрутке вверх.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Карта основная</h2><svg class="ic"><use href="#i-pencil"/></svg></div>
   <div class="balrow"><span>Баланс</span><b>71 920,50 ₽</b></div>
@@ -386,7 +399,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
   <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Вклад на отпуск</div><div class="s">Перевод</div></div><span class="num">-5 000,00 ₽</span></div></div>
   <div class="date"><span>24 августа</span><span class="pos">+89 680,00 ₽</span></div>
   <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Доход</div><div class="n">Аванс</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
-  <div class="row fr"><svg class="ic"><use href="#i-coffee"/></svg><div class="g"><div><div class="t">Кофе</div><div class="s">Еда</div></div><span class="num neg">-320,00 ₽</span></div></div>
+  <div class="swiped"><div class="row fr"><svg class="ic"><use href="#i-coffee"/></svg><div class="g"><div><div class="t">Кофе</div><div class="s">Еда</div></div><span class="num neg">-320,00 ₽</span></div></div><span class="rm">Удалить</span></div>
   <div class="date"><span>22 августа</span><span>-1 935,00 ₽</span></div>
   <div class="row fr"><svg class="ic"><use href="#i-pill"/></svg><div class="g"><div><div class="t">Аптека</div><div class="s">Покупки</div></div><span class="num neg">-1 890,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-adjustments"/></svg><div class="g"><div><div class="t">Разница</div><div class="s">Служебное</div><div class="n">Пересчёт наличных</div></div><span class="num neg">-45,00 ₽</span></div></div>
@@ -832,6 +845,34 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="dlg">
       <h4>Удалить «Пятерочка»?</h4>
       <p>Внимание: 3 операции останутся без места.</p>
+      <div class="acts"><b class="no">Отмена</b><b class="yes">Удалить</b></div>
+    </div>
+  </div>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-09</span><b>Удалить несколько операций</b><span class="uc">UC-08</span><em>Долгое нажатие на строке ленты включает выделение: строка отмечена знаком на месте значка и бледным фоном, касание отмечает остальные, а не открывает их. Панель над лентой — число выделенных и «Удалить»; крестик и «назад» снимают выделение, кнопка «+» спрятана. Подтверждение называет число операций и балансы всех затронутых счетов.</em></figcaption>
+<div class="phone">
+  <div class="hd"><h2>Операции</h2></div>
+  <div class="selbar"><svg class="ic"><use href="#i-x"/></svg><b>Выбрано: 2</b><span class="del">Удалить</span></div>
+  <div class="date"><span>25 августа</span><span>-6 250,00 ₽</span></div>
+  <div class="row fr sel"><svg class="ic"><use href="#i-circle-check"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка · Карта основная</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Перевод</div><div class="s">Карта основная → Вклад на отпуск</div></div><span class="num">-5 000,00 ₽</span></div></div>
+  <div class="date"><span>24 августа</span><span class="pos">+89 540,00 ₽</span></div>
+  <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Доход · Карта основная</div><div class="n">Аванс</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-bus"/></svg><div class="g"><div><div class="t">Метро, автобус</div><div class="s">Транспорт · Наличные</div></div><span class="num neg">-140,00 ₽</span></div></div>
+  <div class="row fr sel"><svg class="ic"><use href="#i-circle-check"/></svg><div class="g"><div><div class="t">Кофе</div><div class="s">Еда · Карта основная</div></div><span class="num neg">-320,00 ₽</span></div></div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+  <div class="veil">
+    <div class="dlg">
+      <h4>Удалить 2 операции?</h4>
+      <p>Баланс «Карта основная» станет 73 490,50 ₽. Отменить удаление будет нельзя.</p>
       <div class="acts"><b class="no">Отмена</b><b class="yes">Удалить</b></div>
     </div>
   </div>

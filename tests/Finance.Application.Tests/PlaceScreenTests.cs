@@ -2,6 +2,7 @@ using Finance.Application.Features.Places.Card;
 using Finance.Application.Features.Places.Catalog;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Queries;
 
 namespace Finance.Application.Tests;
@@ -172,7 +173,7 @@ public sealed class PlaceScreenTests
         Guid account = await fixture.AccountAsync("Карта", 1000m);
         Guid transaction = await fixture.SaveAsync(fixture.Expense(account, 10m, place: "Пятёрочка"));
 
-        await fixture.Database.Resolve<IDeleteTransactionHandler>().HandleAsync(transaction);
+        await fixture.Database.Resolve<IDeleteTransactionsHandler>().HandleAsync([transaction]);
 
         PlaceListItem place = Assert.Single(await fixture.Database.Resolve<IPlacesQuery>().ReadAsync());
 

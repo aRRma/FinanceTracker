@@ -1,8 +1,11 @@
 using Finance.Application.Features.Transactions.Card;
+using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
+using Finance.Application.Texts;
 using Finance.Domain.Enums;
 using Finance.Domain.Errors;
 using Finance.Domain.Values;
@@ -171,7 +174,7 @@ public sealed class TransactionsTests
         Guid cash = await given.AccountAsync("Наличные", 1000m);
         Guid key = await given.SaveAsync(given.Expense(cash, 200m));
 
-        await given.Database.Resolve<IDeleteTransactionHandler>().HandleAsync(key);
+        await given.Database.Resolve<IDeleteTransactionsHandler>().HandleAsync([key]);
 
         Assert.Equal(1000m, (await given.BalanceAsync(cash)).Amount);
         Assert.Null(await given.Database.Resolve<ITransactionCardQuery>().ReadAsync(key));
@@ -194,10 +197,102 @@ public sealed class TransactionsTests
         Guid cash = await given.AccountAsync("Наличные");
         Guid key = await given.SaveAsync(given.Expense(cash, 200m));
 
-        IDeleteTransactionHandler handler = given.Database.Resolve<IDeleteTransactionHandler>();
+        IDeleteTransactionsHandler handler = given.Database.Resolve<IDeleteTransactionsHandler>();
 
-        await handler.HandleAsync(key);
-        await handler.HandleAsync(key);
+        await handler.HandleAsync([key]);
+        await handler.HandleAsync([key]);
+    }
+
+    /// <summary>
+    /// Выделенные в ленте операции удаляются одной правкой: одно оповещение, а не по
+    /// одному на строку, — иначе лента перечитывалась бы на каждой и показывала
+    /// удаление наполовину. Балансы обоих счетов перевода возвращаются.
+    /// </summary>
+    [Fact]
+    public async Task Несколько_операций_удаляются_одним_изменением()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1000m);
+        Guid card = await given.AccountAsync("Карта");
+
+        Guid[] keys =
+        [
+            await given.SaveAsync(given.Expense(cash, 200m)),
+            await given.SaveAsync(given.Income(cash, 50m)),
+            await given.SaveAsync(given.Transfer(cash, card, 300m))
+        ];
+
+        List<DataChange> changes = [];
+        given.Database.Resolve<IChangeNotifier>().Changed += changes.Add;
+
+        await given.Database.Resolve<IDeleteTransactionsHandler>().HandleAsync(keys);
+
+        Assert.Equal([DataChange.Transactions], changes);
+        Assert.Equal(1000m, (await given.BalanceAsync(cash)).Amount);
+        Assert.Equal(0m, (await given.BalanceAsync(card)).Amount);
+    }
+
+    /// <summary>
+    /// Повторное удаление уже удалённых ничего не меняет и экраны не дёргает.
+    /// </summary>
+    [Fact]
+    public async Task Повторное_удаление_нескольких_ничего_не_меняет()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1000m);
+        Guid[] keys = [await given.SaveAsync(given.Expense(cash, 200m)), await given.SaveAsync(given.Expense(cash, 100m))];
+
+        IDeleteTransactionsHandler handler = given.Database.Resolve<IDeleteTransactionsHandler>();
+        await handler.HandleAsync(keys);
+
+        List<DataChange> changes = [];
+        given.Database.Resolve<IChangeNotifier>().Changed += changes.Add;
+
+        await handler.HandleAsync(keys);
+
+        Assert.Empty(changes);
+        Assert.Equal(1000m, (await given.BalanceAsync(cash)).Amount);
+    }
+
+    /// <summary>
+    /// Подтверждение удаления нескольких операций называет их число и сводит сдвиг
+    /// баланса по счёту: две траты с одной карты — одна фраза о карте, а не две.
+    /// Уже удалённая в число не входит.
+    /// </summary>
+    [Fact]
+    public async Task Подтверждение_удаления_нескольких_сводит_балансы_по_счетам()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1000m);
+        Guid card = await given.AccountAsync("Карта");
+
+        Guid gone = await given.SaveAsync(given.Expense(cash, 50m));
+        Guid[] keys =
+        [
+            gone,
+            await given.SaveAsync(given.Expense(cash, 100m)),
+            await given.SaveAsync(given.Expense(cash, 200m)),
+            await given.SaveAsync(given.Income(cash, 50m)),
+            await given.SaveAsync(given.Transfer(cash, card, 300m))
+        ];
+
+        await given.Database.Resolve<IDeleteTransactionsHandler>().HandleAsync([gone]);
+
+        TransactionDeletion deletion = await given.Database.Resolve<ITransactionDeletionQuery>().ReadAsync(keys);
+
+        // Сейчас наличных 450, на карте 300: удаление трат и перевода вернёт деньги,
+        // удаление дохода их заберёт — выйдет 1000 и 0. Четыре — форма «операции»
+        Assert.Equal(4, deletion.Count);
+        Assert.Equal(
+            string.Format(UiCulture.Current, UiTexts.TransactionDeleteManyConfirmTitle, $"4 {UiTexts.TransactionsCountFew}"),
+            deletion.Title);
+        Assert.Equal(
+            [new BalanceAfterDeletion("Наличные", Money.Create(1000m, Currency.RUB)), new BalanceAfterDeletion("Карта", Money.Create(0m, Currency.RUB))],
+            deletion.Balances);
+        Assert.EndsWith(UiTexts.TransactionDeleteIrreversible, deletion.Message, StringComparison.Ordinal);
     }
 
     /// <summary>

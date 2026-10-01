@@ -112,11 +112,14 @@ public partial class TransactionPage : DataPage
     /// </summary>
     private async Task DeleteAsync()
     {
-        string consequence = await _model.DeletePromptAsync();
+        if (await _model.DeletePromptAsync() is not { } deletion)
+        {
+            return;
+        }
 
         bool confirmed = await DisplayAlertAsync(
-            UiTexts.TransactionDeleteConfirmTitle,
-            consequence,
+            deletion.Title,
+            deletion.Message,
             UiTexts.CommonDelete,
             UiTexts.CommonCancel);
 

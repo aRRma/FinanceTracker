@@ -6,94 +6,166 @@
 
     Пустое состояние приходит снаружи: у общей ленты это приглашение записать
     первую операцию, у ленты счёта — ещё и строка начального остатка.
+
+    Удаление — здесь же, общее для обеих лент: смахивание строки влево удаляет
+    одну операцию, долгое нажатие включает выделение для нескольких.
 -->
 <ContentView
     x:Class="Finance.App.Controls.FeedList"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:feed="clr-namespace:Finance.Application.Features.Feed;assembly=Finance.Application"
     xmlns:controls="clr-namespace:Finance.App.Controls"
     x:DataType="feed:FeedViewModel"
     x:Name="Root">
 
-    <!-- Признак жеста свой, а не занятость модели: RefreshView на каждый его подъём
-         запускает обновление, и чтение, поднявшее признак само, запускало бы второе.
-         Обработчик, а не команда: сбой команды из разметки закрыл бы окно молча -->
-    <RefreshView IsRefreshing="{Binding IsRefreshing}" Refreshing="OnRefreshing">
+    <Grid RowDefinitions="Auto,*">
 
-        <CollectionView
-            ItemsSource="{Binding Days}"
-            IsGrouped="True"
-            SelectionMode="None"
-            RemainingItemsThreshold="10"
-            RemainingItemsThresholdReached="OnRemainingItemsThresholdReached"
-            EmptyView="{Binding Empty, Source={x:Reference Root}, x:DataType=controls:FeedList}">
+        <!-- Панель выделения — над списком, а не в шапке страницы: шапки у двух лент
+             разные, а выделение одно. Крестик снимает выделение, как и «назад» -->
+        <Grid Grid.Row="0" IsVisible="{Binding IsSelecting}" Padding="8,6" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8"
+              BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}">
+            <Border Grid.Column="0" Style="{StaticResource IconButton}"
+                    SemanticProperties.Description="{x:Static texts:UiTexts.FeedSelectionEnd}">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnEndSelection" />
+                </Border.GestureRecognizers>
+                <controls:Icon Key="x" HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <Label Grid.Column="1" Text="{Binding SelectionTitle}" VerticalOptions="Center"
+                   FontFamily="OpenSansSemibold" FontSize="17" AutomationId="SelectionTitle" />
+            <Button Grid.Column="2" Text="{x:Static texts:UiTexts.CommonDelete}" Style="{StaticResource BarDangerButton}"
+                    Clicked="OnDeleteSelected" AutomationId="DeleteSelected" />
+        </Grid>
 
-            <CollectionView.GroupHeaderTemplate>
-                <DataTemplate x:DataType="feed:FeedDay">
-                    <!-- Шапка дня утоплена в фон: две серые подписи на фоне страницы
-                         не отделяли один день от другого -->
-                    <Grid Padding="16,8,16,6" ColumnDefinitions="*,Auto"
-                          BackgroundColor="{AppThemeBinding Light={StaticResource SunkLight}, Dark={StaticResource SunkDark}}">
-                        <Label Grid.Column="0" Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
-                        <Label Grid.Column="1" Text="{Binding Total}" Style="{StaticResource AmountSectionLabel}">
-                            <Label.Triggers>
-                                <!-- День в плюсе — смысловым цветом, как доход в строке; цвет, а не стиль:
-                                     стиль шапки со своим шрифтом обязан остаться -->
-                                <DataTrigger TargetType="Label" Binding="{Binding IsTotalPositive}" Value="True">
-                                    <Setter Property="TextColor"
-                                            Value="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
-                                </DataTrigger>
-                            </Label.Triggers>
-                        </Label>
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.GroupHeaderTemplate>
+        <!-- Признак жеста свой, а не занятость модели: RefreshView на каждый его подъём
+             запускает обновление, и чтение, поднявшее признак само, запускало бы второе.
+             Обработчик, а не команда: сбой команды из разметки закрыл бы окно молча -->
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Refreshing="OnRefreshing">
 
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="feed:FeedRowItem">
-                    <Grid Padding="16,10,16,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto,Auto"
-                          MinimumHeightRequest="{StaticResource TouchTarget}"
-                          BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnRowTapped" />
-                        </Grid.GestureRecognizers>
+            <CollectionView
+                ItemsSource="{Binding Days}"
+                IsGrouped="True"
+                SelectionMode="None"
+                RemainingItemsThreshold="10"
+                RemainingItemsThresholdReached="OnRemainingItemsThresholdReached"
+                Scrolled="OnScrolled"
+                EmptyView="{Binding Empty, Source={x:Reference Root}, x:DataType=controls:FeedList}">
 
-                        <controls:Icon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Key="{Binding Icon}" />
-                        <Label Grid.Column="1" Grid.Row="0" Text="{Binding Title}" LineBreakMode="TailTruncation" />
-                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}" LineBreakMode="TailTruncation"
-                               Style="{StaticResource SecondaryLabel}" />
-                        <!-- Заметка — своей строкой под подписью, мельче и тише: в одной строке
-                             с подписью длинная заметка вытесняла группу и срезала счёт -->
-                        <Label Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Note}"
-                               IsVisible="{Binding HasNote}" LineBreakMode="TailTruncation"
-                               Style="{StaticResource CaptionLabel}" />
-                        <!-- Разделитель — под строкой, от текста до правого края -->
-                        <BoxView Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource Divider}" Margin="0,10,0,0" />
-                        <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Amount}"
-                               VerticalOptions="Center" Style="{StaticResource AmountLabel}">
-                            <Label.Triggers>
-                                <!-- Доход и зачисление зелёным, расход красным. Списание
-                                     перевода тоже отрицательно, но остаётся обычным текстом:
-                                     деньги переложены, а не потрачены -->
-                                <DataTrigger TargetType="Label" Binding="{Binding IsPositive}" Value="True">
-                                    <Setter Property="Style" Value="{StaticResource AmountPositiveLabel}" />
-                                </DataTrigger>
-                                <DataTrigger TargetType="Label" Binding="{Binding IsExpense}" Value="True">
-                                    <Setter Property="Style" Value="{StaticResource AmountNegativeLabel}" />
-                                </DataTrigger>
-                            </Label.Triggers>
-                        </Label>
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
+                <CollectionView.GroupHeaderTemplate>
+                    <DataTemplate x:DataType="feed:FeedDay">
+                        <!-- Шапка дня утоплена в фон: две серые подписи на фоне страницы
+                             не отделяли один день от другого -->
+                        <Grid Padding="16,8,16,6" ColumnDefinitions="*,Auto"
+                              BackgroundColor="{AppThemeBinding Light={StaticResource SunkLight}, Dark={StaticResource SunkDark}}">
+                            <Label Grid.Column="0" Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
+                            <Label Grid.Column="1" Text="{Binding Total}" Style="{StaticResource AmountSectionLabel}">
+                                <Label.Triggers>
+                                    <!-- День в плюсе — смысловым цветом, как доход в строке; цвет, а не стиль:
+                                         стиль шапки со своим шрифтом обязан остаться -->
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsTotalPositive}" Value="True">
+                                        <Setter Property="TextColor"
+                                                Value="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.GroupHeaderTemplate>
 
-            <CollectionView.Footer>
-                <!-- Место под плавающую кнопку: последняя строка не должна прятаться за ней -->
-                <BoxView HeightRequest="{StaticResource FloatingButtonClearance}" Color="Transparent" />
-            </CollectionView.Footer>
-        </CollectionView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="feed:FeedRowItem">
+                        <!-- Смахивание влево открывает «Удалить» — то же подтверждение, что в форме.
+                             При выделении смахивание закрывается сразу: строка отмечается касанием -->
+                        <SwipeView SwipeStarted="OnSwipeStarted"
+                                   BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}">
+                            <SwipeView.RightItems>
+                                <SwipeItems Mode="Reveal">
+                                    <!-- Своя подпись, а не SwipeItem: у того цвет текста выбирает платформа,
+                                         и в тёмной теме белое на светло-красном не читалось -->
+                                    <SwipeItemView Invoked="OnSwipeDelete">
+                                        <Grid WidthRequest="96"
+                                              BackgroundColor="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}">
+                                            <Label Text="{x:Static texts:UiTexts.CommonDelete}" FontFamily="OpenSansSemibold"
+                                                   HorizontalOptions="Center" VerticalOptions="Center"
+                                                   TextColor="{AppThemeBinding Light={StaticResource OnAccentLight}, Dark={StaticResource OnAccentDark}}" />
+                                        </Grid>
+                                    </SwipeItemView>
+                                </SwipeItems>
+                            </SwipeView.RightItems>
 
-    </RefreshView>
+                            <!-- Касание и долгое нажатие — своей строкой, а не распознавателями MAUI:
+                                 распознаватель касания спорил бы с долгим нажатием -->
+                            <controls:FeedRow Padding="16,10,16,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"
+                                              RowDefinitions="Auto,Auto,Auto,Auto"
+                                              MinimumHeightRequest="{StaticResource TouchTarget}"
+                                              Tapped="OnRowTapped" LongPressed="OnRowLongPressed"
+                                              BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}">
+                                <controls:FeedRow.Triggers>
+                                    <!-- Выделенная строка — бледным фоном цвета действия, как выбранная строка справочника -->
+                                    <DataTrigger TargetType="controls:FeedRow" Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="BackgroundColor"
+                                                Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}" />
+                                    </DataTrigger>
+                                </controls:FeedRow.Triggers>
+
+                                <controls:Icon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Key="{Binding Icon}">
+                                    <controls:Icon.Triggers>
+                                        <!-- Отметка — на месте значка: цвет незрячему не скажет ничего,
+                                             а знак виден и без цвета -->
+                                        <DataTrigger TargetType="controls:Icon" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="Key" Value="circle-check" />
+                                            <Setter Property="Stroke"
+                                                    Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                        </DataTrigger>
+                                    </controls:Icon.Triggers>
+                                </controls:Icon>
+                                <Label Grid.Column="1" Grid.Row="0" Text="{Binding Title}" LineBreakMode="TailTruncation" />
+                                <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}" LineBreakMode="TailTruncation"
+                                       Style="{StaticResource SecondaryLabel}" />
+                                <!-- Заметка — своей строкой под подписью, мельче и тише: в одной строке
+                                     с подписью длинная заметка вытесняла группу и срезала счёт -->
+                                <Label Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Note}"
+                                       IsVisible="{Binding HasNote}" LineBreakMode="TailTruncation"
+                                       Style="{StaticResource CaptionLabel}">
+                                    <Label.Triggers>
+                                        <!-- Третичный текст на фоне выделенной строки до порога контраста
+                                             не дотягивает: там заметка вторичным -->
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="TextColor"
+                                                    Value="{AppThemeBinding Light={StaticResource Ink2Light}, Dark={StaticResource Ink2Dark}}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <!-- Разделитель — под строкой, от текста до правого края -->
+                                <BoxView Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource Divider}" Margin="0,10,0,0" />
+                                <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Text="{Binding Amount}"
+                                       VerticalOptions="Center" Style="{StaticResource AmountLabel}">
+                                    <Label.Triggers>
+                                        <!-- Доход и зачисление зелёным, расход красным. Списание
+                                             перевода тоже отрицательно, но остаётся обычным текстом:
+                                             деньги переложены, а не потрачены -->
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsPositive}" Value="True">
+                                            <Setter Property="Style" Value="{StaticResource AmountPositiveLabel}" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsExpense}" Value="True">
+                                            <Setter Property="Style" Value="{StaticResource AmountNegativeLabel}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </controls:FeedRow>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <CollectionView.Footer>
+                    <!-- Место под плавающую кнопку: последняя строка не должна прятаться за ней -->
+                    <BoxView HeightRequest="{StaticResource FloatingButtonClearance}" Color="Transparent" />
+                </CollectionView.Footer>
+            </CollectionView>
+
+        </RefreshView>
+    </Grid>
 
 </ContentView>

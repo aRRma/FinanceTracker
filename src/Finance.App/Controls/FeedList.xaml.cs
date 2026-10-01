@@ -1,4 +1,7 @@
+using System.ComponentModel;
 using Finance.Application.Features.Feed;
+using Finance.Application.Infrastructure.Deletion;
+using Finance.Application.Texts;
 
 namespace Finance.App.Controls;
 
@@ -8,10 +11,29 @@ namespace Finance.App.Controls;
 public partial class FeedList : ContentView
 {
     /// <summary>
+    /// Сколько точек пролистать в одну сторону, прежде чем кнопка спрячется или вернётся:
+    /// без порога она дёргалась бы на каждом мелком движении пальца.
+    /// </summary>
+    private const double ScrollThreshold = 24;
+
+    /// <summary>
     /// Чем заполнена пустая лента.
     /// </summary>
     public static readonly BindableProperty EmptyProperty =
         BindableProperty.Create(nameof(Empty), typeof(View), typeof(FeedList));
+
+    /// <summary>
+    /// Плавающая кнопка страницы, которую список прячет при прокрутке.
+    /// </summary>
+    public static readonly BindableProperty FloatingProperty =
+        BindableProperty.Create(nameof(Floating), typeof(View), typeof(FeedList));
+
+    private FeedViewModel? _model;
+    private Page? _page;
+
+    // Путь прокрутки в одну сторону с последней смены направления
+    private double _travel;
+    private bool _floatingHidden;
 
     /// <summary>
     /// Создаёт список.
@@ -19,6 +41,9 @@ public partial class FeedList : ContentView
     public FeedList()
     {
         InitializeComponent();
+
+        Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
     }
 
     /// <summary>
@@ -33,12 +58,58 @@ public partial class FeedList : ContentView
     }
 
     /// <summary>
+    /// Плавающая кнопка страницы. Прокрутка вниз прячет её, вверх и к началу списка —
+    /// возвращает: кнопка закрывала сумму последней видимой строки, а пользователь,
+    /// листающий вниз, читает, а не записывает. При выделении она спрятана тоже —
+    /// там нужна другая кнопка.
+    /// </summary>
+    public View? Floating
+    {
+        get => (View?)GetValue(FloatingProperty);
+        set => SetValue(FloatingProperty, value);
+    }
+
+    /// <inheritdoc />
+    protected override void OnBindingContextChanged()
+    {
+        base.OnBindingContextChanged();
+
+        _model?.PropertyChanged -= OnModelChanged;
+        _model = BindingContext as FeedViewModel;
+        _model?.PropertyChanged += OnModelChanged;
+    }
+
+    // Страница известна, только когда список уже на ней: при создании родителя ещё нет
+    private void OnLoaded(object? sender, EventArgs e)
+    {
+        _page = FindPage();
+        _page?.Appearing += OnPageAppearing;
+    }
+
+    private void OnUnloaded(object? sender, EventArgs e)
+    {
+        _page?.Appearing -= OnPageAppearing;
+        _page = null;
+    }
+
+    // Вернувшийся на страницу видит кнопку, даже если ушёл, пролистав вниз
+    private void OnPageAppearing(object? sender, EventArgs e) => ShowFloating(_model is not { IsSelecting: true });
+
+    private void OnModelChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(FeedViewModel.IsSelecting))
+        {
+            ShowFloating(_model is not { IsSelecting: true });
+        }
+    }
+
+    /// <summary>
     /// Жест «потянуть вниз». Обработчиком, а не привязкой команды: сбой команды,
     /// запущенной разметкой, закрыл бы окно молча.
     /// </summary>
     private void OnRefreshing(object? sender, EventArgs e)
     {
-        if (BindingContext is FeedViewModel model)
+        if (_model is { } model)
         {
             Guarded.Run(model.RefreshAsync);
         }
@@ -49,17 +120,183 @@ public partial class FeedList : ContentView
     /// </summary>
     private void OnRemainingItemsThresholdReached(object? sender, EventArgs e)
     {
-        if (BindingContext is FeedViewModel model)
+        if (_model is { } model)
         {
             Guarded.Run(() => model.LoadMoreAsync());
         }
     }
 
-    private void OnRowTapped(object? sender, TappedEventArgs e)
+    /// <summary>
+    /// Прячет кнопку при прокрутке вниз и возвращает при прокрутке вверх. Считается путь
+    /// в одну сторону, а не каждый сдвиг: палец, лежащий на списке, двигает его
+    /// на точку туда и обратно, и кнопка мигала бы.
+    /// </summary>
+    private void OnScrolled(object? sender, ItemsViewScrolledEventArgs e)
     {
-        if (sender is BindableObject { BindingContext: FeedRowItem row })
+        if (_model is { IsSelecting: true })
+        {
+            return;
+        }
+
+        // У начала списка кнопка видна всегда: прятать её некому мешать
+        if (e.VerticalOffset < ScrollThreshold)
+        {
+            _travel = 0;
+            ShowFloating(true);
+
+            return;
+        }
+
+        if (Math.Sign(e.VerticalDelta) != Math.Sign(_travel))
+        {
+            _travel = 0;
+        }
+
+        _travel += e.VerticalDelta;
+
+        if (Math.Abs(_travel) >= ScrollThreshold)
+        {
+            ShowFloating(_travel < 0);
+        }
+    }
+
+    private void ShowFloating(bool visible)
+    {
+        if (Floating is not { } floating || _floatingHidden == !visible)
+        {
+            return;
+        }
+
+        _floatingHidden = !visible;
+
+        // Уезжает вниз за край на свою высоту с отступом, а не гаснет прозрачностью:
+        // прозрачная кнопка ловила бы касания поверх строк
+        double shift = visible ? 0 : floating.Height + floating.Margin.Bottom + floating.Margin.Top;
+
+        floating.InputTransparent = !visible;
+        Guarded.Run(() => floating.TranslateToAsync(0, shift, 200, visible ? Easing.CubicOut : Easing.CubicIn));
+    }
+
+    /// <summary>
+    /// Касание строки открывает операцию, а при выделении — отмечает строку.
+    /// </summary>
+    private void OnRowTapped(object? sender, EventArgs e)
+    {
+        if (sender is not BindableObject { BindingContext: FeedRowItem row } || _model is not { } model)
+        {
+            return;
+        }
+
+        if (model.IsSelecting)
+        {
+            model.ToggleSelection(row.Key);
+        }
+        else
         {
             Navigator.Go($"{Routes.Transaction}?key={row.Key}");
         }
+    }
+
+    /// <summary>
+    /// Долгое нажатие включает выделение с этой строки; при выделении — отмечает, как касание.
+    /// </summary>
+    private void OnRowLongPressed(object? sender, EventArgs e)
+    {
+        if (sender is not BindableObject { BindingContext: FeedRowItem row } || _model is not { } model)
+        {
+            return;
+        }
+
+        if (model.IsSelecting)
+        {
+            model.ToggleSelection(row.Key);
+        }
+        else
+        {
+            model.StartSelection(row.Key);
+        }
+    }
+
+    private void OnEndSelection(object? sender, TappedEventArgs e) => _model?.EndSelection();
+
+    /// <summary>
+    /// Смахивание при выделении закрывается сразу: строку там отмечают касанием,
+    /// и «Удалить» у одной строки рядом с «Удалить» выделенного путало бы, что удалится.
+    /// </summary>
+    private void OnSwipeStarted(object? sender, SwipeStartedEventArgs e)
+    {
+        if (_model is { IsSelecting: true } && sender is SwipeView swipe)
+        {
+            swipe.Close(animated: false);
+        }
+    }
+
+    private void OnSwipeDelete(object? sender, EventArgs e)
+    {
+        if (sender is BindableObject { BindingContext: FeedRowItem row } && _model is { } model)
+        {
+            Guarded.Run(() => DeleteOneAsync(model, row.Key));
+        }
+    }
+
+    private void OnDeleteSelected(object? sender, EventArgs e)
+    {
+        if (_model is { } model)
+        {
+            Guarded.Run(() => DeleteSelectedAsync(model));
+        }
+    }
+
+    /// <summary>
+    /// Подтверждение обязательно, как в форме: отмены и корзины нет, и диалог —
+    /// единственная защита. Он называет последствие — каким станет баланс.
+    /// </summary>
+    private async Task DeleteOneAsync(FeedViewModel model, Guid key)
+    {
+        TransactionDeletion deletion = await model.DeletePromptAsync(key);
+
+        // Операцию уже удалили — спрашивать не о чем
+        if (deletion.Count > 0 && await ConfirmAsync(deletion))
+        {
+            await model.DeleteAsync(key);
+        }
+    }
+
+    /// <summary>
+    /// Удалять нечего — выделенное уже удалено, — значит, и спрашивать не о чем:
+    /// выделение снимается целиком, с отметками. Перечитывания после пустого
+    /// удаления не будет, и отметки иначе остались бы на строках.
+    /// </summary>
+    private async Task DeleteSelectedAsync(FeedViewModel model)
+    {
+        TransactionDeletion deletion = await model.DeleteSelectedPromptAsync();
+
+        if (deletion.Count == 0)
+        {
+            model.EndSelection();
+
+            return;
+        }
+
+        if (await ConfirmAsync(deletion))
+        {
+            await model.DeleteSelectedAsync();
+        }
+    }
+
+    private async Task<bool> ConfirmAsync(TransactionDeletion deletion) =>
+        FindPage() is { } page
+        && await page.DisplayAlertAsync(deletion.Title, deletion.Message, UiTexts.CommonDelete, UiTexts.CommonCancel);
+
+    private Page? FindPage()
+    {
+        Element? element = Parent;
+
+        while (element is not null and not Page)
+        {
+            element = element.Parent;
+        }
+
+        return element as Page;
     }
 }

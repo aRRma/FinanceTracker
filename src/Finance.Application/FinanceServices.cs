@@ -16,6 +16,7 @@ using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Features.WalletImport;
 using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
@@ -124,7 +125,8 @@ public static class FinanceServices
         services.AddSingleton<ITransactionFormQuery, TransactionFormQuery>();
         services.AddSingleton<ITransactionCardQuery, TransactionCardQuery>();
         services.AddSingleton<ISaveTransactionHandler, SaveTransactionHandler>();
-        services.AddSingleton<IDeleteTransactionHandler, DeleteTransactionHandler>();
+        services.AddSingleton<IDeleteTransactionsHandler, DeleteTransactionsHandler>();
+        services.AddSingleton<ITransactionDeletionQuery, TransactionDeletionQuery>();
         services.AddSingleton<IReportQuery, ReportQuery>();
         services.AddSingleton<IFrequentCategoriesQuery, FrequentCategoriesQuery>();
         services.AddSingleton<IWalletImportHandler, WalletImportHandler>();

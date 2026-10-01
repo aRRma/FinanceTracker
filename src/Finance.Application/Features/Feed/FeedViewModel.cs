@@ -1,7 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Queries;
+using Finance.Application.Texts;
 using Finance.Domain.Values;
 
 namespace Finance.Application.Features.Feed;
@@ -9,9 +11,10 @@ namespace Finance.Application.Features.Feed;
 /// <summary>
 /// Лента операций — общая и по одному счёту, одной моделью: различаются только
 /// шапка, подпись строки и то, чем заполнена пустота. Читается постранично:
-/// при десятках тысяч операций поднимать ленту целиком нельзя.
+/// при десятках тысяч операций поднимать ленту целиком нельзя. Из ленты операции
+/// удаляют — смахиванием по одной или выделением по нескольку.
 /// </summary>
-public sealed partial class FeedViewModel : ScreenViewModel
+public sealed partial class FeedViewModel : ScreenViewModel, ISelectionModel
 {
     /// <summary>
     /// Строк на страницу: экран с запасом на пару прокруток.
@@ -20,7 +23,13 @@ public sealed partial class FeedViewModel : ScreenViewModel
 
     private readonly IFeedQuery _feed;
     private readonly IAccountsQuery _accounts;
+    private readonly IDeleteTransactionsHandler _delete;
+    private readonly ITransactionDeletionQuery _deletion;
     private readonly IClock _clock;
+
+    // Выделенные операции — ключами, отдельно от строк: строки при перечитывании
+    // создаются заново, а отметки обязаны пережить его у оставшихся
+    private readonly HashSet<Guid> _selected = [];
 
     private int _loaded;
 
@@ -41,17 +50,29 @@ public sealed partial class FeedViewModel : ScreenViewModel
     /// </summary>
     /// <param name="feed">Чтение ленты.</param>
     /// <param name="accounts">Счета с балансами — для шапки ленты счёта.</param>
+    /// <param name="delete">Удаление операций.</param>
+    /// <param name="deletion">Последствия удаления — для текста подтверждения.</param>
     /// <param name="clock">Часы: «сегодня» пользователя для шапок дней.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
-    public FeedViewModel(IFeedQuery feed, IAccountsQuery accounts, IClock clock, IChangeNotifier changes)
+    public FeedViewModel(
+        IFeedQuery feed,
+        IAccountsQuery accounts,
+        IDeleteTransactionsHandler delete,
+        ITransactionDeletionQuery deletion,
+        IClock clock,
+        IChangeNotifier changes)
         : base(changes)
     {
         ArgumentNullException.ThrowIfNull(feed);
         ArgumentNullException.ThrowIfNull(accounts);
+        ArgumentNullException.ThrowIfNull(delete);
+        ArgumentNullException.ThrowIfNull(deletion);
         ArgumentNullException.ThrowIfNull(clock);
 
         _feed = feed;
         _accounts = accounts;
+        _delete = delete;
+        _deletion = deletion;
         _clock = clock;
     }
 
@@ -127,6 +148,19 @@ public sealed partial class FeedViewModel : ScreenViewModel
     public partial bool HasMore { get; private set; }
 
     /// <summary>
+    /// Включено выделение: касание строки отмечает её, а не открывает.
+    /// Включается долгим нажатием, выключается «назад», крестиком и удалением.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsSelecting { get; private set; }
+
+    /// <summary>
+    /// Сколько строк выделено — подпись панели выделения.
+    /// </summary>
+    [ObservableProperty]
+    public partial string SelectionTitle { get; private set; } = string.Empty;
+
+    /// <summary>
     /// Лента устарела: пока её не было видно, изменились операции или справочники,
     /// или наступил другой день. Неустаревшую ленту на возврате не перечитывают:
     /// перечитывание вернуло бы прокрутку к началу, и заглянувший в операцию
@@ -175,6 +209,7 @@ public sealed partial class FeedViewModel : ScreenViewModel
             List<FeedDay> fresh = [];
             Append(page, fresh);
             Replace(fresh);
+            ForgetVanished();
 
             IsEmpty = page.Items.Count == 0;
             IsLoaded = true;
@@ -231,6 +266,187 @@ public sealed partial class FeedViewModel : ScreenViewModel
     }
 
     /// <summary>
+    /// Долгое нажатие: включает выделение и отмечает строку, на которой оно было.
+    /// </summary>
+    /// <param name="key">Ключ операции.</param>
+    public void StartSelection(Guid key)
+    {
+        IsSelecting = true;
+
+        if (_selected.Add(key))
+        {
+            Mark(key, selected: true);
+        }
+
+        ShowCount();
+    }
+
+    /// <summary>
+    /// Касание строки при выделении: отмечает её или снимает отметку. Снята последняя —
+    /// выделение выключается само: пустое выделение ничего не умеет, а касание
+    /// следующей строки иначе отметило бы её, вместо того чтобы открыть.
+    /// </summary>
+    /// <param name="key">Ключ операции.</param>
+    public void ToggleSelection(Guid key)
+    {
+        if (!IsSelecting)
+        {
+            return;
+        }
+
+        bool selected = !_selected.Remove(key);
+
+        if (selected)
+        {
+            _selected.Add(key);
+        }
+
+        Mark(key, selected);
+
+        if (_selected.Count == 0)
+        {
+            EndSelection();
+        }
+        else
+        {
+            ShowCount();
+        }
+    }
+
+    /// <inheritdoc />
+    public void EndSelection()
+    {
+        // Один проход по строкам, а не поиск каждой отмеченной: снятие идёт
+        // на каждом уходе со страницы, а прочитанных строк бывают тысячи
+        if (_selected.Count > 0)
+        {
+            foreach (FeedDay day in Days)
+            {
+                for (int i = 0; i < day.Count; i++)
+                {
+                    if (day[i].IsSelected)
+                    {
+                        day[i] = day[i] with { IsSelected = false };
+                    }
+                }
+            }
+        }
+
+        ForgetSelection();
+    }
+
+    private void ForgetSelection()
+    {
+        _selected.Clear();
+        IsSelecting = false;
+        SelectionTitle = string.Empty;
+    }
+
+    /// <summary>
+    /// Последствия удаления одной операции — для подтверждения смахивания.
+    /// </summary>
+    /// <param name="key">Ключ операции.</param>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    public Task<TransactionDeletion> DeletePromptAsync(Guid key, CancellationToken cancellationToken = default) =>
+        _deletion.ReadAsync([key], cancellationToken);
+
+    /// <summary>
+    /// Последствия удаления выделенного — для подтверждения.
+    /// </summary>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    public Task<TransactionDeletion> DeleteSelectedPromptAsync(CancellationToken cancellationToken = default) =>
+        _deletion.ReadAsync([.. _selected], cancellationToken);
+
+    /// <summary>
+    /// Удаляет одну операцию. Подтверждение уже получено экраном.
+    /// </summary>
+    /// <param name="key">Ключ операции.</param>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    public Task DeleteAsync(Guid key, CancellationToken cancellationToken = default) =>
+        _delete.HandleAsync([key], cancellationToken);
+
+    /// <summary>
+    /// Удаляет выделенное и выключает выделение. Подтверждение уже получено экраном.
+    /// </summary>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    public async Task DeleteSelectedAsync(CancellationToken cancellationToken = default)
+    {
+        if (_selected.Count == 0)
+        {
+            return;
+        }
+
+        await _delete.HandleAsync([.. _selected], cancellationToken);
+
+        // После записи, а не до: не удалось — отметки остаются, и повторить
+        // можно, не выделяя заново. Строки не перекрашиваются: перечитывание
+        // по оповещению о записи их уберёт, а замены строк вперемешку с заменой
+        // их дня роняли сгруппированный список рассинхроном позиций
+        ForgetSelection();
+    }
+
+    /// <summary>
+    /// Ставит в день строку с новой отметкой на место прежней. Строку целиком, а не
+    /// признак у неё: заменённая строка приходит в список одной заменой, и перерисовывается
+    /// только она.
+    /// </summary>
+    private void Mark(Guid key, bool selected)
+    {
+        foreach (FeedDay day in Days)
+        {
+            for (int i = 0; i < day.Count; i++)
+            {
+                if (day[i].Key == key)
+                {
+                    if (day[i].IsSelected != selected)
+                    {
+                        day[i] = day[i] with { IsSelected = selected };
+                    }
+
+                    return;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// После перечитывания забывает отметки строк, которых в ленте больше нет:
+    /// их удалили или перенесли на другой счёт, и удалять их отсюда было бы
+    /// удалением невидимого.
+    /// </summary>
+    private void ForgetVanished()
+    {
+        if (_selected.Count == 0)
+        {
+            return;
+        }
+
+        HashSet<Guid> shown = [];
+
+        foreach (FeedDay day in Days)
+        {
+            foreach (FeedRowItem row in day)
+            {
+                shown.Add(row.Key);
+            }
+        }
+
+        _selected.IntersectWith(shown);
+
+        if (_selected.Count == 0)
+        {
+            EndSelection();
+        }
+        else
+        {
+            ShowCount();
+        }
+    }
+
+    private void ShowCount() =>
+        SelectionTitle = string.Format(UiCulture.Current, UiTexts.FeedSelectedCount, _selected.Count);
+
+    /// <summary>
     /// Раскладывает строки страницы по дням. Первая строка страницы может
     /// продолжать день с прошлой страницы — тогда она встаёт в него, а не заводит
     /// вторую шапку с той же датой.
@@ -250,7 +466,9 @@ public sealed partial class FeedViewModel : ScreenViewModel
                 days.Add(current);
             }
 
-            current.Add(FeedRowItem.From(item, showAccount: !IsAccountFeed));
+            FeedRowItem row = FeedRowItem.From(item, showAccount: !IsAccountFeed);
+
+            current.Add(_selected.Contains(row.Key) ? row with { IsSelected = true } : row);
         }
 
         _loaded += page.Items.Count;
@@ -264,11 +482,30 @@ public sealed partial class FeedViewModel : ScreenViewModel
     /// </summary>
     private void Replace(List<FeedDay> fresh)
     {
+        // Опустевшая лента очищается сбросом, а не поштучно: убранный поштучно
+        // последний день оставлял список пустым без заглушки «операций нет».
+        // Прокрутку беречь в пустом списке незачем
+        if (fresh.Count == 0)
+        {
+            Days.Clear();
+
+            return;
+        }
+
         for (int i = 0; i < fresh.Count; i++)
         {
             if (i >= Days.Count)
             {
                 Days.Add(fresh[i]);
+            }
+            else if (fresh[i].Count != Days[i].Count)
+            {
+                // Замена дня с другим числом строк приходит в сгруппированный список
+                // одним изменённым элементом, и тот падал с рассинхроном позиций,
+                // когда из дня удаляли несколько строк. Удаление со вставкой он
+                // понимает однозначно, а прокрутку они не сбрасывают
+                Days.RemoveAt(i);
+                Days.Insert(i, fresh[i]);
             }
             else if (!fresh[i].SameAs(Days[i]))
             {

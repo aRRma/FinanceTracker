@@ -23,6 +23,9 @@ public partial class AccountFeedPage : DataPage
 
         InitializeComponent();
 
+        // Кнопка объявлена в разметке после списка: ссылкой вперёд её не достать
+        List.Floating = AddButton;
+
         _model = model;
         BindingContext = model;
     }

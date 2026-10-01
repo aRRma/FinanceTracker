@@ -3,8 +3,10 @@ using Finance.Application.Features.Feed;
 using Finance.Application.Features.Places.Card;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
+using Finance.Application.Texts;
 using Finance.Domain.Enums;
 using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
@@ -125,7 +127,7 @@ public sealed class FeedTests
         Guid cash = await given.AccountAsync("Наличные");
         Guid key = await given.SaveAsync(given.Expense(cash, 10m));
 
-        await given.Database.Resolve<IDeleteTransactionHandler>().HandleAsync(key);
+        await given.Database.Resolve<IDeleteTransactionsHandler>().HandleAsync([key]);
 
         Assert.Empty((await given.FeedAsync()).Items);
     }
@@ -247,6 +249,8 @@ public sealed class FeedTests
         FeedViewModel model = new(
             new PagedFeed(given.Database.Resolve<IFeedQuery>(), pageSize: 2),
             given.Database.Resolve<IAccountsQuery>(),
+            given.Database.Resolve<IDeleteTransactionsHandler>(),
+            given.Database.Resolve<ITransactionDeletionQuery>(),
             given.Database.Resolve<IClock>(),
             given.Database.Resolve<IChangeNotifier>());
 
@@ -285,6 +289,8 @@ public sealed class FeedTests
         FeedViewModel model = new(
             given.Database.Resolve<IFeedQuery>(),
             given.Database.Resolve<IAccountsQuery>(),
+            given.Database.Resolve<IDeleteTransactionsHandler>(),
+            given.Database.Resolve<ITransactionDeletionQuery>(),
             given.Database.Resolve<IClock>(),
             given.Database.Resolve<IChangeNotifier>());
 
@@ -324,6 +330,8 @@ public sealed class FeedTests
         FeedViewModel model = new(
             given.Database.Resolve<IFeedQuery>(),
             given.Database.Resolve<IAccountsQuery>(),
+            given.Database.Resolve<IDeleteTransactionsHandler>(),
+            given.Database.Resolve<ITransactionDeletionQuery>(),
             given.Database.Resolve<IClock>(),
             given.Database.Resolve<IChangeNotifier>());
 
@@ -358,6 +366,8 @@ public sealed class FeedTests
         FeedViewModel model = new(
             given.Database.Resolve<IFeedQuery>(),
             given.Database.Resolve<IAccountsQuery>(),
+            given.Database.Resolve<IDeleteTransactionsHandler>(),
+            given.Database.Resolve<ITransactionDeletionQuery>(),
             given.Database.Resolve<IClock>(),
             given.Database.Resolve<IChangeNotifier>());
 
@@ -386,6 +396,8 @@ public sealed class FeedTests
         FeedViewModel model = new(
             given.Database.Resolve<IFeedQuery>(),
             given.Database.Resolve<IAccountsQuery>(),
+            given.Database.Resolve<IDeleteTransactionsHandler>(),
+            given.Database.Resolve<ITransactionDeletionQuery>(),
             clock,
             given.Database.Resolve<IChangeNotifier>());
 
@@ -445,6 +457,8 @@ public sealed class FeedTests
         FeedViewModel model = new(
             given.Database.Resolve<IFeedQuery>(),
             accounts,
+            given.Database.Resolve<IDeleteTransactionsHandler>(),
+            given.Database.Resolve<ITransactionDeletionQuery>(),
             given.Database.Resolve<IClock>(),
             given.Database.Resolve<IChangeNotifier>());
 
@@ -474,6 +488,8 @@ public sealed class FeedTests
         FeedViewModel model = new(
             new PagedFeed(given.Database.Resolve<IFeedQuery>(), pageSize: 20),
             given.Database.Resolve<IAccountsQuery>(),
+            given.Database.Resolve<IDeleteTransactionsHandler>(),
+            given.Database.Resolve<ITransactionDeletionQuery>(),
             given.Database.Resolve<IClock>(),
             given.Database.Resolve<IChangeNotifier>());
 
@@ -502,6 +518,8 @@ public sealed class FeedTests
         FeedViewModel model = new(
             given.Database.Resolve<IFeedQuery>(),
             given.Database.Resolve<IAccountsQuery>(),
+            given.Database.Resolve<IDeleteTransactionsHandler>(),
+            given.Database.Resolve<ITransactionDeletionQuery>(),
             given.Database.Resolve<IClock>(),
             given.Database.Resolve<IChangeNotifier>());
 
@@ -528,6 +546,8 @@ public sealed class FeedTests
         FeedViewModel model = new(
             given.Database.Resolve<IFeedQuery>(),
             given.Database.Resolve<IAccountsQuery>(),
+            given.Database.Resolve<IDeleteTransactionsHandler>(),
+            given.Database.Resolve<ITransactionDeletionQuery>(),
             given.Database.Resolve<IClock>(),
             given.Database.Resolve<IChangeNotifier>());
 
@@ -571,6 +591,180 @@ public sealed class FeedTests
         Assert.Contains("ix_transactions_feed", plan, StringComparison.Ordinal);
         Assert.DoesNotContain("TEMP B-TREE", plan, StringComparison.Ordinal);
     }
+
+    /// <summary>
+    /// Долгое нажатие включает выделение и отмечает строку, касание отмечает и снимает,
+    /// а снятие последней отметки выключает выделение само.
+    /// </summary>
+    [Fact]
+    public async Task Выделение_отмечает_и_снимает_строки()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+        Guid first = await given.SaveAsync(given.Expense(cash, 10m));
+        Guid second = await given.SaveAsync(given.Expense(cash, 20m));
+
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
+        await model.LoadAsync(accountKey: null);
+
+        model.StartSelection(first);
+
+        Assert.True(model.IsSelecting);
+        Assert.True(Row(model, first).IsSelected);
+        Assert.False(Row(model, second).IsSelected);
+        Assert.Equal(string.Format(UiCulture.Current, UiTexts.FeedSelectedCount, 1), model.SelectionTitle);
+
+        model.ToggleSelection(second);
+        model.ToggleSelection(first);
+
+        Assert.False(Row(model, first).IsSelected);
+        Assert.True(Row(model, second).IsSelected);
+
+        model.ToggleSelection(second);
+
+        Assert.False(model.IsSelecting);
+        Assert.False(Row(model, second).IsSelected);
+    }
+
+    /// <summary>
+    /// Без выделения касание строки ничего не отмечает: оно открывает операцию.
+    /// </summary>
+    [Fact]
+    public async Task Касание_без_выделения_не_отмечает()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+        Guid key = await given.SaveAsync(given.Expense(cash, 10m));
+
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
+        await model.LoadAsync(accountKey: null);
+
+        model.ToggleSelection(key);
+
+        Assert.False(model.IsSelecting);
+        Assert.False(Row(model, key).IsSelected);
+    }
+
+    /// <summary>
+    /// «Назад» и уход с экрана снимают отметки со всех строк разом.
+    /// </summary>
+    [Fact]
+    public async Task Снятие_выделения_снимает_все_отметки()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+        Guid first = await given.SaveAsync(given.Expense(cash, 10m));
+        Guid second = await given.SaveAsync(given.Expense(cash, 20m));
+
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
+        await model.LoadAsync(accountKey: null);
+
+        model.StartSelection(first);
+        model.ToggleSelection(second);
+        model.EndSelection();
+
+        Assert.False(model.IsSelecting);
+        Assert.DoesNotContain(model.Days.SelectMany(static day => day), static row => row.IsSelected);
+        Assert.Empty(model.SelectionTitle);
+    }
+
+    /// <summary>
+    /// Перечитывание ленты — чужая правка, возврат с формы — сохраняет отметки
+    /// у оставшихся строк и забывает исчезнувшие; исчезли все — выделение выключено.
+    /// </summary>
+    [Fact]
+    public async Task Перечитывание_сохраняет_отметки_оставшихся_строк()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+        Guid kept = await given.SaveAsync(given.Expense(cash, 10m));
+        Guid gone = await given.SaveAsync(given.Expense(cash, 20m));
+
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
+        await model.LoadAsync(accountKey: null);
+
+        model.StartSelection(kept);
+        model.ToggleSelection(gone);
+
+        IDeleteTransactionsHandler delete = given.Database.Resolve<IDeleteTransactionsHandler>();
+
+        await delete.HandleAsync([gone]);
+        await model.LoadAsync(accountKey: null);
+
+        Assert.True(model.IsSelecting);
+        Assert.True(Row(model, kept).IsSelected);
+        Assert.Equal(string.Format(UiCulture.Current, UiTexts.FeedSelectedCount, 1), model.SelectionTitle);
+
+        await delete.HandleAsync([kept]);
+        await model.LoadAsync(accountKey: null);
+
+        Assert.False(model.IsSelecting);
+    }
+
+    /// <summary>
+    /// Удаление выделенного удаляет ровно отмеченные операции и выключает выделение.
+    /// </summary>
+    [Fact]
+    public async Task Удаление_выделенного_удаляет_отмеченные()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+        Guid first = await given.SaveAsync(given.Expense(cash, 10m));
+        Guid second = await given.SaveAsync(given.Expense(cash, 20m));
+        Guid untouched = await given.SaveAsync(given.Expense(cash, 40m));
+
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
+        await model.LoadAsync(accountKey: null);
+
+        model.StartSelection(first);
+        model.ToggleSelection(second);
+
+        TransactionDeletion deletion = await model.DeleteSelectedPromptAsync();
+
+        Assert.Equal(2, deletion.Count);
+
+        await model.DeleteSelectedAsync();
+        await model.LoadAsync(accountKey: null);
+
+        Assert.False(model.IsSelecting);
+        Assert.Equal([untouched], model.Days.SelectMany(static day => day).Select(static row => row.Key));
+        Assert.Equal(960m, (await given.BalanceAsync(cash)).Amount);
+    }
+
+    /// <summary>
+    /// Смахивание удаляет одну операцию, не трогая выделения.
+    /// </summary>
+    [Fact]
+    public async Task Смахивание_удаляет_одну_операцию()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+        Guid swiped = await given.SaveAsync(given.Expense(cash, 10m));
+        Guid kept = await given.SaveAsync(given.Expense(cash, 20m));
+
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
+        await model.LoadAsync(cash);
+
+        TransactionDeletion deletion = await model.DeletePromptAsync(swiped);
+
+        Assert.Equal(1, deletion.Count);
+        Assert.Equal(UiTexts.TransactionDeleteConfirmTitle, deletion.Title);
+
+        await model.DeleteAsync(swiped);
+        await model.LoadAsync(cash);
+
+        Assert.Equal([kept], model.Days.SelectMany(static day => day).Select(static row => row.Key));
+        Assert.Equal(980m, (await given.BalanceAsync(cash)).Amount);
+    }
+
+    private static FeedRowItem Row(FeedViewModel model, Guid key) =>
+        model.Days.SelectMany(static day => day).Single(row => row.Key == key);
 
     /// <summary>
     /// Урезает страницу до заданного размера: модель просит полсотни, а тесту нужно две.

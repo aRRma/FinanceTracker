@@ -8,9 +8,9 @@ using Microsoft.EntityFrameworkCore;
 namespace Finance.Application.Features.Transactions.Card;
 
 /// <summary>
-/// Чтение счетов операции на пишущем пути. Общее для записи и удаления: собрать
-/// доменную операцию из строки без валют её счетов нельзя, а валюта у строки
-/// не хранится — она у счёта каждой стороны.
+/// Чтение счетов операции на пишущем пути записи: собрать доменную операцию из строки
+/// без валют её счетов нельзя, а валюта у строки не хранится — она у счёта каждой
+/// стороны. Удаление читает валюты сразу для всех строк само (`DeleteTransactionsHandler`).
 /// </summary>
 internal static class TransactionSides
 {
@@ -54,21 +54,5 @@ internal static class TransactionSides
             : null;
 
         return (source.Currency, targetCurrency);
-    }
-
-    /// <summary>
-    /// Собирает доменную операцию из строки, дочитав валюты её счетов.
-    /// </summary>
-    /// <param name="context">Контекст базы.</param>
-    /// <param name="row">Строка операции.</param>
-    /// <param name="cancellationToken">Признак отмены.</param>
-    public static async Task<Transaction> ToDomainAsync(
-        FinanceDbContext context,
-        TransactionRow row,
-        CancellationToken cancellationToken)
-    {
-        (Currency source, Currency? target) = await CurrenciesAsync(context, row, cancellationToken).ConfigureAwait(false);
-
-        return row.ToDomain(source, target);
     }
 }

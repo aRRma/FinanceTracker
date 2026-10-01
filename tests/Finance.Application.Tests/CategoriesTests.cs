@@ -1,5 +1,6 @@
 using Finance.Application.Features.Categories.Card;
 using Finance.Application.Features.Transactions.Card;
+using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
@@ -385,7 +386,7 @@ public sealed class CategoriesTests
         Guid account = await fixture.AccountAsync("Карта", 1000m);
         Guid transaction = await fixture.SaveAsync(fixture.Expense(account, 100m));
 
-        await fixture.Database.Resolve<IDeleteTransactionHandler>().HandleAsync(transaction);
+        await fixture.Database.Resolve<IDeleteTransactionsHandler>().HandleAsync([transaction]);
         await fixture.Database.Resolve<IDeleteSubcategoryHandler>().HandleAsync(fixture.ExpenseCategory);
 
         await using FinanceDbContext context = await fixture.Database.Contexts.CreateDbContextAsync();
@@ -463,7 +464,7 @@ public sealed class CategoriesTests
         await fixture.SaveAsync(fixture.Expense(account, 100m));
         Guid removed = await fixture.SaveAsync(fixture.Expense(account, 250m));
 
-        await fixture.Database.Resolve<IDeleteTransactionHandler>().HandleAsync(removed);
+        await fixture.Database.Resolve<IDeleteTransactionsHandler>().HandleAsync([removed]);
 
         CategoryDeletion deletion = await DeletionAsync(fixture, fixture.ExpenseCategory);
 

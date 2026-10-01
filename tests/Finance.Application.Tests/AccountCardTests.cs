@@ -2,6 +2,7 @@ using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Accounts.Catalog;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Texts;
 using Finance.Domain.Enums;
@@ -241,7 +242,7 @@ public sealed class AccountCardTests
         Guid key = await fixture.AccountAsync("Lishnyaya");
 
         Guid transaction = await fixture.SaveAsync(fixture.Expense(key, 100m));
-        await fixture.Database.Resolve<IDeleteTransactionHandler>().HandleAsync(transaction);
+        await fixture.Database.Resolve<IDeleteTransactionsHandler>().HandleAsync([transaction]);
 
         AccountViewModel model = fixture.Database.Resolve<AccountViewModel>();
         await model.LoadAsync(key);

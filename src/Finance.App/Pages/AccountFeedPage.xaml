@@ -50,7 +50,7 @@
             </Label>
         </Grid>
 
-        <controls:FeedList Grid.Row="1">
+        <controls:FeedList x:Name="List" Grid.Row="1">
             <controls:FeedList.Empty>
                 <VerticalStackLayout Padding="16,12" Spacing="16" IsVisible="{Binding IsEmpty}">
                     <!-- Откуда взялся баланс в шапке, пока операций нет -->
@@ -78,9 +78,9 @@
         </controls:FeedList>
 
         <!-- Пока лента пуста, добавлять предлагает кнопка в самом пустом состоянии -->
-        <Button Grid.Row="1" Text="+" Clicked="OnAdd" IsVisible="{Binding HasItems}"
+        <Button x:Name="AddButton" Grid.Row="1" Text="+" Clicked="OnAdd" IsVisible="{Binding HasItems}"
                 Style="{StaticResource FloatingButton}"
-                SemanticProperties.Description="{x:Static texts:UiTexts.FeedAddForAccountHint}" />
+                SemanticProperties.Description="{x:Static texts:UiTexts.FeedAddForAccountHint}" AutomationId="AddTransaction" />
     </Grid>
 
 </pages:DataPage>

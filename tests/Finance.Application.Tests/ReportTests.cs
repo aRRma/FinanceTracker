@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Finance.Application.Features.Report;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Texts;
@@ -122,7 +123,7 @@ public sealed partial class ReportTests
         Guid deleted = await given.SaveAsync(given.Expense(card, 100m));
         await given.SaveAsync(given.Expense(card, 250m));
 
-        await given.Database.Resolve<IDeleteTransactionHandler>().HandleAsync(deleted);
+        await given.Database.Resolve<IDeleteTransactionsHandler>().HandleAsync([deleted]);
 
         ReportTotal group = Assert.Single(await given.ReportAsync());
 

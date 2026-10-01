@@ -287,6 +287,12 @@
   <data name="FeedAddForAccountHint" xml:space="preserve">
     <value>Записать операцию по этому счёту</value>
   </data>
+  <data name="FeedSelectedCount" xml:space="preserve">
+    <value>Выбрано: {0}</value>
+  </data>
+  <data name="FeedSelectionEnd" xml:space="preserve">
+    <value>Снять выделение</value>
+  </data>
   <!-- Форма операции -->
   <data name="TransactionTitleNew" xml:space="preserve">
     <value>Новая операция</value>
@@ -365,6 +371,18 @@
   </data>
   <data name="TransactionBalanceAfter" xml:space="preserve">
     <value>Баланс «{0}» станет {1}.</value>
+  </data>
+  <data name="TransactionDeleteManyConfirmTitle" xml:space="preserve">
+    <value>Удалить {0}?</value>
+  </data>
+  <data name="TransactionsCountOne" xml:space="preserve">
+    <value>операцию</value>
+  </data>
+  <data name="TransactionsCountFew" xml:space="preserve">
+    <value>операции</value>
+  </data>
+  <data name="TransactionsCountMany" xml:space="preserve">
+    <value>операций</value>
   </data>
   <!-- Экраны выбора -->
   <data name="PickAccountTitle" xml:space="preserve">

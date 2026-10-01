@@ -1,6 +1,7 @@
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Texts;
 using Finance.Domain.Enums;
@@ -366,8 +367,8 @@ public sealed class TransactionKeypadTests
         fixture.Database.Resolve<ITransactionFormQuery>(),
         fixture.Database.Resolve<ITransactionCardQuery>(),
         save ?? fixture.Database.Resolve<ISaveTransactionHandler>(),
-        fixture.Database.Resolve<IDeleteTransactionHandler>(),
-        fixture.Database.Resolve<IAccountsQuery>(),
+        fixture.Database.Resolve<IDeleteTransactionsHandler>(),
+        fixture.Database.Resolve<ITransactionDeletionQuery>(),
         fixture.Database.Resolve<IClock>(),
         fixture.Database.Resolve<TransactionPicks>(),
         fixture.Database.Resolve<IChangeNotifier>());

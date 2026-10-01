@@ -1,5 +1,6 @@
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Texts;
 using Finance.Domain.Enums;
@@ -314,26 +315,29 @@ public sealed class TransactionFormTests
         TransactionViewModel model = fixture.Database.Resolve<TransactionViewModel>();
         await model.LoadAsync(transfer);
 
-        string prompt = await model.DeletePromptAsync();
+        TransactionDeletion? deletion = await model.DeletePromptAsync();
 
-        // Сейчас на карте 700, в наличных 300: удаление вернёт 1000 и 0
-        Assert.Contains(BalanceAfter("Карта", 1000m), prompt, StringComparison.Ordinal);
-        Assert.Contains(BalanceAfter("Наличные", 0m), prompt, StringComparison.Ordinal);
-        Assert.EndsWith(UiTexts.TransactionDeleteIrreversible, prompt, StringComparison.Ordinal);
+        // Сейчас на карте 700, в наличных 300: удаление вернёт 1000 и 0.
+        // Счёт списания называется первым
+        Assert.NotNull(deletion);
+        Assert.Equal(UiTexts.TransactionDeleteConfirmTitle, deletion.Title);
+        Assert.Equal(
+            $"{BalanceAfter("Карта", 1000m)} {BalanceAfter("Наличные", 0m)} {UiTexts.TransactionDeleteIrreversible}",
+            deletion.Message);
     }
 
     /// <summary>
-    /// У несохранённой операции последствий нет — только предупреждение о необратимости.
+    /// У несохранённой операции удалять нечего: и спрашивать не о чем.
     /// </summary>
     [Fact]
-    public async Task Подтверждение_удаления_новой_операции_без_балансов()
+    public async Task Новую_операцию_удалить_нельзя()
     {
         await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
         await fixture.AccountAsync("Карта");
 
         TransactionViewModel model = await NewAsync(fixture);
 
-        Assert.Equal(UiTexts.TransactionDeleteIrreversible, await model.DeletePromptAsync());
+        Assert.Null(await model.DeletePromptAsync());
         Assert.False(await model.DeleteAsync());
     }
 

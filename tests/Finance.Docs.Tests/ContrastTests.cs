@@ -54,9 +54,11 @@ public sealed partial class ContrastTests
             ("Positive", "PositiveBackground"),
             ("Ink", "PositiveBackground"), ("Ink2", "PositiveBackground"),
 
-            // Выбранная строка справочника настроек. Ink3 на этот фон не ставится:
-            // подписи выбранной строки — основной текст и вторичная подпись
-            ("Ink", "AccentBackground"), ("Ink2", "AccentBackground")
+            // Выбранная строка справочника настроек и выделенная строка ленты: на ней
+            // ещё сумма смысловым цветом. Ink3 на этот фон не ставится — до порога
+            // он не дотягивает, и заметка выделенной строки перекрашена во вторичный
+            ("Ink", "AccentBackground"), ("Ink2", "AccentBackground"),
+            ("Positive", "AccentBackground"), ("Negative", "AccentBackground")
         ];
 
         // Пары, встречающиеся только в одной теме. Выбранный сегмент переключателя
