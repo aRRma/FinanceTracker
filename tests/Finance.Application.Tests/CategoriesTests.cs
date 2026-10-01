@@ -171,6 +171,55 @@ public sealed class CategoriesTests
     }
 
     /// <summary>
+    /// Возврат в универсальной статье — доход. Односторонняя расходная группа
+    /// его не принимает, и после переезда правка такой операции упала бы на правиле вида.
+    /// </summary>
+    [Fact]
+    public async Task Перенос_подкатегории_с_возвратами_в_одностороннюю_группу_отвергается()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 10_000m);
+        Guid universal = await given.GroupAsync("Техника", CategoryKind.Expense, acceptsAnyKind: true);
+        Guid oneSided = await given.GroupAsync("Только траты", CategoryKind.Expense);
+        Guid gadgets = await given.SubcategoryAsync(universal, "Гаджеты");
+
+        await given.SaveAsync(given.Expense(card, 1_000m, category: gadgets));
+        await given.SaveAsync(given.Income(card, 300m, category: gadgets));
+
+        DomainException failure = await Assert.ThrowsAsync<DomainException>(
+            () => SaveAsync(given.Database, Moved(gadgets, oneSided, "Гаджеты")));
+
+        Assert.Equal(Invariant.MoveKeepsKind, failure.Invariant);
+    }
+
+    /// <summary>
+    /// Без возвратов подкатегория универсальной группы переезжает в одностороннюю
+    /// свободно: запрет касается только операций, которых новая группа не примет.
+    /// </summary>
+    [Fact]
+    public async Task Подкатегория_с_одними_тратами_переезжает_в_одностороннюю_группу()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid card = await given.AccountAsync("Карта", 10_000m);
+        Guid universal = await given.GroupAsync("Техника", CategoryKind.Expense, acceptsAnyKind: true);
+        Guid oneSided = await given.GroupAsync("Только траты", CategoryKind.Expense);
+        Guid gadgets = await given.SubcategoryAsync(universal, "Гаджеты");
+
+        await given.SaveAsync(given.Expense(card, 1_000m, category: gadgets));
+
+        await SaveAsync(given.Database, Moved(gadgets, oneSided, "Гаджеты"));
+
+        CategoryListItem moved = Assert.Single(await ReadAsync(given.Database), item => item.Key == gadgets);
+
+        Assert.Equal(oneSided, moved.ParentKey);
+    }
+
+    private static SaveCategoryCommand Moved(Guid subcategory, Guid newGroup, string name) =>
+        new() { Key = subcategory, ParentKey = newGroup, Name = name, Icon = "basket" };
+
+    /// <summary>
     /// Служебная группа замкнута: переехавшая в неё категория пропала бы из отчёта молча.
     /// </summary>
     [Fact]

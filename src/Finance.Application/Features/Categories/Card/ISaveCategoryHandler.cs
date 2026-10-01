@@ -17,7 +17,8 @@ public interface ISaveCategoryHandler
     /// <exception cref="DomainException">
     /// Имя занято (<see cref="Invariant.NameUnique"/>), имя пусто
     /// (<see cref="Invariant.NameTrimmedAndNotEmpty"/>), перенос в группу другого вида
-    /// (<see cref="Invariant.MoveKeepsKind"/>) или в служебную
+    /// или не принимающую вид записанных операций (<see cref="Invariant.MoveKeepsKind"/>),
+    /// в служебную
     /// (<see cref="Invariant.ServiceGroupClosedToMoves"/>), перенос приёмника или
     /// служебной категории (<see cref="Invariant.ProtectedCategoryStays"/>),
     /// подкатегория в служебной группе (<see cref="Invariant.GroupHasReceiver"/>).

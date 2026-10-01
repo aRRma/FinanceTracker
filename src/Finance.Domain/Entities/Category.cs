@@ -205,9 +205,14 @@ public sealed class Category : Entity
     /// <param name="currentGroup">Группа, в которой подкатегория находится сейчас.</param>
     /// <param name="newGroup">Группа, в которую она переезжает.</param>
     /// <param name="namesInNewGroup">Имена неудалённых подкатегорий новой группы.</param>
-    public void MoveTo(Category currentGroup, Category newGroup, IEnumerable<string> namesInNewGroup)
+    /// <param name="recordedKinds">Виды неудалённых операций подкатегории.</param>
+    public void MoveTo(
+        Category currentGroup,
+        Category newGroup,
+        IEnumerable<string> namesInNewGroup,
+        IReadOnlyCollection<TransactionKind> recordedKinds)
     {
-        CategoryRules.EnsureCanMove(this, currentGroup, newGroup, namesInNewGroup);
+        CategoryRules.EnsureCanMove(this, currentGroup, newGroup, namesInNewGroup, recordedKinds);
 
         ParentKey = newGroup.Key;
     }

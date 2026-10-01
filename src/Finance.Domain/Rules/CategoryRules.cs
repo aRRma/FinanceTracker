@@ -56,21 +56,25 @@ public static class CategoryRules
 
     /// <summary>
     /// Проверяет, что подкатегорию можно перенести в другую группу: та обязана
-    /// быть группой того же вида и не служебной, сама подкатегория — не приёмником
-    /// и не служебной, а имя — свободным в новой группе.
+    /// быть группой того же вида, не служебной и принимать все виды записанных
+    /// операций, сама подкатегория — не приёмником и не служебной, а имя — свободным
+    /// в новой группе.
     /// </summary>
     /// <param name="subcategory">Переносимая подкатегория.</param>
     /// <param name="currentGroup">Группа, в которой она находится сейчас.</param>
     /// <param name="newGroup">Группа, в которую она переезжает.</param>
     /// <param name="namesInNewGroup">Имена неудалённых подкатегорий новой группы.</param>
+    /// <param name="recordedKinds">Виды неудалённых операций подкатегории.</param>
     public static void EnsureCanMove(
         Category subcategory,
         Category currentGroup,
         Category newGroup,
-        IEnumerable<string> namesInNewGroup)
+        IEnumerable<string> namesInNewGroup,
+        IReadOnlyCollection<TransactionKind> recordedKinds)
     {
         ArgumentNullException.ThrowIfNull(subcategory);
         ArgumentNullException.ThrowIfNull(namesInNewGroup);
+        ArgumentNullException.ThrowIfNull(recordedKinds);
 
         DomainException.ThrowIf(
             subcategory.IsGroup,
@@ -107,6 +111,20 @@ public static class CategoryRules
                 RuleTexts.Format(
                     RuleText.MoveKeepsKind,
                     subcategory.Name, currentGroup.Name, currentGroup.Kind, newGroup.Name, newGroup.Kind));
+        }
+
+        // Совпадения вида групп мало: в универсальной группе лежат и операции
+        // обратного вида — возвраты в расходной статье. Односторонняя группа их
+        // не примет, и правка такой операции после переезда упала бы на правиле вида
+        foreach (TransactionKind recorded in recordedKinds)
+        {
+            CategoryKind kind = recorded is TransactionKind.Income ? CategoryKind.Income : CategoryKind.Expense;
+
+            DomainException.ThrowIf(
+                !newGroup.Accepts(kind),
+                Invariant.MoveKeepsKind,
+                kind is CategoryKind.Income ? RuleText.MoveRejectsIncome : RuleText.MoveRejectsExpense,
+                subcategory.Name, newGroup.Name);
         }
 
         NameUniqueness.Ensure(

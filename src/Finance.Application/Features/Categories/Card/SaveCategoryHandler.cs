@@ -194,7 +194,17 @@ public sealed class SaveCategoryHandler : ISaveCategoryHandler
         IReadOnlyList<Category> neighbours = await ReadSubcategoriesAsync(context, targetKey, cancellationToken)
             .ConfigureAwait(false);
 
-        subcategory.MoveTo(current, target, neighbours.Select(static neighbour => neighbour.Name));
+        // Виды записанных операций: универсальная группа держит и возвраты,
+        // а новая группа обязана принять каждый из них
+        List<TransactionKind> recordedKinds = await context.Transactions
+            .AsNoTracking()
+            .Where(row => row.CategoryKey == subcategory.Key)
+            .Select(static row => row.Kind)
+            .Distinct()
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        subcategory.MoveTo(current, target, neighbours.Select(static neighbour => neighbour.Name), recordedKinds);
     }
 
     /// <summary>

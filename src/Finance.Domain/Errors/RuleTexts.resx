@@ -148,6 +148,12 @@
   <data name="MoveKeepsKind" xml:space="preserve">
     <value>«{0}» нельзя перенести из «{1}» ({2}) в «{3}» ({4}): вид не совпадает</value>
   </data>
+  <data name="MoveRejectsIncome" xml:space="preserve">
+    <value>В «{0}» есть доходы, а «{1}» принимает только расходы</value>
+  </data>
+  <data name="MoveRejectsExpense" xml:space="preserve">
+    <value>В «{0}» есть расходы, а «{1}» принимает только доходы</value>
+  </data>
   <data name="ServiceGroupHasOneSubcategory" xml:space="preserve">
     <value>У служебной группы «{0}» обязана быть ровно одна служебная подкатегория</value>
   </data>

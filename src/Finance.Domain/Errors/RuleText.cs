@@ -265,5 +265,15 @@ public enum RuleText
     /// <summary>
     /// Действие сравнения — в сообщении о разных валютах.
     /// </summary>
-    ActionCompare = 50
+    ActionCompare = 50,
+
+    /// <summary>
+    /// Переносят подкатегорию с доходами в группу, принимающую только расходы.
+    /// </summary>
+    MoveRejectsIncome = 51,
+
+    /// <summary>
+    /// Переносят подкатегорию с расходами в группу, принимающую только доходы.
+    /// </summary>
+    MoveRejectsExpense = 52
 }

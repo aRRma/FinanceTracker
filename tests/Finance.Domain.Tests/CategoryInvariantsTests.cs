@@ -62,7 +62,50 @@ public sealed class CategoryInvariantsTests
         Category home = Given.Group("Жильё");
         Category groceries = Given.Subcategory(food);
 
-        groceries.MoveTo(food, home, []);
+        groceries.MoveTo(food, home, [], []);
+
+        Assert.Equal(home.Key, groceries.ParentKey);
+    }
+
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.MoveKeepsKind))]
+    public void Перенос_с_возвратами_в_одностороннюю_группу_отвергается()
+    {
+        // Вид групп совпадает, но в универсальной статье лежат и возвраты — доходы,
+        // которых односторонняя расходная группа не примет
+        Category food = Given.Group("Еда", acceptsAnyKind: true);
+        Category home = Given.Group("Жильё");
+        Category groceries = Given.Subcategory(food);
+
+        DomainException error = Assert.Throws<DomainException>(
+            () => groceries.MoveTo(food, home, [], [TransactionKind.Expense, TransactionKind.Income]));
+
+        Assert.Equal(Invariant.MoveKeepsKind, error.Invariant);
+        Assert.Equal(food.Key, groceries.ParentKey);
+    }
+
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.MoveKeepsKind))]
+    public void Перенос_с_возвратами_в_универсальную_группу_разрешён()
+    {
+        Category food = Given.Group("Еда", acceptsAnyKind: true);
+        Category home = Given.Group("Жильё", acceptsAnyKind: true);
+        Category groceries = Given.Subcategory(food);
+
+        groceries.MoveTo(food, home, [], [TransactionKind.Expense, TransactionKind.Income]);
+
+        Assert.Equal(home.Key, groceries.ParentKey);
+    }
+
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.MoveKeepsKind))]
+    public void Перенос_одних_расходов_в_одностороннюю_группу_разрешён()
+    {
+        Category food = Given.Group("Еда", acceptsAnyKind: true);
+        Category home = Given.Group("Жильё");
+        Category groceries = Given.Subcategory(food);
+
+        groceries.MoveTo(food, home, [], [TransactionKind.Expense]);
 
         Assert.Equal(home.Key, groceries.ParentKey);
     }
@@ -77,7 +120,7 @@ public sealed class CategoryInvariantsTests
         Category other = Given.Subcategory(food, "Прочие траты");
 
         DomainException error = Assert.Throws<DomainException>(
-            () => other.MoveTo(food, home, ["  прочие ТРАТЫ "]));
+            () => other.MoveTo(food, home, ["  прочие ТРАТЫ "], []));
 
         Assert.Equal(Invariant.NameUnique, error.Invariant);
         Assert.Equal(food.Key, other.ParentKey);
@@ -91,7 +134,7 @@ public sealed class CategoryInvariantsTests
         Category salary = Given.Group("Доходы", CategoryKind.Income);
         Category groceries = Given.Subcategory(food);
 
-        DomainException error = Assert.Throws<DomainException>(() => groceries.MoveTo(food, salary, []));
+        DomainException error = Assert.Throws<DomainException>(() => groceries.MoveTo(food, salary, [], []));
 
         Assert.Equal(Invariant.MoveKeepsKind, error.Invariant);
         Assert.Equal(food.Key, groceries.ParentKey);
@@ -106,7 +149,7 @@ public sealed class CategoryInvariantsTests
         Category service = Given.Group("Служебное", role: CategoryRole.Service);
         Category groceries = Given.Subcategory(food);
 
-        DomainException error = Assert.Throws<DomainException>(() => groceries.MoveTo(food, service, []));
+        DomainException error = Assert.Throws<DomainException>(() => groceries.MoveTo(food, service, [], []));
 
         Assert.Equal(Invariant.ServiceGroupClosedToMoves, error.Invariant);
         Assert.Equal(food.Key, groceries.ParentKey);
@@ -119,7 +162,7 @@ public sealed class CategoryInvariantsTests
         Category food = Given.Group("Еда");
         Category home = Given.Group("Жильё");
 
-        DomainException error = Assert.Throws<DomainException>(() => food.MoveTo(food, home, []));
+        DomainException error = Assert.Throws<DomainException>(() => food.MoveTo(food, home, [], []));
 
         Assert.Equal(Invariant.CategoryLevelFixed, error.Invariant);
     }
@@ -228,7 +271,7 @@ public sealed class CategoryInvariantsTests
         Category home = Given.Group("Жильё");
         Category other = Given.Subcategory(food, "Прочее", CategoryRole.Other);
 
-        DomainException error = Assert.Throws<DomainException>(() => other.MoveTo(food, home, []));
+        DomainException error = Assert.Throws<DomainException>(() => other.MoveTo(food, home, [], []));
 
         Assert.Equal(Invariant.ProtectedCategoryStays, error.Invariant);
     }
