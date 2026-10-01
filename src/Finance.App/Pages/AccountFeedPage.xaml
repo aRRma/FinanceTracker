@@ -15,6 +15,22 @@
     x:DataType="feed:FeedViewModel"
     Title="{Binding AccountName}">
 
+    <!-- Карандаш у названия открывает карточку счёта. Заголовок в своей панели
+         тоже свой: штатный вместе с содержимым панели не показывается -->
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4" Margin="0,0,10,0" HorizontalOptions="Fill">
+            <Label Grid.Column="0" Text="{Binding AccountName}" Style="{StaticResource BarTitleLabel}"
+                   LineBreakMode="TailTruncation" />
+            <Border Grid.Column="1" Style="{StaticResource IconButton}"
+                    SemanticProperties.Description="{x:Static texts:UiTexts.AccountEdit}">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnEdit" />
+                </Border.GestureRecognizers>
+                <controls:Icon Key="pencil" HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
+    </Shell.TitleView>
+
     <Grid RowDefinitions="Auto,*">
 
         <!-- Баланс строкой, а не карточкой: в макете он стоит подзаголовком

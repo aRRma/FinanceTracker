@@ -129,6 +129,11 @@ public enum Invariant
     OpenedOnNotAfterTransactions = 20,
 
     /// <summary>
+    /// Счёт удаляется только без неудалённых операций.
+    /// </summary>
+    AccountDeletedOnlyWithoutTransactions = 35,
+
+    /// <summary>
     /// Дата открытия счёта — в тех же границах, что и дата операции.
     /// </summary>
     OpeningDateInRange = 21,

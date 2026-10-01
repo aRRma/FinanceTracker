@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Личный трекер финансов — прототип</title>
 <!-- СГЕНЕРИРОВАНО из mockups.html скриптом tools/build_prototype.py. Руками не править. -->
-<!-- отпечатки источников: mockups.html=11dda3543268fa3767fa375b87a04f40b1985518c4053f59c7ebccc3c31cfa45 build_prototype.py=de6155045356871d3e62873c6e5c3824969b663cf8acf532e245ce173086022e -->
+<!-- отпечатки источников: mockups.html=504e09256f523a0be5c1f7e647dc923fca31e02f60fb5192685f05b2bdbb533c build_prototype.py=de6155045356871d3e62873c6e5c3824969b663cf8acf532e245ce173086022e -->
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -428,7 +428,7 @@ body{padding:0}
 
 <div class="scr right" data-screen="A-03" title="A-03 · Просмотреть ленту счёта">
 <div class="phone">
-  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Карта основная</h2></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Карта основная</h2><svg class="ic"><use href="#i-pencil"/></svg></div>
   <div class="balrow"><span>Баланс</span><b>71 920,50 ₽</b></div>
   <div class="date"><span>25 августа</span><span>-6 250,00 ₽</span></div>
   <div class="row fr"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
@@ -892,13 +892,13 @@ body{padding:0}
 
 <div class="scr right" data-screen="D-02" title="D-02 · Изменить счёт">
 <div class="phone">
-  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт</h2></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт</h2><b class="del">Удалить</b><b class="save">Сохранить</b></div>
   <div class="body">
     <div class="card form">
-      <div class="fld"><span class="k">Название</span><span class="v">Карта основная</span></div>
+      <div class="fld"><span class="k">Название</span><span class="v">Карта кредитная</span></div>
       <div class="fld"><span class="k">Тип</span><span class="v">Карта</span></div>
       <div class="fld"><span class="k">Валюта</span><span class="v lock">Рубль ₽</span></div>
-      <div class="fld"><span class="k">Начальный остаток</span><span class="v">14500</span></div>
+      <div class="fld"><span class="k">Начальный остаток</span><span class="v neg" style="border-bottom:2px solid var(--acc)">-15 000,00 ₽</span></div>
       <div class="fld"><span class="k">Дата открытия</span><span class="v">01.01.2026</span></div>
     </div>
     <div class="card form">
@@ -908,7 +908,17 @@ body{padding:0}
       <div class="swrow"><span>Заблокированный</span><span class="sw2" id="d2close"><i></i></span></div>
       <div class="note">Заблокированный счёт не показывается на главном экране и не предлагается в выборе</div>
     </div>
-    <div class="btn">Сохранить</div>
+  </div>
+  <div class="kp" style="bottom:52px">
+    <div class="nums">
+      <b>7</b><b>8</b><b>9</b>
+      <b>4</b><b>5</b><b>6</b>
+      <b>1</b><b>2</b><b>3</b>
+      <b>,</b><b>0</b><b><svg class="ic"><use href="#i-backspace"/></svg></b>
+    </div>
+    <div class="ops">
+      <b>÷</b><b>×</b><b>−</b><b>+</b><b>=</b>
+    </div>
   </div>
   <nav class="nav">
     <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>

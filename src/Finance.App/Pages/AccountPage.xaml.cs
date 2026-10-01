@@ -43,6 +43,28 @@ public partial class AccountPage : DataPage
 
     private void OnSave(object? sender, EventArgs e) => Guarded.Run(SaveAsync);
 
+    private void OnDelete(object? sender, EventArgs e) => Guarded.Run(DeleteAsync);
+
+    // Две клавиатуры на экран не помещаются: набор названия убирает клавиатуру суммы
+    private void OnNameFocused(object? sender, FocusEventArgs e) => _model.AreKeysVisible = false;
+
+    private void OnOpeningBalanceTapped(object? sender, TappedEventArgs e) => Guarded.Run(ShowKeysAsync);
+
+    /// <summary>
+    /// Касание остатка зовёт клавиатуру суммы, а системную, если она осталась
+    /// от названия, убирает явно: снятый фокус на Android её не прячет.
+    /// </summary>
+    private async Task ShowKeysAsync()
+    {
+        if (NameEntry.IsSoftInputShowing())
+        {
+            await NameEntry.HideSoftInputAsync(CancellationToken.None);
+        }
+
+        NameEntry.Unfocus();
+        _model.ShowKeys();
+    }
+
     /// <summary>
     /// Погашенное поле валюты само ничего не объясняет, поэтому касание по нему
     /// говорит, почему валюту не сменить.
@@ -76,6 +98,36 @@ public partial class AccountPage : DataPage
         if (await _model.SaveAsync())
         {
             await Navigator.GoAsync("..");
+        }
+    }
+
+    /// <summary>
+    /// Счёт с операциями не удаляется — об этом говорится сразу, без вопроса,
+    /// на который всё равно пришёл бы отказ. Пустой удаляется после подтверждения.
+    /// </summary>
+    private async Task DeleteAsync()
+    {
+        if (_model.DeleteRefusal is { } refusal)
+        {
+            Notice.Show(refusal);
+
+            return;
+        }
+
+        if (!await DisplayAlertAsync(_model.DeleteTitle, null, UiTexts.CommonDelete, UiTexts.CommonCancel))
+        {
+            return;
+        }
+
+        if (await _model.DeleteAsync())
+        {
+            // Карточку открыли карандашом из ленты этого счёта — «назад» вернул бы
+            // в ленту удалённого счёта, поэтому уходим на шаг дальше, туда, откуда
+            // открыли ленту
+            IReadOnlyList<Page> stack = Navigation.NavigationStack;
+            bool fromFeed = stack.Count > 1 && stack[^2] is AccountFeedPage;
+
+            await Navigator.GoAsync(fromFeed ? "../.." : "..");
         }
     }
 }

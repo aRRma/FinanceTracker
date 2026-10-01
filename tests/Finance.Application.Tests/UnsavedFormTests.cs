@@ -116,10 +116,7 @@ public sealed class UnsavedFormTests
     {
         await using TestDatabase database = await TestDatabase.CreateAsync();
 
-        AccountViewModel model = new(
-            database.Resolve<IAccountCardQuery>(),
-            database.Resolve<ISaveAccountHandler>(),
-            database.Resolve<IClock>());
+        AccountViewModel model = database.Resolve<AccountViewModel>();
 
         await model.LoadAsync(key: null);
 

@@ -232,6 +232,33 @@ public sealed class Account : Entity
     public void SetSortOrder(int sortOrder) => SortOrder = sortOrder;
 
     /// <summary>
+    /// Удаляет счёт мягко — только если по нему нет ни одной неудалённой операции:
+    /// иначе они остались бы без счёта и выпали бы из лент и балансов. Удалённые
+    /// операции удалению не мешают: их не показывает ни один экран, и вернуть их нечем.
+    /// </summary>
+    /// <param name="atUtc">Момент удаления.</param>
+    /// <param name="hasTransactions">Есть ли по счёту неудалённая операция. Читается вызывающей стороной.</param>
+    public void Delete(DateTimeOffset atUtc, bool hasTransactions)
+    {
+        DomainException.ThrowIf(
+            hasTransactions,
+            Invariant.AccountDeletedOnlyWithoutTransactions,
+            RuleText.AccountHasTransactions,
+            Name);
+
+        base.Delete(atUtc);
+    }
+
+    /// <summary>
+    /// Общий путь удаления сущности счёту закрыт: он не знает об операциях
+    /// и пропустил бы проверку, ради которой есть перегрузка с ними.
+    /// </summary>
+    /// <param name="atUtc">Момент удаления.</param>
+    /// <exception cref="InvalidOperationException">Всегда: удаление счёта требует сведений об операциях.</exception>
+    public override void Delete(DateTimeOffset atUtc) =>
+        throw new InvalidOperationException(DomainFaults.AccountDeleteNeedsTransactions());
+
+    /// <summary>
     /// Начальный остаток проходит те же проверки точности и предела, что и сумма операции.
     /// </summary>
     private static Money CreateOpeningBalance(decimal amount, Currency currency)

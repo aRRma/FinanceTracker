@@ -377,9 +377,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-03</span><b>Просмотреть ленту счёта</b><span class="uc">UC-06</span><em>Баланс — строкой под шапкой, а не карточкой: четверть первого экрана под одно число не уходит. Подпись строки — место, иначе группа; группа, чьё название повторяет подкатегорию («Без категории»), не пишется второй раз. Заметка — своей строкой ниже. Лента открыта с балансов, поэтому подсвечена их вкладка.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-03</span><b>Просмотреть ленту счёта</b><span class="uc">UC-06</span><em>Баланс — строкой под шапкой, а не карточкой: четверть первого экрана под одно число не уходит. Подпись строки — место, иначе группа; группа, чьё название повторяет подкатегорию («Без категории»), не пишется второй раз. Заметка — своей строкой ниже. Лента открыта с балансов, поэтому подсвечена их вкладка. Карандаш в шапке открывает карточку счёта [D-02].</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Карта основная</h2></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Карта основная</h2><svg class="ic"><use href="#i-pencil"/></svg></div>
   <div class="balrow"><span>Баланс</span><b>71 920,50 ₽</b></div>
   <div class="date"><span>25 августа</span><span>-6 250,00 ₽</span></div>
   <div class="row fr"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
@@ -874,15 +874,15 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-02</span><b>Изменить счёт</b><span class="uc">UC-14 UC-13 UC-21</span><em>Валюта заперта: по счёту есть операции. Каждое ограничение объяснено рядом с полем, а не всплывает при сохранении. Блокировка счёта с деньгами подтверждается отдельным вопросом с суммой остатка. Сохранение — кнопкой под формой.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-02</span><b>Изменить счёт</b><span class="uc">UC-14 UC-13 UC-21</span><em>Валюта заперта: по счёту есть операции. Каждое ограничение объяснено рядом с полем, а не всплывает при сохранении. Блокировка счёта с деньгами подтверждается отдельным вопросом с суммой остатка. Остаток набирается клавиатурой суммы — она появляется по касанию поля и уходит при наборе названия; долг — минусом первой клавишей, красным. Сохранение и удаление — в шапке, как в форме операции: клавиатура их не закрывает. Счёт с операциями не удаляется — «Удалить» отвечает всплывающим сообщением, что его можно заблокировать; пустой удаляется после подтверждения.</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт</h2></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт</h2><b class="del">Удалить</b><b class="save">Сохранить</b></div>
   <div class="body">
     <div class="card form">
-      <div class="fld"><span class="k">Название</span><span class="v">Карта основная</span></div>
+      <div class="fld"><span class="k">Название</span><span class="v">Карта кредитная</span></div>
       <div class="fld"><span class="k">Тип</span><span class="v">Карта</span></div>
       <div class="fld"><span class="k">Валюта</span><span class="v lock">Рубль ₽</span></div>
-      <div class="fld"><span class="k">Начальный остаток</span><span class="v">14500</span></div>
+      <div class="fld"><span class="k">Начальный остаток</span><span class="v neg" style="border-bottom:2px solid var(--acc)">-15 000,00 ₽</span></div>
       <div class="fld"><span class="k">Дата открытия</span><span class="v">01.01.2026</span></div>
     </div>
     <div class="card form">
@@ -892,7 +892,17 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="swrow"><span>Заблокированный</span><span class="sw2" id="d2close"><i></i></span></div>
       <div class="note">Заблокированный счёт не показывается на главном экране и не предлагается в выборе</div>
     </div>
-    <div class="btn">Сохранить</div>
+  </div>
+  <div class="kp" style="bottom:52px">
+    <div class="nums">
+      <b>7</b><b>8</b><b>9</b>
+      <b>4</b><b>5</b><b>6</b>
+      <b>1</b><b>2</b><b>3</b>
+      <b>,</b><b>0</b><b><svg class="ic"><use href="#i-backspace"/></svg></b>
+    </div>
+    <div class="ops">
+      <b>÷</b><b>×</b><b>−</b><b>+</b><b>=</b>
+    </div>
   </div>
   <nav class="nav">
     <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>

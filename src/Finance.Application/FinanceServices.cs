@@ -119,6 +119,7 @@ public static class FinanceServices
         services.AddSingleton<IReorderAccountsHandler, ReorderAccountsHandler>();
         services.AddSingleton<IAccountCardQuery, AccountCardQuery>();
         services.AddSingleton<ISaveAccountHandler, SaveAccountHandler>();
+        services.AddSingleton<IDeleteAccountHandler, DeleteAccountHandler>();
         services.AddSingleton<IFeedQuery, FeedQuery>();
         services.AddSingleton<ITransactionFormQuery, TransactionFormQuery>();
         services.AddSingleton<ITransactionCardQuery, TransactionCardQuery>();

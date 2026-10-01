@@ -44,4 +44,8 @@ public partial class AccountFeedPage : DataPage
 
     private void OnAdd(object? sender, EventArgs e) =>
         Navigator.Go($"{Routes.Transaction}?account={Key}");
+
+    // Правка счёта — с его ленты: из «Ещё → Счета» вход искать никто не станет
+    private void OnEdit(object? sender, TappedEventArgs e) =>
+        Navigator.Go($"{Routes.Account}?key={Key}");
 }

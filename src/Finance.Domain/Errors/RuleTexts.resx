@@ -127,6 +127,9 @@
   <data name="OpenedOnNotAfterTransactions" xml:space="preserve">
     <value>Дату открытия счёта «{0}» нельзя сдвинуть на {1}: есть операция от {2}</value>
   </data>
+  <data name="AccountHasTransactions" xml:space="preserve">
+    <value>Счёт «{0}» с операциями не удаляется — его можно заблокировать</value>
+  </data>
   <data name="ReceiverIsNotGroup" xml:space="preserve">
     <value>Приёмником «Прочее» бывает только подкатегория, не группа</value>
   </data>

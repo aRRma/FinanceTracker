@@ -18,6 +18,12 @@ internal static class DomainFaults
     internal static string KeyIsEmpty() => "Ключ не может быть пустым: он ни на что не ссылается";
 
     /// <summary>
+    /// Счёт удаляют общим путём сущности, минуя проверку операций.
+    /// </summary>
+    internal static string AccountDeleteNeedsTransactions() =>
+        "Счёт удаляется только перегрузкой с признаком операций: общий путь пропустил бы проверку";
+
+    /// <summary>
     /// Переданная категория — не группа.
     /// </summary>
     /// <param name="name">Название категории.</param>

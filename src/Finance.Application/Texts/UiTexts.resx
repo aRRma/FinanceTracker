@@ -177,8 +177,20 @@
   <data name="AccountTitleExisting" xml:space="preserve">
     <value>Счёт</value>
   </data>
-  <data name="AccountNamePlaceholder" xml:space="preserve">
-    <value>Карта основная</value>
+  <data name="AccountNamePlaceholderCard" xml:space="preserve">
+    <value>Например, Сбер зарплатная</value>
+  </data>
+  <data name="AccountNamePlaceholderCash" xml:space="preserve">
+    <value>Например, Наличные дома</value>
+  </data>
+  <data name="AccountEdit" xml:space="preserve">
+    <value>Изменить счёт</value>
+  </data>
+  <data name="AccountDeleteConfirmTitle" xml:space="preserve">
+    <value>Удалить счёт «{0}»?</value>
+  </data>
+  <data name="AccountDeleteHasTransactions" xml:space="preserve">
+    <value>Счёт с операциями не удалить — его можно заблокировать</value>
   </data>
   <data name="AccountTypeLabel" xml:space="preserve">
     <value>Тип</value>

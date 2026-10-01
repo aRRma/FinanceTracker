@@ -124,6 +124,43 @@ public sealed class AccountInvariantsTests
     }
 
     [Fact]
+    [Trait("Инвариант", nameof(Invariant.AccountDeletedOnlyWithoutTransactions))]
+    public void Счёт_с_операциями_не_удаляется()
+    {
+        Account account = Given.Account();
+
+        DomainException error = Assert.Throws<DomainException>(
+            () => account.Delete(Given.NowUtc, hasTransactions: true));
+
+        Assert.Equal(Invariant.AccountDeletedOnlyWithoutTransactions, error.Invariant);
+        Assert.False(account.IsDeleted);
+    }
+
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.AccountDeletedOnlyWithoutTransactions))]
+    public void Счёт_без_операций_удаляется()
+    {
+        Account account = Given.Account();
+
+        account.Delete(Given.NowUtc, hasTransactions: false);
+
+        Assert.Equal(Given.NowUtc, account.DeletedAtUtc);
+    }
+
+    /// <summary>
+    /// Общий путь удаления сущности не знает об операциях и пропустил бы проверку.
+    /// </summary>
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.AccountDeletedOnlyWithoutTransactions))]
+    public void Счёт_не_удаляется_в_обход_проверки_операций()
+    {
+        Account account = Given.Account();
+
+        Assert.Throws<InvalidOperationException>(() => account.Delete(Given.NowUtc));
+        Assert.False(account.IsDeleted);
+    }
+
+    [Fact]
     [Trait("Инвариант", nameof(Invariant.DeletionIsSoft))]
     public void Удаление_только_мягкое_и_повторное_метку_не_сдвигает()
     {

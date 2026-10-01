@@ -275,5 +275,10 @@ public enum RuleText
     /// <summary>
     /// Переносят подкатегорию с расходами в группу, принимающую только доходы.
     /// </summary>
-    MoveRejectsExpense = 52
+    MoveRejectsExpense = 52,
+
+    /// <summary>
+    /// Удаляют счёт, по которому есть операции.
+    /// </summary>
+    AccountHasTransactions = 53
 }

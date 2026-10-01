@@ -62,8 +62,76 @@ public sealed class AmountInputTests
     [InlineData("12", '+', "12+")]
     [InlineData("12+", '×', "12×")]
     [InlineData("12,", '−', "12−")]
+    [InlineData("0", '−', "0−")]
     public void Действие_ставится_только_после_числа(string expression, char key, string expected) =>
         Assert.Equal(expected, AmountInput.Append(expression, key));
+
+    /// <summary>
+    /// Начальный остаток бывает долгом: там минус первой клавишей начинает
+    /// отрицательное число. Прочие действия в пустом поле и после одного знака
+    /// по-прежнему ничего не делают.
+    /// </summary>
+    [Theory]
+    [InlineData("", '−', "−")]
+    [InlineData("", '+', "")]
+    [InlineData("−", '−', "−")]
+    [InlineData("−", '×', "−")]
+    [InlineData("−15", '+', "−15+")]
+    [InlineData("0", '−', "−")]
+    [InlineData("0,", '−', "−")]
+    [InlineData("0", '+', "0+")]
+    public void Минус_первым_начинает_отрицательное_число(string expression, char key, string expected) =>
+        Assert.Equal(expected, AmountInput.Append(expression, key, signed: true));
+
+    /// <summary>
+    /// У суммы операции знака нет — его задаёт вид, — и минус в пустом поле ничего не делает.
+    /// </summary>
+    [Fact]
+    public void В_сумме_операции_минус_первым_не_набирается() =>
+        Assert.Equal(string.Empty, AmountInput.Append(string.Empty, '−'));
+
+    /// <summary>
+    /// После знака число набирается как обычно: ведущий ноль заменяется,
+    /// запятая не первая, разряды считаются без знака.
+    /// </summary>
+    [Theory]
+    [InlineData("−", '1', "−1")]
+    [InlineData("−0", '7', "−7")]
+    [InlineData("−", ',', "−0,")]
+    [InlineData("−99999999999", '9', "−999999999999")]
+    [InlineData("−999999999999", '9', "−999999999999")]
+    public void После_знака_число_набирается_как_обычно(string expression, char key, string expected) =>
+        Assert.Equal(expected, AmountInput.Append(expression, key, signed: true));
+
+    /// <summary>
+    /// Знак числа — не действие: итог отрицательного числа показывается сразу,
+    /// без подсказки про «=».
+    /// </summary>
+    [Theory]
+    [InlineData("−15000", false)]
+    [InlineData("−15000−500", true)]
+    public void Знак_первого_числа_не_действие(string expression, bool expected) =>
+        Assert.Equal(expected, AmountInput.HasOperation(expression));
+
+    /// <summary>
+    /// Отрицательный итог возвращается тем же минусом, что на клавише: с дефисом
+    /// набор дальше не узнал бы в нём знак.
+    /// </summary>
+    [Theory]
+    [InlineData("100−250", "−150")]
+    [InlineData("−15000", "−15000")]
+    public void Отрицательный_итог_пишется_типографским_минусом(string expression, string expected) =>
+        Assert.Equal(expected, AmountInput.Collapse(expression));
+
+    /// <summary>
+    /// Число для поля — без разрядов и хвоста нулей, с запятой культуры.
+    /// </summary>
+    [Theory]
+    [InlineData("1234.50", "1234,5")]
+    [InlineData("-15000", "−15000")]
+    [InlineData("0", "0")]
+    public void Число_пишется_как_его_набирают(string value, string expected) =>
+        Assert.Equal(expected, AmountInput.Write(decimal.Parse(value, CultureInfo.InvariantCulture)));
 
     /// <summary>
     /// Стирание убирает последний знак; пустое поле стирать нечем.

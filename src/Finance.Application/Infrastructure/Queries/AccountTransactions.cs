@@ -31,6 +31,25 @@ internal static class AccountTransactions
     }
 
     /// <summary>
+    /// Есть ли по счёту неудалённая операция. Удалённые не считаются: их не
+    /// показывает ни один экран, и удалению счёта они не мешают. Отсев удалённых
+    /// держит общий фильтр запросов — <c>IgnoreQueryFilters</c> здесь перевернул бы правило.
+    /// </summary>
+    /// <param name="context">Контекст базы.</param>
+    /// <param name="accountKey">Ключ счёта.</param>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    /// <returns><c>true</c>, если неудалённая операция есть хоть с одной стороны.</returns>
+    public static Task<bool> ExistsAsync(
+        FinanceDbContext context,
+        Guid accountKey,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        return BothSides(context.Transactions.AsNoTracking(), accountKey).AnyAsync(cancellationToken);
+    }
+
+    /// <summary>
     /// Дата самой ранней неудалённой операции по счёту; пусто — операций нет.
     /// </summary>
     /// <param name="context">Контекст базы.</param>

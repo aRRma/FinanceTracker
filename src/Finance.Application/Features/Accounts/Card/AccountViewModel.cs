@@ -1,5 +1,4 @@
 using Finance.Application.Texts;
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
@@ -18,10 +17,13 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
 {
     private readonly IAccountCardQuery _query;
     private readonly ISaveAccountHandler _handler;
+    private readonly IDeleteAccountHandler _delete;
     private readonly IClock _clock;
 
-    // Как счёт записан: заблокирован ли и сколько на нём. По ним видно, блокируют ли
-    // счёт именно этой правкой и остаются ли на нём деньги
+    // Как счёт записан: имя, заблокирован ли и сколько на нём. По ним видно, блокируют ли
+    // счёт именно этой правкой и остаются ли на нём деньги, а удаление называет
+    // счёт записанным именем, а не набранным в поле
+    private string _savedName = string.Empty;
     private bool _savedClosed;
     private Money? _balance;
 
@@ -34,15 +36,18 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// </summary>
     /// <param name="query">Чтение счёта для правки.</param>
     /// <param name="handler">Сохранение счёта.</param>
+    /// <param name="delete">Удаление счёта.</param>
     /// <param name="clock">Часы: «сегодня» пользователя.</param>
-    public AccountViewModel(IAccountCardQuery query, ISaveAccountHandler handler, IClock clock)
+    public AccountViewModel(IAccountCardQuery query, ISaveAccountHandler handler, IDeleteAccountHandler delete, IClock clock)
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(delete);
         ArgumentNullException.ThrowIfNull(clock);
 
         _query = query;
         _handler = handler;
+        _delete = delete;
         _clock = clock;
 
         OpenedOn = clock.Today;
@@ -63,12 +68,22 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// Наличные или карта.
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(NamePlaceholder))]
     public partial AccountType Type { get; set; } = AccountType.Card;
+
+    /// <summary>
+    /// Подсказка в пустом поле названия — своя у каждого типа: подсказка карты
+    /// у наличных читалась бы так, будто форма не заметила смены типа. «Например»
+    /// не даёт принять подсказку за уже введённое название.
+    /// </summary>
+    public string NamePlaceholder =>
+        Type is AccountType.Cash ? UiTexts.AccountNamePlaceholderCash : UiTexts.AccountNamePlaceholderCard;
 
     /// <summary>
     /// Валюта счёта.
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OpeningBalanceDisplay))]
     public partial Currency Currency { get; set; } = Currency.RUB;
 
     private static readonly AccountType[] TypeOrder = [AccountType.Card, AccountType.Cash];
@@ -145,10 +160,45 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     public bool HasError => !string.IsNullOrEmpty(Error);
 
     /// <summary>
-    /// Начальный остаток, как он набран в поле.
+    /// Начальный остаток, как он набран на клавиатуре суммы. Пусто — ноль: поле
+    /// показывает его суммой с валютой, а минус с пустого поля начинает долг.
     /// </summary>
     [ObservableProperty]
-    public partial string OpeningBalance { get; set; } = "0";
+    [NotifyPropertyChangedFor(nameof(OpeningBalanceDisplay))]
+    [NotifyPropertyChangedFor(nameof(IsOpeningBalanceNegative))]
+    public partial string OpeningBalance { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Остаток для показа: число — суммой с валютой, выражение — как набрано.
+    /// Итог выражения появляется по «=», а не сам собой, как в форме операции.
+    /// </summary>
+    public string OpeningBalanceDisplay
+    {
+        get
+        {
+            if (OpeningBalance.Length is 0)
+            {
+                return Money.Restore(0m, Currency).Display;
+            }
+
+            return !AmountInput.HasOperation(OpeningBalance) && AmountExpression.TryEvaluate(OpeningBalance, out decimal value)
+                ? Money.Restore(value, Currency).Display
+                : OpeningBalance;
+        }
+    }
+
+    /// <summary>
+    /// Остаток — долг: показывается цветом расхода.
+    /// </summary>
+    public bool IsOpeningBalanceNegative =>
+        !AmountInput.HasOperation(OpeningBalance) && AmountExpression.TryEvaluate(OpeningBalance, out decimal value) && value < 0m;
+
+    /// <summary>
+    /// Клавиатура суммы на виду. Появляется по касанию остатка и уходит, пока набирают
+    /// название: две клавиатуры на экран не помещаются, а остаток вводится раз на счёт.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool AreKeysVisible { get; set; }
 
     /// <summary>
     /// Дата открытия.
@@ -217,6 +267,25 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     public string Title => Key is null ? UiTexts.AccountTitleNew : UiTexts.AccountTitleExisting;
 
     /// <summary>
+    /// Правится записанный счёт — его можно удалить. У нового удалять нечего.
+    /// </summary>
+    public bool IsExisting => Key is not null;
+
+    /// <summary>
+    /// Почему счёт не удалить; пусто — удалять можно. Говорится в момент попытки,
+    /// а не надписью на экране: удаляют редко, а блокировка — ответ на тот же вопрос.
+    /// Решает домен при удалении; здесь — только чтобы не спрашивать подтверждения
+    /// у того, что всё равно не удалится.
+    /// </summary>
+    public string? DeleteRefusal => EarliestTransactionOn is null ? null : UiTexts.AccountDeleteHasTransactions;
+
+    /// <summary>
+    /// Заголовок подтверждения удаления. Имя — записанное, а не набранное в поле:
+    /// удаляется счёт как он сохранён.
+    /// </summary>
+    public string DeleteTitle => string.Format(UiCulture.Current, UiTexts.AccountDeleteConfirmTitle, _savedName);
+
+    /// <summary>
     /// Предупреждение перед блокировкой счёта с деньгами; пусто — подтверждать нечего.
     /// Домен блокировке с остатком не мешает, но молча увести деньги из «доступно
     /// к тратам» нельзя: пользователь мог забыть перевести остаток.
@@ -257,17 +326,21 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
         Name = card.Name;
         Type = card.Type;
         Currency = card.Currency;
-        OpeningBalance = card.OpeningBalance.ToString(CultureInfo.InvariantCulture);
+        // Тем же видом, каким набирает клавиатура: с запятой культуры, а не с точкой,
+        // иначе стирание и дописывание сломали бы «1234.5»
+        OpeningBalance = card.OpeningBalance is 0m ? string.Empty : AmountInput.Write(card.OpeningBalance);
         OpenedOn = card.OpenedOn;
         ExcludedFromTotals = card.ExcludedFromTotals;
         IsClosed = card.IsClosed;
         CurrencyLocked = card.CurrencyLocked;
         EarliestTransactionOn = card.EarliestTransactionOn;
+        _savedName = card.Name;
         _savedClosed = card.IsClosed;
         _balance = card.Balance;
         _saved = Snapshot();
 
         OnPropertyChanged(nameof(Title));
+        OnPropertyChanged(nameof(IsExisting));
         OnPropertyChanged(nameof(TypeIndex));
         OnPropertyChanged(nameof(CurrencyIndex));
         OnPropertyChanged(nameof(CurrencyEditable));
@@ -293,7 +366,9 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
         Error = null;
         OnPropertyChanged(nameof(HasError));
 
-        if (!AmountExpression.TryEvaluate(OpeningBalance, out decimal openingBalance))
+        decimal openingBalance = 0m;
+
+        if (OpeningBalance.Length > 0 && !AmountExpression.TryEvaluate(OpeningBalance, out openingBalance))
         {
             Error = UiTexts.AccountOpeningIncomplete;
             OnPropertyChanged(nameof(HasError));
@@ -340,4 +415,84 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
             IsSaving = done;
         }
     }
+
+    /// <summary>
+    /// Удаляет счёт. Нарушенное правило — по счёту успели появиться операции —
+    /// показывается текстом рядом с формой, как при сохранении.
+    /// </summary>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    /// <returns><c>true</c>, если счёт удалён и экран можно закрыть.</returns>
+    [RelayCommand]
+    public async Task<bool> DeleteAsync(CancellationToken cancellationToken = default)
+    {
+        if (Key is not { } key || IsSaving)
+        {
+            return false;
+        }
+
+        Error = null;
+        OnPropertyChanged(nameof(HasError));
+
+        IsSaving = true;
+        bool done = false;
+
+        try
+        {
+            await _delete.HandleAsync(key, cancellationToken);
+
+            done = true;
+
+            return true;
+        }
+        catch (DomainException error)
+        {
+            Error = error.Message;
+            OnPropertyChanged(nameof(HasError));
+
+            return false;
+        }
+        finally
+        {
+            // Как при сохранении: после удачи экран закрывается, и флаг держит
+            // второе нажатие; после отказа снимается
+            IsSaving = done;
+        }
+    }
+
+    /// <summary>
+    /// Нажата клавиша суммы: цифра, запятая или знак действия. Минус первой
+    /// клавишей начинает отрицательный остаток — долг.
+    /// </summary>
+    /// <param name="key">Знак на клавише.</param>
+    /// <exception cref="ArgumentException">Клавиша названа не одним знаком.</exception>
+    [RelayCommand]
+    public void PressKey(string key)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(key);
+
+        if (key.Length is not 1)
+        {
+            throw new ArgumentException(Faults.KeypadKeyIsOneSign(), nameof(key));
+        }
+
+        OpeningBalance = AmountInput.Append(OpeningBalance, key[0], signed: true);
+    }
+
+    /// <summary>
+    /// Стирает последний набранный знак остатка.
+    /// </summary>
+    [RelayCommand]
+    public void Backspace() => OpeningBalance = AmountInput.Backspace(OpeningBalance);
+
+    /// <summary>
+    /// Сворачивает набранное выражение в итог — клавиша «=».
+    /// </summary>
+    [RelayCommand]
+    public void Evaluate() => OpeningBalance = AmountInput.Collapse(OpeningBalance);
+
+    /// <summary>
+    /// Показывает клавиатуру суммы — касание остатка.
+    /// </summary>
+    [RelayCommand]
+    public void ShowKeys() => AreKeysVisible = true;
 }

@@ -34,13 +34,19 @@ public static class AmountInput
     private const int FractionDigitLimit = 2;
 
     /// <summary>
+    /// Знак отрицательного числа — тот же типографский минус, что на клавише вычитания.
+    /// </summary>
+    private const char Minus = '−';
+
+    /// <summary>
     /// Добавляет нажатую клавишу к выражению.
     /// </summary>
     /// <param name="expression">Набранное выражение.</param>
     /// <param name="key">Клавиша: цифра, запятая или знак действия.</param>
+    /// <param name="signed">Минус первой клавишей начинает отрицательное число: так набирают долг в начальном остатке. Сумма операции знака не имеет — его задаёт вид.</param>
     /// <returns>Выражение после нажатия. Невозможное нажатие возвращает его без изменений.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Клавиши с таким знаком на клавиатуре нет.</exception>
-    public static string Append(string expression, char key)
+    public static string Append(string expression, char key, bool signed = false)
     {
         ArgumentNullException.ThrowIfNull(expression);
 
@@ -48,9 +54,22 @@ public static class AmountInput
         {
             _ when char.IsAsciiDigit(key) => AppendDigit(expression, key),
             _ when key == Separator => AppendSeparator(expression),
-            _ when Operators.Contains(key) => AppendOperator(expression, key),
+            _ when Operators.Contains(key) => AppendOperator(expression, key, signed),
             _ => throw new ArgumentOutOfRangeException(nameof(key), key, Faults.KeypadKeyUnknown())
         };
+    }
+
+    /// <summary>
+    /// Число в том виде, в каком его набирают на клавиатуре: без разделителей разрядов,
+    /// без хвоста нулей и с типографским минусом. Набор продолжается с него теми же клавишами.
+    /// </summary>
+    /// <param name="value">Число.</param>
+    /// <returns>Число для поля суммы.</returns>
+    public static string Write(decimal value)
+    {
+        string digits = Math.Abs(value).ToString("0.##", CultureInfo.CurrentCulture);
+
+        return value < 0m ? Minus + digits : digits;
     }
 
     /// <summary>
@@ -70,12 +89,12 @@ public static class AmountInput
     /// нет: он появляется по клавише «=», а не сам собой.
     /// </summary>
     /// <param name="expression">Набранное выражение.</param>
-    /// <returns><c>true</c>, если в выражении есть знак действия.</returns>
+    /// <returns><c>true</c>, если в выражении есть знак действия. Минус первым — знак числа, а не действие.</returns>
     public static bool HasOperation(string expression)
     {
         ArgumentNullException.ThrowIfNull(expression);
 
-        return expression.AsSpan().ContainsAny(Operators);
+        return Unsigned(expression).ContainsAny(Operators);
     }
 
     /// <summary>
@@ -89,11 +108,8 @@ public static class AmountInput
     {
         ArgumentNullException.ThrowIfNull(expression);
 
-        // Разряды не разделяются и хвост нулей не пишется: итог возвращается
-        // в то же поле, и набирать его дальше придётся теми же клавишами
-        return AmountExpression.TryEvaluate(expression, out decimal total)
-            ? total.ToString("0.##", CultureInfo.CurrentCulture)
-            : expression;
+        // Итог возвращается в то же поле, и набирать его дальше придётся теми же клавишами
+        return AmountExpression.TryEvaluate(expression, out decimal total) ? Write(total) : expression;
     }
 
     /// <summary>
@@ -129,15 +145,29 @@ public static class AmountInput
 
     /// <summary>
     /// Знак действия: только после числа. Набранный подряд второй заменяет первый —
-    /// пользователь передумал, а не хочет два действия подряд.
+    /// пользователь передумал, а не хочет два действия подряд. Исключение — минус
+    /// в пустом поле, где числу разрешён знак: это не действие, а начало числа.
     /// </summary>
-    private static string AppendOperator(string expression, char key)
+    private static string AppendOperator(string expression, char key, bool signed)
     {
         // Хвостовая запятая перед действием отбрасывается: «12,+» не выражение,
         // а «12,» — то же число, что «12»
         string typed = expression.TrimEnd(Separator);
 
         if (typed.Length is 0)
+        {
+            return signed && key is Minus ? Minus.ToString() : expression;
+        }
+
+        // Одинокий ноль — то же пустое поле: «0−» никто не набирает ради вычитания
+        // из нуля, а ноль остаётся и после «=» над «5−5»
+        if (signed && key is Minus && typed is "0")
+        {
+            return Minus.ToString();
+        }
+
+        // Знак без числа заменять нечем: действие требует числа перед собой
+        if (typed is [Minus])
         {
             return expression;
         }
@@ -152,14 +182,21 @@ public static class AmountInput
 
     /// <summary>
     /// Число, которое набирается сейчас, — хвост выражения после последнего действия.
+    /// Знак первого числа к нему не относится: разряды считаются без него.
     /// </summary>
     private static ReadOnlySpan<char> CurrentNumber(string expression)
     {
-        ReadOnlySpan<char> typed = expression;
+        ReadOnlySpan<char> typed = Unsigned(expression);
         int operation = typed.LastIndexOfAny(Operators);
 
         return operation < 0 ? typed : typed[(operation + 1)..];
     }
+
+    /// <summary>
+    /// Выражение без знака первого числа.
+    /// </summary>
+    private static ReadOnlySpan<char> Unsigned(string expression) =>
+        expression.StartsWith(Minus) ? expression.AsSpan(1) : expression;
 
     /// <summary>
     /// Влезает ли в набираемое число ещё одна цифра.
