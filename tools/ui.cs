@@ -74,7 +74,8 @@ internal sealed partial class Ui
     public const string Help = """
         dotnet tools/ui.cs -- <команда> [аргументы] [<команда> ...]   команды выполняются по порядку
 
-          boot                 запустить эмулятор, если не запущен, дождаться загрузки, выключить анимации
+          boot [avd]           запустить эмулятор, если не запущен, дождаться загрузки, выключить анимации,
+                               выставить часовой пояс машины; с именем AVD — именно его, чужой гасится
           run                  собрать и развернуть приложение (-t:Run), очистив журнал, и дождаться его окна
           start                холодный старт: force-stop и запуск с ожиданием первого кадра
           stop                 force-stop приложения
@@ -105,7 +106,7 @@ internal sealed partial class Ui
     {
         switch (command)
         {
-            case "boot": await BootAsync(); break;
+            case "boot": await BootAsync(queue.Count > 0 && !IsCommand(queue.Peek()) ? queue.Dequeue() : null); break;
             case "run": await DeployAsync(); break;
             case "start": await StartAsync(); break;
             case "stop": await AdbAsync("shell", "am", "force-stop", Package); break;
@@ -136,15 +137,45 @@ internal sealed partial class Ui
     private static string Take(Queue<string> queue, string command) =>
         queue.Count > 0 ? queue.Dequeue() : throw new UiException($"команде {command} нужен аргумент");
 
-    private async Task BootAsync()
+    /// <summary>
+    /// Поднимает эмулятор. Без имени — первый AVD по алфавиту, если ни один не запущен.
+    /// С именем — именно этот: запущенный чужой гасится. Иначе проверка первого запуска
+    /// молча уходила на эмулятор с данными, где счёт подставляется сам.
+    /// </summary>
+    private async Task BootAsync(string? wanted)
     {
-        if (!(await AdbAsync("devices")).Contains("\tdevice", StringComparison.Ordinal))
-        {
-            string emulator = Sdk("emulator", "emulator.exe");
-            string avd = (await RunAsync(emulator, ["-list-avds"])).Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .FirstOrDefault() ?? throw new UiException("ни одного AVD: emulator -list-avds пуст");
+        string emulator = Sdk("emulator", "emulator.exe");
+        string[] avds = (await RunAsync(emulator, ["-list-avds"]))
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-            // Эмулятор живёт дольше помощника: процесс запускается отдельно и не ждётся
+        if (wanted is not null && !avds.Contains(wanted))
+        {
+            throw new UiException($"нет AVD «{wanted}». Есть: {string.Join(", ", avds)}");
+        }
+
+        bool running = await IsDeviceAsync();
+
+        if (running && wanted is not null && await RunningAvdAsync() is { } current && current != wanted)
+        {
+            await AdbAsync("emu", "kill");
+
+            Stopwatch stopping = Stopwatch.StartNew();
+            while (await IsDeviceAsync())
+            {
+                Deadline(stopping, TimeSpan.FromSeconds(30), $"эмулятор {current} не погас за 30 с");
+                await Task.Delay(1000);
+            }
+
+            Console.WriteLine($"погашен эмулятор {current}");
+            running = false;
+        }
+
+        if (!running)
+        {
+            string avd = wanted ?? avds.FirstOrDefault() ?? throw new UiException("ни одного AVD: emulator -list-avds пуст");
+
+            // Эмулятор живёт дольше помощника и сессии: процесс запускается отдельно
+            // и не ждётся. Запуск фоновой командой оболочки умирает вместе с ней
             Process.Start(new ProcessStartInfo(emulator, ["-avd", avd, "-no-boot-anim"]) { UseShellExecute = true, WindowStyle = ProcessWindowStyle.Minimized });
             Console.WriteLine($"запущен эмулятор {avd}");
         }
@@ -164,8 +195,25 @@ internal sealed partial class Ui
             await AdbAsync("shell", "settings", "put", "global", scale, "0");
         }
 
-        Console.WriteLine($"эмулятор готов за {clock.Elapsed.TotalSeconds:0} с, анимации выключены");
+        // После перезапуска эмулятор уезжает в GMT, и операция «сегодня» по часам
+        // машины оказывалась для приложения завтрашней — домен её отвергал
+        string zone = TimeZoneInfo.TryConvertWindowsIdToIanaId(TimeZoneInfo.Local.Id, out string? iana) ? iana : TimeZoneInfo.Local.Id;
+
+        if ((await AdbAsync("shell", "getprop", "persist.sys.timezone")).Trim() != zone)
+        {
+            await AdbAsync("shell", "service", "call", "alarm", "3", "s16", zone);
+        }
+
+        Console.WriteLine($"эмулятор {await RunningAvdAsync()} готов за {clock.Elapsed.TotalSeconds:0} с, анимации выключены, пояс {zone}");
     }
+
+    private async Task<bool> IsDeviceAsync() =>
+        (await AdbAsync("devices")).Contains("\tdevice", StringComparison.Ordinal);
+
+    // «adb emu avd name» отвечает именем и строкой OK
+    private async Task<string?> RunningAvdAsync() =>
+        (await AdbAsync("emu", "avd", "name")).Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .FirstOrDefault();
 
     private async Task DeployAsync()
     {
