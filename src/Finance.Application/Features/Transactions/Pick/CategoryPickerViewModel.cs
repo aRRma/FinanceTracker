@@ -161,13 +161,18 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
 
         foreach (CategoryListItem group in ordered)
         {
-            CategoryListItem[] children = [.. byParent[group.Key]];
+            // «Прочее» — первым, остальные в порядке справочника: в него записывают,
+            // когда подходящей подкатегории не нашлось, и искать его в конце длинной
+            // группы — лишняя прокрутка. Сортировка устойчивая, алфавит не теряется
+            CategoryListItem[] children =
+                [.. byParent[group.Key].OrderBy(static child => child.Role is not CategoryRole.Other)];
 
             _branches.Add(new Branch(group, children));
 
             // Группа выбранной подкатегории открыта сразу: иначе непонятно,
-            // где стоит текущий выбор, и его приходится искать вслепую
-            if (selected is { } key && Array.Exists(children, child => child.Key == key))
+            // где стоит текущий выбор, и его приходится искать вслепую.
+            // Группа из одной подкатегории не раскрывается — отмечена она сама
+            if (children.Length > 1 && selected is { } key && Array.Exists(children, child => child.Key == key))
             {
                 _expanded.Add(group.Key);
             }
@@ -195,7 +200,7 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(line);
 
-        if (!line.IsGroup || Filter.AsSpan().Trim().Length > 0)
+        if (!line.IsExpandable || Filter.AsSpan().Trim().Length > 0)
         {
             return;
         }
@@ -239,15 +244,15 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
     /// <summary>
     /// Запоминает выбор: форма заберёт его, когда вернётся на экран.
     /// </summary>
-    /// <param name="line">Выбранная подкатегория.</param>
+    /// <param name="line">Выбранная подкатегория или группа из одной подкатегории.</param>
     [RelayCommand]
     public void Pick(CategoryPickerLine line)
     {
         ArgumentNullException.ThrowIfNull(line);
 
-        if (line.IsSubcategory)
+        if (line.Choice is { } key)
         {
-            _picks.Category = line.Key;
+            _picks.Category = key;
         }
     }
 
@@ -293,7 +298,13 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
                 othersTitled = true;
             }
 
-            bool expanded = searching || _expanded.Contains(branch.Group.Key);
+            // Группа из одной подкатегории сама и есть выбор и не раскрывается. Но поиск,
+            // нашедший её по названию подкатегории, показывает и подкатегорию: одна шапка
+            // не объяснила бы, почему группа нашлась, а у соседних групп найденное видно
+            Guid? only = branch.Children is [{ } single] ? single.Key : null;
+            bool expanded = searching
+                ? only is null || !groupMatches
+                : only is null && _expanded.Contains(branch.Group.Key);
 
             Lines.Add(new CategoryPickerLine(
                 branch.Group.Key,
@@ -302,8 +313,9 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
                 isGroup: true,
                 branch.Children.Length,
                 branch.Group.Role is CategoryRole.Service,
-                isSelected: false)
+                isSelected: only is { } choice && choice == _selected)
             {
+                Only = only,
                 IsExpanded = expanded
             });
 

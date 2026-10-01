@@ -34,9 +34,9 @@ public sealed class PresetTests
     [Fact]
     public void Набор_разобран_целиком()
     {
-        Assert.Equal(12, Set.Groups.Count);
-        Assert.Equal(73, Set.Groups.Sum(group => group.Subcategories.Count));
-        Assert.Equal(85, Set.All().Count());
+        Assert.Equal(14, Set.Groups.Count);
+        Assert.Equal(75, Set.Groups.Sum(group => group.Subcategories.Count));
+        Assert.Equal(89, Set.All().Count());
         Assert.NotEqual(Guid.Empty, Set.Namespace);
         Assert.All(Set.All(), category => Assert.NotEqual(Guid.Empty, category.Id));
     }
@@ -168,12 +168,18 @@ public sealed class PresetTests
     /// Возврат, кэшбэк и правка расхождения ложатся в ту же статью, где лежит
     /// трата, а доход в «Зарплате» расходом не бывает.
     /// </summary>
+    /// <remarks>
+    /// Исключение одно — расходная «Без категории». Возврата у неразобранной траты
+    /// не бывает, а приход «не помню откуда», записанный в неё, вычелся бы из
+    /// неразобранного расхода, и отчёт показал бы меньше, чем потрачено.
+    /// </remarks>
     [Fact]
     public void Расходные_группы_набора_принимают_оба_вида()
     {
         string[] oneSidedExpenses = Set.Groups
             .Where(group => group.Kind == CategoryKind.Expense && !group.AcceptsAnyKind)
             .Select(group => group.Key)
+            .Where(key => key is not "unsorted_exp")
             .ToArray();
 
         string[] universalIncomes = Set.Groups
@@ -236,7 +242,7 @@ public sealed class PresetTests
     /// <param name="spoiled">Чем он заменяется.</param>
     [Theory]
     [InlineData("\"key\": \"food\",", "\"key\": \"food\", \"kidn\": \"expense\",")]
-    [InlineData("\"presetVersion\": 2,", "")]
+    [InlineData("\"presetVersion\": 3,", "")]
     [InlineData("\"kind\": \"expense\"", "\"kind\": \"expens\"")]
     public void Испорченный_набор_не_разбирается(string original, string spoiled)
     {

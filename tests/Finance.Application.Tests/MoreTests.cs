@@ -33,12 +33,18 @@ public sealed class MoreTests
 
         await model.LoadAsync();
 
+        int groups = preset.Groups.Count;
         int subcategories = preset.Groups.Sum(group => group.Subcategories.Count);
+
+        // Слова — по числу, а не одной формой: правка набора меняет числа, и форма,
+        // верная для нынешних, на следующих разошлась бы с подписью
+        string groupsWord = Plural.FormOf(groups, "группа", "группы", "групп");
+        string subcategoriesWord = Plural.FormOf(subcategories, "подкатегория", "подкатегории", "подкатегорий");
 
         Assert.Equal("0 счетов", model.AccountsCaption);
         Assert.Equal("0 мест", model.PlacesCaption);
         Assert.Equal(
-            $"{preset.Groups.Count} групп, {subcategories} подкатегории",
+            $"{groups} {groupsWord}, {subcategories} {subcategoriesWord}",
             model.CategoriesCaption);
     }
 

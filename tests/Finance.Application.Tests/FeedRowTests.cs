@@ -53,6 +53,20 @@ public sealed class FeedRowTests
     }
 
     /// <summary>
+    /// Группа с тем же названием, что у подкатегории, в подписи не повторяется:
+    /// в общей ленте остаётся счёт, в ленте счёта подпись пуста. Место — остаётся.
+    /// </summary>
+    [Fact]
+    public void Группа_с_названием_подкатегории_не_повторяется()
+    {
+        FeedItem unsorted = Expense(note: null) with { Title = "Без категории", Group = "Без категории" };
+
+        Assert.Equal("Карта", FeedRowItem.From(unsorted, showAccount: true).Caption);
+        Assert.Equal(string.Empty, FeedRowItem.From(unsorted, showAccount: false).Caption);
+        Assert.Equal("Пятёрочка", FeedRowItem.From(unsorted with { Place = "Пятёрочка" }, showAccount: false).Caption);
+    }
+
+    /// <summary>
     /// У перевода в общей ленте заголовок — «Перевод», подпись — направление,
     /// заметка — третьей строкой, а не вместо заголовка.
     /// </summary>

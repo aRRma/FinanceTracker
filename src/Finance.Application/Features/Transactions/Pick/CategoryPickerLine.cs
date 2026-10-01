@@ -15,7 +15,7 @@ public sealed partial class CategoryPickerLine : ObservableObject
     /// <param name="key">Ключ категории.</param>
     /// <param name="icon">Ключ значка.</param>
     /// <param name="name">Название.</param>
-    /// <param name="isGroup">Строка — шапка группы: она разворачивает, а не выбирается.</param>
+    /// <param name="isGroup">Строка — шапка группы: разворачивает, а с одной подкатегорией выбирает её.</param>
     /// <param name="count">Число подкатегорий — у шапки группы.</param>
     /// <param name="isProtected">Приёмник или служебная: показывается приглушённой.</param>
     /// <param name="isSelected">Эта подкатегория и стоит в форме сейчас.</param>
@@ -85,6 +85,23 @@ public sealed partial class CategoryPickerLine : ObservableObject
     public bool IsSubcategory => !IsGroup && !IsSection;
 
     /// <summary>
+    /// Единственная подкатегория группы. Такая группа не разворачивается, а выбирается
+    /// сама: раскрывать ради одной строки — лишнее касание.
+    /// </summary>
+    public Guid? Only { get; init; }
+
+    /// <summary>
+    /// Что уйдёт в форму по касанию строки: подкатегория или единственная подкатегория
+    /// группы. У разворачиваемой группы и подписи раздела — ничего.
+    /// </summary>
+    public Guid? Choice => IsSubcategory ? Key : Only;
+
+    /// <summary>
+    /// Шапка группы, которая разворачивается: у неё стрелка и число подкатегорий.
+    /// </summary>
+    public bool IsExpandable => IsGroup && Only is null;
+
+    /// <summary>
     /// Число подкатегорий в группе — плашкой у шапки.
     /// </summary>
     public int Count { get; }
@@ -95,7 +112,8 @@ public sealed partial class CategoryPickerLine : ObservableObject
     public bool IsProtected { get; }
 
     /// <summary>
-    /// Выбранная сейчас подкатегория — помечена галочкой.
+    /// Выбранная сейчас подкатегория — помечена галочкой. У группы из одной
+    /// подкатегории помечена сама шапка: раскрывать её нечего.
     /// </summary>
     public bool IsSelected { get; }
 

@@ -212,6 +212,88 @@ public sealed class PickerTests
     }
 
     /// <summary>
+    /// «Прочее» в раскрытой группе стоит первым, хотя по алфавиту оно последнее,
+    /// а поиск находит его как раньше.
+    /// </summary>
+    [Fact]
+    public async Task Прочее_первым_в_раскрытой_группе()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid group = await given.GroupAsync("Питомцы", CategoryKind.Expense);
+        await given.SubcategoryAsync(group, "Ветеринар");
+        await given.SubcategoryAsync(group, "Корм");
+        CategoryListItem other = await OtherAsync(given, group);
+
+        CategoryPickerViewModel picker = CategoryPicker(given);
+        await picker.LoadAsync(CategoryKind.Expense, selected: null);
+
+        CategoryPickerLine header = picker.Lines.First(line => line.Key == group);
+        picker.Toggle(header);
+
+        int index = picker.Lines.IndexOf(header);
+
+        Assert.Equal(
+            [other.Name, "Ветеринар", "Корм"],
+            picker.Lines.Skip(index + 1).Take(3).Select(line => line.Name));
+
+        picker.Filter = other.Name;
+
+        Assert.Contains(picker.Lines, line => line.Key == other.Key);
+    }
+
+    /// <summary>
+    /// Группа из одной подкатегории не раскрывается, а выбирается сама и отдаёт
+    /// форме эту подкатегорию; выбранной она помечена сама, без раскрытия.
+    /// </summary>
+    [Fact]
+    public async Task Группа_из_одной_подкатегории_выбирается_одним_касанием()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        await given.AccountAsync("Карта", 1000m);
+
+        Guid group = await given.GroupAsync("Питомцы", CategoryKind.Expense);
+        CategoryListItem only = await OtherAsync(given, group);
+
+        TransactionViewModel form = Form(given);
+        await form.LoadAsync(key: null);
+
+        CategoryPickerViewModel picker = CategoryPicker(given);
+        await picker.LoadAsync(form.CategoryKind, selected: null);
+
+        CategoryPickerLine header = picker.Lines.First(line => line.Key == group);
+        int count = picker.Lines.Count;
+
+        Assert.False(header.IsExpandable);
+
+        picker.Toggle(header);
+
+        Assert.Equal(count, picker.Lines.Count);
+
+        picker.Pick(header);
+        form.ApplyPicks();
+
+        Assert.Equal(only.Key, form.Category?.Key);
+
+        CategoryPickerViewModel again = CategoryPicker(given);
+        await again.LoadAsync(form.CategoryKind, selected: only.Key);
+
+        Assert.True(again.Lines.First(line => line.Key == group).IsSelected);
+        Assert.DoesNotContain(again.Lines, line => line.Key == only.Key);
+
+        // Найденная по названию подкатегории группа показывает и её: одна шапка
+        // не объяснила бы, почему группа нашлась. По названию группы — только шапку
+        again.Filter = only.Name;
+
+        Assert.Contains(again.Lines, line => line.Key == only.Key);
+
+        again.Filter = "Питомцы";
+
+        Assert.Equal(["Питомцы"], again.Lines.Select(line => line.Name));
+    }
+
+    /// <summary>
     /// Универсальная расходная группа предлагается и при выборе для дохода:
     /// возврату место в той же статье, где лежит трата. Односторонняя — нет.
     /// </summary>
@@ -452,6 +534,14 @@ public sealed class PickerTests
 
     private static TransactionViewModel Form(TransactionFixture fixture) =>
         fixture.Database.Resolve<TransactionViewModel>();
+
+    // «Прочее», которое группа получает при заведении
+    private static async Task<CategoryListItem> OtherAsync(TransactionFixture fixture, Guid group)
+    {
+        IReadOnlyList<CategoryListItem> all = await fixture.Database.Resolve<ICategoriesQuery>().ReadAsync();
+
+        return all.Single(item => item.ParentKey == group && item.Role is CategoryRole.Other);
+    }
 
     private static int IndexOfSection(CategoryPickerViewModel picker)
     {

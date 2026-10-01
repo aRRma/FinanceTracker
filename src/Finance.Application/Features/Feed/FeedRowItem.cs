@@ -37,8 +37,9 @@ public sealed record FeedRowItem(
     public bool HasNote => Note.Length > 0;
 
     /// <summary>
-    /// Собирает строку экрана из строки ленты. Подпись — место, иначе группа, а в общей
-    /// ленте ещё и счёт: вне ленты счёта он перестаёт быть очевидным из контекста.
+    /// Собирает строку экрана из строки ленты. Подпись — место, иначе группа, если её
+    /// название не повторяет заголовок, а в общей ленте ещё и счёт: вне ленты счёта он
+    /// перестаёт быть очевидным из контекста.
     /// Заметка — своей строкой под подписью, а не вместо её части: в одной строке
     /// длинная заметка вытесняла группу и обрезала счёт в конце.
     /// </summary>
@@ -66,9 +67,15 @@ public sealed record FeedRowItem(
                 TransferIcon);
         }
 
+        // Группа с тем же названием, что у подкатегории в заголовке, в подписи не
+        // повторяется: «Без категории · Без категории» ничего не добавляет ко второму разу
+        string? group = string.Equals(item.Group, item.Title, StringComparison.CurrentCultureIgnoreCase)
+            ? null
+            : item.Group;
+
         string? detail = item.Kind is TransactionKind.Transfer
             ? UiTexts.KindTransfer
-            : item.Place ?? item.Group;
+            : item.Place ?? group;
 
         string caption = (detail, showAccount) switch
         {

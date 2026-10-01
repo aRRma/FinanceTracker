@@ -370,6 +370,10 @@
   <data name="PickCategoryDeductions" xml:space="preserve">
     <value>Вычет из доходов</value>
   </data>
+  <data name="CategoryUnsortedName" xml:space="preserve">
+    <value>Без категории</value>
+    <comment>Группа и её подкатегория из стартового набора; установленным базам их заводит миграция</comment>
+  </data>
   <data name="PickAccountNew" xml:space="preserve">
     <value>Новый счёт</value>
   </data>

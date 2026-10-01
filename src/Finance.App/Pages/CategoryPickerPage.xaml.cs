@@ -7,7 +7,8 @@ namespace Finance.App.Pages;
 
 /// <summary>
 /// Экран B-03: выбор подкатегории для формы операции. Шапка группы разворачивает
-/// её, подкатегория выбирается и закрывает экран.
+/// её, подкатегория выбирается и закрывает экран. Группа из одной подкатегории
+/// выбирается сама, как подкатегория.
 /// </summary>
 [QueryProperty(nameof(Kind), "kind")]
 [QueryProperty(nameof(Selected), "selected")]
@@ -54,7 +55,7 @@ public partial class CategoryPickerPage : DataPage
             return;
         }
 
-        if (line.IsGroup)
+        if (line.IsExpandable)
         {
             // Разворачивает вся шапка, а не один знак: выбирать здесь нечего,
             // и вторая зона касания только мешала бы

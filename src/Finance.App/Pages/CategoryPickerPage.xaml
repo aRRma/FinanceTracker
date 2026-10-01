@@ -112,11 +112,13 @@
                                 </Label.Triggers>
                             </Label>
     
-                            <Border Grid.Column="3" Style="{StaticResource Badge}" IsVisible="{Binding IsGroup}">
+                            <!-- У группы из одной подкатегории ни числа, ни стрелки: она не
+                                 раскрывается, а выбирается сама -->
+                            <Border Grid.Column="3" Style="{StaticResource Badge}" IsVisible="{Binding IsExpandable}">
                                 <Label Text="{Binding Count}" Style="{StaticResource CaptionLabel}" />
                             </Border>
     
-                            <controls:Icon Grid.Column="4" Key="{Binding ChevronIcon}" IsVisible="{Binding IsGroup}"
+                            <controls:Icon Grid.Column="4" Key="{Binding ChevronIcon}" IsVisible="{Binding IsExpandable}"
                                            AutomationId="Chevron" Style="{StaticResource MutedIcon}" />
     
                             <controls:Icon Grid.Column="4" Key="check" IsVisible="{Binding IsSelected}"

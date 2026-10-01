@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Личный трекер финансов — прототип</title>
 <!-- СГЕНЕРИРОВАНО из mockups.html скриптом tools/build_prototype.py. Руками не править. -->
-<!-- отпечатки источников: mockups.html=cfc0d6be76f524a441fd2ddf05fe085951162db17c4a49470f98f3ecff812fa4 build_prototype.py=de6155045356871d3e62873c6e5c3824969b663cf8acf532e245ce173086022e -->
+<!-- отпечатки источников: mockups.html=11dda3543268fa3767fa375b87a04f40b1985518c4053f59c7ebccc3c31cfa45 build_prototype.py=de6155045356871d3e62873c6e5c3824969b663cf8acf532e245ce173086022e -->
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -327,6 +327,7 @@ body{padding:0}
 <symbol id="i-pill" viewBox="0 0 24 24"><path d="M4.5 12.5l8 -8a4.94 4.94 0 0 1 7 7l-8 8a4.94 4.94 0 0 1 -7 -7 M8.5 8.5l7 7"/></symbol>
 <symbol id="i-plane" viewBox="0 0 24 24"><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3l4 7"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14 M5 12h14"/></symbol>
+<symbol id="i-question-mark" viewBox="0 0 24 24"><path d="M8 8a3.5 3 0 0 1 3.5 -3h1a3.5 3 0 0 1 3.5 3a3 3 0 0 1 -2 3a3 4 0 0 0 -2 4 M12 19l0 .01"/></symbol>
 <symbol id="i-scooter" viewBox="0 0 24 24"><path d="M16 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M4 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M8 17h5a6 6 0 0 1 5 -5v-5a2 2 0 0 0 -2 -2h-1"/></symbol>
 <symbol id="i-shopping-bag" viewBox="0 0 24 24"><path d="M6.331 8h11.339a2 2 0 0 1 1.977 2.304l-1.255 8.152a3 3 0 0 1 -2.966 2.544h-6.852a3 3 0 0 1 -2.965 -2.544l-1.255 -8.152a2 2 0 0 1 1.977 -2.304 M9 11v-5a3 3 0 0 1 6 0v5"/></symbol>
 <symbol id="i-shopping-cart" viewBox="0 0 24 24"><path d="M4 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M15 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M17 17h-11v-14h-2 M6 5l14 1l-1 7h-13"/></symbol>
@@ -456,7 +457,7 @@ body{padding:0}
     <div class="card">
       <div class="row"><svg class="ic"><use href="#i-wallet"/></svg><div class="g"><div class="t">Счета</div><div class="s">5 счетов</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-map-pin"/></svg><div class="g"><div class="t">Места</div><div class="s">63 места</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
-      <div class="row"><svg class="ic"><use href="#i-tag"/></svg><div class="g"><div class="t">Категории</div><div class="s">12 групп, 73 подкатегории</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><svg class="ic"><use href="#i-tag"/></svg><div class="g"><div class="t">Категории</div><div class="s">14 групп, 75 подкатегорий</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     </div>
     <div class="lbl"><span>Настройки</span></div>
     <div class="card">
@@ -530,17 +531,17 @@ body{padding:0}
   <div class="chiprow"><b class="chip on"><svg class="ic"><use href="#i-shopping-cart"/></svg>Продукты</b><b class="chip"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg>Кафе и рестораны</b><b class="chip"><svg class="ic"><use href="#i-gas-station"/></svg>Топливо</b><b class="chip"><svg class="ic"><use href="#i-coffee"/></svg>Кофе</b></div>
   <div class="list" style="padding-top:6px">
     <div class="row"><svg class="ic"><use href="#i-steering-wheel"/></svg><div class="g"><div class="t">Автомобиль</div></div><span class="badge">5</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="row"><svg class="ic"><use href="#i-question-mark"/></svg><div class="g"><div class="t">Без категории</div></div></div>
     <div class="row"><svg class="ic"><use href="#i-baby-carriage"/></svg><div class="g"><div class="t">Дети</div></div><span class="badge">6</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     <div class="row"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Еда</div></div><span class="badge">6</span><svg class="ic mut"><use href="#i-chevron-down"/></svg></div>
+    <div class="row child"><svg class="ic"><use href="#i-dots"/></svg><div class="g"><div class="t faint">Прочее</div></div></div>
     <div class="row child sel"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div class="t">Продукты</div></div><svg class="ic acc"><use href="#i-check"/></svg></div>
     <div class="row child"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Кафе и рестораны</div></div></div>
     <div class="row child"><svg class="ic"><use href="#i-truck-delivery"/></svg><div class="g"><div class="t">Доставка еды</div></div></div>
     <div class="row child"><svg class="ic"><use href="#i-soup"/></svg><div class="g"><div class="t">Бизнес-ланч</div></div></div>
     <div class="row child"><svg class="ic"><use href="#i-coffee"/></svg><div class="g"><div class="t">Кофе</div></div></div>
-    <div class="row child"><svg class="ic"><use href="#i-dots"/></svg><div class="g"><div class="t faint">Прочее</div></div></div>
     <div class="row"><svg class="ic"><use href="#i-home"/></svg><div class="g"><div class="t">Жильё</div></div><span class="badge">4</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     <div class="row"><svg class="ic"><use href="#i-stethoscope"/></svg><div class="g"><div class="t">Здоровье</div></div><span class="badge">8</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
-    <div class="row"><svg class="ic"><use href="#i-mood-happy"/></svg><div class="g"><div class="t">Отдых</div></div><span class="badge">5</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
   </div>
 </div>
 </div>
@@ -925,6 +926,7 @@ body{padding:0}
   <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span>Поиск по названию</span></div>
   <div class="list">
     <div class="row"><svg class="ic"><use href="#i-steering-wheel"/></svg><div class="g"><div class="t">Автомобиль</div></div><span class="badge">5</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="row"><svg class="ic"><use href="#i-question-mark"/></svg><div class="g"><div class="t">Без категории</div></div><span class="badge">1</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     <div class="row"><svg class="ic"><use href="#i-baby-carriage"/></svg><div class="g"><div class="t">Дети</div></div><span class="badge">6</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     <div class="row"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Еда</div></div><span class="badge">6</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     <div class="row"><svg class="ic"><use href="#i-home"/></svg><div class="g"><div class="t">Жильё</div></div><span class="badge">4</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>

@@ -1,5 +1,5 @@
 {
-  "presetVersion": 2,
+  "presetVersion": 3,
   "namespace": "6f1b2c40-9a3d-5e77-8c21-4b0e7d5a9f13",
   "seededAtUtc": "2000-01-01T00:00:00Z",
   "note": "Ключи и namespace не меняются никогда: из них выводятся UUIDv5 идентификаторы категорий.",
@@ -563,6 +563,23 @@
       "id": "5cba3bf4-501e-512b-9e24-9bebb2f35df3"
     },
     {
+      "key": "unsorted_exp",
+      "name": "Без категории",
+      "kind": "expense",
+      "icon": "question-mark",
+      "role": "normal",
+      "subcategories": [
+        {
+          "key": "unsorted_exp.other",
+          "name": "Без категории",
+          "icon": "question-mark",
+          "role": "other",
+          "id": "b3dbd3bd-583e-5b61-a1dd-643e8a9e0c6e"
+        }
+      ],
+      "id": "241f309d-cbb5-53f9-8e0d-80271aa75c39"
+    },
+    {
       "key": "income",
       "name": "Доход",
       "kind": "income",
@@ -627,6 +644,23 @@
         }
       ],
       "id": "2a561729-0e2f-583f-9025-96dd877c722b"
+    },
+    {
+      "key": "unsorted_inc",
+      "name": "Без категории",
+      "kind": "income",
+      "icon": "question-mark",
+      "role": "normal",
+      "subcategories": [
+        {
+          "key": "unsorted_inc.other",
+          "name": "Без категории",
+          "icon": "question-mark",
+          "role": "other",
+          "id": "5fc3d835-916f-5468-b0b0-e6a07c4b3a95"
+        }
+      ],
+      "id": "4c125039-775b-5c49-b5a4-f11d09c7480f"
     },
     {
       "key": "service_exp",
