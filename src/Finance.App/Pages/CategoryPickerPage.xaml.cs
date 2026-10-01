@@ -48,7 +48,8 @@ public partial class CategoryPickerPage : DataPage
 
     private void OnLineTapped(object? sender, TappedEventArgs e)
     {
-        if (sender is not BindableObject { BindingContext: CategoryPickerLine line })
+        // Подпись раздела не выбирается: касание по ней не должно закрыть экран
+        if (sender is not BindableObject { BindingContext: CategoryPickerLine { IsSection: false } line })
         {
             return;
         }

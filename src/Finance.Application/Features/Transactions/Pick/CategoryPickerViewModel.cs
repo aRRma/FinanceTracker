@@ -35,6 +35,10 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
 
     private Guid? _selected;
 
+    // С какой ветви начинаются группы другого вида и как подписан их раздел
+    private int _othersStart;
+    private string _othersTitle = string.Empty;
+
     /// <summary>
     /// Создаёт модель представления выбора подкатегории.
     /// </summary>
@@ -146,7 +150,16 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
         // Дети раскладываются по группам одним проходом, а не проходом по всему справочнику на каждую группу
         ILookup<Guid?, CategoryListItem> byParent = all.ToLookup(static item => item.ParentKey);
 
-        foreach (CategoryListItem group in all.Where(item => item.IsGroup && item.Accepts(kind)))
+        // Сначала группы вида операции, потом универсальные группы другого вида
+        // своим разделом: доход иначе тонул в расходных группах, которые принимают
+        // его лишь как возврат. Внутри частей порядок справочника — по алфавиту
+        CategoryListItem[] groups = [.. all.Where(item => item.IsGroup && item.Accepts(kind))];
+        CategoryListItem[] ordered = [.. groups.Where(item => item.Kind == kind), .. groups.Where(item => item.Kind != kind)];
+
+        _othersStart = groups.Count(item => item.Kind == kind);
+        _othersTitle = kind is CategoryKind.Income ? UiTexts.PickCategoryRefunds : UiTexts.PickCategoryDeductions;
+
+        foreach (CategoryListItem group in ordered)
         {
             CategoryListItem[] children = [.. byParent[group.Key]];
 
@@ -254,9 +267,12 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
 
         string filter = Filter.Trim();
         bool searching = filter.Length > 0;
+        bool othersTitled = false;
 
-        foreach (Branch branch in _branches)
+        for (int index = 0; index < _branches.Count; index++)
         {
+            Branch branch = _branches[index];
+
             // Совпало название группы — показывается вся группа: искали её
             bool groupMatches = searching && Matches(branch.Group.Name, filter);
 
@@ -267,6 +283,14 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
             if (searching && children.Length is 0)
             {
                 continue;
+            }
+
+            // Подпись раздела — перед первой показанной группой другого вида:
+            // поиск, не нашедший ничего в разделе, не оставляет пустую подпись
+            if (index >= _othersStart && !othersTitled)
+            {
+                Lines.Add(CategoryPickerLine.Section(_othersTitle));
+                othersTitled = true;
             }
 
             bool expanded = searching || _expanded.Contains(branch.Group.Key);

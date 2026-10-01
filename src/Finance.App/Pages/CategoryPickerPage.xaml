@@ -71,44 +71,58 @@
         <CollectionView Grid.Row="2" ItemsSource="{Binding Lines}" SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="pick:CategoryPickerLine">
-                    <Grid Padding="16,10" ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12"
-                          MinimumHeightRequest="{StaticResource TouchTarget}">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnLineTapped" />
-                        </Grid.GestureRecognizers>
-                        <Grid.Triggers>
-                            <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
-                                <Setter Property="BackgroundColor"
-                                        Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}" />
-                            </DataTrigger>
-                        </Grid.Triggers>
-
-                        <!-- Отступ второго уровня: дерево показано отступом, а не рамками -->
-                        <BoxView Grid.Column="0" WidthRequest="24" Color="Transparent"
-                                 IsVisible="{Binding IsSubcategory}" />
-
-                        <controls:Icon Grid.Column="1" Key="{Binding Icon}" />
-
-                        <Label Grid.Column="2" Text="{Binding Name}" VerticalOptions="Center">
-                            <Label.Triggers>
-                                <!-- Приёмник и служебная приглушены: их выбирают редко -->
-                                <DataTrigger TargetType="Label" Binding="{Binding IsProtected}" Value="True">
-                                    <Setter Property="TextColor"
-                                            Value="{AppThemeBinding Light={StaticResource Ink3Light}, Dark={StaticResource Ink3Dark}}" />
+                    <Grid>
+                        <!--
+                            Подпись раздела отделяет группы другого вида — у дохода это
+                            расходные группы, принимающие его как возврат. Линия над ней
+                            и подпись раздела, как над валютами на балансах: доходные
+                            группы стоят первыми, и прочие не смешиваются с ними глазом.
+                        -->
+                        <VerticalStackLayout IsVisible="{Binding IsSection}" Padding="0,8,0,0">
+                            <BoxView Style="{StaticResource Divider}" />
+                            <Label Padding="16,14,16,6" Text="{Binding Name}" Style="{StaticResource SectionLabel}" />
+                        </VerticalStackLayout>
+    
+                        <Grid Padding="16,10" ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12"
+                              IsVisible="{Binding IsCategory}"
+                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnLineTapped" />
+                            </Grid.GestureRecognizers>
+                            <Grid.Triggers>
+                                <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
+                                    <Setter Property="BackgroundColor"
+                                            Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}" />
                                 </DataTrigger>
-                            </Label.Triggers>
-                        </Label>
-
-                        <Border Grid.Column="3" Style="{StaticResource Badge}" IsVisible="{Binding IsGroup}">
-                            <Label Text="{Binding Count}" Style="{StaticResource CaptionLabel}" />
-                        </Border>
-
-                        <controls:Icon Grid.Column="4" Key="{Binding ChevronIcon}" IsVisible="{Binding IsGroup}"
-                                       AutomationId="Chevron" Style="{StaticResource MutedIcon}" />
-
-                        <controls:Icon Grid.Column="4" Key="check" IsVisible="{Binding IsSelected}"
-                                       SemanticProperties.Description="{x:Static texts:UiTexts.CommonSelected}"
-                                       Style="{StaticResource AccentIcon}" />
+                            </Grid.Triggers>
+    
+                            <!-- Отступ второго уровня: дерево показано отступом, а не рамками -->
+                            <BoxView Grid.Column="0" WidthRequest="24" Color="Transparent"
+                                     IsVisible="{Binding IsSubcategory}" />
+    
+                            <controls:Icon Grid.Column="1" Key="{Binding Icon}" />
+    
+                            <Label Grid.Column="2" Text="{Binding Name}" VerticalOptions="Center">
+                                <Label.Triggers>
+                                    <!-- Приёмник и служебная приглушены: их выбирают редко -->
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsProtected}" Value="True">
+                                        <Setter Property="TextColor"
+                                                Value="{AppThemeBinding Light={StaticResource Ink3Light}, Dark={StaticResource Ink3Dark}}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+    
+                            <Border Grid.Column="3" Style="{StaticResource Badge}" IsVisible="{Binding IsGroup}">
+                                <Label Text="{Binding Count}" Style="{StaticResource CaptionLabel}" />
+                            </Border>
+    
+                            <controls:Icon Grid.Column="4" Key="{Binding ChevronIcon}" IsVisible="{Binding IsGroup}"
+                                           AutomationId="Chevron" Style="{StaticResource MutedIcon}" />
+    
+                            <controls:Icon Grid.Column="4" Key="check" IsVisible="{Binding IsSelected}"
+                                           SemanticProperties.Description="{x:Static texts:UiTexts.CommonSelected}"
+                                           Style="{StaticResource AccentIcon}" />
+                        </Grid>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

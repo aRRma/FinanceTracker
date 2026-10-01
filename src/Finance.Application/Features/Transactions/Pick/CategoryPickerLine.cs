@@ -3,9 +3,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace Finance.Application.Features.Transactions.Pick;
 
 /// <summary>
-/// Строка списка категорий: и шапка группы, и подкатегория под ней. Один тип
-/// на оба уровня, потому что список плоский: группировка списка в MAUI прячет
-/// заголовок вместе с содержимым, а свёрнутой группе заголовок как раз и нужен.
+/// Строка списка категорий: и шапка группы, и подкатегория под ней, и подпись
+/// раздела. Один тип на все, потому что список плоский: группировка списка в MAUI
+/// прячет заголовок вместе с содержимым, а свёрнутой группе заголовок как раз и нужен.
 /// </summary>
 public sealed partial class CategoryPickerLine : ObservableObject
 {
@@ -38,6 +38,18 @@ public sealed partial class CategoryPickerLine : ObservableObject
     }
 
     /// <summary>
+    /// Подпись раздела: отделяет группы другого вида, принимающие операцию как
+    /// возврат, от групп вида самой операции. Не выбирается и не разворачивается.
+    /// </summary>
+    /// <param name="title">Текст подписи.</param>
+    /// <returns>Строка-подпись.</returns>
+    public static CategoryPickerLine Section(string title) =>
+        new(Guid.Empty, string.Empty, title, isGroup: false, count: 0, isProtected: false, isSelected: false)
+        {
+            IsSection = true
+        };
+
+    /// <summary>
     /// Ключ категории.
     /// </summary>
     public Guid Key { get; }
@@ -58,9 +70,19 @@ public sealed partial class CategoryPickerLine : ObservableObject
     public bool IsGroup { get; }
 
     /// <summary>
+    /// Строка — подпись раздела, а не категория.
+    /// </summary>
+    public bool IsSection { get; private init; }
+
+    /// <summary>
+    /// Строка — категория: шапка группы или подкатегория.
+    /// </summary>
+    public bool IsCategory => !IsSection;
+
+    /// <summary>
     /// Строка — подкатегория: она с отступом и её можно выбрать.
     /// </summary>
-    public bool IsSubcategory => !IsGroup;
+    public bool IsSubcategory => !IsGroup && !IsSection;
 
     /// <summary>
     /// Число подкатегорий в группе — плашкой у шапки.

@@ -364,6 +364,12 @@
   <data name="PickAccountSource" xml:space="preserve">
     <value>Счёт списания</value>
   </data>
+  <data name="PickCategoryRefunds" xml:space="preserve">
+    <value>Возврат в расходы</value>
+  </data>
+  <data name="PickCategoryDeductions" xml:space="preserve">
+    <value>Вычет из доходов</value>
+  </data>
   <data name="PickAccountNew" xml:space="preserve">
     <value>Новый счёт</value>
   </data>

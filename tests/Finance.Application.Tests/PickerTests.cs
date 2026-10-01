@@ -237,6 +237,76 @@ public sealed class PickerTests
     }
 
     /// <summary>
+    /// У дохода сначала доходные группы, затем подпись раздела и расходные группы,
+    /// принимающие доход как возврат: иначе доход тонул в расходных статьях.
+    /// У расхода другого вида нет — нет и подписи.
+    /// </summary>
+    [Fact]
+    public async Task Группы_другого_вида_идут_своим_разделом()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        await given.GroupAsync("Маркетплейсы", CategoryKind.Expense, acceptsAnyKind: true);
+        await given.GroupAsync("Подработка", CategoryKind.Income);
+
+        CategoryPickerViewModel incomes = CategoryPicker(given);
+        await incomes.LoadAsync(CategoryKind.Income, selected: null);
+
+        int section = IndexOfSection(incomes);
+        string[] names = [.. incomes.Lines.Select(line => line.Name)];
+
+        Assert.Equal(UiTexts.PickCategoryRefunds, names[section]);
+        Assert.Contains("Подработка", names[..section]);
+        Assert.Contains("Маркетплейсы", names[(section + 1)..]);
+        Assert.Single(incomes.Lines, line => line.IsSection);
+
+        CategoryPickerViewModel expenses = CategoryPicker(given);
+        await expenses.LoadAsync(CategoryKind.Expense, selected: null);
+
+        Assert.DoesNotContain(expenses.Lines, line => line.IsSection);
+    }
+
+    /// <summary>
+    /// Поиск показывает подпись раздела, только если нашлось что-то в нём, и
+    /// разворот группы над подписью её не задевает.
+    /// </summary>
+    [Fact]
+    public async Task Подпись_раздела_живёт_с_поиском_и_разворотом()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid marketplaces = await given.GroupAsync("Маркетплейсы", CategoryKind.Expense, acceptsAnyKind: true);
+        await given.SubcategoryAsync(marketplaces, "Возврат заказа");
+        Guid side = await given.GroupAsync("Подработка", CategoryKind.Income);
+        await given.SubcategoryAsync(side, "Переводы текстов");
+
+        CategoryPickerViewModel picker = CategoryPicker(given);
+        await picker.LoadAsync(CategoryKind.Income, selected: null);
+
+        picker.Filter = "Возврат заказа";
+
+        Assert.Equal(
+            [UiTexts.PickCategoryRefunds, "Маркетплейсы", "Возврат заказа"],
+            picker.Lines.Select(line => line.Name));
+
+        picker.Filter = "Переводы текстов";
+
+        Assert.DoesNotContain(picker.Lines, line => line.IsSection);
+
+        picker.Filter = string.Empty;
+
+        CategoryPickerLine group = picker.Lines.First(line => line.Key == side);
+        int before = IndexOfSection(picker);
+
+        picker.Toggle(group);
+        Assert.Equal(before + group.Count, IndexOfSection(picker));
+
+        picker.Toggle(group);
+        Assert.Equal(before, IndexOfSection(picker));
+        Assert.True(picker.Lines[before].IsSection);
+    }
+
+    /// <summary>
     /// Подкатегория универсальной расходной группы, выбранная для дохода, доезжает
     /// до формы: список формы отбирается тем же правилом, что и экран выбора, —
     /// иначе выбор возврата молча пропадал бы, а поле оставалось пустым.
@@ -382,6 +452,19 @@ public sealed class PickerTests
 
     private static TransactionViewModel Form(TransactionFixture fixture) =>
         fixture.Database.Resolve<TransactionViewModel>();
+
+    private static int IndexOfSection(CategoryPickerViewModel picker)
+    {
+        for (int index = 0; index < picker.Lines.Count; index++)
+        {
+            if (picker.Lines[index].IsSection)
+            {
+                return index;
+            }
+        }
+
+        return -1;
+    }
 
     private static AccountPickerViewModel AccountPicker(TransactionFixture fixture) =>
         fixture.Database.Resolve<AccountPickerViewModel>();
