@@ -8,9 +8,14 @@ namespace Finance.App.Pages;
 /// Экран D-02: карточка счёта — заведение и правка.
 /// </summary>
 [QueryProperty(nameof(Key), "key")]
-public partial class AccountPage : DataPage
+public sealed partial class AccountPage : DataPage
 {
     private readonly AccountViewModel _model;
+
+    private bool _deleting;
+
+    // Клавиатура суммы только что позвана: ужатую ею форму докрутить до остатка
+    private bool _scrollToOpening;
 
     /// <summary>
     /// Создаёт экран.
@@ -43,12 +48,65 @@ public partial class AccountPage : DataPage
 
     private void OnSave(object? sender, EventArgs e) => Guarded.Run(SaveAsync);
 
-    private void OnDelete(object? sender, EventArgs e) => Guarded.Run(DeleteAsync);
+    private void OnDelete(object? sender, EventArgs e)
+    {
+        // Второе касание до ответа на первый вопрос открыло бы второй диалог
+        if (_deleting)
+        {
+            return;
+        }
+
+        _deleting = true;
+        Guarded.Run(async () =>
+        {
+            try
+            {
+                await DeleteAsync();
+            }
+            finally
+            {
+                _deleting = false;
+            }
+        });
+    }
 
     // Две клавиатуры на экран не помещаются: набор названия убирает клавиатуру суммы
     private void OnNameFocused(object? sender, FocusEventArgs e) => _model.AreKeysVisible = false;
 
     private void OnOpeningBalanceTapped(object? sender, TappedEventArgs e) => Guarded.Run(ShowKeysAsync);
+
+    /// <summary>
+    /// Клавиатура суммы поднялась и ужала форму — остаток докручивается над ней:
+    /// на тесном экране он уходил под клавиши, и набирали вслепую.
+    /// </summary>
+    /// <remarks>
+    /// Один раз на появление клавиатуры: форма меняет размер и от карточки правила,
+    /// и докрутка на каждую смену уводила бы от места, куда пользователь долистал сам.
+    /// </remarks>
+    private void OnFormSizeChanged(object? sender, EventArgs e)
+    {
+        if (_scrollToOpening && _model.AreKeysVisible)
+        {
+            _scrollToOpening = false;
+            Guarded.Run(() => Form.ScrollToAsync(OpeningField, ScrollToPosition.MakeVisible, animated: true));
+        }
+    }
+
+    /// <summary>
+    /// «Назад» сначала убирает клавиатуру суммы, как системную клавиатуру Android,
+    /// и только потом уводит с экрана.
+    /// </summary>
+    protected override bool OnBackButtonPressed()
+    {
+        if (_model.AreKeysVisible)
+        {
+            _model.AreKeysVisible = false;
+
+            return true;
+        }
+
+        return base.OnBackButtonPressed();
+    }
 
     /// <summary>
     /// Касание остатка зовёт клавиатуру суммы, а системную, если она осталась
@@ -62,6 +120,9 @@ public partial class AccountPage : DataPage
         }
 
         NameEntry.Unfocus();
+
+        // Форму ужмёт только появившаяся клавиатура: уже показанная размер не меняет
+        _scrollToOpening = !_model.AreKeysVisible;
         _model.ShowKeys();
     }
 

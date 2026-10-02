@@ -1,15 +1,12 @@
 using System.Globalization;
+using System.Text;
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
-using Finance.Application.Texts;
 using Finance.Domain.Enums;
 using Finance.Domain.Values;
 using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Finance.Application.Tests;
 
@@ -22,6 +19,8 @@ public sealed class UnsortedGroupsMigrationTests
 {
     private const string Seeded = "2000-01-01 00:00:00.0000000+00:00";
 
+    private static readonly string[] Unsorted = ["unsorted_exp", "unsorted_exp.other", "unsorted_inc", "unsorted_inc.other"];
+
     /// <summary>
     /// База со второй версией набора получает обе группы с их подкатегориями под
     /// ключами, выведенными из текстовых, и отметку третьей версии.
@@ -31,8 +30,8 @@ public sealed class UnsortedGroupsMigrationTests
     {
         await using TestDatabase database = TestDatabase.CreateUnprepared();
 
-        await MigrateToAsync(database, "MergeServiceGroups");
-        await ExecuteAsync(database, Version("2"));
+        await database.MigrateToAsync("MergeServiceGroups");
+        await database.ExecuteAsync(Version("2"));
 
         await database.Resolve<DatabaseBootstrapper>().InitializeAsync();
 
@@ -43,10 +42,7 @@ public sealed class UnsortedGroupsMigrationTests
             CategoryListItem group = Assert.Single(categories, item => item.Key == Derive(key));
             CategoryListItem only = Assert.Single(categories, item => item.ParentKey == group.Key);
 
-            // Миграция берёт название из ресурсов, новая установка — из набора:
-            // разойдись они, обновлённое приложение называло бы группу иначе нового
             Assert.Equal(Preset.Embedded().Groups.Single(item => item.Key == key).Name, group.Name);
-            Assert.Equal(UiTexts.CategoryUnsortedName, group.Name);
             Assert.Equal(kind, group.Kind);
             Assert.False(group.AcceptsAnyKind);
             Assert.Equal(Derive($"{key}.other"), only.Key);
@@ -58,8 +54,31 @@ public sealed class UnsortedGroupsMigrationTests
     }
 
     /// <summary>
+    /// Обновлённая база получает строки, неотличимые от строк новой установки, —
+    /// поле в поле: значок, роль, вид, «вне отчётов» и давняя метка набора. Запрос
+    /// категорий подставляет приёмнику вид от группы и разницы бы не показал,
+    /// поэтому сверяются сами строки таблицы.
+    /// </summary>
+    [Fact]
+    public async Task Миграция_заводит_те_же_строки_что_набор()
+    {
+        await using TestDatabase migrated = TestDatabase.CreateUnprepared();
+        await migrated.MigrateToAsync("MergeServiceGroups");
+        await migrated.ExecuteAsync(Version("2"));
+        await migrated.Resolve<DatabaseBootstrapper>().InitializeAsync();
+
+        await using TestDatabase fresh = await TestDatabase.CreateWithPresetAsync();
+
+        string expected = await RowsAsync(fresh);
+
+        Assert.Equal(Unsorted.Length, expected.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length);
+        Assert.Equal(expected, await RowsAsync(migrated));
+    }
+
+    /// <summary>
     /// Своя группа пользователя с тем же именем в том же виде остаётся единственной:
-    /// имя группы уникально в своём виде. Доходная заводится как обычно. База первой
+    /// имя группы уникально в своём виде без учёта регистра, и две одноимённые
+    /// запретили бы сохранить любую из них. Доходная заводится как обычно. База первой
     /// версии отметку не меняет — пересмотра второй версии в ней по-прежнему нет.
     /// </summary>
     [Fact]
@@ -70,13 +89,12 @@ public sealed class UnsortedGroupsMigrationTests
         PresetGroup expense = Preset.Embedded().Groups.Single(group => group.Key == "unsorted_exp");
         Guid own = Keys.New();
 
-        // Своё имя — с заглавной в каждом слове и табуляцией по краям: доменная
-        // сверка имён сочла бы его тем же, и миграция обязана тоже
-        string ownName = "\t" + CultureInfo.InvariantCulture.TextInfo.ToTitleCase(expense.Name) + " ";
+        // Своё имя — вразнобой заглавными и строчными, с табуляцией по краям:
+        // доменная сверка имён сочла бы его тем же, и миграция обязана тоже
+        string ownName = "\t" + Alternating(expense.Name) + " ";
 
-        await MigrateToAsync(database, "MergeServiceGroups");
-        await ExecuteAsync(
-            database,
+        await database.MigrateToAsync("MergeServiceGroups");
+        await database.ExecuteAsync(
             $"""
             {Version("1")}
 
@@ -107,11 +125,11 @@ public sealed class UnsortedGroupsMigrationTests
     {
         await using TestDatabase database = TestDatabase.CreateUnprepared();
 
-        await MigrateToAsync(database, "MergeServiceGroups");
-        await ExecuteAsync(database, Version("2"));
+        await database.MigrateToAsync("MergeServiceGroups");
+        await database.ExecuteAsync(Version("2"));
         await database.Resolve<DatabaseBootstrapper>().InitializeAsync();
 
-        await MigrateToAsync(database, "MergeServiceGroups");
+        await database.MigrateToAsync("MergeServiceGroups");
 
         Assert.Equal("2", await database.Resolve<ILocalSettings>().GetAsync(SettingName.PresetVersion));
 
@@ -146,21 +164,43 @@ public sealed class UnsortedGroupsMigrationTests
     private static string Version(string value) =>
         $"INSERT INTO settings (name, value) VALUES ('{SettingName.PresetVersion}', '{value}');";
 
-    private static async Task MigrateToAsync(TestDatabase database, string migration)
-    {
-        await using FinanceDbContext context = await database.Contexts.CreateDbContextAsync();
+    // Буквы через одну заглавными: ни одно из привычных написаний, а для домена — то же имя
+    private static string Alternating(string name) =>
+        string.Create(name.Length, name, static (span, source) =>
+        {
+            for (int i = 0; i < source.Length; i++)
+            {
+                span[i] = i % 2 == 0
+                    ? char.ToUpper(source[i], CultureInfo.InvariantCulture)
+                    : char.ToLower(source[i], CultureInfo.InvariantCulture);
+            }
+        });
 
-        await context.GetService<IMigrator>().MigrateAsync(migration);
-    }
-
-    private static async Task ExecuteAsync(TestDatabase database, string sql)
+    // Строки групп «Без категории» целиком, все колонки, по ключу: так видно любое поле,
+    // в котором миграция разошлась бы с набором
+    private static async Task<string> RowsAsync(TestDatabase database)
     {
         await using SqliteConnection connection = new(database.Location.ConnectionString);
         await connection.OpenAsync();
 
         await using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = sql;
+        command.CommandText =
+            $"SELECT * FROM categories WHERE key IN ({string.Join(", ", Unsorted.Select(static key => $"'{Derive(key)}'"))}) ORDER BY key";
 
-        await command.ExecuteNonQueryAsync();
+        await using SqliteDataReader reader = await command.ExecuteReaderAsync();
+
+        StringBuilder rows = new();
+
+        while (await reader.ReadAsync())
+        {
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                rows.Append(CultureInfo.InvariantCulture, $"{reader.GetName(i)}={reader.GetValue(i)}; ");
+            }
+
+            rows.Append('\n');
+        }
+
+        return rows.ToString();
     }
 }

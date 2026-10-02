@@ -12,7 +12,7 @@ namespace Finance.App.Pages;
 /// </summary>
 [QueryProperty(nameof(Kind), "kind")]
 [QueryProperty(nameof(Selected), "selected")]
-public partial class CategoryPickerPage : DataPage
+public sealed partial class CategoryPickerPage : DataPage
 {
     private readonly CategoryPickerViewModel _model;
 

@@ -88,6 +88,7 @@ public static class FinanceServices
         services.AddDbContextFactory<FinanceDbContext>(options => options.UseSqlite(location.ConnectionString));
 
         services.AddSingleton<IChangeNotifier>(new ChangeNotifier(dispatchToInterface));
+        services.AddSingleton<TimeZoneFollower>();
         services.AddSingleton<UnitOfWork>();
         services.AddSingleton<ILocalSettings, LocalSettings>();
         services.AddSingleton<DatabaseBootstrapper>();

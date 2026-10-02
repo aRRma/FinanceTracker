@@ -8,7 +8,7 @@ namespace Finance.App.Pages;
 /// кладётся в общий объект, и экран закрывается.
 /// </summary>
 [QueryProperty(nameof(Current), "current")]
-public partial class PlacePickerPage : DataPage
+public sealed partial class PlacePickerPage : DataPage
 {
     private readonly PlacePickerViewModel _model;
 

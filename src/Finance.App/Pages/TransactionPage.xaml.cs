@@ -12,7 +12,7 @@ namespace Finance.App.Pages;
 [QueryProperty(nameof(Key), "key")]
 [QueryProperty(nameof(Account), "account")]
 [QueryProperty(nameof(Kind), "kind")]
-public partial class TransactionPage : DataPage
+public sealed partial class TransactionPage : DataPage
 {
     private readonly TransactionViewModel _model;
 

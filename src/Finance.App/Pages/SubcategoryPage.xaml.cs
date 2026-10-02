@@ -9,7 +9,7 @@ namespace Finance.App.Pages;
 /// </summary>
 [QueryProperty(nameof(Key), "key")]
 [QueryProperty(nameof(Group), "group")]
-public partial class SubcategoryPage : DataPage
+public sealed partial class SubcategoryPage : DataPage
 {
     private readonly SubcategoryViewModel _model;
 

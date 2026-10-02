@@ -6,7 +6,7 @@ namespace Finance.App.Pages;
 /// <summary>
 /// Экран D-01: справочник счетов.
 /// </summary>
-public partial class AccountsPage : DataPage
+public sealed partial class AccountsPage : DataPage
 {
     private readonly AccountsViewModel _model;
 

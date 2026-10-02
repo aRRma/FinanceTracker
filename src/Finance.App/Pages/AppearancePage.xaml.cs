@@ -6,7 +6,7 @@ namespace Finance.App.Pages;
 /// <summary>
 /// Экран D-06: выбор темы оформления.
 /// </summary>
-public partial class AppearancePage : DataPage
+public sealed partial class AppearancePage : DataPage
 {
     private readonly AppearanceViewModel _model;
 

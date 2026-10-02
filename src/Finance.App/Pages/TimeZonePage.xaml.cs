@@ -7,7 +7,7 @@ namespace Finance.App.Pages;
 /// <summary>
 /// Экран D-08: выбор часового пояса.
 /// </summary>
-public partial class TimeZonePage : DataPage
+public sealed partial class TimeZonePage : DataPage
 {
     private readonly TimeZoneViewModel _model;
 

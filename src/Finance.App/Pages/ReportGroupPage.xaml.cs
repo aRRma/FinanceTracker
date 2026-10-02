@@ -8,7 +8,7 @@ namespace Finance.App.Pages;
 /// </summary>
 [QueryProperty(nameof(Key), "key")]
 [QueryProperty(nameof(Month), "month")]
-public partial class ReportGroupPage : DataPage
+public sealed partial class ReportGroupPage : DataPage
 {
     private readonly ReportGroupViewModel _model;
 

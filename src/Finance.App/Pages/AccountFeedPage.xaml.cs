@@ -7,7 +7,7 @@ namespace Finance.App.Pages;
 /// Экран A-03: лента одного счёта.
 /// </summary>
 [QueryProperty(nameof(Key), "key")]
-public partial class AccountFeedPage : DataPage
+public sealed partial class AccountFeedPage : DataPage
 {
     private readonly FeedViewModel _model;
 
@@ -25,6 +25,7 @@ public partial class AccountFeedPage : DataPage
 
         // Кнопка объявлена в разметке после списка: ссылкой вперёд её не достать
         List.Floating = AddButton;
+        Selection.List = List;
 
         _model = model;
         BindingContext = model;

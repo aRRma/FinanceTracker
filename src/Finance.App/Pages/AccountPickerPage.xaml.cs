@@ -12,7 +12,7 @@ namespace Finance.App.Pages;
 [QueryProperty(nameof(Excluded), "excluded")]
 [QueryProperty(nameof(Target), "target")]
 [QueryProperty(nameof(Kind), "kind")]
-public partial class AccountPickerPage : DataPage
+public sealed partial class AccountPickerPage : DataPage
 {
     private readonly AccountPickerViewModel _model;
 

@@ -2,6 +2,7 @@ using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain.Enums;
 
@@ -133,11 +134,12 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
         foreach (FrequentCategory item in frequent)
         {
             // Приглушения в панели нет: сюда попадает только то, чем и правда
-            // пользуются, и «Прочее» здесь такая же рабочая подкатегория
+            // пользуются, и «Прочее» здесь такая же рабочая подкатегория. Подписано
+            // оно с группой: чипов «Прочее» иначе было бы несколько одинаковых
             Frequent.Add(new CategoryPickerLine(
                 item.Key,
                 item.Icon,
-                item.Name,
+                CategoryCaption.Of(item.Name, item.GroupName, item.Role),
                 isGroup: false,
                 count: 0,
                 isProtected: false,
@@ -313,7 +315,9 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
                 isGroup: true,
                 branch.Children.Length,
                 branch.Group.Role is CategoryRole.Service,
-                isSelected: only is { } choice && choice == _selected)
+                // Раскрытая поиском, она показывает выбранную подкатегорию строкой ниже,
+                // и отметка на шапке выделила бы один выбор дважды
+                isSelected: !expanded && only is { } choice && choice == _selected)
             {
                 Only = only,
                 IsExpanded = expanded

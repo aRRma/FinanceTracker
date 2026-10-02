@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Шапка ленты при выделении (C-09): крестик, число выделенных и «Удалить».
+    Встаёт на место заголовка страницы, а не над списком: полоса над списком
+    сдвигала строки вниз под пальцем, и следующее касание попадало в соседнюю.
+    Общая для обеих лент; удаляет сам список — у него подтверждение и защита
+    от второго диалога.
+-->
+<ContentView
+    x:Class="Finance.App.Controls.SelectionBar"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
+    xmlns:feed="clr-namespace:Finance.Application.Features.Feed;assembly=Finance.Application"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    x:DataType="feed:FeedViewModel">
+
+    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Margin="0,0,10,0">
+        <Border Grid.Column="0" Style="{StaticResource IconButton}"
+                SemanticProperties.Description="{x:Static texts:UiTexts.FeedSelectionEnd}" AutomationId="EndSelection">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnEnd" />
+            </Border.GestureRecognizers>
+            <controls:Icon Key="x" HorizontalOptions="Center" VerticalOptions="Center" />
+        </Border>
+        <Label Grid.Column="1" Text="{Binding SelectionTitle}" Style="{StaticResource BarTitleLabel}"
+               LineBreakMode="TailTruncation" AutomationId="SelectionTitle" />
+        <Button Grid.Column="2" Text="{x:Static texts:UiTexts.CommonDelete}" Style="{StaticResource BarDangerButton}"
+                Clicked="OnDelete" AutomationId="DeleteSelected" />
+    </Grid>
+
+</ContentView>

@@ -9,9 +9,10 @@ using Finance.Domain.Values;
 namespace Finance.Application.Features.Accounts.Card;
 
 /// <summary>
-/// Карточка счёта: заведение и правка одним экраном. Запреты показываются сразу —
-/// валюта заперта операциями, дата открытия дальше первой операции не двигается, —
-/// потому что узнать о них при сохранении поздно: пользователь уже всё ввёл.
+/// Карточка счёта: заведение, правка и удаление одним экраном. Запреты показываются
+/// сразу — валюта заперта операциями, дата открытия дальше первой операции не двигается,
+/// счёт с операциями не удаляется, — потому что узнать о них при сохранении поздно.
+/// Остаток набирается клавиатурой суммы, как сумма операции, а долг — минусом первым.
 /// </summary>
 public sealed partial class AccountViewModel : ObservableObject, IFormModel
 {
@@ -29,7 +30,7 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
 
     // Снимок формы на момент загрузки: с ним сравнивается нынешнее состояние,
     // когда экран покидают, не сохранив. У новой формы снимок — её пустое начало
-    private (string, AccountType, Currency, string, DateOnly, bool, bool) _saved;
+    private (string, AccountType, Currency, decimal?, string, DateOnly, bool, bool) _saved;
 
     /// <summary>
     /// Создаёт модель представления карточки счёта.
@@ -169,36 +170,36 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     public partial string OpeningBalance { get; set; } = string.Empty;
 
     /// <summary>
-    /// Остаток для показа: число — суммой с валютой, выражение — как набрано.
-    /// Итог выражения появляется по «=», а не сам собой, как в форме операции.
+    /// Остаток для показа. Пока клавиатура на виду — как набран: сумма с валютой
+    /// прятала бы запятую и нули после неё, и нажатие выглядело бы непринятым.
+    /// Без клавиатуры число — суммой с валютой, незакрытое выражение — как набрано:
+    /// итог выражения появляется по «=», а не сам собой, как в форме операции.
     /// </summary>
-    public string OpeningBalanceDisplay
-    {
-        get
-        {
-            if (OpeningBalance.Length is 0)
-            {
-                return Money.Restore(0m, Currency).Display;
-            }
-
-            return !AmountInput.HasOperation(OpeningBalance) && AmountExpression.TryEvaluate(OpeningBalance, out decimal value)
-                ? Money.Restore(value, Currency).Display
-                : OpeningBalance;
-        }
-    }
+    public string OpeningBalanceDisplay =>
+        (AreKeysVisible && OpeningBalance.Length > 0) || AmountInput.HasOperation(OpeningBalance) || OpeningValue is not { } value
+            ? OpeningBalance
+            : Money.Restore(value, Currency).Display;
 
     /// <summary>
     /// Остаток — долг: показывается цветом расхода.
     /// </summary>
-    public bool IsOpeningBalanceNegative =>
-        !AmountInput.HasOperation(OpeningBalance) && AmountExpression.TryEvaluate(OpeningBalance, out decimal value) && value < 0m;
+    public bool IsOpeningBalanceNegative => !AmountInput.HasOperation(OpeningBalance) && OpeningValue < 0m;
 
     /// <summary>
     /// Клавиатура суммы на виду. Появляется по касанию остатка и уходит, пока набирают
     /// название: две клавиатуры на экран не помещаются, а остаток вводится раз на счёт.
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OpeningBalanceDisplay))]
     public partial bool AreKeysVisible { get; set; }
+
+    /// <summary>
+    /// Набранный остаток числом: пусто — ноль, выражение — его итог. Не считается —
+    /// пусто: набор не закончен («−», «100+»).
+    /// </summary>
+    private decimal? OpeningValue => OpeningBalance.Length is 0
+        ? 0m
+        : AmountExpression.TryEvaluate(OpeningBalance, out decimal value) ? value : null;
 
     /// <summary>
     /// Дата открытия.
@@ -256,10 +257,12 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Правимые поля формы одним значением. Кортеж сравнивается сам, по всем
     /// полям сразу: список «что считать правкой» отдельно от полей разошёлся бы
-    /// с ними при первом же новом поле.
+    /// с ними при первом же новом поле. Остаток — числом, а не набранной строкой:
+    /// «0» на пустом поле и «1234,50» вместо «1234,5» ничего не меняют. Строка
+    /// идёт в снимок, только пока набор не считается.
     /// </summary>
-    private (string Name, AccountType Type, Currency Currency, string OpeningBalance, DateOnly OpenedOn, bool Excluded, bool Closed) Snapshot() =>
-        (Name, Type, Currency, OpeningBalance, OpenedOn, ExcludedFromTotals, IsClosed);
+    private (string Name, AccountType Type, Currency Currency, decimal? Opening, string OpeningTyped, DateOnly OpenedOn, bool Excluded, bool Closed) Snapshot() =>
+        (Name, Type, Currency, OpeningValue, OpeningValue is null ? OpeningBalance : string.Empty, OpenedOn, ExcludedFromTotals, IsClosed);
 
     /// <summary>
     /// Заголовок экрана.
@@ -366,9 +369,7 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
         Error = null;
         OnPropertyChanged(nameof(HasError));
 
-        decimal openingBalance = 0m;
-
-        if (OpeningBalance.Length > 0 && !AmountExpression.TryEvaluate(OpeningBalance, out openingBalance))
+        if (OpeningValue is not { } openingBalance)
         {
             Error = UiTexts.AccountOpeningIncomplete;
             OnPropertyChanged(nameof(HasError));

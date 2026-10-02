@@ -5,8 +5,6 @@ using Finance.Domain.Enums;
 using Finance.Domain.Values;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Finance.Application.Tests;
 
@@ -35,7 +33,7 @@ public sealed class ServiceGroupMergeTests
         Guid survivor = Keys.Derive(namespaceKey, "service_exp.adjust");
         Guid transaction = Keys.New();
 
-        await MigrateToAsync(database, "AcceptsAnyKind");
+        await database.MigrateToAsync("AcceptsAnyKind");
         await WriteOldRowsAsync(database, group, adjustment, transaction);
 
         // Слияние приезжает обычным запуском приложения, а не отдельной командой
@@ -75,13 +73,6 @@ public sealed class ServiceGroupMergeTests
         Assert.True(service.Accepts(CategoryKind.Income));
     }
 
-    private static async Task MigrateToAsync(TestDatabase database, string migration)
-    {
-        await using FinanceDbContext context = await database.Contexts.CreateDbContextAsync();
-
-        await context.GetService<IMigrator>().MigrateAsync(migration);
-    }
-
     /// <summary>
     /// Пишет то, что оставила прежняя версия: доходную служебную группу с её
     /// «Разницей» и операцию в ней. Строки кладутся запросом, а не через модель:
@@ -92,8 +83,7 @@ public sealed class ServiceGroupMergeTests
     {
         Guid account = Keys.New();
 
-        await ExecuteAsync(
-            database,
+        await database.ExecuteAsync(
             $"""
             INSERT INTO categories
                 (key, parent_key, kind, accepts_any_kind, name, icon, role, exclude_from_reports,
@@ -125,16 +115,5 @@ public sealed class ServiceGroupMergeTests
             $"SELECT COUNT(*) FROM categories WHERE key IN ('{group}', '{adjustment}') AND deleted_at_utc IS NOT NULL";
 
         return Convert.ToInt32(await command.ExecuteScalarAsync(), provider: null);
-    }
-
-    private static async Task ExecuteAsync(TestDatabase database, string sql)
-    {
-        await using SqliteConnection connection = new(database.Location.ConnectionString);
-        await connection.OpenAsync();
-
-        await using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = sql;
-
-        await command.ExecuteNonQueryAsync();
     }
 }

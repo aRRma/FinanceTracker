@@ -348,9 +348,10 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Подкатегория в строке-поле: только выбранное название, без группы —
     /// строка-поле показывает выбор, а не всю вложенность дерева категорий.
+    /// Кроме «Прочего»: оно есть в каждой группе и без неё ничего не говорит.
     /// </summary>
     public string CategoryCaption => Category is { } category
-        ? category.Name
+        ? category.Caption
         : UiTexts.CommonChoose;
 
     /// <summary>

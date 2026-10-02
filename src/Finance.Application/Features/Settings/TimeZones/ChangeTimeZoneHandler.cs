@@ -40,7 +40,7 @@ public sealed class ChangeTimeZoneHandler : IChangeTimeZoneHandler
                 .RemoveAsync(SettingName.TimeZoneId, cancellationToken)
                 .ConfigureAwait(false);
 
-            _clock.TimeZone = TimeZoneInfo.Local;
+            _clock.FollowSystem();
         }
         else
         {

@@ -23,7 +23,7 @@ namespace Finance.App;
     LaunchMode = LaunchMode.SingleTop,
     ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
 [MetaData("android.app.shortcuts", Resource = "@xml/shortcuts")]
-public class MainActivity : MauiAppCompatActivity
+public sealed class MainActivity : MauiAppCompatActivity
 {
     /// <summary>
     /// Действие намерения ярлыка. Совпадает с описанием ярлыков в ресурсах.

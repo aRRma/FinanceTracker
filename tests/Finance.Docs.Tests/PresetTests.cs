@@ -177,17 +177,18 @@ public sealed class PresetTests
     public void Расходные_группы_набора_принимают_оба_вида()
     {
         string[] oneSidedExpenses = Set.Groups
-            .Where(group => group.Kind == CategoryKind.Expense && !group.AcceptsAnyKind)
-            .Select(group => group.Key)
-            .Where(key => key is not "unsorted_exp")
+            .Where(static group => group.Kind == CategoryKind.Expense && !group.AcceptsAnyKind)
+            .Select(static group => group.Key)
             .ToArray();
 
         string[] universalIncomes = Set.Groups
-            .Where(group => group.Kind == CategoryKind.Income && group.AcceptsAnyKind)
-            .Select(group => group.Key)
+            .Where(static group => group.Kind == CategoryKind.Income && group.AcceptsAnyKind)
+            .Select(static group => group.Key)
             .ToArray();
 
-        Assert.Empty(oneSidedExpenses);
+        // Равенством, а не отсевом исключения: универсальной «Без категории» стать
+        // тоже нельзя, и отсев этого не заметил бы
+        Assert.Equal(["unsorted_exp"], oneSidedExpenses);
         Assert.Empty(universalIncomes);
     }
 

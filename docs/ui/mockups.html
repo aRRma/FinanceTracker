@@ -108,9 +108,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 /* Заметка — третьей строкой, мельче и тише подписи: в подписи она вытесняла бы группу и счёт */
 .row.fr .n{font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* Выделение в ленте: панель над списком, отмеченная строка — бледным фоном действия и знаком на месте значка */
-.selbar{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px 0 11px;background:var(--card)}
-.selbar b{flex:1;font-size:13.5px;font-weight:600}
-.selbar .del{color:var(--neg);font-size:12px;font-weight:600}
 .row.fr.sel{background:var(--accbg)}
 .row.fr.sel>.ic{color:var(--acc)}
 .row.fr.sel .n{color:var(--ink2)}
@@ -367,7 +364,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-02</span><b>Просмотреть операции по всем счетам</b><span class="uc">UC-06</span><em>Общая лента. Счёт дописан в подпись, потому что при просмотре всех операций он перестаёт быть очевидным из контекста. Заметка — третьей строкой, мельче: в подписи она вытесняла группу и обрезала счёт. Перевод — одной строкой со стороны списания, подписан «откуда → куда». Итог дня — в рублях по учитываемым счетам: валютный день итога не имеет.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-02</span><b>Просмотреть операции по всем счетам</b><span class="uc">UC-06</span><em>Общая лента. Счёт дописан в подпись, потому что при просмотре всех операций он перестаёт быть очевидным из контекста. Заметка — третьей строкой, мельче: в подписи она вытесняла группу и обрезала счёт. Перевод — одной строкой со стороны списания, подписан «откуда → куда». Итог дня — в рублях по учитываемым счетам: валютный день итога не имеет. Удаление из ленты — как в ленте счёта: смахиванием по одной [A-03], долгим нажатием — выделением [C-09]; кнопка «+» так же уходит за край при прокрутке вниз.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Операции</h2></div>
   <div class="date"><span>25 августа</span><span>-6 250,00 ₽</span></div>
@@ -428,7 +425,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="card">
       <div class="row"><svg class="ic"><use href="#i-sun"/></svg><div class="g"><div class="t">Оформление</div><div class="s">Как в системе</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-world"/></svg><div class="g"><div class="t">Часовой пояс</div><div class="s">Как в системе · Europe/Moscow</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
-      <div class="row"><svg class="ic"><use href="#i-info-circle"/></svg><div class="g"><div class="t">О программе</div><div class="s">Версия 1.0, схема 4</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><svg class="ic"><use href="#i-info-circle"/></svg><div class="g"><div class="t">О программе</div><div class="s">Версия 1.0, схема 5</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     </div>
   </div>
   <nav class="nav">
@@ -496,7 +493,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-03</span><b>Выбрать подкатегорию</b><span class="uc">UC-01</span><em>Группы свёрнуты, открыта та, где стоит нынешний выбор: иначе его пришлось бы искать вслепую. Шапка группы разворачивает её, и первой строкой стоит «Прочее» — для тех, кому хватает статьи без подробностей. Группа из одной подкатегории — «Без категории», «Служебное» — не разворачивается: у неё нет ни числа, ни стрелки, касание выбирает её подкатегорию. Сама группа в операцию не попадает никогда — инвариант не нуждается в проверке. Над списком — частые подкатегории за последние три месяца: до привычной иначе разворот группы и прокрутка. С первой буквой поиска панель уходит. У дохода сначала доходные группы, ниже под линией и подписью «Возврат в расходы» — расходные группы, принимающие доход как возврат, в том же алфавитном порядке.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-03</span><b>Выбрать подкатегорию</b><span class="uc">UC-01</span><em>Группы свёрнуты, открыта та, где стоит нынешний выбор: иначе его пришлось бы искать вслепую. Шапка группы разворачивает её, и первой строкой стоит «Прочее» — для тех, кому хватает статьи без подробностей. В поле формы и на панели частых оно подписано с группой — «Еда · Прочее»: «Прочее» есть в каждой группе, и одно слово не сказало бы, чьё оно. Группа из одной подкатегории — «Без категории», «Служебное» — не разворачивается: у неё нет ни числа, ни стрелки, касание выбирает её подкатегорию. Сама группа в операцию не попадает никогда — инвариант не нуждается в проверке. Над списком — частые подкатегории за последние три месяца: до привычной иначе разворот группы и прокрутка. С первой буквой поиска панель уходит. У дохода сначала доходные группы, ниже под линией и подписью «Возврат в расходы» — расходные группы, принимающие доход как возврат, в том же алфавитном порядке.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Категория расхода</h2></div>
   <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span>Поиск по названию</span></div>
@@ -508,11 +505,11 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="row"><svg class="ic"><use href="#i-baby-carriage"/></svg><div class="g"><div class="t">Дети</div></div><span class="badge">6</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     <div class="row"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Еда</div></div><span class="badge">6</span><svg class="ic mut"><use href="#i-chevron-down"/></svg></div>
     <div class="row child"><svg class="ic"><use href="#i-dots"/></svg><div class="g"><div class="t faint">Прочее</div></div></div>
-    <div class="row child sel"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div class="t">Продукты</div></div><svg class="ic acc"><use href="#i-check"/></svg></div>
-    <div class="row child"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Кафе и рестораны</div></div></div>
-    <div class="row child"><svg class="ic"><use href="#i-truck-delivery"/></svg><div class="g"><div class="t">Доставка еды</div></div></div>
     <div class="row child"><svg class="ic"><use href="#i-soup"/></svg><div class="g"><div class="t">Бизнес-ланч</div></div></div>
+    <div class="row child"><svg class="ic"><use href="#i-truck-delivery"/></svg><div class="g"><div class="t">Доставка еды</div></div></div>
+    <div class="row child"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Кафе и рестораны</div></div></div>
     <div class="row child"><svg class="ic"><use href="#i-coffee"/></svg><div class="g"><div class="t">Кофе</div></div></div>
+    <div class="row child sel"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div class="t">Продукты</div></div><svg class="ic acc"><use href="#i-check"/></svg></div>
     <div class="row"><svg class="ic"><use href="#i-home"/></svg><div class="g"><div class="t">Жильё</div></div><span class="badge">4</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     <div class="row"><svg class="ic"><use href="#i-stethoscope"/></svg><div class="g"><div class="t">Здоровье</div></div><span class="badge">8</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
   </div>
@@ -852,10 +849,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-09</span><b>Удалить несколько операций</b><span class="uc">UC-08</span><em>Долгое нажатие на строке ленты включает выделение: строка отмечена знаком на месте значка и бледным фоном, касание отмечает остальные, а не открывает их. Панель над лентой — число выделенных и «Удалить»; крестик и «назад» снимают выделение, кнопка «+» спрятана. Подтверждение называет число операций и балансы всех затронутых счетов.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-09</span><b>Удалить несколько операций</b><span class="uc">UC-08</span><em>Долгое нажатие на строке ленты включает выделение: строка отмечена знаком на месте значка и бледным фоном, касание отмечает остальные, а не открывает их. Шапку на это время занимает число выделенных и «Удалить» — на её месте, а не полосой над лентой: полоса сдвигала строки под пальцем, и следующее касание попадало в соседнюю. Крестик и «назад» снимают выделение, стрелка «назад» в ленте счёта спрятана, кнопка «+» тоже. Подтверждение называет число операций и балансы затронутых счетов, кроме тех, чей баланс не меняется.</em></figcaption>
 <div class="phone">
-  <div class="hd"><h2>Операции</h2></div>
-  <div class="selbar"><svg class="ic"><use href="#i-x"/></svg><b>Выбрано: 2</b><span class="del">Удалить</span></div>
+  <div class="hd"><svg class="ic lg"><use href="#i-x"/></svg><h2>Выбрано: 2</h2><b class="del">Удалить</b></div>
   <div class="date"><span>25 августа</span><span>-6 250,00 ₽</span></div>
   <div class="row fr sel"><svg class="ic"><use href="#i-circle-check"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка · Карта основная</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
   <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Перевод</div><div class="s">Карта основная → Вклад на отпуск</div></div><span class="num">-5 000,00 ₽</span></div></div>
@@ -915,7 +911,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-02</span><b>Изменить счёт</b><span class="uc">UC-14 UC-13 UC-21</span><em>Валюта заперта: по счёту есть операции. Каждое ограничение объяснено рядом с полем, а не всплывает при сохранении. Блокировка счёта с деньгами подтверждается отдельным вопросом с суммой остатка. Остаток набирается клавиатурой суммы — она появляется по касанию поля и уходит при наборе названия; долг — минусом первой клавишей, красным. Сохранение и удаление — в шапке, как в форме операции: клавиатура их не закрывает. Счёт с операциями не удаляется — «Удалить» отвечает всплывающим сообщением, что его можно заблокировать; пустой удаляется после подтверждения.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-02</span><b>Изменить счёт</b><span class="uc">UC-14 UC-13 UC-21</span><em>Валюта заперта: по счёту есть операции. Каждое ограничение объяснено рядом с полем, а не всплывает при сохранении. Блокировка счёта с деньгами подтверждается отдельным вопросом с суммой остатка. Остаток набирается клавиатурой суммы — она появляется по касанию поля и уходит при наборе названия; долг — минусом первой клавишей, красным. Сохранение и удаление — в шапке, как в форме операции: клавиатура их не закрывает. Панели вкладок нет, тоже как в форме операции: с ней и клавиатурой поле остатка уходило под клавиши. Пока клавиатура на виду, остаток показан как набран — с запятой, без валюты; «назад» сначала убирает клавиатуру. Счёт с операциями не удаляется — «Удалить» отвечает всплывающим сообщением, что его можно заблокировать; пустой удаляется после подтверждения.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт</h2><b class="del">Удалить</b><b class="save">Сохранить</b></div>
   <div class="body">
@@ -934,7 +930,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="note">Заблокированный счёт не показывается на главном экране и не предлагается в выборе</div>
     </div>
   </div>
-  <div class="kp" style="bottom:52px">
+  <div class="kp">
     <div class="nums">
       <b>7</b><b>8</b><b>9</b>
       <b>4</b><b>5</b><b>6</b>
@@ -945,12 +941,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <b>÷</b><b>×</b><b>−</b><b>+</b><b>=</b>
     </div>
   </div>
-  <nav class="nav">
-    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
-    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
-    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
-    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
-  </nav>
 </div>
 </figure>
 
@@ -972,12 +962,12 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="row"><svg class="ic"><use href="#i-shopping-bag"/></svg><div class="g"><div class="t">Покупки</div></div><span class="badge">9</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     <div class="row"><svg class="ic"><use href="#i-wifi"/></svg><div class="g"><div class="t">Связь и подписки</div></div><span class="badge">5</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     <div class="row"><svg class="ic"><use href="#i-train"/></svg><div class="g"><div class="t">Транспорт</div></div><span class="badge">7</span><svg class="ic mut"><use href="#i-chevron-down"/></svg></div>
-    <div class="row child"><svg class="ic"><use href="#i-plane"/></svg><div class="g"><div class="t">Самолёт</div></div></div>
-    <div class="row child"><svg class="ic"><use href="#i-car"/></svg><div class="g"><div class="t">Такси</div></div></div>
     <div class="row child"><svg class="ic"><use href="#i-bus"/></svg><div class="g"><div class="t">Метро, автобус</div></div></div>
     <div class="row child"><svg class="ic"><use href="#i-train"/></svg><div class="g"><div class="t">Поезд</div></div></div>
-    <div class="row child"><svg class="ic"><use href="#i-ticket"/></svg><div class="g"><div class="t">Электричка</div></div></div>
     <div class="row child"><svg class="ic"><use href="#i-scooter"/></svg><div class="g"><div class="t">Самокат</div></div></div>
+    <div class="row child"><svg class="ic"><use href="#i-plane"/></svg><div class="g"><div class="t">Самолёт</div></div></div>
+    <div class="row child"><svg class="ic"><use href="#i-car"/></svg><div class="g"><div class="t">Такси</div></div></div>
+    <div class="row child"><svg class="ic"><use href="#i-ticket"/></svg><div class="g"><div class="t">Электричка</div></div></div>
     <div class="row child"><svg class="ic"><use href="#i-dots"/></svg><div class="g"><div class="t faint">Прочее</div></div></div>
     <div class="row"><svg class="ic"><use href="#i-coins"/></svg><div class="g"><div class="t">Финансы</div></div><span class="badge">9</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     <div class="row"><svg class="ic"><use href="#i-adjustments"/></svg><div class="g"><div class="t faint">Служебное</div></div><span class="badge">1</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
@@ -1083,12 +1073,12 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     </div>
     <div class="lbl"><span>Подкатегории</span></div>
     <div class="card">
-      <div class="row"><div class="g"><div class="t">Продукты</div></div></div>
-      <div class="row"><div class="g"><div class="t">Кафе и рестораны</div></div></div>
-      <div class="row"><div class="g"><div class="t">Доставка еды</div></div></div>
       <div class="row"><div class="g"><div class="t">Бизнес-ланч</div></div></div>
+      <div class="row"><div class="g"><div class="t">Доставка еды</div></div></div>
+      <div class="row"><div class="g"><div class="t">Кафе и рестораны</div></div></div>
       <div class="row"><div class="g"><div class="t">Кофе</div></div></div>
       <div class="row" id="d7-new" style="display:none"><div class="g"><div class="t">Пекарня</div></div></div>
+      <div class="row"><div class="g"><div class="t">Продукты</div></div></div>
       <div class="row"><div class="g"><div class="t faint">Прочее</div></div></div>
       <div class="row"><div class="g"><div class="t accent">Добавить подкатегорию</div></div></div>
     </div>
@@ -1134,7 +1124,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="t" style="font-size:15px;font-weight:600">Личный трекер финансов</div>
     <div class="card">
       <div class="row"><div class="g"><div class="t">Версия</div></div><span class="s">1.0</span></div>
-      <div class="row"><div class="g"><div class="t">Схема базы</div></div><span class="s">4</span></div>
+      <div class="row"><div class="g"><div class="t">Схема базы</div></div><span class="s">5</span></div>
     </div>
     <div class="note dim">Данные хранятся на этом устройстве и никуда не передаются.</div>
     <div class="note dim">Значки — Tabler Icons, лицензия MIT.</div>

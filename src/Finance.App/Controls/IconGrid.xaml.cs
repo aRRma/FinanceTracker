@@ -6,7 +6,7 @@ namespace Finance.App.Controls;
 /// Выбор значка категории: строка с выбранным и раскрывающаяся сетка набора.
 /// Привязывается к <see cref="IconPicker"/> карточки.
 /// </summary>
-public partial class IconGrid : ContentView
+public sealed partial class IconGrid : ContentView
 {
     /// <summary>
     /// Создаёт контрол.

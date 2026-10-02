@@ -48,9 +48,13 @@ public sealed class SourceIdentifierTests
     }
 
     /// <summary>
-    /// Строки всех файлов кода репозитория, кроме проверок документации.
+    /// Строки всех файлов кода и разметки репозитория, кроме проверок документации.
+    /// Разметка — тоже код: в её комментариях номера требований устаревают так же.
     /// </summary>
     private static IReadOnlyList<DocumentLine> SourceLines() =>
-        Documents.Lines(Documents.Files("*.cs").Where(static file => !Documents.Relative(file).StartsWith(Allowed, StringComparison.Ordinal)))
+        Documents.Lines(
+                Documents.Files("*.cs")
+                    .Concat(Documents.Files("*.xaml"))
+                    .Where(static file => !Documents.Relative(file).StartsWith(Allowed, StringComparison.Ordinal)))
             .ToArray();
 }

@@ -294,11 +294,11 @@ public sealed partial class FeedViewModel : ScreenViewModel, ISelectionModel
             return;
         }
 
-        bool selected = !_selected.Remove(key);
+        bool selected = _selected.Add(key);
 
-        if (selected)
+        if (!selected)
         {
-            _selected.Add(key);
+            _selected.Remove(key);
         }
 
         Mark(key, selected);
@@ -480,6 +480,11 @@ public sealed partial class FeedViewModel : ScreenViewModel, ISelectionModel
     /// Очистка с наполнением заново приходит в список сбросом, и тот возвращает
     /// прокрутку к началу: сохранивший правку из глубины истории оказывался бы наверху.
     /// </summary>
+    /// <remarks>
+    /// Дни сводятся по дате, а не по месту в списке: исчезнувший или новый день
+    /// сдвигает все дни под собой, и сверка по месту меняла бы каждый из них —
+    /// удаление единственной операции дня перерисовывало бы всю дочитанную ленту.
+    /// </remarks>
     private void Replace(List<FeedDay> fresh)
     {
         // Опустевшая лента очищается сбросом, а не поштучно: убранный поштучно
@@ -492,28 +497,42 @@ public sealed partial class FeedViewModel : ScreenViewModel, ISelectionModel
             return;
         }
 
-        for (int i = 0; i < fresh.Count; i++)
+        int i = 0;
+
+        // Обе последовательности идут от новых дней к старым: показанный день
+        // новее перечитанного — значит, его больше нет
+        foreach (FeedDay day in fresh)
         {
-            if (i >= Days.Count)
+            while (i < Days.Count && Days[i].Date > day.Date)
             {
-                Days.Add(fresh[i]);
-            }
-            else if (fresh[i].Count != Days[i].Count)
-            {
-                // Замена дня с другим числом строк приходит в сгруппированный список
-                // одним изменённым элементом, и тот падал с рассинхроном позиций,
-                // когда из дня удаляли несколько строк. Удаление со вставкой он
-                // понимает однозначно, а прокрутку они не сбрасывают
                 Days.RemoveAt(i);
-                Days.Insert(i, fresh[i]);
             }
-            else if (!fresh[i].SameAs(Days[i]))
+
+            if (i < Days.Count && Days[i].Date == day.Date)
             {
-                Days[i] = fresh[i];
+                if (day.Count != Days[i].Count)
+                {
+                    // Замена дня с другим числом строк приходит в сгруппированный список
+                    // одним изменённым элементом, и тот падал с рассинхроном позиций,
+                    // когда из дня удаляли несколько строк. Удаление со вставкой он
+                    // понимает однозначно, а прокрутку они не сбрасывают
+                    Days.RemoveAt(i);
+                    Days.Insert(i, day);
+                }
+                else if (!day.SameAs(Days[i]))
+                {
+                    Days[i] = day;
+                }
             }
+            else
+            {
+                Days.Insert(i, day);
+            }
+
+            i++;
         }
 
-        while (Days.Count > fresh.Count)
+        while (Days.Count > i)
         {
             Days.RemoveAt(Days.Count - 1);
         }

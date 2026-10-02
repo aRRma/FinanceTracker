@@ -171,6 +171,77 @@ public sealed class AccountCardTests
     }
 
     /// <summary>
+    /// Пока клавиатура на виду, остаток показан как набран: сумма с валютой спрятала
+    /// бы запятую, и «1,» выглядело бы непринятым нажатием. Без клавиатуры — суммой.
+    /// </summary>
+    [Fact]
+    public async Task Пока_клавиатура_на_виду_остаток_показан_как_набран()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        AccountViewModel model = await NewAsync(fixture, "Zapyataya");
+
+        model.ShowKeys();
+        Press(model, "1,");
+
+        Assert.Equal("1,", model.OpeningBalanceDisplay);
+
+        model.AreKeysVisible = false;
+
+        Assert.Equal(Money.Restore(1m, Currency.RUB).Display, model.OpeningBalanceDisplay);
+    }
+
+    /// <summary>
+    /// Правкой остатка считается другое число, а не другая запись того же: «0» на
+    /// пустом поле и ноль после запятой уход с формы не останавливают. Недобранный
+    /// ввод — правка: его потеря незаметной не будет.
+    /// </summary>
+    [Fact]
+    public async Task Правка_остатка_сверяется_по_значению()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        Guid key = await fixture.AccountAsync("Kopeyki", 1234.5m);
+        AccountViewModel saved = fixture.Database.Resolve<AccountViewModel>();
+        await saved.LoadAsync(key);
+
+        Press(saved, "0");
+
+        Assert.Equal("1234,50", saved.OpeningBalance);
+        Assert.False(saved.IsDirty);
+
+        AccountViewModel fresh = fixture.Database.Resolve<AccountViewModel>();
+        await fresh.LoadAsync(key: null);
+
+        Press(fresh, "0");
+        Assert.False(fresh.IsDirty);
+
+        fresh.Backspace();
+        Press(fresh, "−");
+        Assert.True(fresh.IsDirty);
+    }
+
+    /// <summary>
+    /// Недобранный остаток не сохраняется: одинокий минус или знак действия в конце —
+    /// карточка правила, а не ноль и не падение; сохранить исправленное можно снова.
+    /// </summary>
+    [Theory]
+    [InlineData("−")]
+    [InlineData("100+")]
+    public async Task Недобранный_остаток_не_сохраняется(string typed)
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        AccountViewModel model = await NewAsync(fixture, "Nedobor");
+
+        Press(model, typed);
+
+        Assert.False(await model.SaveAsync());
+        Assert.Equal(UiTexts.AccountOpeningIncomplete, model.Error);
+        Assert.True(model.CanSave);
+    }
+
+    /// <summary>
     /// Пустой счёт удаляется и пропадает из списков, а у нового удалять нечего.
     /// </summary>
     [Fact]

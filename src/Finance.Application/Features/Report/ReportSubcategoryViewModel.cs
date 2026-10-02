@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
+using Finance.Application.Texts;
 using Finance.Domain.Enums;
 using Finance.Domain.Values;
 
@@ -153,7 +154,7 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
         Name = name;
         Total = total.DisplaySigned;
         IsTotalExpense = !total.IsPositive;
-        Caption = $"{Month.Caption} · {Plural.Of(items.Count, "операция", "операции", "операций")}";
+        Caption = $"{Month.Caption} · {Plural.Of(items.Count, UiTexts.ReportTransactionsCountOne, UiTexts.ReportTransactionsCountFew, UiTexts.ReportTransactionsCountMany)}";
         IsEmpty = Rows.Count is 0;
         IsLoaded = true;
     }

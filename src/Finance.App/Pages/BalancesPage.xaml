@@ -43,7 +43,7 @@
                        VerticalOptions="Center" Style="{StaticResource AmountLabel}">
                     <Label.Triggers>
                         <!-- Минус на счёте — смысловым цветом: обычным текстом его
-                             не отличить от обычного остатка (NFR-25) -->
+                             не отличить от обычного остатка -->
                         <DataTrigger TargetType="Label" Binding="{Binding IsNegative}" Value="True">
                             <Setter Property="Style" Value="{StaticResource AmountNegativeLabel}" />
                         </DataTrigger>

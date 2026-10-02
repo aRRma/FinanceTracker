@@ -60,6 +60,13 @@ public sealed class TransactionDeletionQuery : ITransactionDeletionQuery
         // балансы всех счетов по всей истории
         foreach (Guid key in order)
         {
+            // Расход и доход на ту же сумму друг друга гасят: «станет» с прежним
+            // балансом обещало бы перемену, которой не будет
+            if (shifts[key] == 0m)
+            {
+                continue;
+            }
+
             AccountListItem? account = await _accounts.ReadOneAsync(key, cancellationToken).ConfigureAwait(false);
 
             if (account is not null)

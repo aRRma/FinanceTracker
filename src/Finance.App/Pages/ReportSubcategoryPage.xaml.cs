@@ -8,7 +8,7 @@ namespace Finance.App.Pages;
 /// </summary>
 [QueryProperty(nameof(Key), "key")]
 [QueryProperty(nameof(Month), "month")]
-public partial class ReportSubcategoryPage : DataPage
+public sealed partial class ReportSubcategoryPage : DataPage
 {
     private readonly ReportSubcategoryViewModel _model;
 

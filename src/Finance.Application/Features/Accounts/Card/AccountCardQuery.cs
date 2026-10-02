@@ -61,15 +61,13 @@ public sealed class AccountCardQuery : IAccountCardQuery
             .EarliestOnAsync(context, key, cancellationToken)
             .ConfigureAwait(false);
 
-        // Движения читаются по всем счетам разом: отдельного запроса на один счёт
-        // нет, а сводка по всем — два запроса по индексам, не полный проход
-        Dictionary<Guid, decimal> movements = await AccountBalances
-            .ReadMovementsAsync(context, cancellationToken)
+        // Движение одного счёта, а не сводка по всем: карточке нужен один баланс,
+        // а сводка растёт вместе со всей историей операций
+        decimal movement = await AccountBalances
+            .ReadMovementAsync(context, key, cancellationToken)
             .ConfigureAwait(false);
 
-        Money balance = Money.Restore(
-            account.OpeningBalance + movements.GetValueOrDefault(key),
-            account.Currency);
+        Money balance = Money.Restore(account.OpeningBalance + movement, account.Currency);
 
         return new AccountCard
         {

@@ -8,7 +8,7 @@ namespace Finance.App.Controls;
 /// <summary>
 /// Список ленты: общий для вкладки операций и ленты счёта.
 /// </summary>
-public partial class FeedList : ContentView
+public sealed partial class FeedList : ContentView
 {
     /// <summary>
     /// Сколько точек пролистать в одну сторону, прежде чем кнопка спрячется или вернётся:
@@ -34,6 +34,13 @@ public partial class FeedList : ContentView
     // Путь прокрутки в одну сторону с последней смены направления
     private double _travel;
     private bool _floatingHidden;
+
+    // Строка, оставленная смахнутой: её «Удалить» видно и после того, как включили
+    // выделение, а там оно путало бы, что удалится
+    private SwipeView? _swiped;
+
+    // Идёт удаление: второе касание «Удалить» до конца первого открыло бы второй диалог
+    private bool _deleting;
 
     /// <summary>
     /// Создаёт список.
@@ -100,6 +107,12 @@ public partial class FeedList : ContentView
         if (e.PropertyName is nameof(FeedViewModel.IsSelecting))
         {
             ShowFloating(_model is not { IsSelecting: true });
+
+            if (_model is { IsSelecting: true })
+            {
+                _swiped?.Close(animated: false);
+                _swiped = null;
+            }
         }
     }
 
@@ -217,33 +230,89 @@ public partial class FeedList : ContentView
         }
     }
 
-    private void OnEndSelection(object? sender, TappedEventArgs e) => _model?.EndSelection();
-
     /// <summary>
     /// Смахивание при выделении закрывается сразу: строку там отмечают касанием,
     /// и «Удалить» у одной строки рядом с «Удалить» выделенного путало бы, что удалится.
     /// </summary>
     private void OnSwipeStarted(object? sender, SwipeStartedEventArgs e)
     {
-        if (_model is { IsSelecting: true } && sender is SwipeView swipe)
+        if (sender is not SwipeView swipe)
+        {
+            return;
+        }
+
+        if (_model is { IsSelecting: true })
         {
             swipe.Close(animated: false);
+
+            return;
+        }
+
+        // Открытой держится одна строка: две «Удалить» разом путали бы, что
+        // удалится, а прежняя ускользнула бы от закрытия при выделении
+        if (_swiped is { } previous && previous != swipe)
+        {
+            previous.Close();
+            _swiped = null;
+        }
+    }
+
+    private void OnSwipeEnded(object? sender, SwipeEndedEventArgs e)
+    {
+        if (sender is not SwipeView swipe)
+        {
+            return;
+        }
+
+        if (e.IsOpen)
+        {
+            _swiped = swipe;
+        }
+        else if (_swiped == swipe)
+        {
+            _swiped = null;
         }
     }
 
     private void OnSwipeDelete(object? sender, EventArgs e)
     {
-        if (sender is BindableObject { BindingContext: FeedRowItem row } && _model is { } model)
+        if (sender is BindableObject { BindingContext: FeedRowItem row } && _model is { IsSelecting: false } model)
         {
-            Guarded.Run(() => DeleteOneAsync(model, row.Key));
+            // Строка закрывается нажатием «Удалить» сама: держать её — значит держать
+            // в памяти вид, который после удаления уйдёт из списка
+            _swiped = null;
+            Guarded.Run(() => DeleteOnceAsync(() => DeleteOneAsync(model, row.Key)));
         }
     }
 
-    private void OnDeleteSelected(object? sender, EventArgs e)
+    /// <summary>
+    /// Удаляет выделенное — после подтверждения. Зовёт шапка выделения
+    /// (<see cref="SelectionBar"/>): она стоит в заголовке страницы, а не в списке.
+    /// </summary>
+    public void DeleteSelected()
     {
         if (_model is { } model)
         {
-            Guarded.Run(() => DeleteSelectedAsync(model));
+            Guarded.Run(() => DeleteOnceAsync(() => DeleteSelectedAsync(model)));
+        }
+    }
+
+    private async Task DeleteOnceAsync(Func<Task> delete)
+    {
+        if (_deleting)
+        {
+            return;
+        }
+
+        _deleting = true;
+
+        try
+        {
+            await delete();
+        }
+        finally
+        {
+            _deleting = false;
         }
     }
 

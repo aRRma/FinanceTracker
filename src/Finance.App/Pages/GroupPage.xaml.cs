@@ -8,7 +8,7 @@ namespace Finance.App.Pages;
 /// Экраны D-04 и D-07: карточка группы — заведение и правка.
 /// </summary>
 [QueryProperty(nameof(Key), "key")]
-public partial class GroupPage : DataPage
+public sealed partial class GroupPage : DataPage
 {
     private readonly GroupViewModel _model;
 

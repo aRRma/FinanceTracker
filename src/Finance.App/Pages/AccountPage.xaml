@@ -14,11 +14,15 @@
     xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:card="clr-namespace:Finance.Application.Features.Accounts.Card;assembly=Finance.Application"
     x:DataType="card:AccountViewModel"
-    Title="{Binding Title}">
+    Title="{Binding Title}"
+    Shell.TabBarIsVisible="False">
 
     <!--
         Сохранение и удаление — на панели заголовка, как в форме операции: снизу
-        встаёт клавиатура суммы и закрыла бы кнопку внизу формы.
+        встаёт клавиатура суммы и закрыла бы кнопку внизу формы. Панели вкладок нет,
+        тоже как в форме операции: вместе с клавиатурой суммы она оставляла полям
+        полосу, где поле остатка уходило под клавиши, а с тремя системными кнопками
+        под клавиатурой оставался пустой просвет.
     -->
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4" Margin="0,0,10,0" HorizontalOptions="Fill">
@@ -34,7 +38,7 @@
          ScrollView не понимает вовсе, поэтому снизу её держит обёртка: без неё
          поле названия оставалось под системной клавиатурой -->
     <Grid RowDefinitions="*,Auto,Auto" SafeAreaEdges="Container, Container, Container, All">
-        <ScrollView Grid.Row="0">
+        <ScrollView x:Name="Form" Grid.Row="0" SizeChanged="OnFormSizeChanged">
             <VerticalStackLayout Padding="16,12" Spacing="16">
 
                 <Border Style="{StaticResource Card}">
@@ -62,9 +66,10 @@
                         <Label Text="{x:Static texts:UiTexts.AccountOpeningBalanceLabel}" Style="{StaticResource CaptionLabel}" />
                         <!-- Строка вместо поля ввода: системная клавиатура не открывается,
                              касание зовёт клавиатуру суммы. Черта под суммой подсвечена,
-                             пока набирается остаток, — как поле в фокусе -->
-                        <VerticalStackLayout Spacing="0"
-                                             SemanticProperties.Description="{x:Static texts:UiTexts.AccountOpeningBalanceLabel}">
+                             пока набирается остаток, — как поле в фокусе. Описания для чтения
+                             вслух у строки нет: оно заменило бы собой сумму, а подпись поля
+                             стоит над ней -->
+                        <VerticalStackLayout x:Name="OpeningField" Spacing="0">
                             <VerticalStackLayout.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnOpeningBalanceTapped" />
                             </VerticalStackLayout.GestureRecognizers>

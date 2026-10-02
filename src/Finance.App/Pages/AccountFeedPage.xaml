@@ -16,18 +16,27 @@
     Title="{Binding AccountName}">
 
     <!-- Карандаш у названия открывает карточку счёта. Заголовок в своей панели
-         тоже свой: штатный вместе с содержимым панели не показывается -->
+         тоже свой: штатный вместе с содержимым панели не показывается. При выделении
+         место заголовка занимает шапка выделения -->
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4" Margin="0,0,10,0" HorizontalOptions="Fill">
-            <Label Grid.Column="0" Text="{Binding AccountName}" Style="{StaticResource BarTitleLabel}"
-                   LineBreakMode="TailTruncation" />
-            <Border Grid.Column="1" Style="{StaticResource IconButton}"
-                    SemanticProperties.Description="{x:Static texts:UiTexts.AccountEdit}">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnEdit" />
-                </Border.GestureRecognizers>
-                <controls:Icon Key="pencil" HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
+        <Grid>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4" Margin="0,0,10,0" HorizontalOptions="Fill">
+                <Grid.Triggers>
+                    <DataTrigger TargetType="Grid" Binding="{Binding IsSelecting}" Value="True">
+                        <Setter Property="IsVisible" Value="False" />
+                    </DataTrigger>
+                </Grid.Triggers>
+                <Label Grid.Column="0" Text="{Binding AccountName}" Style="{StaticResource BarTitleLabel}"
+                       LineBreakMode="TailTruncation" />
+                <Border Grid.Column="1" Style="{StaticResource IconButton}"
+                        SemanticProperties.Description="{x:Static texts:UiTexts.AccountEdit}" AutomationId="EditAccount">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnEdit" />
+                    </Border.GestureRecognizers>
+                    <controls:Icon Key="pencil" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+            </Grid>
+            <controls:SelectionBar x:Name="Selection" IsVisible="{Binding IsSelecting}" />
         </Grid>
     </Shell.TitleView>
 

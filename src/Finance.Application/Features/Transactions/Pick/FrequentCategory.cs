@@ -1,3 +1,5 @@
+using Finance.Domain.Enums;
+
 namespace Finance.Application.Features.Transactions.Pick;
 
 /// <summary>
@@ -15,6 +17,16 @@ public sealed record FrequentCategory
     /// Название подкатегории.
     /// </summary>
     public required string Name { get; init; }
+
+    /// <summary>
+    /// Название группы — для подписи «Прочего».
+    /// </summary>
+    public required string GroupName { get; init; }
+
+    /// <summary>
+    /// Роль подкатегории: у «Прочего» подпись с группой.
+    /// </summary>
+    public required CategoryRole Role { get; init; }
 
     /// <summary>
     /// Ключ значка.

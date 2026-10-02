@@ -21,13 +21,16 @@ public sealed partial class TextResourceTests
 
     /// <summary>
     /// Внутренние сообщения «кухни кода»: пишутся тому, кто читает журнал,
-    /// наружу не выходят и в ресурсы не уезжают.
+    /// наружу не выходят и в ресурсы не уезжают. И миграция данных набора: её
+    /// строки — данные, как в preset.json, и замороженная миграция не смеет
+    /// брать их из ресурса, который переведут или перепишут.
     /// </summary>
     private static readonly string[] Faults =
     [
         "src/Finance.Application/Infrastructure/Faults.cs",
         "src/Finance.App/AppFaults.cs",
-        "src/Finance.Domain/Errors/DomainFaults.cs"
+        "src/Finance.Domain/Errors/DomainFaults.cs",
+        "src/Finance.Application/Infrastructure/Storage/Migrations/20261001130110_AddUnsortedGroups.cs"
     ];
 
     [Fact]
@@ -139,6 +142,8 @@ public sealed partial class TextResourceTests
                 // комментарий с кириллицей не в счёт
                 string keep = "latin only";
                 string found = "Счета";
+                string nested = $"{count} · {Plural.Of(count, "операция", "операции")}";
+                string verbatim = @$"{count} {Plural.Of(count, "счёт", "счета")}";
                 """);
 
             string[] literals = Literals(sample)
@@ -146,7 +151,13 @@ public sealed partial class TextResourceTests
                 .Select(static line => line.Text)
                 .ToArray();
 
-            Assert.Equal(["\"Счета\""], literals);
+            Assert.Equal(
+                [
+                    "\"Счета\"",
+                    "$\"{count} · {Plural.Of(count, \"операция\", \"операции\")}\"",
+                    "@$\"{count} {Plural.Of(count, \"счёт\", \"счета\")}\""
+                ],
+                literals);
         }
         finally
         {
@@ -227,7 +238,12 @@ public sealed partial class TextResourceTests
     /// <summary>
     /// Строковый литерал кода, включая экранированные кавычки внутри.
     /// </summary>
-    [GeneratedRegex(@"""(?:[^""\\\n]|\\.)*""")]
+    /// <remarks>
+    /// Интерполированная строка — первой ветвью и вместе с подстановками: строки
+    /// внутри подстановки (<c>$"{Plural.Of(n, "…")}"</c>) иначе разбивали её на пары
+    /// кавычек вперекос, и кириллица оказывалась между найденными литералами.
+    /// </remarks>
+    [GeneratedRegex(@"(?:\$@?|@\$)""(?:[^""{\\\n]|\\.|\{\{|\{[^}\n]*\})*""|""(?:[^""\\\n]|\\.)*""")]
     private static partial Regex Literal();
 
     /// <summary>

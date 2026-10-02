@@ -6,7 +6,7 @@ namespace Finance.App.Pages;
 /// <summary>
 /// Экран A-04: справочники и настройки.
 /// </summary>
-public partial class MorePage : DataPage
+public sealed partial class MorePage : DataPage
 {
     private readonly MoreViewModel _model;
 

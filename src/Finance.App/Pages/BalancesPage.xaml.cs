@@ -6,7 +6,7 @@ namespace Finance.App.Pages;
 /// <summary>
 /// Экран A-01: балансы счетов и «доступно к тратам» по валютам.
 /// </summary>
-public partial class BalancesPage : DataPage
+public sealed partial class BalancesPage : DataPage
 {
     private readonly BalancesViewModel _model;
 

@@ -32,6 +32,12 @@ public sealed record FeedRowItem(
     private const string TransferIcon = "swap";
 
     /// <summary>
+    /// Подпись есть. Её нет у «Без категории» без места в ленте счёта: группа там
+    /// повторила бы заголовок, а пустая строка оставила бы под ним провал.
+    /// </summary>
+    public bool HasCaption => Caption.Length > 0;
+
+    /// <summary>
     /// Заметка есть — под подписью её третья строка.
     /// </summary>
     public bool HasNote => Note.Length > 0;
@@ -76,7 +82,7 @@ public sealed record FeedRowItem(
 
         // Группа с тем же названием, что у подкатегории в заголовке, в подписи не
         // повторяется: «Без категории · Без категории» ничего не добавляет ко второму разу
-        string? group = string.Equals(item.Group, item.Title, StringComparison.CurrentCultureIgnoreCase)
+        string? group = string.Equals(item.Group, item.Title, StringComparison.OrdinalIgnoreCase)
             ? null
             : item.Group;
 

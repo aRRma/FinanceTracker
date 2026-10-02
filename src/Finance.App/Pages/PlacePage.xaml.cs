@@ -8,7 +8,7 @@ namespace Finance.App.Pages;
 /// Экран C-08: карточка места — переименование и удаление.
 /// </summary>
 [QueryProperty(nameof(Key), "key")]
-public partial class PlacePage : DataPage
+public sealed partial class PlacePage : DataPage
 {
     private readonly PlaceViewModel _model;
 

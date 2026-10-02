@@ -4,6 +4,7 @@ using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
+using Finance.Application.Texts;
 
 namespace Finance.Application.Tests;
 
@@ -24,12 +25,7 @@ public sealed class MoreTests
 
         Preset preset = Preset.Embedded();
 
-        MoreViewModel model = new(
-            database.Resolve<IAccountsQuery>(),
-            database.Resolve<IPlacesQuery>(),
-            database.Resolve<ICategoriesQuery>(),
-            database.Resolve<ISettingsSummaryQuery>(),
-            database.Resolve<IChangeNotifier>());
+        MoreViewModel model = database.Resolve<MoreViewModel>();
 
         await model.LoadAsync();
 
@@ -38,8 +34,9 @@ public sealed class MoreTests
 
         // Слова — по числу, а не одной формой: правка набора меняет числа, и форма,
         // верная для нынешних, на следующих разошлась бы с подписью
-        string groupsWord = Plural.FormOf(groups, "группа", "группы", "групп");
-        string subcategoriesWord = Plural.FormOf(subcategories, "подкатегория", "подкатегории", "подкатегорий");
+        string groupsWord = Plural.FormOf(groups, UiTexts.MoreGroupsOne, UiTexts.MoreGroupsFew, UiTexts.MoreGroupsMany);
+        string subcategoriesWord = Plural.FormOf(
+            subcategories, UiTexts.MoreSubcategoriesOne, UiTexts.MoreSubcategoriesFew, UiTexts.MoreSubcategoriesMany);
 
         Assert.Equal("0 счетов", model.AccountsCaption);
         Assert.Equal("0 мест", model.PlacesCaption);

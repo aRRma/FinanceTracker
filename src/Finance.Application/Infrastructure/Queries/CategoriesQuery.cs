@@ -78,8 +78,9 @@ public sealed class CategoriesQuery : ICategoriesQuery
                 Role = parent.Role
             });
 
-            // «Прочее» и служебная уходят в конец группы: они не выбираются
-            // и не правятся, а место им — под обычными подкатегориями
+            // «Прочее» и служебная уходят в конец группы: они не удаляются и не
+            // переносятся, и в справочнике место им — под обычными подкатегориями.
+            // Экран выбора ставит «Прочее» первым сам: там в него записывают
             IOrderedEnumerable<CategoryListItem> children = subcategories[parent.Key]
                 .Select(row => new CategoryListItem
                 {

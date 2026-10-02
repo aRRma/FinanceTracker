@@ -20,29 +20,14 @@
     x:DataType="feed:FeedViewModel"
     x:Name="Root">
 
-    <Grid RowDefinitions="Auto,*">
-
-        <!-- Панель выделения — над списком, а не в шапке страницы: шапки у двух лент
-             разные, а выделение одно. Крестик снимает выделение, как и «назад» -->
-        <Grid Grid.Row="0" IsVisible="{Binding IsSelecting}" Padding="8,6" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8"
-              BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}">
-            <Border Grid.Column="0" Style="{StaticResource IconButton}"
-                    SemanticProperties.Description="{x:Static texts:UiTexts.FeedSelectionEnd}">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnEndSelection" />
-                </Border.GestureRecognizers>
-                <controls:Icon Key="x" HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
-            <Label Grid.Column="1" Text="{Binding SelectionTitle}" VerticalOptions="Center"
-                   FontFamily="OpenSansSemibold" FontSize="17" AutomationId="SelectionTitle" />
-            <Button Grid.Column="2" Text="{x:Static texts:UiTexts.CommonDelete}" Style="{StaticResource BarDangerButton}"
-                    Clicked="OnDeleteSelected" AutomationId="DeleteSelected" />
-        </Grid>
+    <Grid>
 
         <!-- Признак жеста свой, а не занятость модели: RefreshView на каждый его подъём
              запускает обновление, и чтение, поднявшее признак само, запускало бы второе.
-             Обработчик, а не команда: сбой команды из разметки закрыл бы окно молча -->
-        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Refreshing="OnRefreshing">
+             Обработчик, а не команда: сбой команды из разметки закрыл бы окно молча.
+             Шапка выделения — не здесь, а на месте заголовка страницы (SelectionBar):
+             полоса над списком сдвигала строки под пальцем -->
+        <RefreshView IsRefreshing="{Binding IsRefreshing}" Refreshing="OnRefreshing">
 
             <CollectionView
                 ItemsSource="{Binding Days}"
@@ -78,7 +63,7 @@
                     <DataTemplate x:DataType="feed:FeedRowItem">
                         <!-- Смахивание влево открывает «Удалить» — то же подтверждение, что в форме.
                              При выделении смахивание закрывается сразу: строка отмечается касанием -->
-                        <SwipeView SwipeStarted="OnSwipeStarted"
+                        <SwipeView SwipeStarted="OnSwipeStarted" SwipeEnded="OnSwipeEnded"
                                    BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}">
                             <SwipeView.RightItems>
                                 <SwipeItems Mode="Reveal">
@@ -123,7 +108,7 @@
                                 </controls:Icon>
                                 <Label Grid.Column="1" Grid.Row="0" Text="{Binding Title}" LineBreakMode="TailTruncation" />
                                 <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}" LineBreakMode="TailTruncation"
-                                       Style="{StaticResource SecondaryLabel}" />
+                                       IsVisible="{Binding HasCaption}" Style="{StaticResource SecondaryLabel}" />
                                 <!-- Заметка — своей строкой под подписью, мельче и тише: в одной строке
                                      с подписью длинная заметка вытесняла группу и срезала счёт -->
                                 <Label Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Note}"

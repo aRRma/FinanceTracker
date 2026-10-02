@@ -1,7 +1,10 @@
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Finance.Application.Tests;
@@ -28,6 +31,34 @@ internal sealed class TestDatabase : IAsyncDisposable
         _services.GetRequiredService<IDbContextFactory<FinanceDbContext>>();
 
     public T Resolve<T>() where T : notnull => _services.GetRequiredService<T>();
+
+    /// <summary>
+    /// Накатывает схему до названной миграции включительно, а с более поздней —
+    /// откатывает до неё: так тест получает базу, какой её оставило прежнее приложение.
+    /// </summary>
+    /// <param name="migration">Имя миграции.</param>
+    public async Task MigrateToAsync(string migration)
+    {
+        await using FinanceDbContext context = await Contexts.CreateDbContextAsync();
+
+        await context.GetService<IMigrator>().MigrateAsync(migration);
+    }
+
+    /// <summary>
+    /// Выполняет SQL в обход EF: так подкладывают строки, какими их писало прежнее
+    /// приложение, и портят базу, которую приложение само испортить не даст.
+    /// </summary>
+    /// <param name="sql">Команды SQL.</param>
+    public async Task ExecuteAsync(string sql)
+    {
+        await using SqliteConnection connection = new(Location.ConnectionString);
+        await connection.OpenAsync();
+
+        await using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = sql;
+
+        await command.ExecuteNonQueryAsync();
+    }
 
     /// <summary>
     /// Создаёт пустую базу с накатанной схемой.
@@ -87,8 +118,8 @@ internal sealed class TestDatabase : IAsyncDisposable
         // и временные базы будут копиться до перезагрузки. Сбрасывается только
         // свой пул: ClearAllPools закрывал соединения соседних тестов, идущих
         // параллельно, и те падали с ObjectDisposedException в Open
-        using Microsoft.Data.Sqlite.SqliteConnection own = new(connectionString);
-        Microsoft.Data.Sqlite.SqliteConnection.ClearPool(own);
+        using SqliteConnection own = new(connectionString);
+        SqliteConnection.ClearPool(own);
 
         try
         {

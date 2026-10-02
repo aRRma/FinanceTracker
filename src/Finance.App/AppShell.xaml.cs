@@ -5,7 +5,7 @@ namespace Finance.App;
 /// <summary>
 /// Каркас навигации: четыре вкладки и маршруты вложенных экранов.
 /// </summary>
-public partial class AppShell : Shell
+public sealed partial class AppShell : Shell
 {
     // Вкладка, с которой уходят. В OnNavigated текущая вкладка уже новая,
     // а сбрасывать нужно стек прежней

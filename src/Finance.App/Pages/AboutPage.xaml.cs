@@ -8,7 +8,7 @@ namespace Finance.App.Pages;
 /// <summary>
 /// Экран D-09: «О программе».
 /// </summary>
-public partial class AboutPage : DataPage
+public sealed partial class AboutPage : DataPage
 {
     private readonly AboutViewModel _model;
     private readonly WalletImportViewModel _import;

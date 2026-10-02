@@ -384,6 +384,16 @@
   <data name="TransactionsCountMany" xml:space="preserve">
     <value>операций</value>
   </data>
+  <data name="ReportTransactionsCountOne" xml:space="preserve">
+    <value>операция</value>
+    <comment>Подпись подкатегории в отчёте: «Сентябрь · 21 операция» — именительный, а не винительный, как в «Удалить 1 операцию?»</comment>
+  </data>
+  <data name="ReportTransactionsCountFew" xml:space="preserve">
+    <value>операции</value>
+  </data>
+  <data name="ReportTransactionsCountMany" xml:space="preserve">
+    <value>операций</value>
+  </data>
   <!-- Экраны выбора -->
   <data name="PickAccountTitle" xml:space="preserve">
     <value>Счёт</value>
@@ -399,10 +409,6 @@
   </data>
   <data name="PickCategoryDeductions" xml:space="preserve">
     <value>Вычет из доходов</value>
-  </data>
-  <data name="CategoryUnsortedName" xml:space="preserve">
-    <value>Без категории</value>
-    <comment>Группа и её подкатегория из стартового набора; установленным базам их заводит миграция</comment>
   </data>
   <data name="PickAccountNew" xml:space="preserve">
     <value>Новый счёт</value>

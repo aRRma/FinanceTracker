@@ -55,7 +55,7 @@ public sealed class DatabaseBootstrapperTests
         int categories = await CountCategoriesAsync(database);
         Assert.NotEqual(0, categories);
 
-        await ExecuteAsync(database, "DELETE FROM __EFMigrationsHistory");
+        await database.ExecuteAsync("DELETE FROM __EFMigrationsHistory");
 
         DatabaseMigrationException error = await Assert.ThrowsAsync<DatabaseMigrationException>(
             () => database.Resolve<DatabaseBootstrapper>().InitializeAsync());
@@ -80,10 +80,10 @@ public sealed class DatabaseBootstrapperTests
         int categories = await CountCategoriesAsync(database);
         Assert.NotEqual(0, categories);
 
-        await ExecuteAsync(database, "DELETE FROM __EFMigrationsHistory");
+        await database.ExecuteAsync("DELETE FROM __EFMigrationsHistory");
 
         DatabaseBootstrapper bootstrapper = database.Resolve<DatabaseBootstrapper>();
-        bootstrapper.BeforeMigrate = () => ExecuteAsync(database, "DROP TABLE categories");
+        bootstrapper.BeforeMigrate = () => database.ExecuteAsync("DROP TABLE categories");
 
         await Assert.ThrowsAsync<DatabaseMigrationException>(() => bootstrapper.InitializeAsync());
 
@@ -103,7 +103,7 @@ public sealed class DatabaseBootstrapperTests
         DatabaseBootstrapper bootstrapper = database.Resolve<DatabaseBootstrapper>();
 
         // Чужая таблица с именем из схемы: накат споткнётся о неё
-        bootstrapper.BeforeMigrate = () => ExecuteAsync(database, "CREATE TABLE accounts (x INTEGER)");
+        bootstrapper.BeforeMigrate = () => database.ExecuteAsync("CREATE TABLE accounts (x INTEGER)");
 
         DatabaseMigrationException error = await Assert.ThrowsAsync<DatabaseMigrationException>(
             () => bootstrapper.InitializeAsync());
@@ -122,7 +122,7 @@ public sealed class DatabaseBootstrapperTests
         await using TestDatabase database = await TestDatabase.CreateAsync();
 
         await File.WriteAllTextAsync(database.Location.BackupPath, "прежняя копия");
-        await ExecuteAsync(database, "DELETE FROM __EFMigrationsHistory");
+        await database.ExecuteAsync("DELETE FROM __EFMigrationsHistory");
 
         // Папка на месте временного файла: копирование в неё невозможно
         Directory.CreateDirectory(database.Location.BackupPath + ".tmp");
@@ -139,16 +139,5 @@ public sealed class DatabaseBootstrapperTests
         await using FinanceDbContext context = await database.Contexts.CreateDbContextAsync();
 
         return await context.Categories.CountAsync();
-    }
-
-    private static async Task ExecuteAsync(TestDatabase database, string sql)
-    {
-        await using SqliteConnection connection = new(database.Location.ConnectionString);
-        await connection.OpenAsync();
-
-        await using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = sql;
-
-        await command.ExecuteNonQueryAsync();
     }
 }

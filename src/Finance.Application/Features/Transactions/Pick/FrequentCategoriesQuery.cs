@@ -90,7 +90,7 @@ public sealed class FrequentCategoriesQuery : IFrequentCategoriesQuery
          // а не записывают траты, и место частой она занимала бы зря
          where (parent.Kind == kind || parent.AcceptsAnyKind == true)
                && category.Role != CategoryRole.Service
-         group row by new { category.Key, category.Name, category.Icon } into bucket
+         group row by new { category.Key, category.Name, category.Icon, category.Role, GroupName = parent.Name } into bucket
          // Ничья разрывается названием только ради устойчивого порядка: русского
          // алфавита SQLite не знает, но два запуска подряд обязаны дать одно и то же
          orderby bucket.Count() descending, bucket.Key.Name
@@ -98,6 +98,8 @@ public sealed class FrequentCategoriesQuery : IFrequentCategoriesQuery
          {
              Key = bucket.Key.Key,
              Name = bucket.Key.Name,
+             GroupName = bucket.Key.GroupName,
+             Role = bucket.Key.Role,
              Icon = bucket.Key.Icon,
              Count = bucket.Count()
          })

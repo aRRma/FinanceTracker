@@ -7,7 +7,7 @@ namespace Finance.App.Pages;
 /// <summary>
 /// Экран D-03: справочник категорий.
 /// </summary>
-public partial class CategoriesPage : DataPage
+public sealed partial class CategoriesPage : DataPage
 {
     private readonly CategoriesViewModel _model;
 

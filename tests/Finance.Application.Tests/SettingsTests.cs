@@ -105,6 +105,41 @@ public sealed class SettingsTests
     }
 
     /// <summary>
+    /// Выбранный пояс от телефона не зависит: возврат из фона его не трогает и экраны
+    /// не перечитывает. «Как в системе» снова отдаёт часы зоне телефона.
+    /// </summary>
+    [Fact]
+    public async Task Выбранный_пояс_переживает_возврат_из_фона()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        IChangeTimeZoneHandler change = database.Resolve<IChangeTimeZoneHandler>();
+        SystemClock clock = database.Resolve<SystemClock>();
+        IChangeNotifier changes = database.Resolve<IChangeNotifier>();
+
+        await change.HandleAsync(FarEast);
+
+        Assert.False(clock.FollowsSystem);
+
+        long before = changes.VersionOf(DataChange.Settings);
+        database.Resolve<TimeZoneFollower>().Resume();
+
+        Assert.Equal(FarEast, clock.TimeZone.Id);
+        Assert.Equal(before, changes.VersionOf(DataChange.Settings));
+
+        await change.HandleAsync(id: null);
+
+        Assert.True(clock.FollowsSystem);
+        Assert.Equal(TimeZoneInfo.Local.Id, clock.TimeZone.Id);
+
+        // Телефон пояса не менял — перечитывать экраны незачем
+        before = changes.VersionOf(DataChange.Settings);
+        database.Resolve<TimeZoneFollower>().Resume();
+
+        Assert.Equal(before, changes.VersionOf(DataChange.Settings));
+    }
+
+    /// <summary>
     /// Незнакомая зона отвергается до записи. Записанная, она молча откатилась бы
     /// на системную при следующем запуске, а пользователь считал бы выбор сохранённым.
     /// </summary>

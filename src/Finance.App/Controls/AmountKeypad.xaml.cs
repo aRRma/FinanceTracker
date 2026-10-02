@@ -7,7 +7,7 @@ namespace Finance.App.Controls;
 /// Клавиатура суммы: цифры, четыре действия, стирание и «=». Что делает нажатая
 /// клавиша, решает модель представления — контрол только называет знак.
 /// </summary>
-public partial class AmountKeypad : ContentView
+public sealed partial class AmountKeypad : ContentView
 {
     /// <summary>
     /// Команда нажатия клавиши. Знак клавиши приходит параметром.

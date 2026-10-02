@@ -6,7 +6,7 @@ namespace Finance.App.Pages;
 /// <summary>
 /// Экраны E-01 и E-04: отчёт о расходах и доходах за месяц по группам.
 /// </summary>
-public partial class ReportPage : DataPage
+public sealed partial class ReportPage : DataPage
 {
     private readonly ReportViewModel _model;
 

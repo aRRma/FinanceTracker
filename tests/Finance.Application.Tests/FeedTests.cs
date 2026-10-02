@@ -286,13 +286,7 @@ public sealed class FeedTests
             await given.SaveAsync(given.Expense(cash, 1m, on: given.Today.AddDays(-(i / 3))));
         }
 
-        FeedViewModel model = new(
-            given.Database.Resolve<IFeedQuery>(),
-            given.Database.Resolve<IAccountsQuery>(),
-            given.Database.Resolve<IDeleteTransactionsHandler>(),
-            given.Database.Resolve<ITransactionDeletionQuery>(),
-            given.Database.Resolve<IClock>(),
-            given.Database.Resolve<IChangeNotifier>());
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
 
         await model.LoadAsync(accountKey: null);
 
@@ -327,13 +321,7 @@ public sealed class FeedTests
         await given.SaveAsync(given.Expense(cash, 2m, on: given.Today.AddDays(-1)));
         await given.SaveAsync(given.Expense(cash, 3m, on: given.Today.AddDays(-2)));
 
-        FeedViewModel model = new(
-            given.Database.Resolve<IFeedQuery>(),
-            given.Database.Resolve<IAccountsQuery>(),
-            given.Database.Resolve<IDeleteTransactionsHandler>(),
-            given.Database.Resolve<ITransactionDeletionQuery>(),
-            given.Database.Resolve<IClock>(),
-            given.Database.Resolve<IChangeNotifier>());
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
 
         await model.LoadAsync(accountKey: null);
 
@@ -363,13 +351,7 @@ public sealed class FeedTests
 
         Guid cash = await given.AccountAsync("Наличные", 1_000m);
 
-        FeedViewModel model = new(
-            given.Database.Resolve<IFeedQuery>(),
-            given.Database.Resolve<IAccountsQuery>(),
-            given.Database.Resolve<IDeleteTransactionsHandler>(),
-            given.Database.Resolve<ITransactionDeletionQuery>(),
-            given.Database.Resolve<IClock>(),
-            given.Database.Resolve<IChangeNotifier>());
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
 
         model.Activate();
         await model.LoadAsync(accountKey: null);
@@ -454,13 +436,7 @@ public sealed class FeedTests
         Assert.Equal("Наличные", one.Name);
         Assert.Null(await accounts.ReadOneAsync(Guid.CreateVersion7()));
 
-        FeedViewModel model = new(
-            given.Database.Resolve<IFeedQuery>(),
-            accounts,
-            given.Database.Resolve<IDeleteTransactionsHandler>(),
-            given.Database.Resolve<ITransactionDeletionQuery>(),
-            given.Database.Resolve<IClock>(),
-            given.Database.Resolve<IChangeNotifier>());
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
 
         await model.LoadAsync(cash);
 
@@ -515,13 +491,7 @@ public sealed class FeedTests
 
         Guid euro = await given.AccountAsync("Карта евро", 1_240m, Currency.EUR);
 
-        FeedViewModel model = new(
-            given.Database.Resolve<IFeedQuery>(),
-            given.Database.Resolve<IAccountsQuery>(),
-            given.Database.Resolve<IDeleteTransactionsHandler>(),
-            given.Database.Resolve<ITransactionDeletionQuery>(),
-            given.Database.Resolve<IClock>(),
-            given.Database.Resolve<IChangeNotifier>());
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
 
         await model.LoadAsync(euro);
 
@@ -543,13 +513,7 @@ public sealed class FeedTests
         Guid card = await given.AccountAsync("Карта", 100m);
         await given.SaveAsync(given.Expense(card, 250m));
 
-        FeedViewModel model = new(
-            given.Database.Resolve<IFeedQuery>(),
-            given.Database.Resolve<IAccountsQuery>(),
-            given.Database.Resolve<IDeleteTransactionsHandler>(),
-            given.Database.Resolve<ITransactionDeletionQuery>(),
-            given.Database.Resolve<IClock>(),
-            given.Database.Resolve<IChangeNotifier>());
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
 
         await model.LoadAsync(card);
 
@@ -737,7 +701,7 @@ public sealed class FeedTests
     }
 
     /// <summary>
-    /// Смахивание удаляет одну операцию, не трогая выделения.
+    /// Смахивание удаляет ровно смахнутую операцию, соседние остаются.
     /// </summary>
     [Fact]
     public async Task Смахивание_удаляет_одну_операцию()
@@ -761,6 +725,106 @@ public sealed class FeedTests
 
         Assert.Equal([kept], model.Days.SelectMany(static day => day).Select(static row => row.Key));
         Assert.Equal(980m, (await given.BalanceAsync(cash)).Amount);
+    }
+
+    /// <summary>
+    /// Исчезнувший день убирается из списка одним удалением, а дни под ним остаются
+    /// теми же: сверка дней по месту в списке, а не по дате, сочла бы изменившимся
+    /// каждый день ниже и перерисовала бы всю дочитанную ленту.
+    /// </summary>
+    [Fact]
+    public async Task Удаление_единственной_операции_дня_убирает_только_её_день()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+        Guid lonely = await given.SaveAsync(given.Expense(cash, 1m, on: given.Today));
+
+        // Числа строк в соседних днях разные: при сверке по месту ни один день
+        // не совпал бы с тем, что стоял на его месте
+        foreach ((int daysAgo, int rows) in new[] { (1, 2), (2, 1), (3, 2) })
+        {
+            for (int i = 0; i < rows; i++)
+            {
+                await given.SaveAsync(given.Expense(cash, 2m, on: given.Today.AddDays(-daysAgo)));
+            }
+        }
+
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
+        await model.LoadAsync(accountKey: null);
+
+        FeedDay[] before = [.. model.Days];
+        List<NotifyCollectionChangedAction> changes = [];
+        model.Days.CollectionChanged += (_, e) => changes.Add(e.Action);
+
+        await model.DeleteAsync(lonely);
+        await model.LoadAsync(accountKey: null);
+
+        Assert.Equal([NotifyCollectionChangedAction.Remove], changes);
+        Assert.Equal(before[1..], model.Days, ReferenceEqualityComparer.Instance);
+    }
+
+    /// <summary>
+    /// День, из которого ушла строка, ставится удалением и вставкой, а не заменой:
+    /// замену дня с другим числом строк сгруппированный список на Android не понимает
+    /// и падает. Опустевшая лента очищается сбросом — иначе не показалась бы заглушка.
+    /// </summary>
+    [Fact]
+    public async Task День_с_другим_числом_строк_не_заменяется_а_пустая_лента_сбрасывается()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+        Guid first = await given.SaveAsync(given.Expense(cash, 1m));
+        Guid second = await given.SaveAsync(given.Expense(cash, 2m));
+
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
+        await model.LoadAsync(accountKey: null);
+
+        List<NotifyCollectionChangedAction> changes = [];
+        model.Days.CollectionChanged += (_, e) => changes.Add(e.Action);
+
+        await model.DeleteAsync(first);
+        await model.LoadAsync(accountKey: null);
+
+        Assert.Equal([NotifyCollectionChangedAction.Remove, NotifyCollectionChangedAction.Add], changes);
+
+        changes.Clear();
+        await model.DeleteAsync(second);
+        await model.LoadAsync(accountKey: null);
+
+        Assert.Equal([NotifyCollectionChangedAction.Reset], changes);
+        Assert.True(model.IsEmpty);
+    }
+
+    /// <summary>
+    /// Счёт, чей баланс удаление не меняет — расход и доход на ту же сумму, — в тексте
+    /// подтверждения не называется: «станет» с прежним балансом обещало бы перемену.
+    /// </summary>
+    [Fact]
+    public async Task Подтверждение_не_называет_счёт_без_перемены_баланса()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+        Guid card = await given.AccountAsync("Карта", 1_000m);
+        Guid spent = await given.SaveAsync(given.Expense(cash, 100m));
+        Guid got = await given.SaveAsync(given.Income(cash, 100m));
+        Guid other = await given.SaveAsync(given.Expense(card, 5m));
+
+        FeedViewModel model = given.Database.Resolve<FeedViewModel>();
+        await model.LoadAsync(accountKey: null);
+
+        model.StartSelection(spent);
+        model.ToggleSelection(got);
+        model.ToggleSelection(other);
+
+        TransactionDeletion deletion = await model.DeleteSelectedPromptAsync();
+
+        Assert.Equal(3, deletion.Count);
+        BalanceAfterDeletion balance = Assert.Single(deletion.Balances);
+        Assert.Equal("Карта", balance.AccountName);
+        Assert.Equal(Money.Restore(1_000m, Currency.RUB), balance.Balance);
     }
 
     private static FeedRowItem Row(FeedViewModel model, Guid key) =>

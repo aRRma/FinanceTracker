@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Finance.Application.Texts;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
@@ -16,6 +17,10 @@ public abstract class DataPage : ContentPage
     private readonly FinanceStartup _startup;
 
     private bool _loaded;
+
+    // Стрелка «назад» формы и экрана с выделением: у формы спрашивает о несохранённом,
+    // при выделении прячется
+    private BackButtonBehavior? _back;
 
     /// <summary>
     /// Создаёт страницу.
@@ -48,12 +53,27 @@ public abstract class DataPage : ContentPage
 
         // Стрелка в шапке мимо OnBackButtonPressed не идёт вовсе: Shell уводит
         // её своим переходом. Перехватывать приходится обе кнопки порознь
-        if (BindingContext is IFormModel)
+        // Одна стрелка на обе роли: заведи их порознь, вторая затёрла бы первую,
+        // и форма с выделением ушла бы без вопроса о несохранённом
+        if (BindingContext is IFormModel or ISelectionModel && _back is null)
         {
-            Shell.SetBackButtonBehavior(this, new BackButtonBehavior
+            _back = new BackButtonBehavior();
+
+            if (BindingContext is IFormModel)
             {
-                Command = new Command(() => Guarded.Run(LeaveAsync))
-            });
+                _back.Command = new Command(() => Guarded.Run(LeaveAsync));
+            }
+
+            Shell.SetBackButtonBehavior(this, _back);
+        }
+
+        // При выделении шапку занимает своя полоса с крестиком, и стрелка рядом
+        // с ним была бы второй отменой — к тому же уводящей с экрана, а не
+        // снимающей выделение. На это время стрелка прячется
+        if (BindingContext is ISelectionModel and INotifyPropertyChanged observed)
+        {
+            observed.PropertyChanged -= OnSelectionChanged;
+            observed.PropertyChanged += OnSelectionChanged;
         }
 
         // Решение о перечитывании — до подписки: появившийся экран считает
@@ -74,6 +94,14 @@ public abstract class DataPage : ContentPage
         {
             _loaded = true;
             Guarded.Run(PrepareAndLoadAsync);
+        }
+    }
+
+    private void OnSelectionChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(ISelectionModel.IsSelecting) && sender is ISelectionModel selection && _back is { } back)
+        {
+            back.IsVisible = !selection.IsSelecting;
         }
     }
 
@@ -210,6 +238,11 @@ public abstract class DataPage : ContentPage
         if (BindingContext is ISelectionModel selection)
         {
             selection.EndSelection();
+        }
+
+        if (BindingContext is INotifyPropertyChanged observed)
+        {
+            observed.PropertyChanged -= OnSelectionChanged;
         }
 
         if (BindingContext is IScreenModel screen)

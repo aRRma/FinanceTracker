@@ -1,6 +1,5 @@
 using System.Globalization;
 using Finance.Application.Infrastructure.Settings;
-using Finance.Application.Texts;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -19,14 +18,20 @@ namespace Finance.Application.Infrastructure.Storage.Migrations
         private const string IncomeGroup = "4c125039-775b-5c49-b5a4-f11d09c7480f";
         private const string IncomeReceiver = "5fc3d835-916f-5468-b0b0-e6a07c4b3a95";
 
+        // Название — данные набора, как в preset.json, а не текст интерфейса: из ресурса
+        // его переведут или перепишут, а из набора — правка набора изменила бы, что
+        // делает уже накатанная где-то миграция. Совпадение с набором сверяет тест
+        private const string Name = "Без категории";
+
         private const string PreviousVersion = "2";
         private const string Version = "3";
 
         // Метка набора — та же давняя, что у остальных его строк, в виде UtcMomentConverter
         private const string Seeded = "'2000-01-01 00:00:00.0000000+00:00'";
 
-        // Пробелы, которые срезает и доменная сверка имён: обычный, табуляция,
-        // переводы строки и неразрывный
+        // Пробелы по краям имени, которые встречаются в набранном: обычный, табуляция,
+        // переводы строки и неразрывный. Домен срезает все пробельные знаки, но имена
+        // хранит уже срезанными, так что прочие сюда не доходят
         private const string Blanks = "' ' || char(9) || char(10) || char(13) || char(160)";
 
         /// <inheritdoc />
@@ -35,12 +40,9 @@ namespace Finance.Application.Infrastructure.Storage.Migrations
             // Набор пишется один раз за жизнь установки, поэтому группы «Без категории»
             // приезжают на уже установленные базы миграцией. На новой установке миграции
             // идут раньше набора, и строки набора там ещё нет: группы заведёт он сам, а
-            // вставка здесь уронила бы его на повторном ключе.
-            // Название — из ресурсов: русскому тексту место там, а не в коде
-            string name = UiTexts.CategoryUnsortedName;
-
-            AddGroup(migrationBuilder, ExpenseGroup, ExpenseReceiver, "Expense", name);
-            AddGroup(migrationBuilder, IncomeGroup, IncomeReceiver, "Income", name);
+            // вставка здесь уронила бы его на повторном ключе
+            AddGroup(migrationBuilder, ExpenseGroup, ExpenseReceiver, "Expense", Name);
+            AddGroup(migrationBuilder, IncomeGroup, IncomeReceiver, "Income", Name);
 
             // Отметка версии поднимается только со второй: у базы первой версии группы
             // теперь есть, а пересмотра второй версии по-прежнему нет
@@ -67,18 +69,22 @@ namespace Finance.Application.Infrastructure.Storage.Migrations
         private static void AddGroup(MigrationBuilder migrationBuilder, string group, string receiver, string kind, string name)
         {
             // Своя группа с тем же именем того же вида у пользователя уже может быть,
-            // а имя группы уникально в своём виде. Тогда новая не заводится: его группа
-            // и есть «Без категории». lower() в SQLite кириллицу не понимает, поэтому
-            // сверка идёт по написаниям, посчитанным здесь: как в наборе, строчными,
-            // заглавными и с заглавной в каждом слове. Прочую смесь регистров
-            // пользователь набирать не станет
-            string[] spellings =
-            [
-                name,
-                name.ToLower(CultureInfo.InvariantCulture),
-                name.ToUpper(CultureInfo.InvariantCulture),
-                CultureInfo.InvariantCulture.TextInfo.ToTitleCase(name.ToLower(CultureInfo.InvariantCulture))
-            ];
+            // а имя группы уникально в своём виде без учёта регистра. Тогда новая не
+            // заводится: его группа и есть «Без категории». Пропусти миграция «без
+            // Категории», две группы с одним именем запретили бы сохранить любую из них.
+            // lower() в SQLite кириллицу не понимает, поэтому строчными имя делает
+            // replace() — по одной на каждую заглавную букву, какая в нём бывает
+            string lowered = $"trim(name, {Blanks})";
+
+            foreach (char letter in name.ToUpper(CultureInfo.InvariantCulture).Distinct())
+            {
+                char lower = char.ToLower(letter, CultureInfo.InvariantCulture);
+
+                if (lower != letter)
+                {
+                    lowered = $"replace({lowered}, {Text(letter.ToString())}, {Text(lower.ToString())})";
+                }
+            }
 
             migrationBuilder.Sql(
                 $"""
@@ -91,10 +97,10 @@ namespace Finance.Application.Infrastructure.Storage.Migrations
                   AND NOT EXISTS (
                       SELECT 1 FROM categories
                       WHERE parent_key IS NULL AND kind = '{kind}' AND deleted_at_utc IS NULL
-                        AND trim(name, {Blanks}) IN ({string.Join(", ", spellings.Distinct().Select(Text))}))
+                        AND {lowered} = {Text(name.ToLower(CultureInfo.InvariantCulture))})
                 """);
 
-            // Приёмник — только под своей группой: если группа не заведена,
+            // Приёмник — только под своей живой группой: если группа не заведена,
             // повиснуть без неё он не должен
             migrationBuilder.Sql(
                 $"""
@@ -102,7 +108,7 @@ namespace Finance.Application.Infrastructure.Storage.Migrations
                     (key, parent_key, kind, accepts_any_kind, name, icon, role, exclude_from_reports,
                      created_at_utc, updated_at_utc)
                 SELECT '{receiver}', '{group}', NULL, NULL, {Text(name)}, 'question-mark', 'Other', 0, {Seeded}, {Seeded}
-                WHERE EXISTS (SELECT 1 FROM categories WHERE key = '{group}')
+                WHERE EXISTS (SELECT 1 FROM categories WHERE key = '{group}' AND deleted_at_utc IS NULL)
                   AND NOT EXISTS (SELECT 1 FROM categories WHERE key = '{receiver}')
                 """);
         }

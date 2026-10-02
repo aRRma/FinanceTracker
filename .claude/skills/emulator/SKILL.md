@@ -89,6 +89,7 @@ dotnet tools/ui.cs -- help                     # все команды
 
 - **Git Bash переписывает пути устройства в пути Windows:** `/sdcard/ui.xml` уходит в `adb` как `C:/Program Files/Git/sdcard/ui.xml`, команда «проходит», а файла нет. Перед такими командами — `export MSYS_NO_PATHCONV=1`. Помощник этой ловушки не знает: он зовёт `adb` без оболочки.
 - **Смахивание строки влево** — `adb shell input swipe 900 <y> 350 <y> 300` (из PowerShell, `& "…\adb.exe"`): у помощника `swipe` только вертикальный. Кнопка под смахнутой строкой нажимается координатами, у `SwipeItemView` нет `AutomationId` в выгрузке.
+- **Выделение в ленте — `hold <x,y>` по строке**, снятие — `tap EndSelection` или `key back`. Отметка строки приходит в окно с задержкой: снимок вплотную за касанием показывает счётчик «Выбрано: 2» при одной отмеченной строке — это не ошибка, перед `shot` нужен `wait` по элементу на экране.
 - **Развёртывание без помощника:** `dotnet build src/Finance.App/Finance.App.csproj -f net10.0-android -t:Run '-p:AdbTarget=-s emulator-5554'`. Кавычки вокруг `-p:AdbTarget=…` обязательны: без них аргумент рвётся по пробелу, а MSBuild сообщает `XA0010` — «выбранное устройство не запущено», хотя оно работает.
 - **`uiautomator dump /dev/tty` дописывает после XML строку** «UI hierchary dumped to: /dev/tty», и разбор XML на ней падает.
 

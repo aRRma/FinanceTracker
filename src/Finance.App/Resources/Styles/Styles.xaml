@@ -10,7 +10,7 @@
     xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:controls="clr-namespace:Finance.App.Controls">
 
-    <!-- Зона касания: меньше 48 dp попасть пальцем не получается (NFR-25) -->
+    <!-- Зона касания: меньше 48 dp попасть пальцем не получается -->
     <x:Double x:Key="TouchTarget">48</x:Double>
 
     <!-- Сколько места оставить под плавающей кнопкой: её сторона плюс поля с двух
@@ -203,7 +203,7 @@
         <Setter Property="FontSize" Value="20" />
     </Style>
 
-    <!-- Доход и отрицательный баланс: различимы в обеих темах (NFR-25) -->
+    <!-- Доход и отрицательный баланс: различимы в обеих темах -->
     <Style x:Key="PositiveLabel" TargetType="Label">
         <Setter Property="TextColor"
                 Value="{AppThemeBinding Light={StaticResource PositiveLight}, Dark={StaticResource PositiveDark}}" />

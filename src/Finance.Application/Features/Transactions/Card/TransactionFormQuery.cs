@@ -59,7 +59,8 @@ public sealed class TransactionFormQuery : ITransactionFormQuery
                 parent.Name,
                 parent.Kind!.Value,
                 parent.AcceptsAnyKind == true,
-                subcategory.Icon))
+                subcategory.Icon,
+                subcategory.Role))
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 

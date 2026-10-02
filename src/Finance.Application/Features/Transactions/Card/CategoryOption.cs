@@ -1,3 +1,4 @@
+using Finance.Application.Infrastructure;
 using Finance.Domain.Enums;
 
 namespace Finance.Application.Features.Transactions.Card;
@@ -13,18 +14,25 @@ namespace Finance.Application.Features.Transactions.Card;
 /// <param name="Kind">Вид группы — по нему список отбирается под вид операции.</param>
 /// <param name="AcceptsAnyKind">Группа принимает операции обоих видов.</param>
 /// <param name="Icon">Ключ значка.</param>
+/// <param name="Role">Роль подкатегории: у «Прочего» подпись с группой.</param>
 public sealed record CategoryOption(
     Guid Key,
     string Name,
     string GroupName,
     CategoryKind Kind,
     bool AcceptsAnyKind,
-    string Icon)
+    string Icon,
+    CategoryRole Role)
 {
     /// <summary>
     /// Подпись строки выбора: группа и подкатегория.
     /// </summary>
     public string Label => $"{GroupName} · {Name}";
+
+    /// <summary>
+    /// Подпись в строке-поле формы: название, а у «Прочего» — с группой.
+    /// </summary>
+    public string Caption => CategoryCaption.Of(Name, GroupName, Role);
 
     /// <summary>
     /// Операция такого вида допустима в этой подкатегории. Экран выбора отбирает

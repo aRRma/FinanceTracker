@@ -1,9 +1,11 @@
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Texts;
 using Finance.Domain.Enums;
+using Finance.Domain.Values;
 
 namespace Finance.Application.Tests;
 
@@ -276,6 +278,9 @@ public sealed class PickerTests
 
         Assert.Equal(only.Key, form.Category?.Key);
 
+        // «Прочее» в форме подписано с группой: одно слово не сказало бы, чьё оно
+        Assert.Equal($"Питомцы · {only.Name}", form.CategoryCaption);
+
         CategoryPickerViewModel again = CategoryPicker(given);
         await again.LoadAsync(form.CategoryKind, selected: only.Key);
 
@@ -286,11 +291,48 @@ public sealed class PickerTests
         // не объяснила бы, почему группа нашлась. По названию группы — только шапку
         again.Filter = only.Name;
 
-        Assert.Contains(again.Lines, line => line.Key == only.Key);
+        // Выбор отмечен один раз — строкой подкатегории, а не ещё и шапкой над ней
+        Assert.True(again.Lines.Single(line => line.Key == only.Key).IsSelected);
+        Assert.False(again.Lines.Single(line => line.Key == group).IsSelected);
 
         again.Filter = "Питомцы";
 
         Assert.Equal(["Питомцы"], again.Lines.Select(line => line.Name));
+        Assert.True(again.Lines.Single().IsSelected);
+    }
+
+    /// <summary>
+    /// «Прочее» подписывается с группой, приёмник с названием своей группы — без
+    /// повтора, обычная подкатегория — одним названием.
+    /// </summary>
+    [Fact]
+    public void Подпись_прочего_называет_группу()
+    {
+        Assert.Equal("Транспорт · Прочее", CategoryCaption.Of("Прочее", "Транспорт", CategoryRole.Other));
+        Assert.Equal("Без категории", CategoryCaption.Of("Без категории", "Без категории", CategoryRole.Other));
+        Assert.Equal("Такси", CategoryCaption.Of("Такси", "Транспорт", CategoryRole.Normal));
+    }
+
+    /// <summary>
+    /// Для дохода «Без категории» — среди доходных групп, а расходной «Без категории»
+    /// в разделе возвратов нет: она не универсальная, и непонятный приход не вычитается
+    /// из неразобранных трат.
+    /// </summary>
+    [Fact]
+    public async Task Для_дохода_предлагается_только_доходная_без_категории()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid space = Preset.Embedded().Namespace;
+
+        CategoryPickerViewModel picker = CategoryPicker(given);
+        await picker.LoadAsync(CategoryKind.Income, selected: null);
+
+        int refunds = picker.Lines.IndexOf(picker.Lines.Single(static line => line.IsSection));
+        int unsorted = picker.Lines.IndexOf(picker.Lines.Single(line => line.Key == Keys.Derive(space, "unsorted_inc")));
+
+        Assert.True(unsorted < refunds);
+        Assert.DoesNotContain(picker.Lines, line => line.Key == Keys.Derive(space, "unsorted_exp"));
     }
 
     /// <summary>

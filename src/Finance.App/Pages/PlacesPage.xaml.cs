@@ -7,7 +7,7 @@ namespace Finance.App.Pages;
 /// <summary>
 /// Экран D-05: справочник мест.
 /// </summary>
-public partial class PlacesPage : DataPage
+public sealed partial class PlacesPage : DataPage
 {
     private readonly PlacesViewModel _model;
 
