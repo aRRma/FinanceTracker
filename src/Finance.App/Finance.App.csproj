@@ -45,10 +45,7 @@
 		     первого кадра с данными, цена — APK 40,7 → 62,1 МБ. Действует только
 		     в Release: Debug идёт без AOT.
 
-		     Свойство относится к Mono. В .NET 11 Mono для MAUI убран, Android
-		     переходит на CoreCLR с ReadyToRun, и здесь оно перестанет действовать:
-		     при переходе его заменяет MauiEnableFullReadyToRun=true, запуск
-		     замеряется заново. NativeAOT в MAUI 10 официально только для iOS и
+		     NativeAOT в MAUI 10 официально только для iOS и
 		     Mac Catalyst, на Android — экспериментальный; EF Core под ним требует
 		     предкомпилированную модель, а её не даёт фильтр мягкого удаления -->
 		<AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
