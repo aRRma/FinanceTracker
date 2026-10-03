@@ -7,6 +7,7 @@ using Finance.Application.Texts;
 using Finance.Domain.Enums;
 using Finance.Domain.Errors;
 using Finance.Domain.Values;
+using static Finance.Application.Tests.TypedAmount;
 
 namespace Finance.Application.Tests;
 
@@ -38,8 +39,60 @@ public sealed class TransactionKeypadTests
         model.EvaluateCommand.Execute(null);
 
         Assert.Equal("1590", model.Amount);
-        // Сверка через Display: разряды разделены пробелом, который в тесте не набрать
-        Assert.Equal(Money.Restore(-1590m, Currency.RUB).DisplaySigned, model.AmountHero);
+        Assert.Equal(Whole(Money.Restore(-1590m, Currency.RUB).DisplaySigned), model.AmountHero);
+    }
+
+    /// <summary>
+    /// Записанная сумма встаёт в поле так, как её набирают: целая — без запятой и без
+    /// «,00», с копейками — с запятой. Иначе открытая на правку операция показывала бы
+    /// нули, которых новая не показывает.
+    /// </summary>
+    [Fact]
+    public async Task Записанная_сумма_встаёт_как_набранная()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        Guid account = await fixture.AccountAsync("Карта", 10_000m);
+
+        Guid whole = await fixture.SaveAsync(fixture.Expense(account, 1500m));
+        Guid cents = await fixture.SaveAsync(fixture.Expense(account, 1500.5m));
+
+        TransactionViewModel model = Model(fixture);
+        await model.LoadAsync(whole);
+
+        Assert.Equal("1500", model.Amount);
+        Assert.Equal(Whole(Money.Restore(-1500m, Currency.RUB).DisplaySigned), model.AmountHero);
+
+        model = Model(fixture);
+        await model.LoadAsync(cents);
+
+        Assert.Equal("1500,5", model.Amount);
+        Assert.Equal(Money.Restore(-1500.5m, Currency.RUB).DisplaySigned, model.AmountHero);
+    }
+
+    /// <summary>
+    /// Нулей после запятой, которую никто не нажимал, нет: «1 500 ₽». Дробная часть
+    /// появляется с запятой — сразу двумя знаками, как во всём приложении.
+    /// </summary>
+    [Fact]
+    public async Task Дробная_часть_видна_только_после_запятой()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        await fixture.AccountAsync("Карта");
+
+        TransactionViewModel model = Model(fixture);
+        await model.LoadAsync(key: null);
+
+        Press(model, "1500");
+
+        Assert.Equal(Whole(Money.Restore(-1500m, Currency.RUB).DisplaySigned), model.AmountHero);
+
+        Press(model, ",");
+
+        Assert.Equal(Money.Restore(-1500m, Currency.RUB).DisplaySigned, model.AmountHero);
+
+        Press(model, "5");
+
+        Assert.Equal(Money.Restore(-1500.5m, Currency.RUB).DisplaySigned, model.AmountHero);
     }
 
     /// <summary>
@@ -122,7 +175,7 @@ public sealed class TransactionKeypadTests
 
         // Пока ничего не набрано, выражение пусто, а итог показывает ноль в валюте счёта
         Assert.Equal(string.Empty, model.AmountDisplay);
-        Assert.Equal(Money.Restore(0m, Currency.RUB).Display, model.AmountHero);
+        Assert.Equal(Whole(Money.Restore(0m, Currency.RUB).Display), model.AmountHero);
 
         model.PressKeyCommand.Execute("0");
 
@@ -135,7 +188,7 @@ public sealed class TransactionKeypadTests
 
     /// <summary>
     /// Итог крупно подписан знаком вида: расход минусом, доход плюсом, перевод
-    /// без знака. Ноль знака не получает — «−0,00 ₽» читался бы как долг.
+    /// без знака. Ноль знака не получает — «−0 ₽» читался бы как долг.
     /// </summary>
     [Fact]
     public async Task Итог_подписан_знаком_вида()
@@ -146,13 +199,13 @@ public sealed class TransactionKeypadTests
         TransactionViewModel model = Model(fixture);
         await model.LoadAsync(key: null);
 
-        Assert.Equal(Money.Restore(0m, Currency.RUB).Display, model.AmountHero);
+        Assert.Equal(Whole(Money.Restore(0m, Currency.RUB).Display), model.AmountHero);
         Assert.Equal(AmountTone.Placeholder, model.AmountTone);
 
         model.PressKeyCommand.Execute("1");
         model.PressKeyCommand.Execute("2");
 
-        Assert.Equal(Money.Restore(-12m, Currency.RUB).DisplaySigned, model.AmountHero);
+        Assert.Equal(Whole(Money.Restore(-12m, Currency.RUB).DisplaySigned), model.AmountHero);
         Assert.StartsWith("-", model.AmountHero, StringComparison.Ordinal);
         Assert.Equal(AmountTone.Expense, model.AmountTone);
 
@@ -163,7 +216,7 @@ public sealed class TransactionKeypadTests
 
         model.Kind = TransactionKind.Transfer;
 
-        Assert.Equal(Money.Restore(12m, Currency.RUB).Display, model.AmountHero);
+        Assert.Equal(Whole(Money.Restore(12m, Currency.RUB).Display), model.AmountHero);
         Assert.Equal(AmountTone.Plain, model.AmountTone);
     }
 
@@ -194,7 +247,7 @@ public sealed class TransactionKeypadTests
         model.EvaluateCommand.Execute(null);
 
         Assert.False(model.HasAmountOperation);
-        Assert.Equal(Money.Restore(-12m, Currency.RUB).DisplaySigned, model.AmountHero);
+        Assert.Equal(Whole(Money.Restore(-12m, Currency.RUB).DisplaySigned), model.AmountHero);
     }
 
     /// <summary>

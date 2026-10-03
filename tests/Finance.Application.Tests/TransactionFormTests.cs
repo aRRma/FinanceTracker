@@ -5,6 +5,7 @@ using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Texts;
 using Finance.Domain.Enums;
 using Finance.Domain.Values;
+using static Finance.Application.Tests.TypedAmount;
 
 namespace Finance.Application.Tests;
 
@@ -83,26 +84,32 @@ public sealed class TransactionFormTests
 
         TransactionViewModel model = await NewAsync(fixture);
 
-        Assert.Equal(MoneyFormat.Number(0m), model.AmountHero);
+        Assert.Equal("0", model.AmountHero);
         Assert.Equal(AmountTone.Placeholder, model.AmountTone);
 
         model.PressKey("1");
         model.PressKey("5");
         model.PressKey("0");
 
-        Assert.Equal(MoneyFormat.Number(-150m), model.AmountHero);
+        Assert.Equal("-150", model.AmountHero);
         Assert.Equal(AmountTone.Expense, model.AmountTone);
         Assert.DoesNotContain(Currency.RUB.Symbol, model.AmountHero, StringComparison.Ordinal);
 
         model.Kind = TransactionKind.Income;
 
-        Assert.Equal($"+{MoneyFormat.Number(150m)}", model.AmountHero);
+        Assert.Equal("+150", model.AmountHero);
         Assert.Equal(AmountTone.Income, model.AmountTone);
 
         model.Kind = TransactionKind.Transfer;
 
-        Assert.Equal(MoneyFormat.Number(150m), model.AmountHero);
+        Assert.Equal("150", model.AmountHero);
         Assert.Equal(AmountTone.Plain, model.AmountTone);
+
+        // Без валюты дробная часть подчиняется тому же правилу: только после запятой
+        model.PressKey(",");
+        model.PressKey("5");
+
+        Assert.Equal("150,50", model.AmountHero);
     }
 
     /// <summary>
@@ -124,7 +131,7 @@ public sealed class TransactionFormTests
         Assert.Equal(card, model.SourceAccount?.Key);
         Assert.False(model.NeedsNewAccount);
         Assert.Equal("150", model.Amount);
-        Assert.Equal(Money.Restore(-150m, Currency.RUB).DisplaySigned, model.AmountHero);
+        Assert.Equal(Whole(Money.Restore(-150m, Currency.RUB).DisplaySigned), model.AmountHero);
     }
 
     /// <summary>

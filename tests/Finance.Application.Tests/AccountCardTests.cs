@@ -8,6 +8,7 @@ using Finance.Application.Texts;
 using Finance.Domain.Enums;
 using Finance.Domain.Errors;
 using Finance.Domain.Values;
+using static Finance.Application.Tests.TypedAmount;
 
 namespace Finance.Application.Tests;
 
@@ -51,7 +52,7 @@ public sealed class AccountCardTests
         Press(model, "−15000");
 
         Assert.True(model.IsOpeningBalanceNegative);
-        Assert.Equal(Money.Restore(-15_000m, Currency.RUB).Display, model.OpeningBalanceDisplay);
+        Assert.Equal(Whole(Money.Restore(-15_000m, Currency.RUB).Display), model.OpeningBalanceDisplay);
         Assert.Equal(-15_000m, await SavedBalanceAsync(fixture, model));
     }
 
@@ -86,7 +87,7 @@ public sealed class AccountCardTests
 
         AccountViewModel model = await NewAsync(fixture, "Pustoy");
 
-        Assert.Equal(Money.Restore(0m, Currency.RUB).Display, model.OpeningBalanceDisplay);
+        Assert.Equal(Whole(Money.Restore(0m, Currency.RUB).Display), model.OpeningBalanceDisplay);
         Assert.Equal(0m, await SavedBalanceAsync(fixture, model));
     }
 
@@ -188,7 +189,8 @@ public sealed class AccountCardTests
 
         model.AreKeysVisible = false;
 
-        Assert.Equal(Money.Restore(1m, Currency.RUB).Display, model.OpeningBalanceDisplay);
+        // Набор окончен, а запятая так и висит без цифр: это то же целое число
+        Assert.Equal(Whole(Money.Restore(1m, Currency.RUB).Display), model.OpeningBalanceDisplay);
     }
 
     /// <summary>

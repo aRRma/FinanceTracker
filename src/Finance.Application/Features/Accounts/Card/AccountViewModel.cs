@@ -172,13 +172,21 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Остаток для показа. Пока клавиатура на виду — как набран: сумма с валютой
     /// прятала бы запятую и нули после неё, и нажатие выглядело бы непринятым.
-    /// Без клавиатуры число — суммой с валютой, незакрытое выражение — как набрано:
+    /// Без клавиатуры число — суммой с валютой, дробная часть — только если набрана
+    /// запятая; незакрытое выражение — как набрано:
     /// итог выражения появляется по «=», а не сам собой, как в форме операции.
     /// </summary>
     public string OpeningBalanceDisplay =>
         (AreKeysVisible && OpeningBalance.Length > 0) || AmountInput.HasOperation(OpeningBalance) || OpeningValue is not { } value
             ? OpeningBalance
-            : Money.Restore(value, Currency).Display;
+            : Money.Restore(value, Currency).DisplayTyped(Settled);
+
+    /// <summary>
+    /// Набранное без висящей запятой. Суммой остаток показан, только когда набор
+    /// окончен, а тогда «1500,» — то же 1500: «,00» обещало бы копейки, которых после
+    /// сохранения и повторного открытия уже не будет.
+    /// </summary>
+    private string Settled => OpeningBalance.TrimEnd(AmountInput.Separator);
 
     /// <summary>
     /// Остаток — долг: показывается цветом расхода.

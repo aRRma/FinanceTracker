@@ -11,12 +11,24 @@ namespace Finance.Application.Infrastructure;
 public static class MoneyFormat
 {
     /// <summary>
-    /// Число в формате сумм, но без знака валюты: так форма операции показывает
-    /// набранное, пока счёт не выбран и валюты ещё нет.
+    /// Набираемое число без знака валюты: так форма операции показывает сумму, пока
+    /// счёт не выбран и валюты ещё нет. Дробная часть — только после набранной запятой.
     /// </summary>
-    /// <param name="amount">Число.</param>
-    /// <returns>Число с разрядами и двумя знаками после запятой: <c>82 430,50</c>.</returns>
-    public static string Number(decimal amount) => amount.ToString("N", UiCulture.Money);
+    /// <param name="amount">Итог набранного.</param>
+    /// <param name="typed">Набранное на клавиатуре суммы, без знака действия.</param>
+    /// <returns>Число с разрядами: <c>1 500</c>, а с запятой — <c>1 500,50</c>.</returns>
+    public static string Typed(decimal amount, string typed) => amount.ToString(TypedFormat(typed), UiCulture.Money);
+
+    /// <summary>
+    /// Нули после запятой, которую никто не набирал, — шум: пока пользователь
+    /// не нажал запятую, сумма целая, и «,00» к ней ничего не добавляет.
+    /// </summary>
+    private static string TypedFormat(string typed)
+    {
+        ArgumentNullException.ThrowIfNull(typed);
+
+        return typed.Contains(AmountInput.Separator, StringComparison.Ordinal) ? "N" : "N0";
+    }
 
     extension(Currency currency)
     {
@@ -49,6 +61,13 @@ public static class MoneyFormat
         /// Сумма со знаком валюты: <c>82 430,50 ₽</c>.
         /// </summary>
         public string Display => $"{money.Amount.ToString("N", UiCulture.Money)} {money.Currency.Symbol}";
+
+        /// <summary>
+        /// Набираемая сумма со знаком валюты: <c>1 500 ₽</c>, а после запятой — <c>1 500,50 ₽</c>.
+        /// </summary>
+        /// <param name="typed">Набранное на клавиатуре суммы, без знака действия.</param>
+        /// <returns>Сумма для поля, которое набирают клавиатурой суммы.</returns>
+        public string DisplayTyped(string typed) => $"{Typed(money.Amount, typed)} {money.Currency.Symbol}";
 
         /// <summary>
         /// Сумма с явным знаком для ленты: доход показан с плюсом, расход с минусом.

@@ -1,6 +1,5 @@
 using Finance.Application.Texts;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Features.Transactions.Pick;
@@ -596,8 +595,11 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
             Kind = card.Kind;
             SourceAccount = Find(card.SourceAccountKey);
             TargetAccount = card.TargetAccountKey is { } target ? Find(target) : null;
-            Amount = card.Amount.ToString(CultureInfo.CurrentCulture);
-            TargetAmount = card.TargetAmount?.ToString(CultureInfo.CurrentCulture) ?? string.Empty;
+            // Тем же путём, что итог «=»: сумма встаёт в поле так, как её набирают,
+            // без хвоста нулей — иначе «1500,00» показало бы копейки, которых не набирали,
+            // и не дало бы дописать цифру
+            Amount = AmountInput.Write(card.Amount);
+            TargetAmount = card.TargetAmount is { } credited ? AmountInput.Write(credited) : string.Empty;
             Category = Categories.FirstOrDefault(option => option.Key == card.CategoryKey);
             PlaceName = card.PlaceName ?? string.Empty;
             OccurredOn = card.OccurredOn;
@@ -1072,7 +1074,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
 
     private AccountOption? Find(Guid key) => Accounts.FirstOrDefault(account => account.Key == key);
 
-    // Знак вида ставится только ненулевому итогу: «−0,00 ₽» читался бы как долг
+    // Знак вида ставится только ненулевому итогу: «−0 ₽» читался бы как долг.
+    // Дробная часть — только после набранной запятой: «,00» по умолчанию было бы
+    // числом, которого пользователь не набирал
     private static string Hero(string expression, Currency? currency, TransactionKind kind)
     {
         if (AmountInput.HasOperation(expression))
@@ -1088,7 +1092,9 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         }
 
         decimal signed = kind is TransactionKind.Expense && value > 0m ? -value : value;
-        string shown = currency is { } known ? Money.Restore(signed, known).Display : MoneyFormat.Number(signed);
+        string shown = currency is { } known
+            ? Money.Restore(signed, known).DisplayTyped(expression)
+            : MoneyFormat.Typed(signed, expression);
 
         return kind is TransactionKind.Income && value > 0m ? $"+{shown}" : shown;
     }
