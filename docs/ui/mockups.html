@@ -328,7 +328,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-01</span><b>Посмотреть, сколько доступно</b><span class="uc">UC-02</span><em>Валюта и «доступно» в одну строку, итог под ними. Накопления — своей карточкой без подытога: скрытый счёт не попадает и в отдельную сумму. Отрицательный баланс — смысловым цветом, без предупреждений. Кнопка операции подписана: строка «Добавить счёт» тоже начинается с плюса.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-01</span><b>Посмотреть, сколько доступно</b><span class="uc">UC-02</span><em>Валюта и «доступно» в одну строку, итог под ними. Накопления — своей карточкой без подытога: скрытый счёт не попадает и в отдельную сумму. В валюте одних накоплений («Доллары») «доступно» нет вовсе: там оно всегда ноль. Отрицательный баланс — смысловым цветом, без предупреждений. Кнопка операции подписана: строка «Добавить счёт» тоже начинается с плюса.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Балансы</h2></div>
   <div class="body">
@@ -348,6 +348,12 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="total">1 240,00 €</div>
     <div class="card">
       <div class="row"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта евро</div></div><span class="num">1 240,00 €</span></div>
+    </div>
+    <div class="lbl" style="margin-top:4px"><span>Доллары</span></div>
+    <div class="lbl"><span>Накопления</span></div>
+    <div class="note" style="margin-top:-4px">Скрыты</div>
+    <div class="card">
+      <div class="row"><svg class="ic"><use href="#i-building-bank"/></svg><div class="g"><div class="t dim">Доллары дома</div></div><span class="num">1 460,00 $</span></div>
     </div>
     <div class="card">
       <div class="row"><svg class="ic acc"><use href="#i-plus"/></svg><div class="g"><div class="t accent">Добавить счёт</div></div></div>
@@ -911,7 +917,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-02</span><b>Изменить счёт</b><span class="uc">UC-14 UC-13 UC-21</span><em>Валюта заперта: по счёту есть операции. Каждое ограничение объяснено рядом с полем, а не всплывает при сохранении. Блокировка счёта с деньгами подтверждается отдельным вопросом с суммой остатка. Остаток набирается клавиатурой суммы — она появляется по касанию поля и уходит при наборе названия; долг — минусом первой клавишей, красным. Сохранение и удаление — в шапке, как в форме операции: клавиатура их не закрывает. Панели вкладок нет, тоже как в форме операции: с ней и клавиатурой поле остатка уходило под клавиши. Пока клавиатура на виду, остаток показан как набран — с запятой, без валюты; «назад» сначала убирает клавиатуру. Счёт с операциями не удаляется — «Удалить» отвечает всплывающим сообщением, что его можно заблокировать; пустой удаляется после подтверждения.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-02</span><b>Изменить счёт</b><span class="uc">UC-14 UC-13 UC-21</span><em>Валюта заперта: по счёту есть операции. Каждое ограничение объяснено рядом с полем, а не всплывает при сохранении. Блокировка счёта с деньгами подтверждается отдельным вопросом с суммой остатка; у нового счёта переключателя блокировки нет — заводить сразу заблокированный незачем. Остаток набирается клавиатурой суммы — она появляется по касанию поля и уходит при наборе названия; долг — минусом первой клавишей, красным. Сохранение и удаление — в шапке, как в форме операции: клавиатура их не закрывает. Панели вкладок нет, тоже как в форме операции: с ней и клавиатурой поле остатка уходило под клавиши. Пока клавиатура на виду, остаток показан как набран — с запятой, без валюты; «назад» сначала убирает клавиатуру. Счёт с операциями не удаляется — «Удалить» отвечает всплывающим сообщением, что его можно заблокировать; пустой удаляется после подтверждения.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт</h2><b class="del">Удалить</b><b class="save">Сохранить</b></div>
   <div class="body">
@@ -925,9 +931,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="card form">
       <div class="swrow"><span>Скрытый</span><span class="sw2"><i></i></span></div>
       <div class="note">Счёт не входит в итоги и отчёт</div>
-      <div class="dv"></div>
-      <div class="swrow"><span>Заблокированный</span><span class="sw2" id="d2close"><i></i></span></div>
-      <div class="note">Заблокированный счёт не показывается на главном экране и не предлагается в выборе</div>
+      <div class="dv d2-closing"></div>
+      <div class="swrow d2-closing"><span>Заблокированный</span><span class="sw2" id="d2close"><i></i></span></div>
+      <div class="note d2-closing">Заблокированный счёт не показывается на главном экране и не предлагается в выборе</div>
     </div>
   </div>
   <div class="kp">

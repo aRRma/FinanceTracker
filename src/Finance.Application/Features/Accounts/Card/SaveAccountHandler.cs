@@ -38,6 +38,13 @@ public sealed class SaveAccountHandler : ISaveAccountHandler
     {
         ArgumentNullException.ThrowIfNull(command);
 
+        // Отказ, а не молчаливый сброс признака: вызывающий, приславший его,
+        // получил бы открытый счёт и не узнал бы об этом
+        if (command is { Key: null, IsClosed: true })
+        {
+            throw new ArgumentException(Faults.NewAccountClosed(), nameof(command));
+        }
+
         return _unitOfWork.ExecuteAsync<Guid>(
             async (context, token) =>
             {
@@ -78,12 +85,6 @@ public sealed class SaveAccountHandler : ISaveAccountHandler
             nextOrder,
             _clock.Today,
             _clock.NowUtc);
-
-        // Заблокированным счёт заводят только правкой: заводить сразу заблокированный нечего
-        if (command.IsClosed)
-        {
-            account.Close();
-        }
 
         context.Accounts.Add(account.ToRow());
 

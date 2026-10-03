@@ -24,7 +24,7 @@ public sealed class AccountCatalogTests
 
         Guid card = await SaveAsync(database, Command("Карта"));
         Guid deposit = await SaveAsync(database, Command("Вклад") with { ExcludedFromTotals = true });
-        Guid old = await SaveAsync(database, Command("Старая") with { ExcludedFromTotals = true, IsClosed = true });
+        Guid old = await SaveClosedAsync(database, Command("Старая") with { ExcludedFromTotals = true });
 
         AccountsViewModel model = await LoadedAsync(database);
 

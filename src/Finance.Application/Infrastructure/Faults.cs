@@ -21,6 +21,11 @@ internal static class Faults
     internal static string AccountNotFound(Guid key) => $"Счёт {key} не найден";
 
     /// <summary>
+    /// Команда заводит счёт сразу заблокированным: блокируют только заведённый.
+    /// </summary>
+    internal static string NewAccountClosed() => "Новый счёт не заводится заблокированным — блокируют только заведённый";
+
+    /// <summary>
     /// Место пропало из базы между чтением и переименованием.
     /// </summary>
     /// <param name="key">Ключ места.</param>

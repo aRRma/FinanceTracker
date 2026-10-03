@@ -62,6 +62,29 @@ public sealed class BalancesTests
     }
 
     /// <summary>
+    /// Валюта одних накоплений «доступно» не показывает: там оно всегда ноль. Появился
+    /// нескрытый счёт той же валюты — подытог вернулся.
+    /// </summary>
+    [Fact]
+    public async Task Валюта_одних_накоплений_не_показывает_доступно()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        await SaveAsync(database, Command("Копилка", 5000m, excludedFromTotals: true));
+        await SaveAsync(database, Command("Вклад", 1000m, excludedFromTotals: true));
+
+        BalancesViewModel model = Model(database);
+        await model.LoadAsync();
+
+        Assert.False(Assert.Single(model.Sections).HasSpendable);
+
+        await SaveAsync(database, Command("Карта", 100m));
+        await model.LoadAsync();
+
+        Assert.True(Assert.Single(model.Sections).HasSpendable);
+    }
+
+    /// <summary>
     /// До первого чтения экран не утверждает ни что счета есть, ни что их нет.
     /// Иначе приглашение завести первый счёт и кнопка «записать операцию» успевали
     /// бы мигнуть на каждом заходе — обе привязаны к этим же признакам.

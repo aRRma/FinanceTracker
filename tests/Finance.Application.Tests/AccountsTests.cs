@@ -262,6 +262,20 @@ public sealed class AccountsTests
     }
 
     /// <summary>
+    /// Новый счёт с признаком блокировки отвергается, а не заводится молча открытым:
+    /// блокируют только заведённый счёт, и вызывающий узнаёт об ошибке сразу.
+    /// </summary>
+    [Fact]
+    public async Task Новый_счёт_не_заводится_заблокированным()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        await Assert.ThrowsAsync<ArgumentException>(() => SaveAsync(database, Command("Карта", 1000m) with { IsClosed = true }));
+
+        Assert.Empty(await database.Resolve<IAccountsQuery>().ReadAsync());
+    }
+
+    /// <summary>
     /// Блокировка обратима, и ненулевой баланс ей не мешает.
     /// </summary>
     [Fact]
@@ -289,7 +303,7 @@ public sealed class AccountsTests
 
         Guid rich = await SaveAsync(database, Command("Карта", 1_000m));
         Guid empty = await SaveAsync(database, Command("Пустая", 0m));
-        Guid closed = await SaveAsync(database, Command("Старая", 500m) with { IsClosed = true });
+        Guid closed = await SaveClosedAsync(database, Command("Старая", 500m));
 
         AccountViewModel model = Model(database);
 

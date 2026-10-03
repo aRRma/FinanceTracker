@@ -99,7 +99,7 @@ public sealed partial class BalancesViewModel : ScreenViewModel
     /// </summary>
     private static IEnumerable<CurrencySection> BuildSections(IReadOnlyList<AccountListItem> accounts)
     {
-        foreach (IGrouping<Currency, AccountListItem> group in accounts.GroupBy(account => account.Balance.Currency))
+        foreach (IGrouping<Currency, AccountListItem> group in accounts.GroupBy(static account => account.Balance.Currency))
         {
             AccountListItem[] spendable = group.Where(static account => !account.ExcludedFromTotals).ToArray();
 

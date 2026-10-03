@@ -68,13 +68,15 @@
                             <DataTemplate x:DataType="balances:CurrencySection">
                                 <VerticalStackLayout Spacing="8">
                                     <!-- Валюта и «доступно» в одну строку, число под ними справа:
-                                         три подписи столбиком читались как три разных заголовка -->
+                                         три подписи столбиком читались как три разных заголовка.
+                                         В валюте одних накоплений «доступно» нет вовсе: там оно всегда ноль -->
                                     <Grid ColumnDefinitions="*,Auto" Padding="2,0">
                                         <Label Grid.Column="0" Text="{Binding Title}" Style="{StaticResource SectionLabel}" />
-                                        <Label Grid.Column="1" Text="{x:Static texts:UiTexts.BalancesAvailable}" Style="{StaticResource SectionLabel}" />
+                                        <Label Grid.Column="1" Text="{x:Static texts:UiTexts.BalancesAvailable}" Style="{StaticResource SectionLabel}"
+                                               IsVisible="{Binding HasSpendable}" />
                                     </Grid>
                                     <Label Text="{Binding Available}" Style="{StaticResource TotalLabel}"
-                                           HorizontalTextAlignment="End" Padding="2,0">
+                                           HorizontalTextAlignment="End" Padding="2,0" IsVisible="{Binding HasSpendable}">
                                         <Label.Triggers>
                                             <DataTrigger TargetType="Label" Binding="{Binding IsAvailableNegative}" Value="True">
                                                 <Setter Property="TextColor"
@@ -83,7 +85,7 @@
                                         </Label.Triggers>
                                     </Label>
 
-                                    <Border Style="{StaticResource Card}">
+                                    <Border Style="{StaticResource Card}" IsVisible="{Binding HasSpendable}">
                                         <VerticalStackLayout
                                             BindableLayout.ItemsSource="{Binding Spendable}"
                                             BindableLayout.ItemTemplate="{StaticResource AccountTileTemplate}" />

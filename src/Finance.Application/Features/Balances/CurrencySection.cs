@@ -1,7 +1,7 @@
 namespace Finance.Application.Features.Balances;
 
 /// <summary>
-/// Раздел одной валюты на главном экране. Подытог в разделе ровно один —
+/// Раздел одной валюты на главном экране. Подытог в разделе не больше одного —
 /// «доступно к тратам»: общей суммы по валютам не существует, а накопления
 /// не показывают суммой намеренно, иначе «скрытый» теряет смысл.
 /// </summary>
@@ -17,6 +17,12 @@ public sealed record CurrencySection(
     IReadOnlyList<AccountTile> Spendable,
     IReadOnlyList<AccountTile> Savings)
 {
+    /// <summary>
+    /// В валюте есть нескрытые счета. Без них «доступно» всегда ноль
+    /// и ничего не говорит, а пустая карточка выглядит поломкой.
+    /// </summary>
+    public bool HasSpendable => Spendable.Count > 0;
+
     /// <summary>
     /// В разделе есть накопления — заголовок «Накопления» показывать стоит.
     /// </summary>

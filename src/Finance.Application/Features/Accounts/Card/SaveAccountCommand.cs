@@ -45,6 +45,7 @@ public sealed record SaveAccountCommand
 
     /// <summary>
     /// «Счёт заблокирован». Обратимо, ненулевой баланс блокировке не мешает.
+    /// У нового счёта — всегда ложь, иначе обработчик откажет: блокируют только заведённый.
     /// </summary>
     public required bool IsClosed { get; init; }
 }

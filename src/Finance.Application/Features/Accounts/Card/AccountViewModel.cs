@@ -278,7 +278,8 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     public string Title => Key is null ? UiTexts.AccountTitleNew : UiTexts.AccountTitleExisting;
 
     /// <summary>
-    /// Правится записанный счёт — его можно удалить. У нового удалять нечего.
+    /// Правится записанный счёт — его можно удалить и заблокировать. У нового удалять
+    /// нечего, а блокировать незачем.
     /// </summary>
     public bool IsExisting => Key is not null;
 

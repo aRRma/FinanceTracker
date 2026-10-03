@@ -45,6 +45,19 @@ internal static class AccountSetup
         database.Resolve<ISaveAccountHandler>().HandleAsync(command);
 
     /// <summary>
+    /// Заводит счёт и блокирует его правкой — как пользователь: при заведении
+    /// признак блокировки не действует.
+    /// </summary>
+    public static async Task<Guid> SaveClosedAsync(TestDatabase database, SaveAccountCommand command)
+    {
+        Guid key = await SaveAsync(database, command);
+
+        await SaveAsync(database, command with { Key = key, IsClosed = true });
+
+        return key;
+    }
+
+    /// <summary>
     /// Записывает операцию прямо в базу. Категория у такой операции выдуманная:
     /// стартового набора в базе нет, а балансу и ленте категория не нужна.
     /// </summary>

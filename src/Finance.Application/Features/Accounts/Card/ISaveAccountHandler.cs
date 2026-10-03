@@ -11,5 +11,6 @@ public interface ISaveAccountHandler
     /// <param name="command">Что введено в карточке.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <exception cref="Finance.Domain.Errors.DomainException">Нарушено доменное правило: имя занято, валюта заперта операциями, дата открытия позже операций.</exception>
+    /// <exception cref="ArgumentException">Новый счёт прислан заблокированным.</exception>
     Task<Guid> HandleAsync(SaveAccountCommand command, CancellationToken cancellationToken = default);
 }

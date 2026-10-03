@@ -110,14 +110,18 @@
                         <Label Text="{x:Static texts:UiTexts.AccountExcludeHint}"
                                Style="{StaticResource CaptionLabel}" />
 
-                        <BoxView Style="{StaticResource Divider}" />
+                        <!-- Блокировка — только у заведённого счёта: заводить сразу
+                             выведенный из употребления счёт незачем -->
+                        <VerticalStackLayout Spacing="10" IsVisible="{Binding IsExisting}">
+                            <BoxView Style="{StaticResource Divider}" />
 
-                        <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
-                            <Label Grid.Column="0" Text="{x:Static texts:UiTexts.AccountClosedLabel}" VerticalOptions="Center" />
-                            <Switch Grid.Column="1" IsToggled="{Binding IsClosed}" />
-                        </Grid>
-                        <Label Text="{x:Static texts:UiTexts.AccountClosedHint}"
-                               Style="{StaticResource CaptionLabel}" />
+                            <Grid ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
+                                <Label Grid.Column="0" Text="{x:Static texts:UiTexts.AccountClosedLabel}" VerticalOptions="Center" />
+                                <Switch Grid.Column="1" IsToggled="{Binding IsClosed}" />
+                            </Grid>
+                            <Label Text="{x:Static texts:UiTexts.AccountClosedHint}"
+                                   Style="{StaticResource CaptionLabel}" />
+                        </VerticalStackLayout>
                     </VerticalStackLayout>
                 </Border>
 
