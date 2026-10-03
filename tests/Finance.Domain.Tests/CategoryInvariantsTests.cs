@@ -157,7 +157,7 @@ public sealed class CategoryInvariantsTests
 
     [Fact]
     [Trait("Инвариант", nameof(Invariant.CategoryLevelFixed))]
-    public void Подкатегорию_нельзя_повысить_до_группы()
+    public void Группу_нельзя_перенести_в_другую_группу()
     {
         Category food = Given.Group("Еда");
         Category home = Given.Group("Жильё");

@@ -540,8 +540,8 @@
                                 <Setter TargetName="Plate" Property="Border.BackgroundColor"
                                         Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}" />
                                 <!-- В тёмной теме подпись основным текстом, а не цветом
-                                     действия: акцент на своём фоне даёт контраст 3,9
-                                     при пороге 4,5 (ContrastTests). Выбранный сегмент
+                                     действия: акцент на своём фоне стоит у самого порога
+                                     4,5 (ContrastTests). Выбранный сегмент
                                      и так виден плашкой -->
                                 <Setter TargetName="Caption" Property="Label.TextColor"
                                         Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource InkDark}}" />

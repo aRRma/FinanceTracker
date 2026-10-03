@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Finance.Domain\Finance.Domain.csproj" />
-    <ProjectReference Include="..\..\src\Finance.Application\Finance.Application.csproj" />
   </ItemGroup>
 
 </Project>
