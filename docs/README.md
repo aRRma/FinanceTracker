@@ -32,6 +32,7 @@
 | Темы, цвета, значки | `NFR-21…NFR-25` в [requirements/05-quality.md](requirements/05-quality.md), переключатель темы в [ui/mockups.html](ui/mockups.html) — эталон палитр; перечень значков — [data/icons.json](../data/icons.json), контуры — [data/icon-paths.json](../data/icon-paths.json), значки макетов собирает `dotnet tools/mockup_icons.cs` |
 | Как назвать новое понятие | [../CONTEXT.md](../CONTEXT.md) — сначала словарь, потом код |
 | Перенос истории из Wallet | [ADR-0014](adr/0014-wallet-import-one-shot-through-domain-path.md) |
+| Выгрузка в файл и восстановление из неё | [ADR-0015](adr/0015-export-is-database-file.md), `FR-SET-05`, `FR-SET-06`, `NFR-27`, сценарий UC-25 |
 | Сборка, тесты, эмулятор, экраны, тексты | навыки в `.claude/skills/` — список и когда какой загружать в [../CLAUDE.md](../CLAUDE.md) |
 
 ## Остальные документы

@@ -41,6 +41,13 @@
         <Setter Property="VerticalOptions" Value="Center" />
     </Style>
 
+    <!-- Знак необратимого: предупреждение перед заменой данных -->
+    <Style x:Key="NegativeIcon" TargetType="controls:Icon">
+        <Setter Property="Stroke"
+                Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
+
     <Style TargetType="Page" ApplyToDerivedTypes="True">
         <Setter Property="BackgroundColor"
                 Value="{AppThemeBinding Light={StaticResource PaperLight}, Dark={StaticResource PaperDark}}" />

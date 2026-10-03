@@ -44,6 +44,9 @@ public sealed partial class MorePage : DataPage
     private void OnTimeZone(object? sender, TappedEventArgs e) =>
         Navigator.Go(Routes.TimeZone);
 
+    private void OnExport(object? sender, TappedEventArgs e) =>
+        Navigator.Go(Routes.Export);
+
     private void OnAbout(object? sender, TappedEventArgs e) =>
         Navigator.Go(Routes.About);
 }

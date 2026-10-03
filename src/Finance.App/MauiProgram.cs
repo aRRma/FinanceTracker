@@ -61,7 +61,8 @@ public static class MauiProgram
             Path.Combine(FileSystem.AppDataDirectory, DatabaseFileName),
             dispatchToInterface: MainThread.BeginInvokeOnMainThread,
             applyTheme: ApplyTheme,
-            applicationVersion: AppInfo.Current.VersionString);
+            applicationVersion: AppInfo.Current.VersionString,
+            cacheFolder: FileSystem.CacheDirectory);
 
         AddPages(builder.Services);
 
@@ -112,5 +113,6 @@ public static class MauiProgram
         services.AddTransient<AppearancePage>();
         services.AddTransient<TimeZonePage>();
         services.AddTransient<AboutPage>();
+        services.AddTransient<ExportPage>();
     }
 }

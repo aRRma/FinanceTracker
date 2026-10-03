@@ -112,31 +112,17 @@ public sealed class DatabaseBootstrapper
     }
 
     /// <summary>
-    /// Снимает целостную копию средствами СУБД. Обычное копирование файла взяло бы
-    /// базу вместе с недописанным журналом, и копия оказалась бы нерабочей.
+    /// Снимает резервную копию. Прежняя заменяется только готовой новой: иначе
+    /// сорвавшееся копирование оставило бы базу без копии, и следующей миграции
+    /// откатываться было бы не на что.
     /// </summary>
     private async Task BackupAsync(CancellationToken cancellationToken)
     {
-        // Копия пишется во временный файл и подменяет прежнюю только готовой:
-        // удали мы прежнюю заранее, сорвавшееся копирование — кончилось место —
-        // оставило бы базу вовсе без копии, а следующая миграция откатываться
-        // была бы уже не на что
-        string draft = _location.BackupPath + ".tmp";
-
         try
         {
-            File.Delete(draft);
-
-            await using SqliteConnection connection = new(_location.ConnectionString);
-            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-
-            await using SqliteCommand command = connection.CreateCommand();
-            command.CommandText = "VACUUM INTO $backup";
-            command.Parameters.AddWithValue("$backup", draft);
-
-            await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-
-            File.Move(draft, _location.BackupPath, overwrite: true);
+            await VacuumInto
+                .WriteAsync(_location.ConnectionString, _location.BackupPath, cancellationToken)
+                .ConfigureAwait(false);
         }
         catch (Exception error) when (error is not OperationCanceledException)
         {

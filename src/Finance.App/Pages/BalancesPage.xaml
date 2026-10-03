@@ -139,6 +139,10 @@
             <Label Text="{x:Static texts:UiTexts.BalancesEmptyHint}"
                    HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
             <Button Text="{x:Static texts:UiTexts.BalancesAddAccount}" Clicked="OnCreateAccount" AutomationId="CreateFirstAccount" />
+            <!-- После переустановки человек попадает сюда, а не в «Ещё»: вернуть
+                 данные из выгрузки можно, не разыскивая экран «Данные» -->
+            <Button Text="{x:Static texts:UiTexts.RecoveryAction}" Clicked="OnRecover" AutomationId="RecoverFirstRun"
+                    Style="{StaticResource GhostButton}" />
         </VerticalStackLayout>
 
         <!-- Пока счетов нет, записывать операцию некуда — кнопки нет. С подписью,

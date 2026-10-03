@@ -108,6 +108,11 @@ public static class Routes
     public const string About = "settings/about";
 
     /// <summary>
+    /// Выгрузка в файл и восстановление из него.
+    /// </summary>
+    public const string Export = "settings/data";
+
+    /// <summary>
     /// Регистрирует маршруты в каркасе навигации.
     /// </summary>
     public static void Register()
@@ -129,5 +134,6 @@ public static class Routes
         Routing.RegisterRoute(Appearance, typeof(AppearancePage));
         Routing.RegisterRoute(TimeZone, typeof(TimeZonePage));
         Routing.RegisterRoute(About, typeof(AboutPage));
+        Routing.RegisterRoute(Export, typeof(ExportPage));
     }
 }

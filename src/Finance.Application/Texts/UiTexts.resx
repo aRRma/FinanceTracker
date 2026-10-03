@@ -739,6 +739,80 @@
   <data name="WalletImportDoneText" xml:space="preserve">
     <value>Записаны счета — {0}, места — {1}, операции — {2}.</value>
   </data>
+  <!-- Выгрузка и восстановление из неё -->
+  <data name="ExportTitle" xml:space="preserve">
+    <value>Данные</value>
+  </data>
+  <data name="MoreExportCaption" xml:space="preserve">
+    <value>Сохранить в файл или восстановить</value>
+  </data>
+  <data name="ExportAction" xml:space="preserve">
+    <value>Сохранить данные в файл</value>
+  </data>
+  <data name="ExportActionHint" xml:space="preserve">
+    <value>Для переноса на другой телефон</value>
+  </data>
+  <data name="ExportShareTitle" xml:space="preserve">
+    <value>Данные трекера</value>
+  </data>
+  <data name="RecoveryAction" xml:space="preserve">
+    <value>Восстановить из файла</value>
+  </data>
+  <data name="RecoveryActionHint" xml:space="preserve">
+    <value>Текущие данные заменятся данными файла</value>
+  </data>
+  <data name="RecoveryNotExport" xml:space="preserve">
+    <value>В этом файле нет данных трекера</value>
+  </data>
+  <data name="RecoveryDamaged" xml:space="preserve">
+    <value>Файл повреждён</value>
+  </data>
+  <data name="RecoveryNewer" xml:space="preserve">
+    <value>Файл из новой версии приложения — сначала обновите его</value>
+  </data>
+  <data name="RecoveryWarningTitle" xml:space="preserve">
+    <value>Все текущие данные будут удалены</value>
+  </data>
+  <data name="RecoveryWarningText" xml:space="preserve">
+    <value>Их заменят данные из файла</value>
+  </data>
+  <data name="RecoveryWarningIrreversible" xml:space="preserve">
+    <value>Вернуть их будет нельзя</value>
+  </data>
+  <data name="RecoveryAccountsOne" xml:space="preserve">
+    <value>счёт</value>
+  </data>
+  <data name="RecoveryAccountsFew" xml:space="preserve">
+    <value>счёта</value>
+  </data>
+  <data name="RecoveryAccountsMany" xml:space="preserve">
+    <value>счетов</value>
+  </data>
+  <data name="RecoveryTransactionsOne" xml:space="preserve">
+    <value>операция</value>
+  </data>
+  <data name="RecoveryTransactionsFew" xml:space="preserve">
+    <value>операции</value>
+  </data>
+  <data name="RecoveryTransactionsMany" xml:space="preserve">
+    <value>операций</value>
+  </data>
+  <data name="RecoveryConfirm" xml:space="preserve">
+    <value>Удалить и восстановить</value>
+  </data>
+  <data name="RecoveryConfirmWaiting" xml:space="preserve">
+    <value>Удалить и восстановить ({0})</value>
+    <comment>Кнопка неактивна, пока идёт отсчёт: «Удалить и восстановить (5)»</comment>
+  </data>
+  <data name="RecoveryDoneTitle" xml:space="preserve">
+    <value>Данные восстановлены</value>
+  </data>
+  <data name="RecoveryDoneText" xml:space="preserve">
+    <value>Приложение перезапустится.</value>
+  </data>
+  <data name="RecoveryRestart" xml:space="preserve">
+    <value>Перезапустить</value>
+  </data>
   <!-- Сбои, которые видит пользователь -->
   <data name="DatabaseCreateFailed" xml:space="preserve">
     <value>Не удалось создать базу. Данных ещё не было, терять нечего.</value>

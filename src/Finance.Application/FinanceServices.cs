@@ -4,6 +4,7 @@ using Finance.Application.Features.Accounts.Catalog;
 using Finance.Application.Features.Balances;
 using Finance.Application.Features.Categories.Card;
 using Finance.Application.Features.Categories.Catalog;
+using Finance.Application.Features.Export;
 using Finance.Application.Features.Places.Card;
 using Finance.Application.Features.Places.Catalog;
 using Finance.Application.Features.Feed;
@@ -55,13 +56,18 @@ public static class FinanceServices
     /// Язык интерфейса: на нём показываются тексты, склоняются счётные формы
     /// и записываются даты. Пусто — русский, пока единственный язык приложения.
     /// </param>
+    /// <param name="cacheFolder">
+    /// Папка временных файлов приложения: выгрузка, пока её отдают, и присланный файл, пока его проверяют.
+    /// Пусто — папка рядом с базой, так работают тесты.
+    /// </param>
     public static IServiceCollection AddFinance(
         this IServiceCollection services,
         string databasePath,
         Action<Action>? dispatchToInterface = null,
         Action<Theme>? applyTheme = null,
         string? applicationVersion = null,
-        CultureInfo? culture = null)
+        CultureInfo? culture = null,
+        string? cacheFolder = null)
     {
         ArgumentNullException.ThrowIfNull(services);
 
@@ -70,7 +76,7 @@ public static class FinanceServices
         // язык обязан быть уже выбран
         UiCulture.Use(culture);
 
-        DatabaseLocation location = new(databasePath);
+        DatabaseLocation location = new(databasePath, cacheFolder);
 
         services.AddSingleton(location);
         services.AddSingleton(IconCatalog.Embedded());
@@ -131,6 +137,8 @@ public static class FinanceServices
         services.AddSingleton<IReportQuery, ReportQuery>();
         services.AddSingleton<IFrequentCategoriesQuery, FrequentCategoriesQuery>();
         services.AddSingleton<IWalletImportHandler, WalletImportHandler>();
+        services.AddSingleton<IExportHandler, ExportHandler>();
+        services.AddSingleton<IRecoveryHandler, RecoveryHandler>();
 
         // Один на приложение: сюда экран выбора кладёт решение, а форма операции
         // забирает его при возвращении. Экраны при этом живут порознь
@@ -159,5 +167,6 @@ public static class FinanceServices
         services.AddTransient<TimeZoneViewModel>();
         services.AddTransient<AboutViewModel>();
         services.AddTransient<WalletImportViewModel>();
+        services.AddTransient<ExportViewModel>();
     }
 }

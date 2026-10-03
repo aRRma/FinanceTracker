@@ -32,6 +32,9 @@ public sealed partial class BalancesPage : DataPage
     private void OnCreateAccount(object? sender, EventArgs e) =>
         Navigator.Go(Routes.Account);
 
+    private void OnRecover(object? sender, EventArgs e) =>
+        Navigator.Go(Routes.Export);
+
     private void OnAddTransaction(object? sender, EventArgs e) =>
         Navigator.Go(Routes.Transaction);
 

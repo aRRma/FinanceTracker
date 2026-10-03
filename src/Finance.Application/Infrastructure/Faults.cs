@@ -219,4 +219,19 @@ internal static class Faults
     /// <param name="index">Номер операции в файле, с нуля.</param>
     internal static string WalletImportTransferCurrencies(int index) =>
         $"Операция {index} файла переноса — перевод между счетами разных валют";
+
+    /// <summary>
+    /// Восстановление запрошено без проверенного файла: проверку пропустили или файл не подошёл.
+    /// </summary>
+    internal static string RecoveryNotChecked() => "Восстанавливать нечего: файл не проверен или не подошёл";
+
+    /// <summary>
+    /// Выгрузка или восстановление запущены, пока идёт прежнее действие экрана «Данные».
+    /// </summary>
+    internal static string ExportRunning() => "Выгрузка или восстановление уже идут";
+
+    /// <summary>
+    /// Замену подтвердили раньше, чем кончился отсчёт предупреждения.
+    /// </summary>
+    internal static string RecoveryWarningRunning() => "Замена подтверждена до конца отсчёта предупреждения";
 }

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран D-10: «Данные». Выгрузка всей базы в файл и восстановление из него —
+    для переноса на другой телефон и переустановки. Файл отдаётся через
+    «Поделиться»: там Google Диск, Telegram и почта. Замена непустой базы —
+    через предупреждение D-11 на месте строк, кнопка которого оживает после отсчёта.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.ExportPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:export="clr-namespace:Finance.Application.Features.Export;assembly=Finance.Application"
+    x:DataType="export:ExportViewModel"
+    Title="{x:Static texts:UiTexts.ExportTitle}">
+
+    <Grid>
+        <!-- Container: .NET 10 пускает страницу под системные полосы, а ScrollView
+             из всех областей понимает только эту -->
+        <ScrollView SafeAreaEdges="Container" IsVisible="{Binding IsActionsShown}">
+            <VerticalStackLayout Padding="16,12" Spacing="16">
+
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout>
+                        <Grid Padding="14,12" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto"
+                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnExport" />
+                            </Grid.GestureRecognizers>
+
+                            <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="download" />
+                            <Label Grid.Column="1" Grid.Row="0" AutomationId="Export"
+                                   Text="{x:Static texts:UiTexts.ExportAction}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Grid.Row="1" Text="{x:Static texts:UiTexts.ExportActionHint}"
+                                   Style="{StaticResource SecondaryLabel}" />
+                        </Grid>
+
+                        <BoxView Style="{StaticResource Divider}" />
+
+                        <Grid Padding="14,12" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto"
+                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnRecover" />
+                            </Grid.GestureRecognizers>
+
+                            <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="upload" />
+                            <Label Grid.Column="1" Grid.Row="0" AutomationId="Recover"
+                                   Text="{x:Static texts:UiTexts.RecoveryAction}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Grid.Row="1" Text="{x:Static texts:UiTexts.RecoveryActionHint}"
+                                   Style="{StaticResource SecondaryLabel}" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Выгрузка и проверка многолетней истории идут секунды: без знака
+                     касание выглядело бы несработавшим -->
+                <ActivityIndicator AutomationId="ExportBusy" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                   HeightRequest="32" WidthRequest="32" HorizontalOptions="Center" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Предупреждение на месте строк, а не системным диалогом: в диалоге
+             кнопку нельзя погасить на время отсчёта -->
+        <ScrollView SafeAreaEdges="Container" IsVisible="{Binding IsWarningShown}">
+            <VerticalStackLayout Padding="16,12" Spacing="16">
+
+                <Border Style="{StaticResource ErrorCard}">
+                    <VerticalStackLayout Padding="20,24" Spacing="12">
+                        <!-- Знак в круге цветом карточки: на красноватом фоне голый
+                             контур терялся -->
+                        <Border WidthRequest="56" HeightRequest="56" StrokeThickness="0" HorizontalOptions="Center"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="28" />
+                            </Border.StrokeShape>
+                            <controls:Icon Key="alert-triangle" Style="{StaticResource NegativeIcon}"
+                                           HorizontalOptions="Center" />
+                        </Border>
+
+                        <Label AutomationId="RecoveryWarning" Text="{x:Static texts:UiTexts.RecoveryWarningTitle}"
+                               Style="{StaticResource TitleLabel}" HorizontalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+                        <Label Text="{x:Static texts:UiTexts.RecoveryWarningText}" HorizontalTextAlignment="Center" />
+
+                        <!-- Что именно пропадёт — счётом, а не словами «все данные»:
+                             по числам видно, есть ли что терять -->
+                        <Border Style="{StaticResource Card}" Margin="0,4">
+                            <VerticalStackLayout>
+                                <Grid Padding="14,12" ColumnDefinitions="Auto,*">
+                                    <controls:Icon Grid.Column="0" Margin="0,0,12,0" Key="wallet" />
+                                    <Label Grid.Column="1" AutomationId="AccountsToDelete" Text="{Binding AccountsToDelete}"
+                                           VerticalOptions="Center" />
+                                </Grid>
+                                <BoxView Style="{StaticResource Divider}" />
+                                <Grid Padding="14,12" ColumnDefinitions="Auto,*">
+                                    <controls:Icon Grid.Column="0" Margin="0,0,12,0" Key="receipt" />
+                                    <Label Grid.Column="1" AutomationId="TransactionsToDelete" Text="{Binding TransactionsToDelete}"
+                                           VerticalOptions="Center" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Label Text="{x:Static texts:UiTexts.RecoveryWarningIrreversible}" Style="{StaticResource NegativeLabel}"
+                               FontFamily="OpenSansSemibold" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button AutomationId="RecoveryConfirm" Text="{Binding ConfirmButtonText}" IsEnabled="{Binding CanConfirm}"
+                        Style="{StaticResource DangerButton}" Clicked="OnWarningConfirm" />
+                <Button AutomationId="RecoveryCancel" Text="{x:Static texts:UiTexts.CommonCancel}"
+                        Style="{StaticResource GhostButton}" Clicked="OnWarningCancel" />
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                   HeightRequest="32" WidthRequest="32" HorizontalOptions="Center" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</pages:DataPage>
