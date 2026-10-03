@@ -35,6 +35,8 @@ public sealed partial class ExportPage : DataPage
     /// <inheritdoc />
     protected override Task LoadAsync() => Task.CompletedTask;
 
+    private void OnExportToDevice(object? sender, TappedEventArgs e) => Guarded.Run(() => ExclusiveAsync(ExportToDeviceAsync));
+
     private void OnExport(object? sender, TappedEventArgs e) => Guarded.Run(() => ExclusiveAsync(ExportAsync));
 
     private void OnRecover(object? sender, TappedEventArgs e) => Guarded.Run(() => ExclusiveAsync(RecoverAsync));
@@ -59,6 +61,17 @@ public sealed partial class ExportPage : DataPage
         finally
         {
             _busy = false;
+        }
+    }
+
+    private async Task ExportToDeviceAsync()
+    {
+        string file = await _model.ExportAsync();
+
+        // Отказ в окне выбора места — не ошибка: пользователь передумал
+        if (await DeviceFileSaver.SaveAsync(file))
+        {
+            Notice.Show(UiTexts.ExportSaved);
         }
     }
 

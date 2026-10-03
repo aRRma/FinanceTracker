@@ -749,8 +749,23 @@
   <data name="ExportAction" xml:space="preserve">
     <value>Сохранить данные в файл</value>
   </data>
-  <data name="ExportActionHint" xml:space="preserve">
-    <value>Для переноса на другой телефон</value>
+  <data name="ExportToDevice" xml:space="preserve">
+    <value>На этот телефон</value>
+  </data>
+  <data name="ExportToDeviceHint" xml:space="preserve">
+    <value>В папку, например «Загрузки»</value>
+  </data>
+  <data name="ExportShare" xml:space="preserve">
+    <value>Отправить</value>
+  </data>
+  <data name="ExportShareHint" xml:space="preserve">
+    <value>В Telegram, на Google Диск или почтой</value>
+  </data>
+  <data name="ExportSaved" xml:space="preserve">
+    <value>Файл сохранён</value>
+  </data>
+  <data name="RecoveryPick" xml:space="preserve">
+    <value>Выбрать файл</value>
   </data>
   <data name="ExportShareTitle" xml:space="preserve">
     <value>Данные трекера</value>

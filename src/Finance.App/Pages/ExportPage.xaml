@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
     Экран D-10: «Данные». Выгрузка всей базы в файл и восстановление из него —
-    для переноса на другой телефон и переустановки. Файл отдаётся через
-    «Поделиться»: там Google Диск, Telegram и почта. Замена непустой базы —
+    для переноса на другой телефон и переустановки. Файл сохраняется в папку
+    на самом телефоне или отдаётся через «Поделиться». Замена непустой базы —
     через предупреждение D-11 на месте строк, кнопка которого оживает после отсчёта.
 -->
 <pages:DataPage
@@ -22,18 +22,21 @@
         <ScrollView SafeAreaEdges="Container" IsVisible="{Binding IsActionsShown}">
             <VerticalStackLayout Padding="16,12" Spacing="16">
 
+                <!-- Два пути сохранения рядом, а не один «Поделиться»: в окне отправки
+                     нет пункта «положить в папку», и сохранить на сам телефон было нечем -->
+                <Label Text="{x:Static texts:UiTexts.ExportAction}" Style="{StaticResource SectionLabel}" />
                 <Border Style="{StaticResource Card}">
                     <VerticalStackLayout>
                         <Grid Padding="14,12" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto"
                               MinimumHeightRequest="{StaticResource TouchTarget}">
                             <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnExport" />
+                                <TapGestureRecognizer Tapped="OnExportToDevice" />
                             </Grid.GestureRecognizers>
 
                             <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="download" />
-                            <Label Grid.Column="1" Grid.Row="0" AutomationId="Export"
-                                   Text="{x:Static texts:UiTexts.ExportAction}" VerticalOptions="Center" />
-                            <Label Grid.Column="1" Grid.Row="1" Text="{x:Static texts:UiTexts.ExportActionHint}"
+                            <Label Grid.Column="1" Grid.Row="0" AutomationId="ExportToDevice"
+                                   Text="{x:Static texts:UiTexts.ExportToDevice}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Grid.Row="1" Text="{x:Static texts:UiTexts.ExportToDeviceHint}"
                                    Style="{StaticResource SecondaryLabel}" />
                         </Grid>
 
@@ -42,16 +45,32 @@
                         <Grid Padding="14,12" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto"
                               MinimumHeightRequest="{StaticResource TouchTarget}">
                             <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnRecover" />
+                                <TapGestureRecognizer Tapped="OnExport" />
                             </Grid.GestureRecognizers>
 
-                            <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="upload" />
-                            <Label Grid.Column="1" Grid.Row="0" AutomationId="Recover"
-                                   Text="{x:Static texts:UiTexts.RecoveryAction}" VerticalOptions="Center" />
-                            <Label Grid.Column="1" Grid.Row="1" Text="{x:Static texts:UiTexts.RecoveryActionHint}"
+                            <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="share" />
+                            <Label Grid.Column="1" Grid.Row="0" AutomationId="Export"
+                                   Text="{x:Static texts:UiTexts.ExportShare}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Grid.Row="1" Text="{x:Static texts:UiTexts.ExportShareHint}"
                                    Style="{StaticResource SecondaryLabel}" />
                         </Grid>
                     </VerticalStackLayout>
+                </Border>
+
+                <Label Text="{x:Static texts:UiTexts.RecoveryAction}" Style="{StaticResource SectionLabel}" />
+                <Border Style="{StaticResource Card}">
+                    <Grid Padding="14,12" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRecover" />
+                        </Grid.GestureRecognizers>
+
+                        <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="upload" />
+                        <Label Grid.Column="1" Grid.Row="0" AutomationId="Recover"
+                               Text="{x:Static texts:UiTexts.RecoveryPick}" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="1" Text="{x:Static texts:UiTexts.RecoveryActionHint}"
+                               Style="{StaticResource SecondaryLabel}" />
+                    </Grid>
                 </Border>
 
                 <!-- Выгрузка и проверка многолетней истории идут секунды: без знака

@@ -19,4 +19,14 @@ internal static class AppFaults
     /// </summary>
     /// <param name="key">Ключ значка.</param>
     internal static string IconPathMissing(string key) => $"У значка «{key}» нет контура";
+
+    /// <summary>
+    /// Окно выбора места не открыть: у приложения нет активности на экране.
+    /// </summary>
+    internal static string NoActivity() => "Нет активности, из которой открыть окно выбора места";
+
+    /// <summary>
+    /// Система отдала место для сохранения, но писать в него не позволила.
+    /// </summary>
+    internal static string FileNotWritable() => "Выбранное место не открылось на запись";
 }

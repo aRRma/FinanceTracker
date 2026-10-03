@@ -301,6 +301,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <symbol id="i-question-mark" viewBox="0 0 24 24"><path d="M8 8a3.5 3 0 0 1 3.5 -3h1a3.5 3 0 0 1 3.5 3a3 3 0 0 1 -2 3a3 4 0 0 0 -2 4 M12 19l0 .01"/></symbol>
 <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2m4 -14h6m-6 4h6m-2 4h2"/></symbol>
 <symbol id="i-scooter" viewBox="0 0 24 24"><path d="M16 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M4 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M8 17h5a6 6 0 0 1 5 -5v-5a2 2 0 0 0 -2 -2h-1"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><path d="M3 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0 M15 6a3 3 0 1 0 6 0a3 3 0 1 0 -6 0 M15 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0 M8.7 10.7l6.6 -3.4 M8.7 13.3l6.6 3.4"/></symbol>
 <symbol id="i-shopping-bag" viewBox="0 0 24 24"><path d="M6.331 8h11.339a2 2 0 0 1 1.977 2.304l-1.255 8.152a3 3 0 0 1 -2.966 2.544h-6.852a3 3 0 0 1 -2.965 -2.544l-1.255 -8.152a2 2 0 0 1 1.977 -2.304 M9 11v-5a3 3 0 0 1 6 0v5"/></symbol>
 <symbol id="i-shopping-cart" viewBox="0 0 24 24"><path d="M4 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M15 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M17 17h-11v-14h-2 M6 5l14 1l-1 7h-13"/></symbol>
 <symbol id="i-soup" viewBox="0 0 24 24"><path d="M4 11h16a1 1 0 0 1 1 1v.5c0 1.5 -2.517 5.573 -4 6.5v1a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-1c-1.687 -1.054 -4 -5 -4 -6.5v-.5a1 1 0 0 1 1 -1 M12 4a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2 M16 4a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2 M8 4a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/></symbol>
@@ -1152,13 +1153,18 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-10</span><b>Перенести данные на другой телефон</b><span class="uc">UC-25</span><em>Две строки: сохранить всю базу файлом и восстановить из него. Файл уходит через системное «Поделиться» — Telegram, Google Диск, почта. Чужой, повреждённый и файл из более новой версии отвергаются с причиной, данные при этом не трогаются. На пустую базу — после переустановки — файл восстанавливается сразу, без вопросов; если в базе уже есть счета или операции, сначала предупреждение [D-11]. После замены приложение перезапускается.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-10</span><b>Перенести данные на другой телефон</b><span class="uc">UC-25</span><em>Сохранить всю базу файлом — двумя путями рядом: в папку на самом телефоне (системное окно выбора места, например «Загрузки») или через «Поделиться» — Telegram, Google Диск, почта. В окне «Поделиться» пункта «положить в папку» нет, поэтому одного его не хватало. Восстановить — выбрать файл. Чужой, повреждённый и файл из более новой версии отвергаются с причиной, данные при этом не трогаются. На пустую базу — после переустановки — файл восстанавливается сразу, без вопросов; если в базе уже есть счета или операции, сначала предупреждение [D-11]. После замены приложение перезапускается.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Данные</h2></div>
   <div class="body">
+    <div class="lbl"><span>Сохранить данные в файл</span></div>
     <div class="card">
-      <div class="row"><svg class="ic"><use href="#i-download"/></svg><div class="g"><div class="t">Сохранить данные в файл</div><div class="s">Для переноса на другой телефон</div></div></div>
-      <div class="row"><svg class="ic"><use href="#i-upload"/></svg><div class="g"><div class="t">Восстановить из файла</div><div class="s">Текущие данные заменятся данными файла</div></div></div>
+      <div class="row"><svg class="ic"><use href="#i-download"/></svg><div class="g"><div class="t">На этот телефон</div><div class="s">В папку, например «Загрузки»</div></div></div>
+      <div class="row"><svg class="ic"><use href="#i-share"/></svg><div class="g"><div class="t">Отправить</div><div class="s">В Telegram, на Google Диск или почтой</div></div></div>
+    </div>
+    <div class="lbl"><span>Восстановить из файла</span></div>
+    <div class="card">
+      <div class="row"><svg class="ic"><use href="#i-upload"/></svg><div class="g"><div class="t">Выбрать файл</div><div class="s">Текущие данные заменятся данными файла</div></div></div>
     </div>
   </div>
   <nav class="nav">
