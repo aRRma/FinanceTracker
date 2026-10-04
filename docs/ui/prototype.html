@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Личный трекер финансов — прототип</title>
 <!-- СГЕНЕРИРОВАНО из mockups.html скриптом tools/build_prototype.py. Руками не править. -->
-<!-- отпечатки источников: mockups.html=b3aa75a94641aa7784686e6b67fb49b1c3ccb908e053516cfaac0628b892599c build_prototype.py=e322ddab0fd4287683bd5e9d0f9bace205151fc471d238ed9db271c4b65096b1 -->
+<!-- отпечатки источников: mockups.html=770c847ca80f208db08e3cd86b042a90abe59b8035057464d981f92b8be80e2c build_prototype.py=e322ddab0fd4287683bd5e9d0f9bace205151fc471d238ed9db271c4b65096b1 -->
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -646,6 +646,7 @@ body{padding:0}
     </div>
     <div class="card">
       <div class="row"><svg class="ic"><use href="#i-calendar"/></svg><span class="t" style="flex:1">Сегодня</span><div class="chips"><b class="chip on">Сегодня</b><b class="chip">Вчера</b><b class="chip">…</b></div></div>
+      <div class="row"><svg class="ic"><use href="#i-pencil"/></svg><span class="entry ph">Заметка — необязательно</span></div>
     </div>
   </div>
   <div class="kp">
@@ -739,7 +740,7 @@ body{padding:0}
 
 <div class="scr right" data-screen="C-03" title="C-03 · Открыть счёт без операций">
 <div class="phone">
-  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Карта евро</h2></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Карта евро</h2><svg class="ic"><use href="#i-pencil"/></svg></div>
   <div class="balrow"><span>Баланс</span><b>1 240,00 €</b></div>
   <div class="body">
     <div class="card">
@@ -1293,7 +1294,7 @@ body{padding:0}
     <div class="month"><span class="ibtn"><svg class="ic back"><use href="#i-chevron-right"/></svg></span><b>Февраль 2026</b><span class="ibtn"><svg class="ic"><use href="#i-chevron-right"/></svg></span></div>
   </div>
   <div class="empty" style="padding-top:120px">
-    <h3>В этом месяце операций не было</h3>
+    <h3>Нет операций</h3>
     <p>Выберите другой месяц стрелками вверху.</p>
   </div>
   <nav class="nav">

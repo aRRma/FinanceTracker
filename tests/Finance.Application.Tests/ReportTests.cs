@@ -465,8 +465,9 @@ public sealed partial class ReportTests
     }
 
     /// <summary>
-    /// Пустой отчёт при валютном счёте не советует листать месяцы: операции
-    /// в этом месяце есть, просто по счетам, которые в отчёт не входят.
+    /// Пустой отчёт при валютном счёте говорит, что операций нет по активным счетам,
+    /// и не советует листать месяцы: операции в этом месяце есть, просто по счетам,
+    /// которые в отчёт не входят. Месяц без операций вовсе — просто «нет операций».
     /// </summary>
     [Fact]
     public async Task Пустой_отчёт_при_валютном_счёте_не_советует_листать()
@@ -476,14 +477,17 @@ public sealed partial class ReportTests
         Guid euro = await given.AccountAsync("Карта евро", 1_000m, Currency.EUR);
 
         ReportViewModel before = await LoadedModelAsync(given);
+        Assert.Equal(UiTexts.ReportEmptyTitle, before.EmptyTitle);
         Assert.Equal(UiTexts.ReportEmptyOtherMonth, before.EmptyHint);
+        Assert.True(before.HasEmptyHint);
 
         await given.SaveAsync(given.Expense(euro, 48m));
 
         ReportViewModel after = await LoadedModelAsync(given);
 
         Assert.True(after.IsEmpty);
-        Assert.Equal(UiTexts.ReportEmptyCurrency, after.EmptyHint);
+        Assert.Equal(UiTexts.ReportEmptyUncounted, after.EmptyTitle);
+        Assert.False(after.HasEmptyHint, "Операции месяца есть, а пустой отчёт советует сменить месяц.");
     }
 
     /// <summary>

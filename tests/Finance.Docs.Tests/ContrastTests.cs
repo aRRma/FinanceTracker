@@ -43,10 +43,6 @@ public sealed partial class ContrastTests
             ("Negative", "Paper"), ("Negative", "Card"),
             ("Transfer", "Card"),
 
-            // Значок подкатегории на бледном кружке цвета вида; расход и доход
-            // на своих фонах сверяются ниже
-            ("Transfer", "TransferBackground"),
-
             // Карточка нарушенного правила: сообщение и обычный текст на её фоне
             ("Negative", "NegativeBackground"), ("Ink", "NegativeBackground"),
 

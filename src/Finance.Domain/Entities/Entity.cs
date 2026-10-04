@@ -68,9 +68,4 @@ public abstract class Entity
     /// новее чужой правки только оттого, что кнопку нажали дважды.
     /// </summary>
     public virtual void Delete(DateTimeOffset atUtc) => DeletedAtUtc ??= atUtc;
-
-    /// <summary>
-    /// Проставляет метку изменения. Вызывается единой точкой сохранения.
-    /// </summary>
-    public void MarkUpdated(DateTimeOffset atUtc) => UpdatedAtUtc = atUtc;
 }

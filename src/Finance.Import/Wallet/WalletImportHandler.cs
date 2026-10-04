@@ -62,7 +62,7 @@ public sealed class WalletImportHandler : IWalletImportHandler
         return _unitOfWork.ExecuteAsync<WalletImportCounts>(
             async (context, token) =>
             {
-                // Проверка внутри той же транзакции, а не только перед нажатием:
+                // Проверка внутри той же транзакции, а не только перед запуском:
                 // второй перенос поверх первого удвоил бы все балансы
                 if (!await IsEmptyAsync(context, token).ConfigureAwait(false))
                 {

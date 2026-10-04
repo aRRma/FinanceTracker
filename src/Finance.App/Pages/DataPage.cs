@@ -52,7 +52,7 @@ public abstract class DataPage : ContentPage
         base.OnAppearing();
 
         // Стрелка в шапке мимо OnBackButtonPressed не идёт вовсе: Shell уводит
-        // её своим переходом. Перехватывать приходится обе кнопки порознь
+        // её своим переходом. Перехватывать приходится обе кнопки порознь.
         // Одна стрелка на обе роли: заведи их порознь, вторая затёрла бы первую,
         // и форма с выделением ушла бы без вопроса о несохранённом
         if (BindingContext is IFormModel or ISelectionModel && _back is null)

@@ -48,13 +48,15 @@ public sealed class SourceIdentifierTests
     }
 
     /// <summary>
-    /// Строки всех файлов кода и разметки репозитория, кроме проверок документации.
-    /// Разметка — тоже код: в её комментариях номера требований устаревают так же.
+    /// Строки всех файлов кода, разметки, проектов и манифеста, кроме проверок документации.
+    /// Разметка и проекты — тоже код: в их комментариях номера требований устаревают так же.
     /// </summary>
     private static IReadOnlyList<DocumentLine> SourceLines() =>
         Documents.Lines(
                 Documents.Files("*.cs")
                     .Concat(Documents.Files("*.xaml"))
+                    .Concat(Documents.Files("*.csproj"))
+                    .Concat(Documents.Files("AndroidManifest.xml"))
                     .Where(static file => !Documents.Relative(file).StartsWith(Allowed, StringComparison.Ordinal)))
             .ToArray();
 }

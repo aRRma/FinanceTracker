@@ -101,12 +101,25 @@ public sealed partial class ReportViewModel : ScreenViewModel
     public string MonthTitle => Month.Title;
 
     /// <summary>
-    /// Подпись пустого состояния. Когда операции месяца есть, но в суммы не вошли,
-    /// пустота объясняется правилом отчёта: иначе пользователь с валютным счётом
+    /// Заголовок пустого состояния. Когда операции месяца есть, но в суммы не вошли,
+    /// он говорит об этом, а не «нет операций»: иначе пользователь с валютным счётом
     /// принял бы пустой отчёт за поломку.
     /// </summary>
     [ObservableProperty]
+    public partial string EmptyTitle { get; private set; } = UiTexts.ReportEmptyTitle;
+
+    /// <summary>
+    /// Подсказка под заголовком пустого состояния — сменить месяц. Пуста, когда
+    /// операции месяца есть, но в суммы не вошли: другой месяц тут не поможет.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasEmptyHint))]
     public partial string EmptyHint { get; private set; } = UiTexts.ReportEmptyOtherMonth;
+
+    /// <summary>
+    /// Показывать ли подсказку под заголовком пустого состояния.
+    /// </summary>
+    public bool HasEmptyHint => EmptyHint.Length > 0;
 
     /// <summary>
     /// Вперёд идти есть куда: показан не текущий месяц. Считается от часов на каждом
@@ -127,7 +140,7 @@ public sealed partial class ReportViewModel : ScreenViewModel
         // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
         IReadOnlyList<ReportTotal> all = await _report.ReadGroupsAsync(Month, cancellationToken);
 
-        // Второй запрос только когда отчёт пуст целиком: при строках подсказка не видна
+        // Второй запрос только когда отчёт пуст целиком: при строках пустое состояние не видно
         bool hasUncounted = all.Count is 0 && await _report.HasUncountedAsync(Month, cancellationToken);
 
         if (generation != _generation)
@@ -136,7 +149,8 @@ public sealed partial class ReportViewModel : ScreenViewModel
         }
 
         _all = all;
-        EmptyHint = hasUncounted ? UiTexts.ReportEmptyCurrency : UiTexts.ReportEmptyOtherMonth;
+        EmptyTitle = hasUncounted ? UiTexts.ReportEmptyUncounted : UiTexts.ReportEmptyTitle;
+        EmptyHint = hasUncounted ? string.Empty : UiTexts.ReportEmptyOtherMonth;
 
         Rebuild();
 

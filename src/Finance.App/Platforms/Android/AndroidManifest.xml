@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 	<application android:allowBackup="false" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true"></application>
-	<!-- Автоматический бэкап системы выключен (NFR-08): он восстановил бы базу
+	<!-- Автоматический бэкап системы выключен: он восстановил бы базу
 	     на другом устройстве из чужого по времени снимка, а сверить его с локальной
 	     базой нечем — обмена между устройствами в MVP нет -->
-	<!-- Разрешений на сеть нет намеренно: к сети приложение не обращается (SYS-04),
+	<!-- Разрешений на сеть нет намеренно: к сети приложение не обращается,
 	     а обмен с сервером отложен целиком. Шаблон MAUI заводит INTERNET и
 	     ACCESS_NETWORK_STATE сам — при обновлении шаблона их надо убирать снова -->
 </manifest>

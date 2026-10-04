@@ -88,7 +88,7 @@ public sealed class WalletImportTests
 
     /// <summary>
     /// Второй перенос поверх первого удвоил бы все балансы: в базу, где уже есть
-    /// счёт, перенос не идёт, и строка переноса там не показывается.
+    /// счёт, перенос не идёт.
     /// </summary>
     [Fact]
     public async Task Перенос_идёт_только_в_пустую_базу()
@@ -205,8 +205,8 @@ public sealed class WalletImportTests
     }
 
     /// <summary>
-    /// После переноса экраны узнают о новых счетах, местах и операциях: балансы
-    /// и лента, открытые до переноса, перечитаются на возврате.
+    /// Перенос публикует изменение счетов, мест и операций, как любая команда
+    /// через единицу работы: он пишет тем же путём, что и формы.
     /// </summary>
     [Fact]
     public async Task Перенос_оповещает_экраны()
@@ -248,7 +248,7 @@ public sealed class WalletImportTests
     }
 
     /// <summary>
-    /// Файл, записанный тулзой, читается приложением без потерь: формат задаёт
+    /// Файл, записанный тулзой, читается переносом без потерь: формат задаёт
     /// один тип на обе стороны.
     /// </summary>
     [Fact]
@@ -325,7 +325,8 @@ public sealed class WalletImportTests
     public async Task База_с_переносом_принимается_восстановлением()
     {
         await using TestDatabase source = await CreateDatabaseAsync();
-        await source.Resolve<IWalletImportHandler>().HandleAsync(Sample());        string file = await source.Resolve<IExportHandler>().HandleAsync();
+        await source.Resolve<IWalletImportHandler>().HandleAsync(Sample());
+        string file = await source.Resolve<IExportHandler>().HandleAsync();
 
         await using TestDatabase target = await TestDatabase.CreateWithPresetAsync();
         IRecoveryHandler recovery = target.Resolve<IRecoveryHandler>();

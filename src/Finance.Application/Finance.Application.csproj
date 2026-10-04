@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <!-- Стартовый набор и значки едут внутри сборки: инициализация базы идёт
-       без обращения к сети и без файлов рядом с приложением (SEED-01, NFR-21) -->
+       без обращения к сети и без файлов рядом с приложением -->
   <ItemGroup>
     <EmbeddedResource Include="..\..\data\preset.json" LogicalName="Finance.Application.preset.json" />
     <EmbeddedResource Include="..\..\data\icons.json" LogicalName="Finance.Application.icons.json" />

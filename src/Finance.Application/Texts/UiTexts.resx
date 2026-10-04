@@ -596,13 +596,14 @@
     <value>Переводы между своими счетами в отчёт не входят</value>
   </data>
   <data name="ReportEmptyTitle" xml:space="preserve">
-    <value>В этом месяце операций не было</value>
+    <value>Нет операций</value>
   </data>
   <data name="ReportEmptyOtherMonth" xml:space="preserve">
     <value>Выберите другой месяц стрелками вверху.</value>
   </data>
-  <data name="ReportEmptyCurrency" xml:space="preserve">
-    <value>Нет операций по счетам.</value>
+  <!-- Операции месяца есть, но только по счетам вне отчёта: накопления и валютные -->
+  <data name="ReportEmptyUncounted" xml:space="preserve">
+    <value>Нет операций по активным счетам</value>
   </data>
   <data name="ReportGroupEmptyTitle" xml:space="preserve">
     <value>Операций больше нет</value>
