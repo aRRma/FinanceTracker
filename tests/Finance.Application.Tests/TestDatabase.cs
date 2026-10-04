@@ -65,11 +65,13 @@ internal sealed class TestDatabase : IAsyncDisposable
     /// </summary>
     /// <param name="applyTheme">Чем подменяется переключение оформления: платформы в тестах нет.</param>
     /// <param name="applicationVersion">Версия приложения для экрана «О программе».</param>
+    /// <param name="extra">Службы сверх прикладного слоя — например, перенос, которого в приложении нет.</param>
     public static async Task<TestDatabase> CreateAsync(
         Action<Theme>? applyTheme = null,
-        string? applicationVersion = null)
+        string? applicationVersion = null,
+        Action<IServiceCollection>? extra = null)
     {
-        TestDatabase database = CreateUnprepared(applyTheme, applicationVersion);
+        TestDatabase database = CreateUnprepared(applyTheme, applicationVersion, extra);
         await database.Resolve<DatabaseBootstrapper>().InitializeAsync();
 
         return database;
@@ -79,9 +81,12 @@ internal sealed class TestDatabase : IAsyncDisposable
     /// Создаёт базу с накатанной схемой и стартовым набором — как после первого запуска.
     /// </summary>
     /// <param name="applicationVersion">Версия приложения для экрана «О программе».</param>
-    public static async Task<TestDatabase> CreateWithPresetAsync(string? applicationVersion = null)
+    /// <param name="extra">Службы сверх прикладного слоя.</param>
+    public static async Task<TestDatabase> CreateWithPresetAsync(
+        string? applicationVersion = null,
+        Action<IServiceCollection>? extra = null)
     {
-        TestDatabase database = await CreateAsync(applicationVersion: applicationVersion);
+        TestDatabase database = await CreateAsync(applicationVersion: applicationVersion, extra: extra);
         await database.Resolve<DatabaseInitializer>().InitializeAsync();
 
         return database;
@@ -93,20 +98,22 @@ internal sealed class TestDatabase : IAsyncDisposable
     /// </summary>
     /// <param name="applyTheme">Чем подменяется переключение оформления: платформы в тестах нет.</param>
     /// <param name="applicationVersion">Версия приложения для экрана «О программе».</param>
+    /// <param name="extra">Службы сверх прикладного слоя.</param>
     public static TestDatabase CreateUnprepared(
         Action<Theme>? applyTheme = null,
-        string? applicationVersion = null)
+        string? applicationVersion = null,
+        Action<IServiceCollection>? extra = null)
     {
         string folder = Path.Combine(Path.GetTempPath(), "finance-tests", Guid.CreateVersion7().ToString("N"));
         Directory.CreateDirectory(folder);
 
-        ServiceProvider services = new ServiceCollection()
+        IServiceCollection collection = new ServiceCollection()
             .AddSingleton<TimeProvider>(new TestTime())
             .AddFinance(Path.Combine(folder, "finance.db"), applyTheme: applyTheme, applicationVersion: applicationVersion)
-            .ConfigureDbContext<FinanceDbContext>(static options => options.AddInterceptors(NoSyncInterceptor.Instance))
-            .BuildServiceProvider();
+            .ConfigureDbContext<FinanceDbContext>(static options => options.AddInterceptors(NoSyncInterceptor.Instance));
+        extra?.Invoke(collection);
 
-        return new TestDatabase(folder, services);
+        return new TestDatabase(folder, collection.BuildServiceProvider());
     }
 
     public async ValueTask DisposeAsync()

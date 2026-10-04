@@ -1,15 +1,17 @@
 using System.Text;
 using System.Text.Json;
-using Finance.Application.Features.WalletImport;
+using Finance.Application.Features.Export;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
-using Finance.Application.Texts;
 using Finance.Domain.Enums;
 using Finance.Domain.Errors;
+using Finance.Import;
+using Finance.Import.Wallet;
 using Microsoft.EntityFrameworkCore;
 
 using static Finance.Application.Tests.AccountSetup;
+using static Finance.Application.Tests.DatabaseFile;
 
 namespace Finance.Application.Tests;
 
@@ -41,6 +43,13 @@ public sealed class WalletImportTests
             .. extra,
         ]);
 
+    /// <summary>
+    /// База со стартовым набором и переносом: в приложении переноса нет,
+    /// его подключают так же, как тулза на рабочей машине.
+    /// </summary>
+    private static Task<TestDatabase> CreateDatabaseAsync() =>
+        TestDatabase.CreateWithPresetAsync(extra: static services => services.AddWalletImport());
+
     private static WalletImportTransaction Purchase(
         string account, decimal amount, string category, string? place = null, DateOnly? on = null) =>
         new(TransactionKind.Expense, account, null, amount, category, place, on ?? new DateOnly(2025, 3, 10), RecordedAtUtc, null);
@@ -53,7 +62,7 @@ public sealed class WalletImportTests
     [Fact]
     public async Task Перенос_записывает_счета_места_и_операции()
     {
-        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
+        await using TestDatabase database = await CreateDatabaseAsync();
 
         WalletImportCounts written = await database.Resolve<IWalletImportHandler>().HandleAsync(Sample());
 
@@ -84,7 +93,7 @@ public sealed class WalletImportTests
     [Fact]
     public async Task Перенос_идёт_только_в_пустую_базу()
     {
-        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
+        await using TestDatabase database = await CreateDatabaseAsync();
         await SaveAsync(database, Command("Наличные"));
 
         IWalletImportHandler handler = database.Resolve<IWalletImportHandler>();
@@ -102,7 +111,7 @@ public sealed class WalletImportTests
     [Trait("Инвариант", nameof(Invariant.TransactionNotBeforeAccountOpened))]
     public async Task Нарушенное_правило_останавливает_перенос()
     {
-        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
+        await using TestDatabase database = await CreateDatabaseAsync();
         IWalletImportHandler handler = database.Resolve<IWalletImportHandler>();
 
         DomainException error = await Assert.ThrowsAsync<DomainException>(() => handler.HandleAsync(
@@ -120,7 +129,7 @@ public sealed class WalletImportTests
     [Fact]
     public async Task Сбой_записи_откатывает_перенос_целиком()
     {
-        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
+        await using TestDatabase database = await CreateDatabaseAsync();
 
         await using (FinanceDbContext context = await database.Contexts.CreateDbContextAsync())
         {
@@ -143,7 +152,7 @@ public sealed class WalletImportTests
     [Trait("Инвариант", nameof(Invariant.NameUnique))]
     public async Task Одноимённые_счета_отвергаются()
     {
-        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
+        await using TestDatabase database = await CreateDatabaseAsync();
         WalletImportFile file = Sample() with
         {
             Accounts = [.. Sample().Accounts, new("карта", AccountType.Cash, Currency.RUB, 0m, new DateOnly(2025, 1, 1), false)],
@@ -162,7 +171,7 @@ public sealed class WalletImportTests
     [Fact]
     public async Task Перевод_между_валютами_останавливает_перенос()
     {
-        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
+        await using TestDatabase database = await CreateDatabaseAsync();
         WalletImportFile file = Sample(
             new WalletImportTransaction(TransactionKind.Transfer, "Карта", "Доллары", 10m, null, null, new DateOnly(2025, 3, 10), RecordedAtUtc, null));
         file = file with
@@ -183,7 +192,7 @@ public sealed class WalletImportTests
     [Fact]
     public async Task Удалённая_запись_тоже_занимает_базу()
     {
-        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
+        await using TestDatabase database = await CreateDatabaseAsync();
         await SaveAsync(database, Command("Наличные"));
 
         await using (FinanceDbContext context = await database.Contexts.CreateDbContextAsync())
@@ -202,7 +211,7 @@ public sealed class WalletImportTests
     [Fact]
     public async Task Перенос_оповещает_экраны()
     {
-        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
+        await using TestDatabase database = await CreateDatabaseAsync();
         IChangeNotifier notifier = database.Resolve<IChangeNotifier>();
         long accounts = notifier.VersionOf(DataChange.Accounts);
         long places = notifier.VersionOf(DataChange.Places);
@@ -229,7 +238,7 @@ public sealed class WalletImportTests
     [InlineData("Карта", "food.coffee", "Ашан")]
     public async Task Ссылка_мимо_файла_и_набора_останавливает_перенос(string account, string category, string? place)
     {
-        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
+        await using TestDatabase database = await CreateDatabaseAsync();
         IWalletImportHandler handler = database.Resolve<IWalletImportHandler>();
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => handler.HandleAsync(
@@ -308,63 +317,32 @@ public sealed class WalletImportTests
     }
 
     /// <summary>
-    /// Сбой записи снимает признак ожидания: иначе строка крутилась бы вечно,
-    /// а повторить перенос было бы нечем.
+    /// Клиенту перенос попадает готовой базой через восстановление из файла: база,
+    /// собранная на рабочей машине, проходит проверки восстановления на свежей
+    /// установке, заменяет её без предупреждения и приезжает целиком.
     /// </summary>
     [Fact]
-    public async Task Сбой_переноса_снимает_ожидание()
+    public async Task База_с_переносом_принимается_восстановлением()
     {
-        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
-        WalletImportViewModel model = database.Resolve<WalletImportViewModel>();
+        await using TestDatabase source = await CreateDatabaseAsync();
+        await source.Resolve<IWalletImportHandler>().HandleAsync(Sample());        string file = await source.Resolve<IExportHandler>().HandleAsync();
 
-        using MemoryStream stream = new(Encoding.UTF8.GetBytes(await WriteAsync(Sample())));
-        Assert.True(await model.ReadAsync(stream));
-        await SaveAsync(database, Command("Наличные"));
+        await using TestDatabase target = await TestDatabase.CreateWithPresetAsync();
+        IRecoveryHandler recovery = target.Resolve<IRecoveryHandler>();
+        RecoveryCheck check;
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => model.ImportAsync());
+        await using (FileStream stream = File.OpenRead(file))
+        {
+            check = await recovery.CheckAsync(stream);
+        }
 
-        Assert.False(model.IsImporting);
-        Assert.Single(await database.Resolve<IAccountsQuery>().ReadAsync());
-    }
+        // Вердикт — до записи: отвергнутый файл иначе назвал бы себя лишь отказом записи
+        Assert.Equal(RecoveryVerdict.Ready, check.Verdict);
+        Assert.Equal(new RecoverySide { Accounts = 0, Transactions = 0 }, check.Current);
 
-    /// <summary>
-    /// Строка переноса видна на пустой базе, перед записью называет числа из файла,
-    /// а после переноса пропадает.
-    /// </summary>
-    [Fact]
-    public async Task Строка_переноса_спрашивает_с_числами_и_пропадает_после_переноса()
-    {
-        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
-        WalletImportViewModel model = database.Resolve<WalletImportViewModel>();
+        await recovery.RecoverAsync();
 
-        await model.LoadAsync();
-        Assert.True(model.IsAvailable);
-
-        using MemoryStream stream = new(Encoding.UTF8.GetBytes(await WriteAsync(Sample())));
-        Assert.True(await model.ReadAsync(stream));
-        Assert.Equal(string.Format(UiCulture.Current, UiTexts.WalletImportConfirmText, 2, 1, 4), model.ConfirmText);
-
-        string done = await model.ImportAsync();
-
-        Assert.Equal(string.Format(UiCulture.Current, UiTexts.WalletImportDoneText, 2, 1, 4), done);
-        Assert.False(model.IsAvailable);
-        Assert.False(model.IsImporting);
-    }
-
-    /// <summary>
-    /// Выбран не тот файл — это не сбой приложения: модель отвечает отказом,
-    /// и страница говорит об этом своими словами.
-    /// </summary>
-    [Fact]
-    public async Task Чужой_файл_получает_отказ_а_не_сбой()
-    {
-        await using TestDatabase database = await TestDatabase.CreateWithPresetAsync();
-        WalletImportViewModel model = database.Resolve<WalletImportViewModel>();
-
-        using MemoryStream stream = new(Encoding.UTF8.GetBytes("{\"theme\": \"dark\"}"));
-
-        Assert.False(await model.ReadAsync(stream));
-        Assert.Empty(model.ConfirmText);
+        Assert.Equal(await DumpAsync(source.Location.ConnectionString), await DumpAsync(target.Location.ConnectionString));
     }
 
     private static async Task<string> WriteAsync(WalletImportFile file)

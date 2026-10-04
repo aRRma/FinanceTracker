@@ -8,7 +8,7 @@ using Finance.Domain.Rules;
 using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
-namespace Finance.Application.Features.WalletImport;
+namespace Finance.Import.Wallet;
 
 /// <summary>
 /// Переносит историю из Wallet тем же пишущим путём, что и формы: счёт, место
@@ -17,11 +17,9 @@ namespace Finance.Application.Features.WalletImport;
 /// оставил бы в базе записи, которые форма потом не смогла бы сохранить при правке.
 /// </summary>
 /// <remarks>
-/// Отказ на телефоне объясняет себя скупо: нарушенное правило — своим текстом, но без
-/// номера записи, ссылка мимо файла — общим сообщением, а подробность с номером уходит
-/// в журнал. Это сознательный компромисс: тулза подготовки прогоняет тот же файл через
-/// этот же обработчик на рабочей машине и называет запись там, так что до телефона
-/// доходит уже отрепетированный файл.
+/// Работает на рабочей машине, а не в приложении: перенос пишет историю в свежую
+/// базу, и клиент открывает её восстановлением из файла. Нарушенное правило называет
+/// себя своим текстом, но без номера записи; номер есть у ссылки мимо файла.
 /// </remarks>
 public sealed class WalletImportHandler : IWalletImportHandler
 {
@@ -68,7 +66,7 @@ public sealed class WalletImportHandler : IWalletImportHandler
                 // второй перенос поверх первого удвоил бы все балансы
                 if (!await IsEmptyAsync(context, token).ConfigureAwait(false))
                 {
-                    throw new InvalidOperationException(Faults.WalletImportNotEmpty());
+                    throw new InvalidOperationException(ImportFaults.WalletImportNotEmpty());
                 }
 
                 DateOnly today = _clock.Today;
@@ -198,22 +196,22 @@ public sealed class WalletImportHandler : IWalletImportHandler
         DateOnly today)
     {
         Account source = accounts.GetValueOrDefault(item.SourceAccount)
-            ?? throw new InvalidOperationException(Faults.WalletImportUnknownAccount(index, item.SourceAccount));
+            ?? throw new InvalidOperationException(ImportFaults.WalletImportUnknownAccount(index, item.SourceAccount));
 
         Account? target = item.TargetAccount is { } targetName
             ? accounts.GetValueOrDefault(targetName)
-              ?? throw new InvalidOperationException(Faults.WalletImportUnknownAccount(index, targetName))
+              ?? throw new InvalidOperationException(ImportFaults.WalletImportUnknownAccount(index, targetName))
             : null;
 
         Guid? placeKey = item.Place is { } placeName
             ? places.TryGetValue(placeName, out Guid found)
                 ? found
-                : throw new InvalidOperationException(Faults.WalletImportUnknownPlace(index, placeName))
+                : throw new InvalidOperationException(ImportFaults.WalletImportUnknownPlace(index, placeName))
             : null;
 
         Category? category = item.Category is { } categoryKey
             ? categoriesByTextKey.GetValueOrDefault(categoryKey)
-              ?? throw new InvalidOperationException(Faults.WalletImportUnknownCategory(index, categoryKey))
+              ?? throw new InvalidOperationException(ImportFaults.WalletImportUnknownCategory(index, categoryKey))
             : null;
 
         Category? group = category?.ParentKey is { } parentKey
@@ -224,7 +222,7 @@ public sealed class WalletImportHandler : IWalletImportHandler
         // молча пересчитать один к одному
         if (target is not null && target.Currency != source.Currency)
         {
-            throw new InvalidOperationException(Faults.WalletImportTransferCurrencies(index));
+            throw new InvalidOperationException(ImportFaults.WalletImportTransferCurrencies(index));
         }
 
         Money amount = Money.Create(item.Amount, source.Currency);

@@ -1,6 +1,6 @@
 using Finance.Domain.Enums;
 
-namespace Finance.Application.Features.WalletImport;
+namespace Finance.Import.Wallet;
 
 /// <summary>
 /// Операция в файле переноса. Ссылки на счета и места — именами из того же файла,

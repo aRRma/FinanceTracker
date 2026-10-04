@@ -1,14 +1,13 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Finance.Application.Infrastructure;
 using Finance.Domain.Enums;
 
-namespace Finance.Application.Features.WalletImport;
+namespace Finance.Import.Wallet;
 
 /// <summary>
-/// Файл разового переноса истории из Wallet. Его готовит тулза задачи на рабочей
-/// машине (она в архиве задачи вне репозитория, ADR 0014), приложение только принимает: сопоставление чужих справочников с нашими
-/// правится там текстом и не требует сборки приложения.
+/// Файл переноса истории из Wallet. Его готовит тулза задачи на рабочей машине
+/// (она в архиве задачи вне репозитория, ADR 0014): сопоставление чужих справочников
+/// с нашими правится там текстом, а этот формат остаётся неизменным.
 /// </summary>
 /// <param name="Format">Метка формата: чужой JSON с похожими полями не должен разобраться молча.</param>
 /// <param name="Version">Версия формата.</param>
@@ -28,7 +27,7 @@ public sealed partial record WalletImportFile(
     public const string FormatName = "finance.wallet-import";
 
     /// <summary>
-    /// Версия формата, которую читает приложение.
+    /// Версия формата, которую читает перенос.
     /// </summary>
     public const int CurrentVersion = 1;
 
@@ -46,11 +45,11 @@ public sealed partial record WalletImportFile(
         WalletImportFile file = await JsonSerializer
             .DeserializeAsync(json, WalletImportJson.Default.WalletImportFile, cancellationToken)
             .ConfigureAwait(false)
-            ?? throw new JsonException(Faults.WalletImportFileEmpty());
+            ?? throw new JsonException(ImportFaults.WalletImportFileEmpty());
 
         if (file.Format != FormatName || file.Version != CurrentVersion)
         {
-            throw new JsonException(Faults.WalletImportFormat(file.Format, file.Version));
+            throw new JsonException(ImportFaults.WalletImportFormat(file.Format, file.Version));
         }
 
         file.Validate();
@@ -60,7 +59,7 @@ public sealed partial record WalletImportFile(
 
     /// <summary>
     /// Пишет файл. Нужно тулзе подготовки: формат задаёт один тип на обе стороны,
-    /// и разойтись тулзе с приложением не в чем.
+    /// и разойтись тулзе с переносом не в чем.
     /// </summary>
     /// <param name="target">Куда писать.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
@@ -102,7 +101,7 @@ public sealed partial record WalletImportFile(
     {
         if (!condition)
         {
-            throw new JsonException(Faults.WalletImportEntry(list, index));
+            throw new JsonException(ImportFaults.WalletImportEntry(list, index));
         }
     }
 

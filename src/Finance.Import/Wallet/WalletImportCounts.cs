@@ -1,4 +1,4 @@
-namespace Finance.Application.Features.WalletImport;
+namespace Finance.Import.Wallet;
 
 /// <summary>
 /// Сколько записей в файле переноса или сколько их записано.

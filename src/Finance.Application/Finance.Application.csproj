@@ -19,9 +19,12 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12" PrivateAssets="all" />
   </ItemGroup>
 
-  <!-- Строки таблиц внутренние: наружу они не нужны, а тестам нужны -->
+  <!-- Строки таблиц внутренние: наружу они не нужны, а тестам нужны. Переносу —
+       тоже: он пишет историю одной транзакцией прямо в таблицы, через доменные
+       фабрики, но мимо обработчиков форм. Собираются оба из одного коммита -->
   <ItemGroup>
     <InternalsVisibleTo Include="Finance.Application.Tests" />
+    <InternalsVisibleTo Include="Finance.Import" />
   </ItemGroup>
 
   <!-- Класс доступа к текстам собирается из .resx самой сборкой: PublicClass —

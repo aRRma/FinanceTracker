@@ -30,6 +30,7 @@ public sealed partial class TextResourceTests
         "src/Finance.Application/Infrastructure/Faults.cs",
         "src/Finance.App/AppFaults.cs",
         "src/Finance.Domain/Errors/DomainFaults.cs",
+        "src/Finance.Import/ImportFaults.cs",
         "src/Finance.Application/Infrastructure/Storage/Migrations/20261001130110_AddUnsortedGroups.cs"
     ];
 

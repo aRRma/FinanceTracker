@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Перенос истории из других приложений. Приложение на эту сборку не ссылается
+       и в пакет для телефона она не попадает: перенос идёт на рабочей машине,
+       а клиент получает готовую базу и открывает её восстановлением из файла (ADR-0014) -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Finance.Domain\Finance.Domain.csproj" />
+    <ProjectReference Include="..\Finance.Application\Finance.Application.csproj" />
+  </ItemGroup>
+
+</Project>

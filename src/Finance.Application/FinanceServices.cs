@@ -15,7 +15,6 @@ using Finance.Application.Features.Settings.Appearance;
 using Finance.Application.Features.Settings.TimeZones;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
-using Finance.Application.Features.WalletImport;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Initialization;
@@ -136,7 +135,6 @@ public static class FinanceServices
         services.AddSingleton<ITransactionDeletionQuery, TransactionDeletionQuery>();
         services.AddSingleton<IReportQuery, ReportQuery>();
         services.AddSingleton<IFrequentCategoriesQuery, FrequentCategoriesQuery>();
-        services.AddSingleton<IWalletImportHandler, WalletImportHandler>();
         services.AddSingleton<IExportHandler, ExportHandler>();
         services.AddSingleton<IRecoveryHandler, RecoveryHandler>();
 
@@ -166,7 +164,6 @@ public static class FinanceServices
         services.AddTransient<AppearanceViewModel>();
         services.AddTransient<TimeZoneViewModel>();
         services.AddTransient<AboutViewModel>();
-        services.AddTransient<WalletImportViewModel>();
         services.AddTransient<ExportViewModel>();
     }
 }

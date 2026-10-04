@@ -21,7 +21,7 @@
   <!-- Публичные члены обязаны быть прокомментированы: без файла документации
        CS1591 не выдаётся, и забытый комментарий проходит молча. Тестов и
        страниц MAUI правило не касается — там публичность техническая. -->
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Finance.Domain' Or '$(MSBuildProjectName)' == 'Finance.Application'">
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Finance.Domain' Or '$(MSBuildProjectName)' == 'Finance.Application' Or '$(MSBuildProjectName)' == 'Finance.Import'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 

@@ -1,4 +1,4 @@
-namespace Finance.Application.Features.WalletImport;
+namespace Finance.Import.Wallet;
 
 /// <summary>
 /// Разовый перенос истории из Wallet в пустую базу.

@@ -3,6 +3,7 @@
     <Project Path="src/Finance.App/Finance.App.csproj" />
     <Project Path="src/Finance.Application/Finance.Application.csproj" />
     <Project Path="src/Finance.Domain/Finance.Domain.csproj" />
+    <Project Path="src/Finance.Import/Finance.Import.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Finance.Application.Tests/Finance.Application.Tests.csproj" />

@@ -717,28 +717,6 @@
   <data name="AboutIcons" xml:space="preserve">
     <value>Значки — Tabler Icons, лицензия MIT.</value>
   </data>
-  <!-- Разовый перенос из Wallet: строка видна только на пустой базе -->
-  <data name="WalletImportAction" xml:space="preserve">
-    <value>Перенести операции из Wallet</value>
-  </data>
-  <data name="WalletImportConfirmTitle" xml:space="preserve">
-    <value>Перенести операции из файла?</value>
-  </data>
-  <data name="WalletImportConfirmText" xml:space="preserve">
-    <value>Внимание: запишутся счета — {0}, места — {1}, операции — {2}.</value>
-  </data>
-  <data name="WalletImportConfirm" xml:space="preserve">
-    <value>Перенести</value>
-  </data>
-  <data name="WalletImportUnreadable" xml:space="preserve">
-    <value>Этот файл не подходит для переноса</value>
-  </data>
-  <data name="WalletImportDoneTitle" xml:space="preserve">
-    <value>Перенос завершён</value>
-  </data>
-  <data name="WalletImportDoneText" xml:space="preserve">
-    <value>Записаны счета — {0}, места — {1}, операции — {2}.</value>
-  </data>
   <!-- Выгрузка и восстановление из неё -->
   <data name="ExportTitle" xml:space="preserve">
     <value>Данные</value>

@@ -1,6 +1,6 @@
 using Finance.Domain.Enums;
 
-namespace Finance.Application.Features.WalletImport;
+namespace Finance.Import.Wallet;
 
 /// <summary>
 /// Счёт в файле переноса. Порядок счетов в файле — порядок на главном экране.

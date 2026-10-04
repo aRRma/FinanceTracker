@@ -13,7 +13,7 @@
 | `FR-ACC-*` `FR-CAT-*` `FR-TRX-*` `FR-PAY-*` `FR-BAL-*` `FR-LED-*` `FR-RPT-*` `FR-SET-*` | [requirements/03-functional.md](requirements/03-functional.md) | Что приложение умеет делать |
 | `SEED-*` | [requirements/04-preset.md](requirements/04-preset.md) | Инициализация базы: стартовые категории |
 | `NFR-*` | [requirements/05-quality.md](requirements/05-quality.md) | Производительность, надёжность, время, оформление |
-| `SYN-*` | [requirements/06-sync-deferred.md](requirements/06-sync-deferred.md); `FR-SYN-*` — в конце [requirements/03-functional.md](requirements/03-functional.md) | **Вне MVP.** Обмен между устройствами |
+| `SYN-*` | [requirements/06-sync-deferred.md](requirements/06-sync-deferred.md); `FR-SYN-*` — в разделе «Синхронизация» [requirements/03-functional.md](requirements/03-functional.md) | **Вне MVP.** Обмен между устройствами |
 | `TECH-*` | [architecture.md](architecture.md) | Состав проектов, слои, стек, ловушки реализации |
 | `UC-*` | [use-cases.md](use-cases.md) | Сценарии использования |
 | `A-*` `B-*` `C-*` `D-*` `E-*` | [ui/mockups.html](ui/mockups.html) | Экраны: каркас · ввод · состояния · справочники · отчёт |
@@ -31,7 +31,7 @@
 | Инициализация базы | [requirements/04-preset.md](requirements/04-preset.md), [preset-rationale.md](preset-rationale.md), [data/preset.json](../data/preset.json) |
 | Темы, цвета, значки | `NFR-21…NFR-25` в [requirements/05-quality.md](requirements/05-quality.md), переключатель темы в [ui/mockups.html](ui/mockups.html) — эталон палитр; перечень значков — [data/icons.json](../data/icons.json), контуры — [data/icon-paths.json](../data/icon-paths.json), значки макетов собирает `dotnet tools/mockup_icons.cs` |
 | Как назвать новое понятие | [../CONTEXT.md](../CONTEXT.md) — сначала словарь, потом код |
-| Перенос истории из Wallet | [ADR-0014](adr/0014-wallet-import-one-shot-through-domain-path.md) |
+| Перенос истории из других приложений (сборка `Finance.Import`) | [ADR-0014](adr/0014-wallet-import-one-shot-through-domain-path.md) |
 | Выгрузка в файл и восстановление из неё | [ADR-0015](adr/0015-export-is-database-file.md), `FR-SET-05`, `FR-SET-06`, `NFR-27`, сценарий UC-25 |
 | Сборка, тесты, эмулятор, экраны, тексты | навыки в `.claude/skills/` — список и когда какой загружать в [../CLAUDE.md](../CLAUDE.md) |
 
@@ -42,9 +42,5 @@
 - [uncovered.md](uncovered.md) — функциональные требования без сценария и причина у каждого
 - [preset-rationale.md](preset-rationale.md) — почему стартовый набор категорий именно такой. Обоснование, не спецификация
 - [../tasks/README.md](../tasks/README.md) — как вести долгую задачу со своим состоянием: папка на задачу, закрытая уходит в архив вне репозитория
-- [ui/prototype.html](ui/prototype.html) — интерактивный прототип, динамика сценариев. Собирается из макетов скриптом `tools/build_prototype.py`, руками не правится
-- [../PLAN.md](../PLAN.md) — этапы и чеклисты
-
-## Границы MVP
-
-Что входит в MVP и что нет — [requirements/01-scope.md](requirements/01-scope.md). Обмен с сервером отложен целиком, но [requirements/06-sync-deferred.md](requirements/06-sync-deferred.md) сохранён: поля схемы под него заведены сразу.
+- [ui/prototype.html](ui/prototype.html) — интерактивный прототип, динамика сценариев; генерируется из макетов, руками не правится
+- [../PLAN.md](../PLAN.md) — открытое, этап развития, итоги закрытого
