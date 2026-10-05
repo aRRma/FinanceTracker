@@ -33,6 +33,9 @@ public sealed partial class FeedViewModel : ScreenViewModel, ISelectionModel
 
     private int _loaded;
 
+    // Последняя прочитанная строка: с неё дочитывается следующая страница
+    private FeedCursor? _next;
+
     // Номер перечитывания: по нему дочитанная страница узнаёт, что лента
     // за время запроса была перечитана заново и её строки уже не к месту
     private int _generation;
@@ -209,7 +212,7 @@ public sealed partial class FeedViewModel : ScreenViewModel, ISelectionModel
             }
 
             DateOnly today = _clock.Today;
-            FeedPage page = await _feed.ReadAsync(accountKey, skip: 0, take, cancellationToken);
+            FeedPage page = await _feed.ReadAsync(accountKey, after: null, take, cancellationToken);
 
             if (generation != _generation)
             {
@@ -255,7 +258,7 @@ public sealed partial class FeedViewModel : ScreenViewModel, ISelectionModel
 
         try
         {
-            FeedPage page = await _feed.ReadAsync(AccountKey, _loaded, PageSize, cancellationToken);
+            FeedPage page = await _feed.ReadAsync(AccountKey, _next, PageSize, cancellationToken);
 
             // Пока страница читалась, лента могла быть перечитана с начала:
             // её строки уже показаны, и дописывать их значило бы показать
@@ -485,6 +488,7 @@ public sealed partial class FeedViewModel : ScreenViewModel, ISelectionModel
         }
 
         _loaded += page.Items.Count;
+        _next = page.Next;
         HasMore = page.HasMore;
     }
 

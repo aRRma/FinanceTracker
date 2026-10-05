@@ -10,13 +10,15 @@ namespace Finance.Application.Infrastructure.Queries;
 /// <param name="Items">Строки от новых к старым.</param>
 /// <param name="DayTotals">Итог каждого дня, встретившегося в <paramref name="Items"/>.</param>
 /// <param name="HasMore">За последней строкой есть ещё — можно спросить следующую страницу.</param>
+/// <param name="Next">Последняя строка страницы — откуда читать следующую; у пустой страницы пусто.</param>
 public sealed record FeedPage(
     IReadOnlyList<FeedItem> Items,
     IReadOnlyDictionary<DateOnly, Money> DayTotals,
-    bool HasMore)
+    bool HasMore,
+    FeedCursor? Next)
 {
     /// <summary>
     /// Пустая страница: операций нет.
     /// </summary>
-    public static FeedPage Empty { get; } = new([], new Dictionary<DateOnly, Money>(), HasMore: false);
+    public static FeedPage Empty { get; } = new([], new Dictionary<DateOnly, Money>(), HasMore: false, Next: null);
 }

@@ -60,7 +60,7 @@ public static class MoneyFormat
         /// <summary>
         /// Сумма со знаком валюты: <c>82 430,50 ₽</c>.
         /// </summary>
-        public string Display => $"{money.Amount.ToString("N", UiCulture.Money)} {money.Currency.Symbol}";
+        public string Display => string.Create(UiCulture.Money, $"{money.Amount:N} {money.Currency.Symbol}");
 
         /// <summary>
         /// Набираемая сумма со знаком валюты: <c>1 500 ₽</c>, а после запятой — <c>1 500,50 ₽</c>.

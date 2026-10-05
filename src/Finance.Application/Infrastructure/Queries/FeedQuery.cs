@@ -35,11 +35,10 @@ public sealed class FeedQuery : IFeedQuery
     /// <inheritdoc />
     public async Task<FeedPage> ReadAsync(
         Guid? accountKey,
-        int skip,
+        FeedCursor? after,
         int take,
         CancellationToken cancellationToken = default)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(skip);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(take);
 
         await using FinanceDbContext context = await _contexts
@@ -48,8 +47,7 @@ public sealed class FeedQuery : IFeedQuery
 
         // На одну строку больше, чем просили: так узнаётся, есть ли ещё,
         // без отдельного подсчёта всей ленты
-        List<Projection> rows = await Compose(context, accountKey)
-            .Skip(skip)
+        List<Projection> rows = await Compose(context, accountKey, after)
             .Take(take + 1)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -81,17 +79,31 @@ public sealed class FeedQuery : IFeedQuery
             items.Add(ToItem(row, accountKey));
         }
 
-        return new FeedPage(items, totals, hasMore);
+        Projection last = rows[^1];
+
+        return new FeedPage(items, totals, hasMore, new FeedCursor(last.OccurredOn, last.CreatedAtUtc, last.Key));
     }
 
     /// <summary>
-    /// Запрос ленты до разбиения на страницы: выборка, соединения, порядок.
-    /// Открыт тестам, чтобы сверить SQL: лента счёта обязана идти через <c>UNION ALL</c>,
-    /// а не через <c>OR</c> по двум колонкам.
+    /// Запрос ленты до разбиения на страницы: выборка после курсора, соединения, порядок.
+    /// Открыт тестам, чтобы сверить SQL и план: лента счёта обязана идти через <c>UNION ALL</c>,
+    /// а не через <c>OR</c> по двум колонкам, и страница после курсора — поиском по индексу.
     /// </summary>
-    internal static IQueryable<Projection> Compose(FinanceDbContext context, Guid? accountKey)
+    internal static IQueryable<Projection> Compose(FinanceDbContext context, Guid? accountKey, FeedCursor? after = null)
     {
         IQueryable<TransactionRow> transactions = context.Transactions.AsNoTracking();
+
+        // Условие курсора повторяет порядок ленты: дата, момент создания, ключ — всё
+        // по убыванию. «Не позже даты» стоит отдельным условием: с него база начинает
+        // поиск с места в индексе, а не проходит индекс от начала, и это не зависит
+        // от того, разберёт ли планировщик дизъюнкцию. Ставится до объединения
+        // сторон, чтобы каждая выборка ленты счёта искала по своему индексу
+        if (after is { OccurredOn: var day, CreatedAtUtc: var created, Key: var key })
+        {
+            transactions = transactions.Where(row =>
+                row.OccurredOn <= day
+                && (row.OccurredOn < day || row.CreatedAtUtc < created || (row.CreatedAtUtc == created && row.Key < key)));
+        }
 
         IQueryable<TransactionRow> scope = accountKey is { } account
             ? AccountTransactions.BothSides(transactions, account)

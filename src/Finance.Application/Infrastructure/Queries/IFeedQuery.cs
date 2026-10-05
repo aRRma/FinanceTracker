@@ -13,8 +13,8 @@ public interface IFeedQuery
     /// какой бы она ни была.
     /// </summary>
     /// <param name="accountKey">Счёт, чью ленту читать; пусто — общая лента.</param>
-    /// <param name="skip">Сколько строк пропустить — столько уже показано.</param>
+    /// <param name="after">Последняя показанная строка, <see cref="FeedPage.Next"/>; пусто — с начала.</param>
     /// <param name="take">Сколько строк прочитать.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
-    Task<FeedPage> ReadAsync(Guid? accountKey, int skip, int take, CancellationToken cancellationToken = default);
+    Task<FeedPage> ReadAsync(Guid? accountKey, FeedCursor? after, int take, CancellationToken cancellationToken = default);
 }

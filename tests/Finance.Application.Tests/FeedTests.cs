@@ -148,8 +148,8 @@ public sealed class FeedTests
         }
 
         FeedPage first = await given.FeedAsync(take: 2);
-        FeedPage second = await given.FeedAsync(skip: 2, take: 2);
-        FeedPage last = await given.FeedAsync(skip: 4, take: 2);
+        FeedPage second = await given.FeedAsync(after: first.Next, take: 2);
+        FeedPage last = await given.FeedAsync(after: second.Next, take: 2);
 
         Assert.Equal(2, first.Items.Count);
         Assert.True(first.HasMore);
@@ -176,12 +176,85 @@ public sealed class FeedTests
         }
 
         FeedPage first = await given.FeedAsync(take: 3);
-        FeedPage second = await given.FeedAsync(skip: 3, take: 3);
+        FeedPage second = await given.FeedAsync(after: first.Next, take: 3);
 
         Money expected = Money.Restore(-50m, Currency.RUB);
 
         Assert.Equal(expected, first.DayTotals[given.Today]);
         Assert.Equal(expected, second.DayTotals[given.Today]);
+    }
+
+    /// <summary>
+    /// Страницы по одной строке складываются ровно в ленту целиком — и в общей, и в ленте
+    /// счёта, где строки приходят из двух выборок: обеих сторон перевода.
+    /// </summary>
+    [Fact]
+    public async Task Страницы_складываются_в_ленту_целиком()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные", 1_000m);
+        Guid card = await given.AccountAsync("Карта", 1_000m);
+
+        await given.SaveAsync(given.Expense(cash, 10m));
+        await given.SaveAsync(given.Transfer(card, cash, 20m));
+        await given.SaveAsync(given.Income(cash, 30m));
+        await given.SaveAsync(given.Transfer(cash, card, 40m));
+        await given.SaveAsync(given.Expense(card, 50m));
+
+        // Записанные последними, но более ранними датами: порядок ленты по дате
+        // здесь расходится с порядком записи
+        await given.SaveAsync(given.Expense(cash, 60m, on: given.Today.AddDays(-1)));
+        await given.SaveAsync(given.Transfer(card, cash, 70m, on: given.Today.AddDays(-2)));
+
+        foreach (Guid? account in (Guid?[])[null, cash, card])
+        {
+            Assert.Equal(Keys(await given.FeedAsync(account)), await PagedKeysAsync(given, account, take: 1));
+        }
+    }
+
+    /// <summary>
+    /// Операции одного дня с одним моментом создания — так бывает у перенесённой
+    /// истории — делятся на страницы по ключу: ни одна не теряется и не повторяется.
+    /// </summary>
+    [Fact]
+    public async Task Страницы_не_теряют_строк_с_одним_моментом_создания()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные");
+
+        for (int index = 0; index < 5; index++)
+        {
+            await AccountSetup.AddAsync(given.Database, AccountSetup.Expense(cash, index + 1m));
+        }
+
+        Assert.Equal(Keys(await given.FeedAsync()), await PagedKeysAsync(given, account: null, take: 2));
+    }
+
+    /// <summary>
+    /// Операция, записанная, пока лента листается, не сдвигает следующую страницу:
+    /// та продолжает с последней показанной строки, и строка не показывается дважды.
+    /// </summary>
+    [Fact]
+    public async Task Запись_между_страницами_не_повторяет_строку()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные");
+
+        for (int index = 0; index < 4; index++)
+        {
+            await given.SaveAsync(given.Expense(cash, index + 1m));
+        }
+
+        FeedPage first = await given.FeedAsync(take: 2);
+        await given.SaveAsync(given.Expense(cash, 100m));
+        FeedPage second = await given.FeedAsync(after: first.Next, take: 2);
+
+        Assert.Empty(Keys(first).Intersect(Keys(second)));
+        Assert.Equal(2, second.Items.Count);
+        Assert.False(second.HasMore);
     }
 
     /// <summary>
@@ -557,6 +630,28 @@ public sealed class FeedTests
     }
 
     /// <summary>
+    /// Следующая страница начинается поиском по индексу с места курсора, а не проходом
+    /// индекса от начала: иначе каждая страница дороже предыдущей, и глубокая история
+    /// дочитывается всё медленнее. В ленте счёта так ищет каждая из двух выборок.
+    /// </summary>
+    [Fact]
+    public async Task Страница_после_курсора_ищется_по_индексу()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+        await using FinanceDbContext context = await given.Database.Contexts.CreateDbContextAsync();
+
+        FeedCursor after = new(given.Today, DateTimeOffset.UnixEpoch, Guid.CreateVersion7());
+
+        string ledger = await QueryPlan.ExplainAsync(given.Database, FeedQuery.Compose(context, accountKey: null, after).Take(51));
+        string account = await QueryPlan.ExplainAsync(given.Database, FeedQuery.Compose(context, Guid.CreateVersion7(), after).Take(51));
+
+        Assert.Contains("ix_transactions_feed (occurred_on<?)", ledger, StringComparison.Ordinal);
+        Assert.DoesNotContain("TEMP B-TREE", ledger, StringComparison.Ordinal);
+        Assert.Contains("(source_account_key=? AND occurred_on<?)", account, StringComparison.Ordinal);
+        Assert.Contains("(target_account_key=? AND occurred_on<?)", account, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// Долгое нажатие включает выделение и отмечает строку, касание отмечает и снимает,
     /// а снятие последней отметки выключает выделение само.
     /// </summary>
@@ -827,6 +922,33 @@ public sealed class FeedTests
         Assert.Equal(Money.Restore(1_000m, Currency.RUB), balance.Balance);
     }
 
+    private static IEnumerable<Guid> Keys(FeedPage page) => page.Items.Select(static item => item.Key);
+
+    /// <summary>
+    /// Листает ленту курсором до конца. Страниц не больше, чем строк: курсор,
+    /// который не двигается, иначе зациклил бы тест.
+    /// </summary>
+    private static async Task<List<Guid>> PagedKeysAsync(TransactionFixture given, Guid? account, int take)
+    {
+        List<Guid> keys = [];
+        FeedCursor? after = null;
+
+        for (int pages = 0; pages < 100; pages++)
+        {
+            FeedPage page = await given.FeedAsync(account, after, take);
+            keys.AddRange(Keys(page));
+
+            if (!page.HasMore)
+            {
+                return keys;
+            }
+
+            after = page.Next;
+        }
+
+        throw new InvalidOperationException("Лента не кончилась за сотню страниц: курсор не двигается.");
+    }
+
     private static FeedRowItem Row(FeedViewModel model, Guid key) =>
         model.Days.SelectMany(static day => day).Single(row => row.Key == key);
 
@@ -835,7 +957,7 @@ public sealed class FeedTests
     /// </summary>
     private sealed class PagedFeed(IFeedQuery inner, int pageSize) : IFeedQuery
     {
-        public Task<FeedPage> ReadAsync(Guid? accountKey, int skip, int take, CancellationToken cancellationToken = default) =>
-            inner.ReadAsync(accountKey, skip, Math.Min(take, pageSize), cancellationToken);
+        public Task<FeedPage> ReadAsync(Guid? accountKey, FeedCursor? after, int take, CancellationToken cancellationToken = default) =>
+            inner.ReadAsync(accountKey, after, Math.Min(take, pageSize), cancellationToken);
     }
 }

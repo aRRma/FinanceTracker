@@ -168,8 +168,8 @@ internal sealed class TransactionFixture : IAsyncDisposable
         return accounts.Single(item => item.Key == account).Balance;
     }
 
-    public Task<FeedPage> FeedAsync(Guid? account = null, int skip = 0, int take = 50) =>
-        Database.Resolve<IFeedQuery>().ReadAsync(account, skip, take);
+    public Task<FeedPage> FeedAsync(Guid? account = null, FeedCursor? after = null, int take = 50) =>
+        Database.Resolve<IFeedQuery>().ReadAsync(account, after, take);
 
     /// <summary>
     /// Первый уровень отчёта за месяц; пусто — за текущий.

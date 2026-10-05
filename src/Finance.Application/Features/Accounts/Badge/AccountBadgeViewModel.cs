@@ -100,7 +100,7 @@ public sealed partial class AccountBadgeViewModel : ObservableObject
         }
 
         // ConfigureAwait(false) здесь недопустим: следом правится привязанное свойство
-        FeedPage page = await _feed.ReadAsync(key, skip: 0, take: 1, cancellationToken);
+        FeedPage page = await _feed.ReadAsync(key, after: null, take: 1, cancellationToken);
 
         FeedRow = page.Items is [var last, ..] ? AccountBadgeFeedRow.From(last, Mark) : null;
     }
