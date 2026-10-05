@@ -31,4 +31,9 @@ public sealed partial class LockCoverView : ContentView
         _model.Prepare();
         Pad.Resume();
     }
+
+    /// <summary>
+    /// Готовит к показу с тем же набором — заслонку пересобрали при смене темы.
+    /// </summary>
+    public void Resume() => Pad.Resume();
 }

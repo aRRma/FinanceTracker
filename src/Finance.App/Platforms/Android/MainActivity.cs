@@ -62,8 +62,14 @@ public sealed class MainActivity : MauiAppCompatActivity
 
         if (ControlsApplication.Current is { } application)
         {
-            application.RequestedThemeChanged += (_, _) => ApplyStatusBar();
+            application.RequestedThemeChanged += OnThemeChanged;
         }
+    }
+
+    private void OnThemeChanged(object? sender, AppThemeChangedEventArgs e)
+    {
+        ApplyStatusBar();
+        _cover?.Repaint();
     }
 
     /// <summary>
@@ -96,9 +102,9 @@ public sealed class MainActivity : MauiAppCompatActivity
     }
 
     /// <summary>
-    /// Уход в фон: отсчёт времени в фоне и заслонка заранее — при возврате первым
-    /// кадром будет она. Вернётся пользователь раньше пяти минут — она уйдёт
-    /// в <see cref="OnRestart"/>, так и не показавшись.
+    /// Уход в фон: отсчёт времени в фоне и шторка заранее — при возврате первым
+    /// кадром будет она, а не балансы. Заслонку решает <see cref="OnRestart"/>:
+    /// поднятую здесь при возврате раньше пяти минут было бы видно всю анимацию открытия.
     /// </summary>
     protected override void OnStop()
     {
@@ -108,23 +114,27 @@ public sealed class MainActivity : MauiAppCompatActivity
 
         if (_appLock?.IsEnabled is true)
         {
-            _cover?.Raise();
+            _cover?.Shade();
         }
     }
 
     /// <summary>
     /// Окно заслонки принадлежит этой активности: оставленное при её уничтожении,
-    /// оно утекло бы. Новая активность поднимет свою, если вход нужен.
+    /// оно утекло бы. Новая активность поднимет свою, если вход нужен. Приложение
+    /// и модель заслонки живут дольше активности и отпускают её здесь же.
     /// </summary>
     protected override void OnDestroy()
     {
-        _cover?.Dismiss();
+        ControlsApplication.Current?.RequestedThemeChanged -= OnThemeChanged;
+
+        _cover?.Detach();
 
         base.OnDestroy();
     }
 
     /// <summary>
-    /// Возврат из фона: заслонка остаётся, если вход нужен, иначе убирается.
+    /// Возврат из фона: заслонка поднимается поверх шторки, если вход нужен,
+    /// иначе шторка убирается.
     /// </summary>
     protected override void OnRestart()
     {
@@ -132,7 +142,7 @@ public sealed class MainActivity : MauiAppCompatActivity
 
         if (_appLock?.Return() is true)
         {
-            // Уже поднятая остаётся как есть; не поднятая в OnStop — поднимается здесь
+            // Уже поднятая остаётся как есть — с набранным
             _cover?.Raise();
         }
         else

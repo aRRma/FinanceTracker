@@ -419,16 +419,18 @@
     </Style>
 
     <!-- Клавиша ПИН-кода: круг 72 dp на фоне страницы, как у набора кода телефона.
-         Тонкий ободок цветом линии отделяет круг от фона в обеих темах; нажатая
-         клавиша заливается цветом действия — палец видит, что цифра принята,
-         раньше, чем закрасится точка -->
+         В светлой теме — круг цветом фона действия с цифрой цветом действия:
+         белые круги на светло-сером фоне сливались с ним, и клавиатура читалась
+         бледной. В тёмной — круг цветом карточки с тонким ободком цветом линии.
+         Нажатая клавиша заливается цветом действия — палец видит, что цифра
+         принята, раньше, чем закрасится точка -->
     <Style x:Key="PinKey" TargetType="Button">
         <Setter Property="BackgroundColor"
-                Value="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}" />
+                Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource CardDark}}" />
         <Setter Property="TextColor"
-                Value="{AppThemeBinding Light={StaticResource InkLight}, Dark={StaticResource InkDark}}" />
+                Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource InkDark}}" />
         <Setter Property="BorderColor"
-                Value="{AppThemeBinding Light={StaticResource LineLight}, Dark={StaticResource LineDark}}" />
+                Value="{AppThemeBinding Light=Transparent, Dark={StaticResource LineDark}}" />
         <Setter Property="BorderWidth" Value="1" />
         <Setter Property="FontSize" Value="28" />
         <Setter Property="WidthRequest" Value="72" />

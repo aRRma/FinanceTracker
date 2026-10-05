@@ -13,8 +13,14 @@ namespace Finance.App.Controls;
 /// </remarks>
 public sealed partial class PinPad : ContentView
 {
+    /// <summary>
+    /// Задержка прыжка каждой следующей точки в волне.
+    /// </summary>
+    private static readonly TimeSpan WaveStep = TimeSpan.FromMilliseconds(55);
+
     private PinPadViewModel? _model;
     private bool _ticking;
+    private bool _waving;
 
     /// <summary>
     /// Создаёт набор ПИН-кода.
@@ -58,7 +64,7 @@ public sealed partial class PinPad : ContentView
 
     private void OnDigit(object? sender, EventArgs e)
     {
-        if (_model is not { } model || sender is not Button { Text: [char digit] })
+        if (_waving || _model is not { } model || sender is not Button { Text: [char digit] })
         {
             return;
         }
@@ -67,11 +73,84 @@ public sealed partial class PinPad : ContentView
 
         if (model.IsFull)
         {
-            Guarded.Run(() => model.SubmitAsync());
+            Guarded.Run(() => SubmitAsync(model));
         }
     }
 
-    private void OnErase(object? sender, TappedEventArgs e) => _model?.Erase();
+    private void OnErase(object? sender, TappedEventArgs e)
+    {
+        if (!_waving)
+        {
+            _model?.Erase();
+        }
+    }
+
+    /// <summary>
+    /// Набрана последняя цифра: точки пробегают волной, и только потом код уходит
+    /// на проверку. Не одновременно: верный код убирает заслонку, а ответ стирает
+    /// набранное и пересоздаёт точки — волна обрывалась бы на середине.
+    /// </summary>
+    /// <remarks>
+    /// С выключенными в системе анимациями волны нет: ждать проверку ради
+    /// невидимых прыжков незачем. Проверку зовёт и набор, отключённый посреди
+    /// волны, — пересобранная заслонка показывает те же четыре точки и ждёт ответа.
+    /// </remarks>
+    private async Task SubmitAsync(PinPadViewModel model)
+    {
+        if (Android.Animation.ValueAnimator.AreAnimatorsEnabled())
+        {
+            _waving = true;
+
+            try
+            {
+                await WaveAsync();
+            }
+            finally
+            {
+                _waving = false;
+            }
+        }
+
+        await model.SubmitAsync();
+    }
+
+    /// <summary>
+    /// Точки по очереди подпрыгивают, подрастая, и опускаются обратно — волна слева направо.
+    /// </summary>
+    private async Task WaveAsync()
+    {
+        List<Task> jumps = [];
+
+        foreach (IView child in Dots.Children)
+        {
+            if (child is VisualElement dot)
+            {
+                jumps.Add(JumpAsync(dot, WaveStep * jumps.Count));
+            }
+        }
+
+        await Task.WhenAll(jumps);
+    }
+
+    private static async Task JumpAsync(VisualElement dot, TimeSpan delay)
+    {
+        await Task.Delay(delay);
+
+        // Заслонку пересобрали посреди волны (сменилась тема): у отключённой
+        // точки анимациям не найти часов, и запуск бросил бы исключение
+        if (dot.Handler is null)
+        {
+            return;
+        }
+
+        await Task.WhenAll(
+            dot.TranslateToAsync(0, -12, 110, Easing.CubicOut),
+            dot.ScaleToAsync(1.35, 110, Easing.CubicOut));
+
+        await Task.WhenAll(
+            dot.TranslateToAsync(0, 0, 170, Easing.CubicInOut),
+            dot.ScaleToAsync(1, 170, Easing.CubicInOut));
+    }
 
     private void OnModelChanged(object? sender, PropertyChangedEventArgs e)
     {

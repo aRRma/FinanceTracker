@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Личный трекер финансов — прототип</title>
 <!-- СГЕНЕРИРОВАНО из mockups.html скриптом tools/build_prototype.py. Руками не править. -->
-<!-- отпечатки источников: mockups.html=48b7dbb8b2588de2d4609b0a89774ab0cacf556e86e0d07a1dedd2d57bf07680 build_prototype.py=77f871298aad02248fd8a5c89a87598089d2cc5da5628c96a90c5ad427c2acef -->
+<!-- отпечатки источников: mockups.html=5640d161e6ad7b14969a1a8d8b4b987b5936a94ed48d4e8a70da81558e2af41d build_prototype.py=77f871298aad02248fd8a5c89a87598089d2cc5da5628c96a90c5ad427c2acef -->
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -186,10 +186,14 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 /* Набор ПИН-кода: круглые клавиши посередине экрана, единица сверху, как у телефона.
    Круг 72 dp — 50, промежутки 28 и 18 dp — 19 и 12 */
 .pinpad{position:absolute;left:50%;transform:translateX(-50%);display:grid;grid-template-columns:repeat(3,50px);grid-auto-rows:50px;column-gap:19px;row-gap:12px}
-.pinpad b{background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:19px;font-weight:400}
+.pinpad b{background:var(--accbg);border:1px solid var(--accbg);color:var(--acc);display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:19px;font-weight:400}
 .pinpad b.on{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
 .pinpad b.no{background:none;border:none}
-.pinpad .ic{color:var(--ink)}
+.pinpad .ic{color:var(--acc)}
+[data-theme="dark"] .pinpad b{background:var(--card);border-color:var(--line);color:var(--ink)}
+[data-theme="dark"] .pinpad b.on{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+[data-theme="dark"] .pinpad b.no{background:none;border:none}
+[data-theme="dark"] .pinpad .ic{color:var(--ink2)}
 .pinpad.off{opacity:.4}
 .pin{position:absolute;left:0;right:0;text-align:center}
 .pin .lock{width:44px;height:44px;margin:0 auto 11px;border-radius:50%;background:var(--accbg);display:flex;align-items:center;justify-content:center}

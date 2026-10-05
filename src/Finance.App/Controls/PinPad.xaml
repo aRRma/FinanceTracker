@@ -8,7 +8,7 @@
     телефона: это вход, а не ввод суммы, и сплошная клавиатура у нижнего края
     читалась калькулятором. Цифры с единицей сверху — там, где рука ищет
     ПИН-код телефона. Кнопки «Готово» нет — код уходит на проверку по набору
-    последней цифры.
+    последней цифры, а перед этим точки пробегают волной (PinPad.WaveAsync).
 
     Строка ответа держит своё место и пустой: иначе первая же ошибка сдвигала
     бы клавиатуру под пальцем.
@@ -99,7 +99,8 @@
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnErase" />
                         </Border.GestureRecognizers>
-                        <controls:Icon Key="backspace" Size="28" HorizontalOptions="Center" VerticalOptions="Center" />
+                        <controls:Icon Key="backspace" Size="28" HorizontalOptions="Center" VerticalOptions="Center"
+                                       Stroke="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource Ink2Dark}}" />
                     </Border>
                 </Grid>
 

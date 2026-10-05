@@ -15,8 +15,10 @@ namespace Finance.App;
 /// </summary>
 /// <remarks>
 /// Окно — полноэкранный <see cref="Dialog"/>: диалоги приложения — такие же окна,
-/// и поднятый позже ложится поверх них. Поднимается оно при уходе в фон, чтобы
-/// при возврате первым кадром была заслонка, а не балансы.
+/// и поднятый позже ложится поверх них. При уходе в фон поднимается не оно, а шторка
+/// цветом фона внутри окна приложения (<see cref="Shade"/>): окно, поднятое заранее
+/// и убранное при возврате, система показывала до конца анимации открытия, и заслонка
+/// мелькала у того, кому вход не нужен.
 /// </remarks>
 internal sealed class LockCover
 {
@@ -25,6 +27,7 @@ internal sealed class LockCover
 
     private Dialog? _dialog;
     private LockCoverView? _view;
+    private Android.Views.View? _shade;
 
     /// <summary>
     /// Создаёт заслонку активности.
@@ -36,7 +39,7 @@ internal sealed class LockCover
         _activity = activity;
         _model = model;
 
-        _model.Unlocked += (_, _) => Dismiss();
+        _model.Unlocked += OnUnlocked;
     }
 
     /// <summary>
@@ -45,23 +48,44 @@ internal sealed class LockCover
     public bool IsRaised => _dialog is { IsShowing: true };
 
     /// <summary>
-    /// Поднимает заслонку. Уже поднятая остаётся как есть — с набранным.
+    /// Поднимает заслонку с чистым набором. Уже поднятая остаётся как есть — с набранным.
     /// </summary>
-    public void Raise()
+    public void Raise() => Show(fresh: true);
+
+    /// <summary>
+    /// Поднимает окно заслонки.
+    /// </summary>
+    /// <param name="fresh">Набор с чистого листа; иначе набранное остаётся — пересборка при смене темы.</param>
+    private void Show(bool fresh)
     {
         if (IsRaised || _activity.IsFinishing || ControlsApplication.Current?.Windows is not [{ Handler.MauiContext: { } context }, ..])
         {
             return;
         }
 
-        _view ??= new LockCoverView(_model);
-        _view.Prepare();
+        // Окно, закрывшееся помимо нас, отпускается: его набор остался бы подписан на модель
+        Release();
+
+        // Содержимое — каждый раз новое. Смену темы MAUI доносит до привязок
+        // по дереву от приложения, а у содержимого чужого окна родителя нет:
+        // прежнее оставалось в теме, при которой его создали, и хранило клавиши
+        // нажатыми с прошлого входа
+        LockCoverView view = new(_model);
+
+        _view = view;
+
+        if (fresh)
+        {
+            view.Prepare();
+        }
+        else
+        {
+            view.Resume();
+        }
 
         // Содержимое MAUI в чужом окне: тот же контекст, что у окна приложения, —
         // ресурсы темы и обработчики контролов общие
-        Android.Views.View content = _view.ToPlatform(context);
-
-        (content.Parent as ViewGroup)?.RemoveView(content);
+        Android.Views.View content = view.ToPlatform(context);
 
         // Окно от края до края, а раздавать отступы под системные полосы MAUI
         // умеет только в своём окне: в диалоге клавиатура уходила под жестовую
@@ -89,18 +113,102 @@ internal sealed class LockCover
             Paint(window);
         }
 
-        dialog.Show();
-
         _dialog = dialog;
+
+        dialog.Show();
     }
 
     /// <summary>
-    /// Убирает заслонку: вход выполнен или вернулись раньше пяти минут.
+    /// Закрывает содержимое окна приложения шторкой цветом фона — при уходе в фон.
+    /// Последний кадр окна, который система покажет при возврате, — шторка, а не балансы.
+    /// </summary>
+    /// <remarks>
+    /// Шторка — вид внутри окна приложения, а не своё окно: снятая при возврате,
+    /// она уходит со следующим кадром, а окно система убрала бы только после анимации открытия.
+    /// </remarks>
+    public void Shade()
+    {
+        if (_shade is not null || _activity.Window?.DecorView is not ViewGroup decor)
+        {
+            return;
+        }
+
+        Android.Views.View shade = new(_activity);
+
+        if (Paper() is { } paper)
+        {
+            shade.SetBackgroundColor(paper.ToPlatform());
+        }
+
+        decor.AddView(shade, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent));
+
+        _shade = shade;
+    }
+
+    /// <summary>
+    /// Убирает заслонку и шторку: вход выполнен или вернулись раньше пяти минут.
     /// </summary>
     public void Dismiss()
     {
+        if (_shade is { } shade)
+        {
+            (shade.Parent as ViewGroup)?.RemoveView(shade);
+
+            _shade = null;
+        }
+
+        Release();
+    }
+
+    /// <summary>
+    /// Активность уничтожается: окно убирается, а модель, одна на приложение,
+    /// перестаёт держать эту заслонку — и с ней активность.
+    /// </summary>
+    public void Detach()
+    {
+        _model.Unlocked -= OnUnlocked;
+
+        Dismiss();
+    }
+
+    /// <summary>
+    /// Тема сменилась — например, системная, пока приложение в фоне. Шторка
+    /// перекрашивается, а поднятая заслонка собирается заново с тем же набором:
+    /// её содержимое смены темы не видит.
+    /// </summary>
+    public void Repaint()
+    {
+        if (_shade is { } shade && Paper() is { } paper)
+        {
+            shade.SetBackgroundColor(paper.ToPlatform());
+        }
+
+        if (IsRaised)
+        {
+            Release();
+            Show(fresh: false);
+        }
+    }
+
+    private void OnUnlocked(object? sender, EventArgs e) => Dismiss();
+
+    /// <summary>
+    /// Убирает окно заслонки, не трогая шторку: под поднимаемым окном она
+    /// закрывает балансы, пока окно не нарисовано.
+    /// </summary>
+    private void Release()
+    {
         _dialog?.Dismiss();
         _dialog = null;
+
+        if (_view is { } view)
+        {
+            // Модель одна на приложение: подписанный на неё набор пережил бы своё окно
+            view.BindingContext = null;
+            view.DisconnectHandlers();
+
+            _view = null;
+        }
     }
 
     /// <summary>
@@ -115,7 +223,7 @@ internal sealed class LockCover
 
         bool night = application.RequestedTheme is AppTheme.Dark;
 
-        if (application.Resources.TryGetValue(night ? "PaperDark" : "PaperLight", out object? value) && value is Color paper)
+        if (Paper() is { } paper)
         {
             decor.SetBackgroundColor(paper.ToPlatform());
         }
@@ -126,6 +234,15 @@ internal sealed class LockCover
         controller?.AppearanceLightNavigationBars = !night;
         window.NavigationBarContrastEnforced = false;
     }
+
+    /// <summary>
+    /// Цвет фона страниц в нынешней теме приложения.
+    /// </summary>
+    private static Color? Paper() =>
+        ControlsApplication.Current is { } application
+        && application.Resources.TryGetValue(application.RequestedTheme is AppTheme.Dark ? "PaperDark" : "PaperLight", out object? value)
+            ? value as Color
+            : null;
 
     /// <summary>
     /// Отступы рамки — под строку состояния и полосу навигации.
