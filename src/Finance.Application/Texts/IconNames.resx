@@ -138,6 +138,9 @@
   <data name="confetti" xml:space="preserve">
     <value>Конфетти</value>
   </data>
+  <data name="credit-card" xml:space="preserve">
+    <value>Карта</value>
+  </data>
   <data name="dental" xml:space="preserve">
     <value>Зуб</value>
   </data>

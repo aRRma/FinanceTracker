@@ -14,6 +14,8 @@ internal sealed class AccountConfiguration : IEntityTypeConfiguration<AccountRow
         builder.ToTable("accounts");
         builder.Property(row => row.Name).HasColumnName("name").IsRequired();
         builder.Property(row => row.Type).HasColumnName("type").IsRequired();
+        builder.Property(row => row.Color).HasColumnName("color").IsRequired();
+        builder.Property(row => row.Icon).HasColumnName("icon");
         builder.Property(row => row.Currency).HasColumnName("currency").IsRequired();
         builder.Property(row => row.OpeningBalance).HasColumnName("opening_balance").IsRequired();
         builder.Property(row => row.OpenedOn).HasColumnName("opened_on").IsRequired();

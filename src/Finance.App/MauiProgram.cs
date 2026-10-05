@@ -106,6 +106,7 @@ public static class MauiProgram
         services.AddTransient<MorePage>();
         services.AddTransient<AccountsPage>();
         services.AddTransient<AccountPage>();
+        services.AddTransient<AccountBadgePage>();
         services.AddTransient<AccountFeedPage>();
         services.AddTransient<PlacesPage>();
         services.AddTransient<PlacePage>();

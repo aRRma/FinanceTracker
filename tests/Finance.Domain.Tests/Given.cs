@@ -32,7 +32,7 @@ internal static class Given
         bool closed = false)
     {
         Account account = Entities.Account.Create(
-            name, AccountType.Card, currency, openingBalance, openedOn ?? LongAgo,
+            name, AccountType.Card, AccountColor.Blue, icon: null, currency, openingBalance, openedOn ?? LongAgo,
             excludedFromTotals: false, sortOrder: 0, Today, NowUtc);
 
         if (closed)

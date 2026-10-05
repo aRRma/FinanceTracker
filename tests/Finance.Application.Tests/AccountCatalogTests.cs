@@ -77,8 +77,8 @@ public sealed class AccountCatalogTests
         Assert.True(cashRow.IsOpen);
 
         Assert.False(depositRow.IsNegative);
-        Assert.Equal(AccountIcon.For(AccountType.Cash, excludedFromTotals: false), cashRow.Icon);
-        Assert.Equal(AccountIcon.For(AccountType.Cash, excludedFromTotals: true), depositRow.Icon);
+        Assert.Equal(AccountIcon.ByType(AccountType.Cash, excludedFromTotals: false), cashRow.Icon);
+        Assert.Equal(AccountIcon.ByType(AccountType.Cash, excludedFromTotals: true), depositRow.Icon);
     }
 
     /// <summary>
@@ -91,7 +91,7 @@ public sealed class AccountCatalogTests
     [InlineData(AccountType.Cash, true, "building-bank")]
     [InlineData(AccountType.Card, true, "building-bank")]
     public void Значок_счёта_выводится_из_типа_и_признака(AccountType type, bool excludedFromTotals, string icon) =>
-        Assert.Equal(icon, AccountIcon.For(type, excludedFromTotals));
+        Assert.Equal(icon, AccountIcon.For(type, excludedFromTotals, chosen: null));
 
     /// <summary>
     /// Перетащенный счёт встаёт на место того, на который его бросили, и порядок

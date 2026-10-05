@@ -176,8 +176,14 @@
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnPickAccount" />
                                 </Grid.GestureRecognizers>
+                                <!-- Выбранный счёт — его знаком, как на балансах: перепутанный счёт виден до сохранения -->
+                                <controls:AccountBadge Grid.Column="0" IsVisible="{Binding HasSourceAccount}"
+                                                       Tone="{Binding SourceAccount.Color}" IconKey="{Binding SourceAccountIcon}" />
                                 <Border Grid.Column="0" Style="{StaticResource FieldBadge}">
                                     <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding HasSourceAccount}" Value="True">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
                                         <DataTrigger TargetType="Border" Binding="{Binding HasSourceAccount}" Value="False">
                                             <Setter Property="BackgroundColor"
                                                     Value="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}" />
@@ -305,8 +311,14 @@
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnPickTargetAccount" />
                                 </Grid.GestureRecognizers>
+                                <!-- Выбранный счёт — его знаком, как на балансах: перепутанный счёт виден до сохранения -->
+                                <controls:AccountBadge Grid.Column="0" IsVisible="{Binding HasTargetAccount}"
+                                                       Tone="{Binding TargetAccount.Color}" IconKey="{Binding TargetAccountIcon}" />
                                 <Border Grid.Column="0" Style="{StaticResource FieldBadge}">
                                     <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding HasTargetAccount}" Value="True">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
                                         <DataTrigger TargetType="Border" Binding="{Binding HasTargetAccount}" Value="False">
                                             <Setter Property="BackgroundColor"
                                                     Value="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}" />

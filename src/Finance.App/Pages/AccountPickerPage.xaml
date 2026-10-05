@@ -56,7 +56,7 @@
                             </DataTrigger>
                         </Grid.Triggers>
 
-                        <controls:Icon Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Key="{Binding Icon}" />
+                        <controls:AccountBadge Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Tone="{Binding Color}" IconKey="{Binding Icon}" />
                         <Label Grid.Column="1" Grid.Row="0" Text="{Binding Name}" VerticalOptions="Center" />
                         <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}"
                                IsVisible="{Binding HasCaption}" Style="{StaticResource SecondaryLabel}" />

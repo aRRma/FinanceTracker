@@ -107,8 +107,14 @@
                                     </controls:Icon.Triggers>
                                 </controls:Icon>
                                 <Label Grid.Column="1" Grid.Row="0" Text="{Binding Title}" LineBreakMode="TailTruncation" />
-                                <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}" LineBreakMode="TailTruncation"
-                                       IsVisible="{Binding HasCaption}" Style="{StaticResource SecondaryLabel}" />
+                                <!-- Счёт в общей ленте — жетоном перед названием: цепочку трат
+                                     по одному счёту видно при прокрутке, у перевода — оба счёта.
+                                     Озвучивается подпись целиком: жетон повторяет название -->
+                                <controls:FeedCaption Grid.Column="1" Grid.Row="1"
+                                                      Text="{Binding Caption}" Account="{Binding Account}"
+                                                      TargetAccount="{Binding TargetAccount}"
+                                                      IsVisible="{Binding HasCaption}"
+                                                      SemanticProperties.Description="{Binding CaptionText}" />
                                 <!-- Заметка — своей строкой под подписью, мельче и тише: в одной строке
                                      с подписью длинная заметка вытесняла группу и срезала счёт -->
                                 <Label Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Note}"

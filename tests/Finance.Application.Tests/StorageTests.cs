@@ -27,7 +27,7 @@ public sealed class StorageTests
         await using TestDatabase database = await TestDatabase.CreateAsync();
 
         Account account = Account.Create(
-            "Наличные", AccountType.Cash, Currency.RUB, 1234.56m, new DateOnly(2026, 1, 1),
+            "Наличные", AccountType.Cash, AccountColor.Blue, icon: null, Currency.RUB, 1234.56m, new DateOnly(2026, 1, 1),
             excludedFromTotals: false, sortOrder: 0, Today, NowUtc);
 
         await using (FinanceDbContext context = await database.Contexts.CreateDbContextAsync())
@@ -51,7 +51,7 @@ public sealed class StorageTests
 
         // Минуя домен: Money.Create такую сумму не пропустит, а проверяется сам конвертер
         Account account = Account.Restore(
-            Keys.New(), "Наличные", AccountType.Cash, Currency.RUB, 1.005m, new DateOnly(2026, 1, 1),
+            Keys.New(), "Наличные", AccountType.Cash, AccountColor.Blue, icon: null, Currency.RUB, 1.005m, new DateOnly(2026, 1, 1),
             excludedFromTotals: false, isClosed: false, sortOrder: 0,
             NowUtc, NowUtc, deletedAtUtc: null, syncedAtUtc: null, externalId: null);
 
@@ -187,7 +187,7 @@ public sealed class StorageTests
     private static async Task<Account> GivenAccountAsync(TestDatabase database)
     {
         Account account = Account.Create(
-            "Карта основная", AccountType.Card, Currency.RUB, 0m, new DateOnly(2026, 1, 1),
+            "Карта основная", AccountType.Card, AccountColor.Blue, icon: null, Currency.RUB, 0m, new DateOnly(2026, 1, 1),
             excludedFromTotals: false, sortOrder: 0, Today, NowUtc);
 
         await using FinanceDbContext context = await database.Contexts.CreateDbContextAsync();

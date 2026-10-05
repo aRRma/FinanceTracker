@@ -26,6 +26,16 @@ public sealed record AccountCard
     public required AccountType Type { get; init; }
 
     /// <summary>
+    /// Цвет счёта.
+    /// </summary>
+    public required AccountColor Color { get; init; }
+
+    /// <summary>
+    /// Значок, выбранный руками. Пусто — значок по типу.
+    /// </summary>
+    public string? Icon { get; init; }
+
+    /// <summary>
     /// Валюта счёта.
     /// </summary>
     public required Currency Currency { get; init; }

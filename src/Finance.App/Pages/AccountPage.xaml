@@ -43,9 +43,34 @@
 
                 <Border Style="{StaticResource Card}">
                     <VerticalStackLayout Padding="14,10" Spacing="10">
+                        <!-- Шапка — счёт, каким он встанет на балансы: знак, название, тип и валюта.
+                             Меняется вместе с полями, так что правку видно до сохранения -->
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" RowDefinitions="Auto,Auto">
+                            <controls:AccountBadge Grid.RowSpan="2" Mode="Header"
+                                                   Tone="{Binding Mark.Color}" IconKey="{Binding Mark.Icon}" />
+                            <Label Grid.Column="1" Text="{Binding Name}" FontFamily="OpenSansSemibold"
+                                   LineBreakMode="TailTruncation" VerticalOptions="End" />
+                            <Label Grid.Column="1" Grid.Row="1" Text="{Binding HeaderCaption}"
+                                   Style="{StaticResource SecondaryLabel}" VerticalOptions="Start" />
+                        </Grid>
+
                         <Label Text="{x:Static texts:UiTexts.CommonName}" Style="{StaticResource CaptionLabel}" />
                         <Entry x:Name="NameEntry" Text="{Binding Name}" Placeholder="{Binding NamePlaceholder}"
                                Focused="OnNameFocused" />
+
+                        <!-- Одна строка вместо двух сеток: карточка не растёт, а выбор живёт
+                             на своём экране с предпросмотром -->
+                        <Label Text="{x:Static texts:UiTexts.AccountBadgeTitle}" Style="{StaticResource CaptionLabel}" />
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" AutomationId="AccountBadge"
+                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnBadgeTapped" />
+                            </Grid.GestureRecognizers>
+                            <controls:AccountBadge Grid.Column="0" Tone="{Binding Mark.Color}" IconKey="{Binding Mark.Icon}" />
+                            <Label Grid.Column="1" Text="{Binding BadgeCaption}" VerticalOptions="Center"
+                                   LineBreakMode="TailTruncation" />
+                            <controls:Icon Grid.Column="2" Key="chevron-right" Style="{StaticResource MutedIcon}" />
+                        </Grid>
 
                         <Label Text="{x:Static texts:UiTexts.AccountTypeLabel}" Style="{StaticResource CaptionLabel}" />
                         <Picker ItemsSource="{Binding TypeNames}" SelectedIndex="{Binding TypeIndex}" />

@@ -1,0 +1,226 @@
+/* Документы вариантов: раскладка страницы и элементы счёта всех четырёх вариантов.
+   Палитра экрана — из kit/base.css (копия стилей docs/ui/mockups.html), цвета счёта —
+   переменные --a-*, их пишет kit.js из одной таблицы PALETTE. */
+
+/* Светлая тема явно: телефон светлой темы стоит и на тёмной странице */
+[data-theme="light"]{
+  --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
+  --ink:#16191C; --ink2:#4C535A; --ink3:#676D74;
+  --line:#E3E6E9; --line2:#CBD1D6;
+  --acc:#0F5C4C; --accbg:#E2EFEB;
+  --pos:#15784A; --neg:#C9302C; --trf:#2259D6; --negbg:#FBEEEE; --posbg:#E3EFE9; --trfbg:#E4EBFA;
+  --onacc:#FFFFFF; --knob:#FFFFFF; --veil:rgba(22,25,28,.42);
+}
+[data-theme="light"] .fab{background:var(--acc);color:var(--onacc);border:none}
+
+/* ---------- Страница документа ---------- */
+.doc{max-width:1360px}
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:40px;align-items:center;padding:8px 0 28px;border-bottom:1px solid var(--line2)}
+.hero h1{font-size:34px;font-weight:600;letter-spacing:-.02em;margin:6px 0 10px;line-height:1.15}
+.hero .kicker{font-size:13px;color:var(--ink2)}
+.hero p{font-size:15.5px;color:var(--ink2);max-width:56ch;margin:0 0 10px}
+.hero p b{color:var(--ink);font-weight:600}
+.hero .specimen{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-radius:18px;overflow:hidden;border:1px solid var(--line2)}
+.hero .specimen>div{min-width:0;padding:22px 16px;background:var(--paper);display:flex;flex-direction:column;gap:12px}
+[data-theme]{color:var(--ink)}
+.docnav{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;margin:0 0 20px;align-items:center}
+.docnav a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line2)}
+.docnav a.on{color:var(--acc);border-color:var(--acc);font-weight:600}
+.docnav button{margin-left:auto;border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit}
+.sec{margin:46px 0 0}
+.sec>h2{font-size:21px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+.sec>.sub{color:var(--ink2);font-size:14px;margin:0 0 18px;max-width:78ch}
+.prose{max-width:76ch;font-size:14.5px}
+.prose p{margin:0 0 10px}
+.prose ul{margin:0 0 10px;padding-left:20px}
+.prose li{margin:0 0 6px}
+.prose b{font-weight:600}
+.prose code,.spec code,.cap code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 4px;border-radius:3px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px 34px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.box h3{font-size:14.5px;font-weight:600;margin:0 0 8px}
+.box p,.box li{font-size:13.5px;color:var(--ink2)}
+.box ul{padding-left:18px;margin:0}
+.box li{margin:0 0 5px}
+.box.plus h3{color:var(--pos)}
+.box.minus h3{color:var(--neg)}
+.themerow{display:flex;align-items:baseline;gap:12px;margin:26px 0 12px;font-size:13px;color:var(--ink2)}
+.themerow b{font-size:14.5px;color:var(--ink);font-weight:600}
+.screens{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:30px 26px;align-items:start}
+.screens.dark-row .cap em{display:none}
+
+/* Таблица токенов */
+.tokens{width:100%;border-collapse:collapse;font-size:13px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tokens th,.tokens td{padding:8px 10px;text-align:left;border-top:1px solid var(--line);vertical-align:middle;white-space:nowrap}
+.tokens thead th{border-top:none;background:var(--sunk);color:var(--ink2);font-weight:600;font-size:12px}
+.tokens td.n{font-family:var(--mono);font-size:11.5px;color:var(--ink2)}
+.tokens .ok{color:var(--pos)} .tokens .bad{color:var(--neg);font-weight:600}
+.chipsw{display:inline-flex;align-items:center;gap:7px}
+.chipsw i{width:18px;height:18px;border-radius:9px;display:inline-block;border:1px solid var(--line)}
+.order{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 0;padding:0;list-style:none;counter-reset:o}
+.order li{counter-increment:o;display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:3px 10px 3px 4px;font-size:12.5px}
+.order li::before{content:counter(o);font-size:11px;color:var(--ink3);min-width:12px;text-align:right}
+.order li i{width:16px;height:16px;border-radius:8px;display:inline-block}
+.pairs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
+.pairs span{display:inline-flex;align-items:center;gap:5px;font-size:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:2px 9px}
+.pairs i{width:12px;height:12px;border-radius:6px;display:inline-block}
+
+/* Анатомия: элемент крупно с размерами */
+.anat{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.anat .stage{background:var(--paper);border:1px solid var(--line);border-radius:12px;height:170px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.anat .stage .zoom{transform:scale(3);transform-origin:center;font-family:var(--app);font-size:13px;color:var(--ink);display:flex;align-items:center;gap:6px}
+.anat .stage .zoom.z2{transform:scale(2)}
+.anat dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px;margin:10px 2px 0}
+.anat dt{color:var(--ink3)}
+.anat dd{margin:0}
+.states{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.states .st{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-family:var(--app)}
+.states .st .row{min-height:44px}
+.states .st p{margin:0;padding:8px 12px 10px;font-family:var(--sans);font-size:12.5px;color:var(--ink2);border-top:1px solid var(--line)}
+.states .st p b{color:var(--ink);font-weight:600}
+pre.xaml{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-family:var(--mono);font-size:12px;line-height:1.55;overflow:auto;margin:8px 0 0;color:var(--ink)}
+pre.xaml .c{color:var(--ink3)}
+
+/* ---------- Цвет счёта (варианты 1–3) ---------- */
+.ac{--c:var(--ink2);--cb:var(--sunk)}
+
+/* 1 · Цветная плашка: значок типа цветом счёта на круглой подложке */
+.tile{width:25px;height:25px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;flex:none;background:var(--cb,var(--sunk))}
+.tile .ic{width:15px;height:15px;color:var(--c,var(--ink2))}
+.tile.lg{width:30px;height:30px;border-radius:15px}
+.tile.lg .ic{width:17px;height:17px}
+.tile.xl{width:44px;height:44px;border-radius:22px}
+.tile.xl .ic{width:24px;height:24px}
+.tile.neutral{--cb:var(--line);--c:var(--ink)}
+.off{opacity:.5}
+/* Точка цвета счёта перед его названием в подписи строки ленты: в приложении — Span «●» цветом счёта */
+.pill{display:inline-block;width:7px;height:7px;border-radius:4px;background:var(--c);margin:0 4px 0 1px;vertical-align:1px;flex:none}
+.s .ic.inl{width:11px;height:11px;vertical-align:-1.5px;margin:0 3px 0 0;color:var(--ink2)}
+
+/* 2 · Кольцо счёта: кольцо цвета счёта вокруг значка, значок остаётся серым */
+.ring{width:25px;height:25px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;flex:none;box-shadow:inset 0 0 0 2px var(--c);background:var(--card)}
+.ring .ic{width:14px;height:14px;color:var(--ink2)}
+.ring.lg{width:30px;height:30px;border-radius:15px;box-shadow:inset 0 0 0 2.4px var(--c)}
+.ring.lg .ic{width:16px;height:16px}
+.ring.xl{width:44px;height:44px;border-radius:22px;box-shadow:inset 0 0 0 3.2px var(--c)}
+.ring.xl .ic{width:22px;height:22px}
+.ring.plain{box-shadow:none;background:none}
+/* Перевод: кольцо пополам — слева счёт списания, справа счёт зачисления */
+.ring.split{box-shadow:none;background:conic-gradient(from 180deg,var(--c1) 0 50%,var(--c2) 50% 100%);position:relative}
+.ring.split::before{content:"";position:absolute;inset:2px;border-radius:50%;background:var(--card)}
+.ring.split .ic{position:relative}
+.row.fr>.ring,.row.fr>.tile{margin-top:7px}
+.row.fr.sel .ring{background:none}
+
+/* 3 · Мини-карта: метка цветом карточки на заливке цвета счёта, пропорции банковской карты */
+.mc{width:32px;height:20px;border-radius:4px;background:var(--c);color:var(--card);font-size:9.5px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;flex:none;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.mc .ic{width:13px;height:13px;color:var(--card)}
+.mc.lg{width:38px;height:24px;font-size:11px;border-radius:5px}
+.mc.lg .ic{width:15px;height:15px}
+.mtag{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:600;line-height:15px;height:15px;padding:0 5px;border-radius:3px;background:var(--c);color:var(--card);white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:.03em}
+.mtag .ic{width:10px;height:10px;color:var(--card)}
+.rc{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none}
+.rc .arrow{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--ink3)}
+/* Большая карта в карточке счёта: живой предпросмотр */
+.bigcard{aspect-ratio:1.586;border-radius:12px;background:var(--c);color:var(--card);padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.bigcard::after{content:"";position:absolute;right:-30%;top:-60%;width:90%;height:160%;border-radius:50%;background:var(--card);opacity:.08}
+.bigcard .top{display:flex;justify-content:space-between;align-items:flex-start;font-size:12px;font-weight:600;position:relative;z-index:1}
+.bigcard .top .ic{color:var(--card);width:18px;height:18px}
+.bigcard .lab{font-size:19px;font-weight:600;letter-spacing:.12em;position:relative;z-index:1;font-variant-numeric:tabular-nums}
+.bigcard .bal{font-size:11px;opacity:.85;position:relative;z-index:1}
+/* Балансы-кошелёк: плитки в две колонки */
+.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bt{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 10px 10px;display:flex;flex-direction:column;gap:6px;min-width:0;position:relative;overflow:hidden}
+.bt::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c)}
+.bt .t{font-size:12px;color:var(--ink2)}
+.bt .num{font-size:14.5px;font-weight:600}
+.bt.add{justify-content:center;align-items:center;color:var(--acc);font-weight:600;font-size:12.5px;border-style:dashed;background:none}
+.bt.add::before{display:none}
+
+/* 4 · Свой значок: монохромный знак на нейтральной подложке */
+.glyph4{display:inline-flex;align-items:center;gap:3px;color:var(--ink3);font-size:10px}
+.glyph4 .ic{width:12px;height:12px;color:var(--ink2)}
+
+/* Выбор цвета в карточке счёта */
+.swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:10px 0;justify-items:center;padding:6px 0 4px}
+.swatches i{width:28px;height:28px;border-radius:14px;background:var(--c);display:flex;align-items:center;justify-content:center}
+.swatches i.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--c)}
+.swatches i .ic{width:15px;height:15px;color:var(--on,var(--card));stroke-width:3}
+.swatches.rings i{background:var(--card);box-shadow:inset 0 0 0 3px var(--c)}
+.swatches.rings i.on{box-shadow:inset 0 0 0 3px var(--c),0 0 0 2px var(--card),0 0 0 4px var(--c)}
+.swatches.rings i .ic{color:var(--c)}
+.icopick{display:grid;grid-template-columns:repeat(6,1fr);gap:6px 4px;justify-items:center;padding-top:4px}
+.icopick span{width:36px;height:36px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:var(--sunk)}
+.icopick span .ic{color:var(--ink2)}
+.icopick span.on{background:var(--acc)}
+.icopick span.on .ic{color:var(--onacc)}
+.preview{display:flex;align-items:center;gap:10px;padding:4px 2px 2px}
+.preview .t{font-weight:600;font-size:13.5px}
+
+/* 5 · Цвет и значок. Крупный знак — плашка (.tile) с выбранным значком; мелкий в ленте —
+   жетон: значок цветом карточки на сплошной заливке цвета счёта. Малому знаку нужна
+   насыщенность — бледная подложка на 13 точках не читается цветом */
+.token{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:7px;background:var(--c);vertical-align:-2.5px;margin:0 4px 0 1px;flex:none}
+.token .ic{width:9px;height:9px;color:var(--on,var(--card));stroke-width:2.4}
+.token.lg{width:22px;height:22px;border-radius:11px;vertical-align:middle}
+.token.lg .ic{width:14px;height:14px}
+.signgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px 4px;justify-items:center;padding:4px 0 2px}
+.signgrid span{width:38px;height:38px;border-radius:19px;display:flex;align-items:center;justify-content:center;background:var(--sunk)}
+.signgrid span .ic{color:var(--ink2)}
+.signgrid span.on{background:var(--cb);box-shadow:inset 0 0 0 2px var(--c)}
+.signgrid span.on .ic{color:var(--c)}
+.suggest{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--ink3);padding:2px 0 4px}
+.suggest b{display:inline-flex;align-items:center;gap:4px;font-weight:400;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:2px 8px 2px 3px}
+.suggest b .ic{width:13px;height:13px;color:var(--ink2)}
+.signrow{display:flex;align-items:center;gap:10px;min-height:38px}
+.signrow .v{flex:1;font-size:13.5px}
+.form .fld .signrow .v{border:none;padding:0}
+.signprev{background:var(--paper);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.signprev .card .row{min-height:36px}
+.signprev .cap2{font-size:10.5px;color:var(--ink3);padding:0 2px}
+.lbl.sp{margin:2px 0 -6px}
+
+/* Сплошная плашка яркой палитры: заливка цветом счёта, значок — белый или тёмный по ступени цвета */
+.tile.solid{background:var(--c)}
+.tile.solid .ic{color:var(--on,var(--card))}
+.signgrid.solid span.on{background:var(--c);box-shadow:none}
+.signgrid.solid span.on .ic{color:var(--on,var(--card))}
+/* Формы бейджа счёта. Жетон в ленте повторяет форму плашки в уменьшенном виде.
+   square — скруглённый квадрат, радиус 30 % (как значки приложений);
+   plate — карта 3 : 2, радиус 5 точек; glow — круг с объёмом: свет сверху-слева, глубина
+   снизу-справа, выведены из того же токена цвета, значок стоит в средней, «чистой» зоне */
+.tile.square{border-radius:30%}
+.token.square{border-radius:4px}
+.tile.plate{width:34px;height:23px;border-radius:5px}
+.tile.plate.lg{width:40px;height:27px;border-radius:6px}
+.tile.plate.xl{width:58px;height:39px;border-radius:8px}
+.token.plate{width:18px;height:12px;border-radius:3px}
+.token.plate .ic{width:9px;height:9px}
+.tile.glow,.token.glow{background:radial-gradient(120% 120% at 28% 22%,color-mix(in srgb,var(--c) 58%,#fff) 0%,var(--c) 52%,color-mix(in srgb,var(--c) 78%,#000) 100%)}
+.tile.glow{box-shadow:0 1px 2px color-mix(in srgb,var(--c) 45%,transparent)}
+.swatches.square i{border-radius:30%}
+.swatches.plate i{width:34px;height:23px;border-radius:5px}
+.swatches.glow i{background:radial-gradient(120% 120% at 28% 22%,color-mix(in srgb,var(--c) 58%,#fff) 0%,var(--c) 52%,color-mix(in srgb,var(--c) 78%,#000) 100%)}
+.signgrid.square span{border-radius:30%}
+.signgrid.plate span{width:46px;height:31px;border-radius:7px}
+.signgrid.glow span.on{background:radial-gradient(120% 120% at 28% 22%,color-mix(in srgb,var(--c) 58%,#fff) 0%,var(--c) 52%,color-mix(in srgb,var(--c) 78%,#000) 100%)}
+
+/* Сравнение палитр: полоса образцов с подписью */
+.strip{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.strip i{width:30px;height:30px;border-radius:15px;display:inline-flex;align-items:center;justify-content:center}
+.strip i .ic{width:16px;height:16px}
+.cmpgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.cmpgrid .box .strip{margin:10px 0 8px}
+.verdict{font-size:12.5px;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:6px}
+.verdict.bad{background:var(--negbg);color:var(--neg)}
+.verdict.ok{background:var(--posbg);color:var(--pos)}
+.duo{display:grid;grid-template-columns:1fr 1fr;border-radius:14px;overflow:hidden;border:1px solid var(--line2)}
+.duo>div{padding:16px 14px;background:var(--paper);font-family:var(--app);font-size:13px}
+
+/* Короткий экран и симуляции */
+.phone.short{height:360px}
+.phone.mid{height:520px}
+.sim-deutan{filter:url(#deutan)}
+.sim-protan{filter:url(#protan)}
+.sim-gray{filter:grayscale(1)}
+@media (max-width:900px){.hero{grid-template-columns:1fr}}

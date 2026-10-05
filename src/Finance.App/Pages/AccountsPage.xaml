@@ -44,7 +44,15 @@
                                SemanticProperties.Description="{x:Static texts:UiTexts.AccountsClosedHint}"
                                Style="{StaticResource MutedIcon}" />
 
-                <controls:Icon Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Key="{Binding Icon}" />
+                <!-- Заблокированный — вполсилы: счёт выведен из употребления, и его цвет свободен -->
+                <controls:AccountBadge Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+                                       Tone="{Binding Color}" IconKey="{Binding Icon}">
+                    <controls:AccountBadge.Triggers>
+                        <DataTrigger TargetType="controls:AccountBadge" Binding="{Binding IsClosed}" Value="True">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </DataTrigger>
+                    </controls:AccountBadge.Triggers>
+                </controls:AccountBadge>
 
                 <Label Grid.Column="2" Grid.Row="0" Text="{Binding Name}" />
                 <Label Grid.Column="2" Grid.Row="1" Text="{Binding Caption}"

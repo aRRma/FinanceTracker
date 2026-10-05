@@ -71,4 +71,30 @@
     <Color x:Key="KnobLight">#FFFFFF</Color>
     <Color x:Key="KnobDark">#E7EAEC</Color>
 
+    <!-- Цвета счетов — палитра «Предельная насыщенность», заливка знака счёта.
+         Порог — только значок на заливке, не ниже 3: к карточке заливка порога не
+         имеет, счёт всегда подписан названием, а погоня за контрастом к карточке
+         и сделала прежние цвета тусклыми. Имена — по AccountColor -->
+    <Color x:Key="AccountBlueLight">#1F7BF5</Color>
+    <Color x:Key="AccountBlueDark">#3082F6</Color>
+    <Color x:Key="AccountOrangeLight">#E87F26</Color>
+    <Color x:Key="AccountOrangeDark">#DB7823</Color>
+    <Color x:Key="AccountSkyLight">#2CB0CA</Color>
+    <Color x:Key="AccountSkyDark">#29A6BF</Color>
+    <Color x:Key="AccountGreenLight">#2DBC55</Color>
+    <Color x:Key="AccountGreenDark">#29B150</Color>
+    <Color x:Key="AccountVioletLight">#994DF5</Color>
+    <Color x:Key="AccountVioletDark">#9E59F6</Color>
+    <Color x:Key="AccountMagentaLight">#F730F0</Color>
+    <Color x:Key="AccountMagentaDark">#EC2DE4</Color>
+    <Color x:Key="AccountRedLight">#F72C2E</Color>
+    <Color x:Key="AccountRedDark">#F72C2E</Color>
+    <Color x:Key="AccountPinkLight">#F62B97</Color>
+    <Color x:Key="AccountPinkDark">#F62B97</Color>
+
+    <!-- Значок на заливке счёта — белый или тёмный, одинаково в обеих темах:
+         какой из двух, решает цвет (AccountColors.TakesDarkGlyph) -->
+    <Color x:Key="AccountGlyphWhite">#FFFFFF</Color>
+    <Color x:Key="AccountGlyphInk">#16191C</Color>
+
 </ResourceDictionary>

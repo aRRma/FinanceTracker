@@ -24,6 +24,16 @@ public sealed record SaveAccountCommand
     public required AccountType Type { get; init; }
 
     /// <summary>
+    /// Цвет счёта. Новому счёту карточка подбирает его по очереди ещё до набора.
+    /// </summary>
+    public required AccountColor Color { get; init; }
+
+    /// <summary>
+    /// Значок, выбранный руками. Пусто — значок по типу.
+    /// </summary>
+    public string? Icon { get; init; }
+
+    /// <summary>
     /// Валюта. После первой операции по счёту не меняется.
     /// </summary>
     public required Currency Currency { get; init; }

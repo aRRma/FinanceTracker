@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Xml.Linq;
+using Finance.Application.Infrastructure;
 using Microsoft.Maui.Graphics;
 
 namespace Finance.Docs.Tests;
@@ -27,8 +28,21 @@ public sealed class IconPathTests
     }
 
     /// <summary>
-    /// Названия для озвучки заведены ровно на ключи набора. Значок без названия
-    /// озвучка прочла бы латинским ключом, а название удалённого значка — мёртвая строка.
+    /// У каждого значка счёта есть контур. Набор свой, в коде, а не в файле набора
+    /// категорий, и сверка файла его не видит.
+    /// </summary>
+    [Fact]
+    public void У_каждого_значка_счёта_есть_контур()
+    {
+        string[] missing = [.. AccountIcon.Choices.Where(key => !LoadedPaths.Value.ContainsKey(key))];
+
+        Assert.Empty(missing);
+    }
+
+    /// <summary>
+    /// Названия для озвучки заведены ровно на ключи обоих наборов — категорий и счетов.
+    /// Значок без названия озвучка прочла бы латинским ключом, а название удалённого
+    /// значка — мёртвая строка.
     /// </summary>
     [Fact]
     public void Названия_значков_совпадают_с_набором()
@@ -39,8 +53,10 @@ public sealed class IconPathTests
             .Select(static element => element.Attribute("name")!.Value)
             .ToHashSet(StringComparer.Ordinal);
 
-        string[] unnamed = [.. Repository.IconKeys.Where(key => !names.Contains(key))];
-        string[] stale = [.. names.Where(name => !Repository.IconKeys.Contains(name))];
+        HashSet<string> keys = [.. Repository.IconKeys, .. AccountIcon.Choices];
+
+        string[] unnamed = [.. keys.Where(key => !names.Contains(key))];
+        string[] stale = [.. names.Where(name => !keys.Contains(name))];
 
         Assert.True(
             unnamed.Length is 0 && stale.Length is 0,

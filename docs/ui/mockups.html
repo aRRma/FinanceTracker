@@ -15,6 +15,10 @@
   --onacc:#FFFFFF; --knob:#FFFFFF; --veil:rgba(22,25,28,.42);
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --app:"Open Sans",var(--sans);
+  /* Цвет счёта — восемь заливок знака; значок на заливке белый или тёмный, одинаково в обеих темах */
+  --acc-blue:#1F7BF5; --acc-orange:#E87F26; --acc-sky:#2CB0CA; --acc-green:#2DBC55;
+  --acc-violet:#994DF5; --acc-magenta:#F730F0; --acc-red:#F72C2E; --acc-pink:#F62B97;
+  --acc-glyph-white:#FFFFFF; --acc-glyph-ink:#16191C;
 }
 [data-theme="dark"]{
   --paper:#101315;--card:#1C2124;--sunk:#252B2F;
@@ -23,6 +27,8 @@
   --acc:#48A78E;--accbg:#1B342D;
   --pos:#5FD08F;--neg:#FF8A80;--trf:#8AB1FF;--negbg:#453435;--posbg:#284037;--trfbg:#303B4B;
   --onacc:#0B1310;--knob:#E7EAEC;--veil:rgba(4,6,7,.62);
+  --acc-blue:#3082F6; --acc-orange:#DB7823; --acc-sky:#29A6BF; --acc-green:#29B150;
+  --acc-violet:#9E59F6; --acc-magenta:#EC2DE4; --acc-red:#F72C2E; --acc-pink:#F62B97;
 }
 /* В тёмной теме плавающая кнопка цветом карточки с акцентной обводкой, как в приложении */
 [data-theme="dark"] .fab{background:var(--card);color:var(--acc);border:1px solid var(--acc)}
@@ -251,6 +257,49 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .stat .b .v{font-size:16px;font-weight:600;margin-top:2px}
 .progress{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
 .progress i{display:block;height:100%;width:62%;background:var(--acc)}
+/* Знак счёта: скруглённый квадрат, залитый цветом счёта, значок белый или тёмный. Размеры в масштабе
+   экрана (330/480 от dp): плашка 36 dp — 25, шапка 44 dp — 30, жетон 19 dp — 13. Цвет — класс ac-…:
+   он задаёт заливку --c и цвет значка --on, цвета самих токенов живут только в палитре выше */
+.ac-blue{--c:var(--acc-blue);--on:var(--acc-glyph-white)}
+.ac-orange{--c:var(--acc-orange);--on:var(--acc-glyph-ink)}
+.ac-sky{--c:var(--acc-sky);--on:var(--acc-glyph-ink)}
+.ac-green{--c:var(--acc-green);--on:var(--acc-glyph-ink)}
+.ac-violet{--c:var(--acc-violet);--on:var(--acc-glyph-white)}
+.ac-magenta{--c:var(--acc-magenta);--on:var(--acc-glyph-white)}
+.ac-red{--c:var(--acc-red);--on:var(--acc-glyph-white)}
+.ac-pink{--c:var(--acc-pink);--on:var(--acc-glyph-white)}
+.tile{width:25px;height:25px;border-radius:7.5px;display:inline-flex;align-items:center;justify-content:center;flex:none;background:var(--c)}
+.tile .ic{width:15px;height:15px;color:var(--on);stroke-width:2}
+.tile.lg{width:30px;height:30px;border-radius:9px}
+.tile.lg .ic{width:17px;height:17px}
+/* Заблокированный счёт — знак вполсилы, его цвет считается свободным */
+.tile.off{opacity:.5}
+.token{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:4px;background:var(--c);vertical-align:-2.5px;margin:0 4px 0 1px;flex:none}
+.token .ic{width:9px;height:9px;color:var(--on);stroke-width:2.4}
+/* Название счёта в шапке ленты: знак слева от заголовка, ближе к стрелке «назад», чем обычные 22 */
+.hdt{display:flex;align-items:center;gap:10px;flex:1;min-width:0;margin-left:-8px}
+/* Шапка карточки счёта: знак, название, подпись «тип · валюта» */
+.preview{display:flex;align-items:center;gap:10px;padding:4px 2px 2px}
+.preview .t{font-weight:600;font-size:13.5px}
+/* Строка «Цвет и значок» в карточке счёта: знак, «цвет · значок», шеврон */
+.signrow{display:flex;align-items:center;gap:10px;min-height:38px}
+.signrow .v{flex:1;font-size:13.5px}
+.form .fld .signrow .v{border:none;padding:0}
+/* Экран «Цвет и значок»: предпросмотр на странице, цвета 4×2, сетка значков по шесть */
+.signprev{background:var(--paper);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.signprev .card .row{min-height:36px}
+.lbl.sp{margin:2px 0 -6px}
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 0;justify-items:center;padding:6px 0 4px}
+.swatches i{width:28px;height:28px;border-radius:30%;background:var(--c);display:flex;align-items:center;justify-content:center}
+.swatches i.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--c)}
+.swatches i .ic{width:15px;height:15px;color:var(--on);stroke-width:3}
+.signgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px 4px;justify-items:center;padding:4px 0 2px}
+.signgrid span{width:38px;height:38px;border-radius:30%;display:flex;align-items:center;justify-content:center;background:var(--sunk)}
+.signgrid span.on{background:var(--c)}
+.signgrid span.on .ic{color:var(--on)}
+.suggest{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--ink3);padding:2px 0 4px}
+.suggest b{display:inline-flex;align-items:center;gap:4px;font-weight:400;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:2px 8px 2px 3px}
+.suggest b .ic{width:13px;height:13px;color:var(--ink2)}
 @media (max-width:420px){.wrap{padding:28px 14px 50px}}
 </style>
 <script>if(matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.dataset.theme="dark"</script></head>
@@ -270,6 +319,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M17 7l-10 10 M8 7h9v9"/></symbol>
 <symbol id="i-baby-carriage" viewBox="0 0 24 24"><path d="M6 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M16 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M2 5h2.5l1.632 4.897a6 6 0 0 0 5.693 4.103h2.675a5.5 5.5 0 0 0 0 -11h-.5v6 M6 9h14 M9 17l1 -3 M16 14l1 3"/></symbol>
 <symbol id="i-backspace" viewBox="0 0 24 24"><path d="M20 6a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-11l-5 -5a1.5 1.5 0 0 1 0 -2l5 -5z M12 10l4 4 M16 10l-4 4"/></symbol>
+<symbol id="i-beach" viewBox="0 0 24 24"><path d="M17.553 16.75a7.5 7.5 0 0 0 -10.606 0 M18 3.804a6 6 0 0 0 -8.196 2.196l10.392 6a6 6 0 0 0 -2.196 -8.196 M16.732 10c1.658 -2.87 2.225 -5.644 1.268 -6.196c-.957 -.552 -3.075 1.326 -4.732 4.196 M15 9l-3 5.196 M3 19.25a2.4 2.4 0 0 1 1 -.25a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 1 .25"/></symbol>
 <symbol id="i-building-bank" viewBox="0 0 24 24"><path d="M3 21l18 0 M3 10l18 0 M5 6l7 -3l7 3 M4 10l0 11 M20 10l0 11 M8 14l0 3 M12 14l0 3 M16 14l0 3"/></symbol>
 <symbol id="i-bus" viewBox="0 0 24 24"><path d="M4 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M16 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M4 17h-2v-11a1 1 0 0 1 1 -1h14a5 7 0 0 1 5 7v5h-2m-4 0h-8 M16 5l1.5 7l4.5 0 M2 10l15 0 M7 5l0 5 M12 5l0 5"/></symbol>
 <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z M16 3v4 M8 3v4 M4 11h16 M11 15h1 M12 15v3"/></symbol>
@@ -283,25 +333,32 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <symbol id="i-coins" viewBox="0 0 24 24"><path d="M9 14c0 1.657 2.686 3 6 3s6 -1.343 6 -3s-2.686 -3 -6 -3s-6 1.343 -6 3 M9 14v4c0 1.656 2.686 3 6 3s6 -1.344 6 -3v-4 M3 6c0 1.072 1.144 2.062 3 2.598s4.144 .536 6 0c1.856 -.536 3 -1.526 3 -2.598c0 -1.072 -1.144 -2.062 -3 -2.598s-4.144 -.536 -6 0c-1.856 .536 -3 1.526 -3 2.598 M3 6v10c0 .888 .772 1.45 2 2 M3 11c0 .888 .772 1.45 2 2"/></symbol>
 <symbol id="i-credit-card" viewBox="0 0 24 24"><path d="M3 8a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-8 M3 10h18 M7 15h.01 M11 15h2"/></symbol>
 <symbol id="i-database" viewBox="0 0 24 24"><path d="M4 6a8 3 0 1 0 16 0a8 3 0 1 0 -16 0 M4 6v12 M20 6v12 M4 12a8 3 0 0 0 16 0 M4 18a8 3 0 0 0 16 0"/></symbol>
+<symbol id="i-device-mobile" viewBox="0 0 24 24"><path d="M6 5a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-14 M11 4h2 M12 17v.01"/></symbol>
 <symbol id="i-dots" viewBox="0 0 24 24"><path d="M4 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M18 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/></symbol>
 <symbol id="i-download" viewBox="0 0 24 24"><path d="M4 17v2 M4 19a2 2 0 0 0 2 2 M6 21h12 M18 21a2 2 0 0 0 2 -2 M20 19v-2 M7 11l5 5l5 -5 M12 4v12"/></symbol>
 <symbol id="i-gas-station" viewBox="0 0 24 24"><path d="M14 11h1a2 2 0 0 1 2 2v3a1.5 1.5 0 0 0 3 0v-7l-3 -3 M4 20v-14a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v14 M3 20l12 0 M18 7v1a1 1 0 0 0 1 1h1 M4 11l10 0"/></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><path d="M3 9a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1l0 -2 M12 8l0 13 M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7 M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5"/></symbol>
 <symbol id="i-grip-vertical" viewBox="0 0 24 24"><path d="M8 5a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M8 12a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M8 19a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M14 5a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M14 12a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M14 19a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"/></symbol>
+<symbol id="i-heart-handshake" viewBox="0 0 24 24"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572 M12 6l-3.293 3.293a1 1 0 0 0 0 1.414l.543 .543c.69 .69 1.81 .69 2.5 0l1 -1a3.182 3.182 0 0 1 4.5 0l2.25 2.25 M12.5 15.5l2 2 M15 13l2 2"/></symbol>
 <symbol id="i-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0 M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7 M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></symbol>
 <symbol id="i-info-circle" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M12 9h.01 M11 12h1v4h1"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0 M15 9h.01"/></symbol>
 <symbol id="i-lock" viewBox="0 0 24 24"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6 M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M8 11v-4a4 4 0 1 1 8 0v4"/></symbol>
 <symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0 M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0"/></symbol>
 <symbol id="i-mood-happy" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M9 9l.01 0 M15 9l.01 0 M8 13a4 4 0 1 0 8 0h-8"/></symbol>
 <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/></symbol>
 <symbol id="i-paw" viewBox="0 0 24 24"><path d="M14.7 13.5c-1.1 -2 -1.441 -2.5 -2.7 -2.5c-1.259 0 -1.736 .755 -2.836 2.747c-.942 1.703 -2.846 1.845 -3.321 3.291c-.097 .265 -.145 .677 -.143 .962c0 1.176 .787 2 1.8 2c1.259 0 3 -1 4.5 -1s3.241 1 4.5 1c1.013 0 1.8 -.823 1.8 -2c0 -.285 -.049 -.697 -.146 -.962c-.475 -1.451 -2.512 -1.835 -3.454 -3.538 M20.188 8.082a1.039 1.039 0 0 0 -.406 -.082h-.015c-.735 .012 -1.56 .75 -1.993 1.866c-.519 1.335 -.28 2.7 .538 3.052c.129 .055 .267 .082 .406 .082c.739 0 1.575 -.742 2.011 -1.866c.516 -1.335 .273 -2.7 -.54 -3.052l-.001 0 M9.474 9c.055 0 .109 0 .163 -.011c.944 -.128 1.533 -1.346 1.32 -2.722c-.203 -1.297 -1.047 -2.267 -1.932 -2.267c-.055 0 -.109 0 -.163 .011c-.944 .128 -1.533 1.346 -1.32 2.722c.204 1.293 1.048 2.267 1.933 2.267 M16.456 6.733c.214 -1.376 -.375 -2.594 -1.32 -2.722a1.164 1.164 0 0 0 -.162 -.011c-.885 0 -1.728 .97 -1.93 2.267c-.214 1.376 .375 2.594 1.32 2.722c.054 .007 .108 .011 .162 .011c.885 0 1.73 -.974 1.93 -2.267 M5.69 12.918c.816 -.352 1.054 -1.719 .536 -3.052c-.436 -1.124 -1.271 -1.866 -2.009 -1.866c-.14 0 -.277 .027 -.407 .082c-.816 .352 -1.054 1.719 -.536 3.052c.436 1.124 1.271 1.866 2.009 1.866c.14 0 .277 -.027 .407 -.082"/></symbol>
 <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4 M13.5 6.5l4 4"/></symbol>
+<symbol id="i-percentage" viewBox="0 0 24 24"><path d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M6 18l12 -12"/></symbol>
 <symbol id="i-pill" viewBox="0 0 24 24"><path d="M4.5 12.5l8 -8a4.94 4.94 0 0 1 7 7l-8 8a4.94 4.94 0 0 1 -7 -7 M8.5 8.5l7 7"/></symbol>
 <symbol id="i-plane" viewBox="0 0 24 24"><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3l4 7"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14 M5 12h14"/></symbol>
 <symbol id="i-question-mark" viewBox="0 0 24 24"><path d="M8 8a3.5 3 0 0 1 3.5 -3h1a3.5 3 0 0 1 3.5 3a3 3 0 0 1 -2 3a3 4 0 0 0 -2 4 M12 19l0 .01"/></symbol>
 <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2m4 -14h6m-6 4h6m-2 4h2"/></symbol>
+<symbol id="i-school" viewBox="0 0 24 24"><path d="M22 9l-10 -4l-10 4l10 4l10 -4v6 M6 10.6v5.4a6 3 0 0 0 12 0v-5.4"/></symbol>
 <symbol id="i-scooter" viewBox="0 0 24 24"><path d="M16 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M4 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M8 17h5a6 6 0 0 1 5 -5v-5a2 2 0 0 0 -2 -2h-1"/></symbol>
 <symbol id="i-share" viewBox="0 0 24 24"><path d="M3 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0 M15 6a3 3 0 1 0 6 0a3 3 0 1 0 -6 0 M15 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0 M8.7 10.7l6.6 -3.4 M8.7 13.3l6.6 3.4"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/></symbol>
 <symbol id="i-shopping-bag" viewBox="0 0 24 24"><path d="M6.331 8h11.339a2 2 0 0 1 1.977 2.304l-1.255 8.152a3 3 0 0 1 -2.966 2.544h-6.852a3 3 0 0 1 -2.965 -2.544l-1.255 -8.152a2 2 0 0 1 1.977 -2.304 M9 11v-5a3 3 0 0 1 6 0v5"/></symbol>
 <symbol id="i-shopping-cart" viewBox="0 0 24 24"><path d="M4 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M15 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M17 17h-11v-14h-2 M6 5l14 1l-1 7h-13"/></symbol>
 <symbol id="i-soup" viewBox="0 0 24 24"><path d="M4 11h16a1 1 0 0 1 1 1v.5c0 1.5 -2.517 5.573 -4 6.5v1a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-1c-1.687 -1.054 -4 -5 -4 -6.5v-.5a1 1 0 0 1 1 -1 M12 4a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2 M16 4a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2 M8 4a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/></symbol>
@@ -313,8 +370,10 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <symbol id="i-ticket" viewBox="0 0 24 24"><path d="M15 5l0 2 M15 11l0 2 M15 17l0 2 M5 5h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-3a2 2 0 0 0 0 -4v-3a2 2 0 0 1 2 -2"/></symbol>
 <symbol id="i-tools-kitchen-2" viewBox="0 0 24 24"><path d="M19 3v12h-5c-.023 -3.681 .184 -7.406 5 -12m0 12v6h-1v-3m-10 -14v17m-3 -17v3a3 3 0 1 0 6 0v-3"/></symbol>
 <symbol id="i-train" viewBox="0 0 24 24"><path d="M21 13c0 -3.87 -3.37 -7 -10 -7h-8 M3 15h16a2 2 0 0 0 2 -2 M3 6v5h17.5 M3 11v4 M8 11v-5 M13 11v-4.5 M3 19h18"/></symbol>
+<symbol id="i-trending-up" viewBox="0 0 24 24"><path d="M3 17l6 -6l4 4l8 -8 M14 7l7 0l0 7"/></symbol>
 <symbol id="i-truck-delivery" viewBox="0 0 24 24"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5 M3 9l4 0"/></symbol>
 <symbol id="i-upload" viewBox="0 0 24 24"><path d="M4 17v2 M4 19a2 2 0 0 0 2 2 M6 21h12 M18 21a2 2 0 0 0 2 -2 M20 19v-2 M7 9l5 -5l5 5 M12 4v12"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0 -8 0 M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2 M16 3.13a4 4 0 0 1 0 7.75 M21 21v-2a4 4 0 0 0 -3 -3.85"/></symbol>
 <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12 M20 12v4h-4a2 2 0 0 1 0 -4h4"/></symbol>
 <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M12 18l.01 0 M9.172 15.172a4 4 0 0 1 5.656 0 M6.343 12.343a8 8 0 0 1 11.314 0 M3.515 9.515c4.686 -4.687 12.284 -4.687 17 0"/></symbol>
 <symbol id="i-world" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M3.6 9h16.8 M3.6 15h16.8 M11.5 3a17 17 0 0 0 0 18 M12.5 3a17 17 0 0 1 0 18"/></symbol>
@@ -324,7 +383,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="wrap">
 <header class="masthead">
 <h1>Макеты экранов</h1>
-<p>35 экранов: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
+<p>36 экранов: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
 <p>Все экраны одного размера — 330 × 690: экран Samsung Galaxy S25 Ultra (480 × 1040 логических пикселей) под строкой состояния, уменьшенный в 480/330 раза. Нижняя панель и клавиатура прижаты к низу, содержимое длиннее экрана обрезается, как на устройстве.</p>
 <p>Правдой считается приложение: макет сверяется с ним и правится в той же задаче, что и экран. Значки — контуры Tabler из набора приложения, названия категорий — из стартового набора.</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
@@ -334,32 +393,32 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-01</span><b>Посмотреть, сколько доступно</b><span class="uc">UC-02</span><em>Валюта и «доступно» в одну строку, итог под ними. Накопления — своей карточкой без подытога: скрытый счёт не попадает и в отдельную сумму. В валюте одних накоплений («Доллары») «доступно» нет вовсе: там оно всегда ноль. Отрицательный баланс — смысловым цветом, без предупреждений. Кнопка операции подписана: строка «Добавить счёт» тоже начинается с плюса.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-01</span><b>Посмотреть, сколько доступно</b><span class="uc">UC-02</span><em>Валюта и «доступно» в одну строку, итог под ними. Накопления — своей карточкой без подытога: скрытый счёт не попадает и в отдельную сумму. В валюте одних накоплений («Доллары») «доступно» нет вовсе: там оно всегда ноль. Отрицательный баланс — смысловым цветом, без предупреждений. Кнопка операции подписана: строка «Добавить счёт» тоже начинается с плюса. У каждого счёта — знак: плашка цвета счёта со значком по назначению; цвет счёт получает сам, меняют его на отдельном экране [D-12].</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Балансы</h2></div>
   <div class="body">
     <div class="lbl"><span>Рубли</span><span>Доступно</span></div>
     <div class="total">82 430,50 ₽</div>
     <div class="card">
-      <div class="row"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div class="t">Наличные</div></div><span class="num">12 400,00 ₽</span></div>
-      <div class="row"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта основная</div></div><span class="num">71 920,50 ₽</span></div>
-      <div class="row" id="a1-credit"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта кредитная</div></div><span class="num neg">-1 890,00 ₽</span></div>
+      <div class="row"><span class="tile ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><div class="g"><div class="t">Наличные</div></div><span class="num">12 400,00 ₽</span></div>
+      <div class="row"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта основная</div></div><span class="num">71 920,50 ₽</span></div>
+      <div class="row" id="a1-credit"><span class="tile ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><div class="g"><div class="t">Карта кредитная</div></div><span class="num neg">-1 890,00 ₽</span></div>
     </div>
     <div class="lbl"><span>Накопления</span></div>
     <div class="note" style="margin-top:-4px">Скрыты</div>
     <div class="card">
-      <div class="row"><svg class="ic"><use href="#i-building-bank"/></svg><div class="g"><div class="t dim">Вклад на отпуск</div></div><span class="num">250 000,00 ₽</span></div>
+      <div class="row"><span class="tile ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><div class="g"><div class="t dim">Вклад на отпуск</div></div><span class="num">250 000,00 ₽</span></div>
     </div>
     <div class="lbl" style="margin-top:4px"><span>Евро</span><span>Доступно</span></div>
     <div class="total">1 240,00 €</div>
     <div class="card">
-      <div class="row"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта евро</div></div><span class="num">1 240,00 €</span></div>
+      <div class="row"><span class="tile ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><div class="g"><div class="t">Карта евро</div></div><span class="num">1 240,00 €</span></div>
     </div>
     <div class="lbl" style="margin-top:4px"><span>Доллары</span></div>
     <div class="lbl"><span>Накопления</span></div>
     <div class="note" style="margin-top:-4px">Скрыты</div>
     <div class="card">
-      <div class="row"><svg class="ic"><use href="#i-building-bank"/></svg><div class="g"><div class="t dim">Доллары дома</div></div><span class="num">1 460,00 $</span></div>
+      <div class="row"><span class="tile ac-magenta"><svg class="ic"><use href="#i-home"/></svg></span><div class="g"><div class="t dim">Доллары дома</div></div><span class="num">1 460,00 $</span></div>
     </div>
     <div class="card">
       <div class="row"><svg class="ic acc"><use href="#i-plus"/></svg><div class="g"><div class="t accent">Добавить счёт</div></div></div>
@@ -376,18 +435,18 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-02</span><b>Просмотреть операции по всем счетам</b><span class="uc">UC-06</span><em>Общая лента. Счёт дописан в подпись, потому что при просмотре всех операций он перестаёт быть очевидным из контекста. Заметка — третьей строкой, мельче: в подписи она вытесняла группу и обрезала счёт. Перевод — одной строкой со стороны списания, подписан «откуда → куда». Итог дня — в рублях по учитываемым счетам: валютный день итога не имеет. Удаление из ленты — как в ленте счёта: смахиванием по одной [A-03], долгим нажатием — выделением [C-09]; кнопка «+» так же уходит за край при прокрутке вниз.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-02</span><b>Просмотреть операции по всем счетам</b><span class="uc">UC-06</span><em>Общая лента. Счёт дописан в подпись, потому что при просмотре всех операций он перестаёт быть очевидным из контекста; перед названием — жетон: знак счёта, уменьшенный для строки, цепочку трат по одному счёту видно при прокрутке. Заметка — третьей строкой, мельче: в подписи она вытесняла группу и обрезала счёт. Перевод — одной строкой со стороны списания, подписан «откуда → куда», у обоих счетов свой жетон. Итог дня — в рублях по учитываемым счетам: валютный день итога не имеет. Удаление из ленты — как в ленте счёта: смахиванием по одной [A-03], долгим нажатием — выделением [C-09]; кнопка «+» так же уходит за край при прокрутке вниз.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Операции</h2></div>
   <div class="date"><span>25 августа</span><span>-6 250,00 ₽</span></div>
-  <div class="row fr"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка · Карта основная</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
-  <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Перевод</div><div class="s">Карта основная → Вклад на отпуск</div></div><span class="num">-5 000,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка · <span class="token ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span>Карта основная</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Перевод</div><div class="s"><span class="token ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span>Карта основная → <span class="token ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span>Вклад на отпуск</div></div><span class="num">-5 000,00 ₽</span></div></div>
   <div class="date"><span>24 августа</span><span class="pos">+89 540,00 ₽</span></div>
-  <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Доход · Карта основная</div><div class="n">Аванс</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
-  <div class="row fr"><svg class="ic"><use href="#i-bus"/></svg><div class="g"><div><div class="t">Метро, автобус</div><div class="s">Транспорт · Наличные</div></div><span class="num neg">-140,00 ₽</span></div></div>
-  <div class="row fr"><svg class="ic"><use href="#i-coffee"/></svg><div class="g"><div><div class="t">Кофе</div><div class="s">Еда · Карта основная</div></div><span class="num neg">-320,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Доход · <span class="token ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span>Карта основная</div><div class="n">Аванс</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-bus"/></svg><div class="g"><div><div class="t">Метро, автобус</div><div class="s">Транспорт · <span class="token ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span>Наличные</div></div><span class="num neg">-140,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-coffee"/></svg><div class="g"><div><div class="t">Кофе</div><div class="s">Еда · <span class="token ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span>Карта основная</div></div><span class="num neg">-320,00 ₽</span></div></div>
   <div class="date"><span>23 августа</span><span></span></div>
-  <div class="row fr"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div><div class="t">Кафе и рестораны</div><div class="s">Еда · Карта евро</div></div><span class="num neg">-48,00 €</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div><div class="t">Кафе и рестораны</div><div class="s">Еда · <span class="token ac-green"><svg class="ic"><use href="#i-plane"/></svg></span>Карта евро</div></div><span class="num neg">-48,00 €</span></div></div>
   <div class="fab">+</div>
   <nav class="nav">
     <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
@@ -399,9 +458,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-03</span><b>Просмотреть ленту счёта</b><span class="uc">UC-06</span><em>Баланс — строкой под шапкой, а не карточкой: четверть первого экрана под одно число не уходит. Подпись строки — место, иначе группа; группа, чьё название повторяет подкатегорию («Без категории»), не пишется второй раз. Заметка — своей строкой ниже. Лента открыта с балансов, поэтому подсвечена их вкладка. Карандаш в шапке открывает карточку счёта [D-02]. Строка «Кофе» смахнута влево: под ней «Удалить» с тем же подтверждением, что в карточке [C-07]. Кнопка «+» уходит за край, пока ленту листают вниз, и возвращается при прокрутке вверх.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-03</span><b>Просмотреть ленту счёта</b><span class="uc">UC-06</span><em>Баланс — строкой под шапкой, а не карточкой: четверть первого экрана под одно число не уходит. Подпись строки — место, иначе группа; группа, чьё название повторяет подкатегорию («Без категории»), не пишется второй раз. Заметка — своей строкой ниже. Рядом с названием — плашка счёта, поэтому в строках жетонов нет: счёт один. Лента открыта с балансов, поэтому подсвечена их вкладка. Карандаш в шапке открывает карточку счёта [D-02]. Строка «Кофе» смахнута влево: под ней «Удалить» с тем же подтверждением, что в карточке [C-07]. Кнопка «+» уходит за край, пока ленту листают вниз, и возвращается при прокрутке вверх.</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Карта основная</h2><svg class="ic"><use href="#i-pencil"/></svg></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><span class="hdt"><span class="tile lg ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><h2>Карта основная</h2></span><svg class="ic"><use href="#i-pencil"/></svg></div>
   <div class="balrow"><span>Баланс</span><b>71 920,50 ₽</b></div>
   <div class="date"><span>25 августа</span><span>-6 250,00 ₽</span></div>
   <div class="row fr"><svg class="ic"><use href="#i-shopping-cart"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
@@ -456,7 +515,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-01</span><b>Ввести сумму</b><span class="uc">UC-01</span><em>Две карточки: в первой обязательное — вид, сумма, счёт и категория, во второй то, что можно не заполнять. Клавиатура открыта сразу — сумму меняют всегда. Итог со знаком и цветом вида; арифметика прямо в поле: пока действие не закрыто клавишей «=», вместо итога подсказка. Панели вкладок на форме нет, сохранение — в шапке. Незаполненное обязательное поле отмечено тихо — кольцом у значка и точкой у подписи: категория пуста на каждой новой операции, и громкая подсветка встречала бы каждый раз. Подставить счёт нечего — сумма видна без знака валюты, поле счёта отмечено так же и подписано «Добавить»: касание открывает карточку нового счёта, «Сохранить» без счёта отвечает всплывающим сообщением.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-01</span><b>Ввести сумму</b><span class="uc">UC-01</span><em>Две карточки: в первой обязательное — вид, сумма, счёт и категория, во второй то, что можно не заполнять. Клавиатура открыта сразу — сумму меняют всегда. Итог со знаком и цветом вида; арифметика прямо в поле: пока действие не закрыто клавишей «=», вместо итога подсказка. Панели вкладок на форме нет, сохранение — в шапке. В поле счёта — его плашка вместо серого кружка: перепутанный счёт видно до сохранения. Незаполненное обязательное поле отмечено тихо — кольцом у значка и точкой у подписи: категория пуста на каждой новой операции, и громкая подсветка встречала бы каждый раз. Подставить счёт нечего — сумма видна без знака валюты, поле счёта отмечено так же и подписано «Добавить»: касание открывает карточку нового счёта, «Сохранить» без счёта отвечает всплывающим сообщением.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Новая операция</h2><b class="save">Сохранить</b></div>
   <div class="body">
@@ -464,7 +523,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="kinds"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расход</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доход</b><b class="trf"><svg class="ic sm"><use href="#i-swap"/></svg>Перевод</b></div>
       <div class="amt"><span class="expr"></span><span class="v exp">-1 590 ₽</span></div>
       <div class="cells">
-        <div class="fld"><span class="ico"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Счёт</span><span class="v">Карта основная</span></span></div>
+        <div class="fld"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Счёт</span><span class="v">Карта основная</span></span></div>
         <div class="fld req"><span class="ico"><svg class="ic"><use href="#i-tag"/></svg></span><span><span class="k">Категория</span><span class="v ask">Выбрать</span></span></div>
       </div>
     </div>
@@ -489,18 +548,18 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-02</span><b>Выбрать счёт</b><span class="uc">UC-01 UC-04</span><em>Балансы показаны прямо в списке: выбирая счёт для расхода, вы обычно и хотите знать, хватит ли на нём денег. Выбранный — плашкой и галочкой; заблокированные не предлагаются. Нужного счёта нет — «Новый счёт» над списком открывает карточку вместо этого экрана, и заведённый счёт встаёт прямо в форму. Заголовок называет сторону только у перевода — «Счёт списания» и «Счёт зачисления»; у расхода и дохода он просто «Счёт».</em></figcaption>
+<figcaption class="cap"><span class="sid">B-02</span><b>Выбрать счёт</b><span class="uc">UC-01 UC-04</span><em>Балансы показаны прямо в списке: выбирая счёт для расхода, вы обычно и хотите знать, хватит ли на нём денег. У каждого счёта его плашка, те же, что на балансах. Выбранный — фоном и галочкой цвета действия: цвет счёта выбор не обозначает. Заблокированные не предлагаются. Нужного счёта нет — «Новый счёт» над списком открывает карточку вместо этого экрана, и заведённый счёт встаёт прямо в форму. Заголовок называет сторону только у перевода — «Счёт списания» и «Счёт зачисления»; у расхода и дохода он просто «Счёт».</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт</h2></div>
   <div class="list">
     <div class="row"><svg class="ic acc"><use href="#i-plus"/></svg><div class="g"><div class="t accent">Новый счёт</div></div></div>
     <div class="lbl" style="padding:10px 11px 6px;margin:0"><span>Рубли</span></div>
-    <div class="row"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div class="t">Наличные</div></div><span class="num">12 400,00 ₽</span></div>
-    <div class="row sel"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта основная</div></div><span class="num">71 920,50 ₽</span><svg class="ic acc"><use href="#i-check"/></svg></div>
-    <div class="row"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта кредитная</div></div><span class="num neg">-1 890,00 ₽</span></div>
-    <div class="row"><svg class="ic"><use href="#i-building-bank"/></svg><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Накопления</div></div><span class="num">250 000,00 ₽</span></div>
+    <div class="row"><span class="tile ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><div class="g"><div class="t">Наличные</div></div><span class="num">12 400,00 ₽</span></div>
+    <div class="row sel"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта основная</div></div><span class="num">71 920,50 ₽</span><svg class="ic acc"><use href="#i-check"/></svg></div>
+    <div class="row"><span class="tile ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><div class="g"><div class="t">Карта кредитная</div></div><span class="num neg">-1 890,00 ₽</span></div>
+    <div class="row"><span class="tile ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Накопления</div></div><span class="num">250 000,00 ₽</span></div>
     <div class="lbl" style="padding:10px 11px 6px;margin:0"><span>Евро</span></div>
-    <div class="row"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта евро</div></div><span class="num">1 240,00 €</span></div>
+    <div class="row"><span class="tile ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><div class="g"><div class="t">Карта евро</div></div><span class="num">1 240,00 €</span></div>
   </div>
 </div>
 </figure>
@@ -562,7 +621,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-05</span><b>Перевести между счетами в одной валюте</b><span class="uc">UC-04 UC-05</span><em>Сумма одна: при совпадающих валютах суммы обязаны быть равны. Справа вместо категории — счёт зачисления, места у перевода нет. Итог без знака и основным цветом: деньги переложены, а не потрачены.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-05</span><b>Перевести между счетами в одной валюте</b><span class="uc">UC-04 UC-05</span><em>Сумма одна: при совпадающих валютах суммы обязаны быть равны. Справа вместо категории — счёт зачисления, места у перевода нет. Итог без знака и основным цветом: деньги переложены, а не потрачены. «Откуда» и «Куда» — каждое со своей плашкой: перепутанные стороны видны сразу.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Новая операция</h2><b class="save">Сохранить</b></div>
   <div class="body">
@@ -570,8 +629,8 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="kinds"><b class="exp"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расход</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доход</b><b class="trf on"><svg class="ic sm"><use href="#i-swap"/></svg>Перевод</b></div>
       <div class="amt"><span class="expr"></span><span class="v">5 000 ₽</span></div>
       <div class="cells">
-        <div class="fld"><span class="ico"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Откуда</span><span class="v">Карта основная</span></span></div>
-        <div class="fld"><span class="ico"><svg class="ic"><use href="#i-building-bank"/></svg></span><span><span class="k">Куда</span><span class="v">Вклад на отпуск</span></span></div>
+        <div class="fld"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Откуда</span><span class="v">Карта основная</span></span></div>
+        <div class="fld"><span class="tile ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><span><span class="k">Куда</span><span class="v">Вклад на отпуск</span></span></div>
       </div>
     </div>
     <div class="card">
@@ -603,8 +662,8 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="amt"><span class="expr"></span><span class="v">500 €</span></div>
       <div class="amt on"><span class="lb"><span>Зачисление</span></span><span class="v">45 000 ₽</span></div>
       <div class="cells">
-        <div class="fld"><span class="ico"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Откуда</span><span class="v">Карта евро</span></span></div>
-        <div class="fld"><span class="ico"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Куда</span><span class="v">Карта основная</span></span></div>
+        <div class="fld"><span class="tile ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><span><span class="k">Откуда</span><span class="v">Карта евро</span></span></div>
+        <div class="fld"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Куда</span><span class="v">Карта основная</span></span></div>
       </div>
     </div>
     <div class="card">
@@ -654,7 +713,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="kinds"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расход</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доход</b><b class="trf"><svg class="ic sm"><use href="#i-swap"/></svg>Перевод</b></div>
       <div class="amt"><span class="expr"></span><span class="v exp">-1 250 ₽</span></div>
       <div class="cells">
-        <div class="fld"><span class="ico"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Счёт</span><span class="v">Карта основная</span></span></div>
+        <div class="fld"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Счёт</span><span class="v">Карта основная</span></span></div>
         <div class="fld req"><span class="ico"><svg class="ic"><use href="#i-tag"/></svg></span><span><span class="k">Категория</span><span class="v ask">Выбрать</span></span></div>
       </div>
     </div>
@@ -712,7 +771,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <figure class="unit">
 <figcaption class="cap"><span class="sid">C-03</span><b>Открыть счёт без операций</b><span class="uc">UC-06 UC-20</span><em>Начальный остаток показан отдельной карточкой — иначе непонятно, откуда взялся баланс при пустой ленте. Добавить операцию предлагает само пустое состояние, плавающей кнопки нет.</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Карта евро</h2><svg class="ic"><use href="#i-pencil"/></svg></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><span class="hdt"><span class="tile lg ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><h2>Карта евро</h2></span><svg class="ic"><use href="#i-pencil"/></svg></div>
   <div class="balrow"><span>Баланс</span><b>1 240,00 €</b></div>
   <div class="body">
     <div class="card">
@@ -804,7 +863,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="kinds"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расход</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доход</b><b class="trf"><svg class="ic sm"><use href="#i-swap"/></svg>Перевод</b></div>
       <div class="amt"><span class="expr"></span><span class="v exp">-1 250 ₽</span></div>
       <div class="cells">
-        <div class="fld"><span class="ico"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Счёт</span><span class="v">Карта основная</span></span></div>
+        <div class="fld"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Счёт</span><span class="v">Карта основная</span></span></div>
         <div class="fld"><span class="ico exp"><svg class="ic"><use href="#i-shopping-cart"/></svg></span><span><span class="k">Категория</span><span class="v">Продукты</span></span></div>
       </div>
     </div>
@@ -864,16 +923,16 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-09</span><b>Удалить несколько операций</b><span class="uc">UC-08</span><em>Долгое нажатие на строке ленты включает выделение: строка отмечена знаком на месте значка и бледным фоном, касание отмечает остальные, а не открывает их. Шапку на это время занимает число выделенных и «Удалить» — на её месте, а не полосой над лентой: полоса сдвигала строки под пальцем, и следующее касание попадало в соседнюю. Крестик и «назад» снимают выделение, стрелка «назад» в ленте счёта спрятана, кнопка «+» тоже. Подтверждение называет число операций и балансы затронутых счетов, кроме тех, чей баланс не меняется.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-09</span><b>Удалить несколько операций</b><span class="uc">UC-08</span><em>Долгое нажатие на строке ленты включает выделение: строка отмечена знаком на месте значка и бледным фоном, касание отмечает остальные, а не открывает их. Шапку на это время занимает число выделенных и «Удалить» — на её месте, а не полосой над лентой: полоса сдвигала строки под пальцем, и следующее касание попадало в соседнюю. Жетоны счетов в подписи остаются: галочка занимает место значка категории, а не знака счёта. Крестик и «назад» снимают выделение, стрелка «назад» в ленте счёта спрятана, кнопка «+» тоже. Подтверждение называет число операций и балансы затронутых счетов, кроме тех, чей баланс не меняется.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg"><use href="#i-x"/></svg><h2>Выбрано: 2</h2><b class="del">Удалить</b></div>
   <div class="date"><span>25 августа</span><span>-6 250,00 ₽</span></div>
-  <div class="row fr sel"><svg class="ic"><use href="#i-circle-check"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка · Карта основная</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
-  <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Перевод</div><div class="s">Карта основная → Вклад на отпуск</div></div><span class="num">-5 000,00 ₽</span></div></div>
+  <div class="row fr sel"><svg class="ic"><use href="#i-circle-check"/></svg><div class="g"><div><div class="t">Продукты</div><div class="s">Пятёрочка · <span class="token ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span>Карта основная</div></div><span class="num neg">-1 250,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-swap"/></svg><div class="g"><div><div class="t">Перевод</div><div class="s"><span class="token ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span>Карта основная → <span class="token ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span>Вклад на отпуск</div></div><span class="num">-5 000,00 ₽</span></div></div>
   <div class="date"><span>24 августа</span><span class="pos">+89 540,00 ₽</span></div>
-  <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Доход · Карта основная</div><div class="n">Аванс</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
-  <div class="row fr"><svg class="ic"><use href="#i-bus"/></svg><div class="g"><div><div class="t">Метро, автобус</div><div class="s">Транспорт · Наличные</div></div><span class="num neg">-140,00 ₽</span></div></div>
-  <div class="row fr sel"><svg class="ic"><use href="#i-circle-check"/></svg><div class="g"><div><div class="t">Кофе</div><div class="s">Еда · Карта основная</div></div><span class="num neg">-320,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div><div class="t">Зарплата</div><div class="s">Доход · <span class="token ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span>Карта основная</div><div class="n">Аванс</div></div><span class="num pos">+90 000,00 ₽</span></div></div>
+  <div class="row fr"><svg class="ic"><use href="#i-bus"/></svg><div class="g"><div><div class="t">Метро, автобус</div><div class="s">Транспорт · <span class="token ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span>Наличные</div></div><span class="num neg">-140,00 ₽</span></div></div>
+  <div class="row fr sel"><svg class="ic"><use href="#i-circle-check"/></svg><div class="g"><div><div class="t">Кофе</div><div class="s">Еда · <span class="token ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span>Карта основная</div></div><span class="num neg">-320,00 ₽</span></div></div>
   <nav class="nav">
     <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
     <a class="on"><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
@@ -896,24 +955,24 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-01</span><b>Упорядочить счета</b><span class="uc">UC-15 UC-13 UC-21</span><em>Порядок задаётся перетаскиванием за всю строку, ручка слева только говорит об этом. Раздел накоплений появляется от признака счёта, а не от его типа; пустые разделы не показываются. Заблокированный счёт вместо ручки помечен замком — его не переставляют.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-01</span><b>Упорядочить счета</b><span class="uc">UC-15 UC-13 UC-21</span><em>Порядок задаётся перетаскиванием за всю строку, ручка слева только говорит об этом. Раздел накоплений появляется от признака счёта, а не от его типа; пустые разделы не показываются. Заблокированный счёт вместо ручки помечен замком — его не переставляют; плашка у него вполсилы, а цвет считается свободным для новых счетов.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счета</h2><span class="tool">+</span></div>
   <div class="body">
     <div class="lbl"><span>Доступно к тратам</span></div>
     <div class="card">
-      <div class="row"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div class="t">Наличные</div><div class="s">Наличные · RUB</div></div><span class="num">12 400,00 ₽</span></div>
-      <div class="row"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта основная</div><div class="s">Карта · RUB</div></div><span class="num">71 920,50 ₽</span></div>
-      <div class="row" id="d1-credit"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта кредитная</div><div class="s">Карта · RUB</div></div><span class="num neg">-1 890,00 ₽</span></div>
-      <div class="row"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта евро</div><div class="s">Карта · EUR</div></div><span class="num">1 240,00 €</span></div>
+      <div class="row"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><span class="tile ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><div class="g"><div class="t">Наличные</div><div class="s">Наличные · RUB</div></div><span class="num">12 400,00 ₽</span></div>
+      <div class="row"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта основная</div><div class="s">Карта · RUB</div></div><span class="num">71 920,50 ₽</span></div>
+      <div class="row" id="d1-credit"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><span class="tile ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><div class="g"><div class="t">Карта кредитная</div><div class="s">Карта · RUB</div></div><span class="num neg">-1 890,00 ₽</span></div>
+      <div class="row"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><span class="tile ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><div class="g"><div class="t">Карта евро</div><div class="s">Карта · EUR</div></div><span class="num">1 240,00 €</span></div>
     </div>
     <div class="lbl"><span>Накопления</span></div>
     <div class="card">
-      <div class="row"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><svg class="ic"><use href="#i-building-bank"/></svg><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Карта · RUB</div></div><span class="num">250 000,00 ₽</span></div>
+      <div class="row"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><span class="tile ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Карта · RUB</div></div><span class="num">250 000,00 ₽</span></div>
     </div>
     <div class="lbl"><span>Заблокированные</span></div>
     <div class="card">
-      <div class="row" id="d1-closed"><svg class="ic mut"><use href="#i-lock"/></svg><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Карта старая</div><div class="s">Карта · RUB</div></div><span class="num">0,00 ₽</span></div>
+      <div class="row" id="d1-closed"><svg class="ic mut"><use href="#i-lock"/></svg><span class="tile ac-red off"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта старая</div><div class="s">Карта · RUB</div></div><span class="num">0,00 ₽</span></div>
     </div>
   </div>
   <nav class="nav">
@@ -926,12 +985,15 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-02</span><b>Изменить счёт</b><span class="uc">UC-14 UC-13 UC-21</span><em>Валюта заперта: по счёту есть операции — касание поля объясняет это всплывающим сообщением; календарь даты открытия так же называет крайний день — день первой операции. Ограничения объясняются в момент касания, а не отказом при сохранении. Блокировка счёта с деньгами подтверждается отдельным вопросом с суммой остатка; у нового счёта переключателя блокировки нет — заводить сразу заблокированный незачем. Остаток набирается клавиатурой суммы — она появляется по касанию поля и уходит при наборе названия; долг — минусом первой клавишей, красным. Сохранение и удаление — в шапке, как в форме операции: клавиатура их не закрывает. Панели вкладок нет, тоже как в форме операции: с ней и клавиатурой поле остатка уходило под клавиши. Пока клавиатура на виду, остаток показан как набран — с запятой, без валюты; «назад» сначала убирает клавиатуру. Счёт с операциями не удаляется — «Удалить» отвечает всплывающим сообщением, что его можно заблокировать; пустой удаляется после подтверждения.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-02</span><b>Изменить счёт</b><span class="uc">UC-14 UC-13 UC-21</span><em>Шапка карточки показывает знак счёта, название и подпись «Карта · RUB»; под названием строка «Цвет и значок» — плашка, «цвет · значок», шеврон — открывает отдельный экран [D-12], а не две длинные сетки в карточке. Валюта заперта: по счёту есть операции — касание поля объясняет это всплывающим сообщением; календарь даты открытия так же называет крайний день — день первой операции. Ограничения объясняются в момент касания, а не отказом при сохранении. Блокировка счёта с деньгами подтверждается отдельным вопросом с суммой остатка; у нового счёта переключателя блокировки нет — заводить сразу заблокированный незачем. Остаток набирается клавиатурой суммы — она появляется по касанию поля и уходит при наборе названия; долг — минусом первой клавишей, красным. Сохранение и удаление — в шапке, как в форме операции: клавиатура их не закрывает. Панели вкладок нет, тоже как в форме операции: с ней и клавиатурой поле остатка уходило под клавиши. Пока клавиатура на виду, остаток показан как набран — с запятой, без валюты; «назад» сначала убирает клавиатуру. Счёт с операциями не удаляется — «Удалить» отвечает всплывающим сообщением, что его можно заблокировать; пустой удаляется после подтверждения.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт</h2><b class="del">Удалить</b><b class="save">Сохранить</b></div>
   <div class="body">
     <div class="card form">
+      <div class="preview"><span class="tile lg ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><div class="g"><div class="t">Карта кредитная</div><div class="s">Карта · RUB</div></div></div>
+      <div class="dv"></div>
       <div class="fld"><span class="k">Название</span><span class="v">Карта кредитная</span></div>
+      <div class="fld"><span class="k">Цвет и значок</span><div class="signrow"><span class="tile ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><span class="v">Голубой · процент</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div></div>
       <div class="fld"><span class="k">Тип</span><span class="v">Карта</span></div>
       <div class="fld"><span class="k">Валюта</span><span class="v lock">Рубль ₽</span></div>
       <div class="fld"><span class="k">Начальный остаток</span><span class="v neg" style="border-bottom:2px solid var(--acc)">-15 000 ₽</span></div>
@@ -1201,6 +1263,35 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
     <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
   </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">D-12</span><b>Выбрать цвет и значок счёта</b><span class="uc">UC-13 UC-14</span><em>Экран открывает строка «Цвет и значок» в карточке счёта [D-02]. Сверху — предпросмотр: строка балансов и строка ленты с жетоном; обе перекрашиваются по каждому касанию, и знак виден там, где его будут узнавать. Ниже восемь цветов в два ряда по четыре, выбранный — с галочкой, и восемнадцать значков по шесть в ряд; выбранный залит цветом счёта, значок на нём белый или тёмный, как будет на балансах. Над сеткой — подсказка по названию: до трёх подходящих значков, сам значок от названия не меняется. «Назад» возвращает выбор в карточку, в базу он уходит по «Сохранить» там; панели вкладок нет, как у остальных экранов выбора.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Цвет и значок</h2></div>
+  <div class="body">
+    <div class="signprev">
+      <div class="card"><div class="row"><span class="tile ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><div class="g"><div class="t">Карта кредитная</div></div><span class="num neg">-1 890,00 ₽</span></div></div>
+      <div class="card"><div class="row fr"><svg class="ic"><use href="#i-gas-station"/></svg><div class="g"><div><div class="t">Топливо</div><div class="s">Лукойл · <span class="token ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span>Карта кредитная</div></div><span class="num neg">-2 400,00 ₽</span></div></div></div>
+    </div>
+    <div class="lbl sp"><span>Цвет</span></div>
+    <div class="card form">
+      <div class="swatches">
+        <i class="ac-blue"></i><i class="ac-orange"></i><i class="ac-sky on"><svg class="ic"><use href="#i-check"/></svg></i><i class="ac-green"></i>
+        <i class="ac-violet"></i><i class="ac-magenta"></i><i class="ac-red"></i><i class="ac-pink"></i>
+      </div>
+    </div>
+    <div class="lbl sp"><span>Значок</span></div>
+    <div class="card form">
+      <div class="suggest">Подходит: <b><svg class="ic"><use href="#i-percentage"/></svg>процент</b></div>
+      <div class="signgrid ac-sky">
+        <span><svg class="ic"><use href="#i-credit-card"/></svg></span><span><svg class="ic"><use href="#i-cash"/></svg></span><span><svg class="ic"><use href="#i-building-bank"/></svg></span><span><svg class="ic"><use href="#i-wallet"/></svg></span><span><svg class="ic"><use href="#i-coins"/></svg></span><span><svg class="ic"><use href="#i-trending-up"/></svg></span>
+        <span class="on"><svg class="ic"><use href="#i-percentage"/></svg></span><span><svg class="ic"><use href="#i-device-mobile"/></svg></span><span><svg class="ic"><use href="#i-plane"/></svg></span><span><svg class="ic"><use href="#i-beach"/></svg></span><span><svg class="ic"><use href="#i-home"/></svg></span><span><svg class="ic"><use href="#i-heart-handshake"/></svg></span>
+        <span><svg class="ic"><use href="#i-gift"/></svg></span><span><svg class="ic"><use href="#i-shield"/></svg></span><span><svg class="ic"><use href="#i-key"/></svg></span><span><svg class="ic"><use href="#i-car"/></svg></span><span><svg class="ic"><use href="#i-school"/></svg></span><span><svg class="ic"><use href="#i-users"/></svg></span>
+      </div>
+    </div>
+  </div>
 </div>
 </figure>
 

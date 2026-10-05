@@ -1,0 +1,249 @@
+/* Создан tools/build.cs из docs/ui/mockups.html — руками не править */
+
+:root{
+  --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
+  --ink:#16191C; --ink2:#4C535A; --ink3:#676D74;
+  --line:#E3E6E9; --line2:#CBD1D6;
+  --acc:#0F5C4C; --accbg:#E2EFEB;
+  --pos:#15784A; --neg:#C9302C; --trf:#2259D6; --negbg:#FBEEEE; --posbg:#E3EFE9; --trfbg:#E4EBFA;
+  --mono:ui-monospace,"SF Mono","Roboto Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  --onacc:#FFFFFF; --knob:#FFFFFF; --veil:rgba(22,25,28,.42);
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --app:"Open Sans",var(--sans);
+}
+[data-theme="dark"]{
+  --paper:#101315;--card:#1C2124;--sunk:#252B2F;
+  --ink:#E7EAEC;--ink2:#A8AFB5;--ink3:#8A9299;
+  --line:#2F373C;--line2:#3A4147;
+  --acc:#48A78E;--accbg:#1B342D;
+  --pos:#5FD08F;--neg:#FF8A80;--trf:#8AB1FF;--negbg:#453435;--posbg:#284037;--trfbg:#303B4B;
+  --onacc:#0B1310;--knob:#E7EAEC;--veil:rgba(4,6,7,.62);
+}
+/* В тёмной теме плавающая кнопка цветом карточки с акцентной обводкой, как в приложении */
+[data-theme="dark"] .fab{background:var(--card);color:var(--acc);border:1px solid var(--acc)}
+[data-theme="dark"] .kinds b.on,[data-theme="dark"] .seg b.on{font-weight:600}
+
+/* Шрифт приложения — Open Sans из его ресурсов; без них — системный */
+@font-face{font-family:"Open Sans";src:url(../../../src/Finance.App/Resources/Fonts/OpenSans-Regular.ttf);font-weight:400}
+@font-face{font-family:"Open Sans";src:url(../../../src/Finance.App/Resources/Fonts/OpenSans-Semibold.ttf);font-weight:600}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1320px;margin:0 auto;padding:48px 24px 80px}
+.masthead{border-bottom:1px solid var(--line2);padding-bottom:20px;margin-bottom:14px}
+.masthead h1{font-size:26px;font-weight:500;margin:0 0 6px;letter-spacing:-0.01em}
+.masthead p{margin:0 0 4px;color:var(--ink2);font-size:14px;max-width:64ch}
+.band{margin:38px 0 20px;padding-bottom:9px;border-bottom:1px solid var(--line2);display:flex;align-items:baseline;gap:12px}
+.band h2{font-size:15px;font-weight:500;margin:0;letter-spacing:.02em}
+.band span{font-size:13px;color:var(--ink2)}
+.sheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:34px 26px;align-items:start}
+.unit{margin:0}
+.cap{margin:0 0 12px;padding-left:2px}
+.sid{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--acc);background:var(--accbg);padding:2px 6px;border-radius:3px;margin-right:8px}
+.cap b{font-weight:500;font-size:14.5px}
+.cap em{display:block;font-style:normal;color:var(--ink2);font-size:12.5px;line-height:1.5;margin-top:4px}
+.cap .uc{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-left:8px}
+
+/* Экран: 330×690 — экран Samsung Galaxy S25 Ultra (480×1040 dp) под строкой состояния в масштабе 330/480;
+   лишнее обрезается, как на устройстве. Страница — цвета бумаги, шапка и панель вкладок — цвета карточки */
+.phone{position:relative;width:330px;height:690px;background:var(--paper);border:1px solid var(--line2);border-radius:22px;overflow:hidden;font-family:var(--app);font-size:13px;line-height:1.4;color:var(--ink)}
+.ic{width:17px;height:17px;flex:none;color:var(--ink2);stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ic.sm{width:14px;height:14px}
+.ic.lg{width:20px;height:20px}
+.ic.acc{color:var(--acc)}
+.ic.mut{color:var(--ink3)}
+.ic.back{transform:rotate(180deg)}
+
+/* Шапка — панель Shell: стрелка «назад», заголовок, действия справа */
+.hd{display:flex;align-items:center;gap:22px;height:46px;padding:0 12px 0 14px;background:var(--card)}
+.hd .ic{color:var(--ink)}
+.hd h2{font-size:16.5px;font-weight:600;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .tool{font-size:17px;font-weight:600;padding:0 4px}
+.hd .save{background:var(--acc);color:var(--onacc);font-size:12px;font-weight:600;padding:6px 12px;border-radius:13px;white-space:nowrap}
+.hd .save.off{opacity:.4}
+.hd .del{color:var(--neg);font-size:12px;font-weight:600;margin-right:-10px}
+
+.body{padding:8px 11px;display:flex;flex-direction:column;gap:11px}
+.lbl{display:flex;justify-content:space-between;font-size:10.5px;font-weight:600;color:var(--ink3);padding:0 1px;margin-bottom:-5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.row{display:flex;align-items:center;gap:9px;padding:8px 10px;min-height:34px}
+.card .row+.row{border-top:1px solid var(--line)}
+.row .g{flex:1;min-width:0}
+.row.sel{background:var(--accbg)}
+.row.child{padding-left:37px}
+.row .k{font-size:13px;color:var(--ink2)}
+.row .v{flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .v.none{color:var(--ink3);font-size:12px}
+.t{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s{font-size:11px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.num{font-size:13px;white-space:nowrap}
+.pos{color:var(--pos)}
+.neg{color:var(--neg)}
+.dim{color:var(--ink2)}
+.faint{color:var(--ink3)}
+.accent{color:var(--acc)}
+.total{font-size:19px;font-weight:600;text-align:right;padding:0 1px;white-space:nowrap}
+.note{font-size:11px;color:var(--ink3);line-height:1.45}
+.note.dim{color:var(--ink2)}
+.badge{font-size:10.5px;color:var(--ink3);background:var(--sunk);border-radius:6px;padding:1px 6px}
+.list{padding-top:2px}
+
+/* Поиск — системная строка поиска на утоплённом фоне */
+.search{display:flex;align-items:center;gap:12px;height:36px;padding:0 12px;background:var(--sunk);color:var(--ink3);font-size:12.5px}
+.search .ic{color:var(--ink)}
+.search span{flex:1;border-bottom:1px solid var(--ink2);padding:6px 0 5px}
+.search .typed{color:var(--ink)}
+
+/* Лента: шапка дня утоплена, строки цвета карточки, разделитель — от текста до края */
+.date{display:flex;justify-content:space-between;padding:6px 11px 5px;background:var(--sunk);font-size:10.5px;font-weight:600;color:var(--ink3)}
+.row.fr{align-items:stretch;padding:0 0 0 11px;background:var(--card);min-height:0}
+.row.fr>.ic{margin-top:10px}
+.row.fr .g{display:flex;align-items:center;gap:9px;padding:6px 11px 6px 0;border-bottom:1px solid var(--line)}
+.row.fr .g>div{flex:1;min-width:0}
+/* Заметка — третьей строкой, мельче и тише подписи: в подписи она вытесняла бы группу и счёт */
+.row.fr .n{font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Выделение в ленте: панель над списком, отмеченная строка — бледным фоном действия и знаком на месте значка */
+.row.fr.sel{background:var(--accbg)}
+.row.fr.sel>.ic{color:var(--acc)}
+.row.fr.sel .n{color:var(--ink2)}
+/* Смахнутая влево строка: под ней «Удалить» */
+.swiped{display:flex;overflow:hidden}
+.swiped .row.fr{flex:0 0 100%;margin-left:-66px}
+.swiped .rm{flex:0 0 66px;display:flex;align-items:center;justify-content:center;background:var(--neg);color:var(--onacc);font-size:11.5px;font-weight:600}
+.balrow{display:flex;justify-content:space-between;align-items:center;padding:8px 11px;font-size:12px;color:var(--ink2)}
+.balrow b{font-size:13.5px;font-weight:600;color:var(--ink)}
+
+/* Сегменты: справочник — плашкой акцента; вид операции и отчёт — своим цветом и знаком */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px}
+.seg b{text-align:center;padding:8px 0;font-size:12.5px;font-weight:400;border-radius:7px;color:var(--ink2)}
+.seg b.on{background:var(--accbg);color:var(--acc)}
+.kinds{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;height:34px;border-bottom:1px solid var(--line)}
+.kinds.boxed{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.kinds b{display:flex;align-items:center;justify-content:center;gap:5px;font-size:12.5px;font-weight:400}
+.kinds b .ic{color:inherit}
+.kinds b.exp{color:var(--neg)}
+.kinds b.inc{color:var(--pos)}
+.kinds b.trf{color:var(--trf)}
+.kinds b.on{color:var(--onacc);font-weight:600}
+.kinds b.exp.on{background:var(--neg)}
+.kinds b.inc.on{background:var(--pos)}
+.kinds b.trf.on{background:var(--trf)}
+
+/* Форма операции: итог крупно по центру, выражение над ним, счёт и категория пополам */
+.amt{display:grid;grid-template-rows:20px auto 20px;padding:0 11px;text-align:center}
+.amt.on{background:var(--sunk)}
+.amt .expr{grid-row:1;align-self:end;font-size:12px;color:var(--ink2)}
+.amt .v{grid-row:2;font-size:30px;font-weight:600;line-height:1.2;white-space:nowrap}
+.amt .v.exp{color:var(--neg)}
+.amt .v.inc{color:var(--pos)}
+.amt .v.zero{color:var(--ink3)}
+.amt .v.wait{font-size:12.5px;font-weight:400;color:var(--ink3);line-height:36px}
+.amt .lb{grid-row:1;align-self:end;display:flex;justify-content:space-between;font-size:11px;color:var(--ink3)}
+.amt+.amt{border-top:1px solid var(--line)}
+.cells{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.cells .fld{display:flex;align-items:center;gap:7px;padding:6px 8px;min-height:42px;min-width:0}
+.cells .fld+.fld{border-left:1px solid var(--line)}
+.cells .fld>span:last-child{min-width:0}
+.cells .k{display:block;font-size:10.5px;color:var(--ink3)}
+.cells .v{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cells .v.ask{color:var(--acc)}
+.ico{width:25px;height:25px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--sunk)}
+/* Незаполненное обязательное поле — тихая метка: кольцо у значка, точка у подписи */
+.fld.req .ico{background:var(--card);box-shadow:inset 0 0 0 1.2px var(--acc);color:var(--acc)}
+.fld.req .k::after{content:"";display:inline-block;width:4px;height:4px;border-radius:2px;background:var(--acc);margin-left:4px;vertical-align:1px}
+.ico .ic{width:15px;height:15px}
+.ico.exp{background:var(--negbg)}
+.ico.exp .ic{color:var(--neg)}
+.ico.inc{background:var(--posbg)}
+.ico.inc .ic{color:var(--pos)}
+.hint{font-size:10.5px;color:var(--ink3);padding:4px 10px 6px;border-top:1px solid var(--line)}
+.chips{display:flex;gap:4px;flex:none}
+.chip{font-size:11px;font-weight:400;padding:3px 8px;border:1px solid var(--line);border-radius:11px;color:var(--ink2);white-space:nowrap;display:flex;align-items:center;gap:4px}
+.chip.on{background:var(--accbg);border-color:transparent;color:var(--acc)}
+.chip .ic{width:13px;height:13px}
+.chiprow{display:flex;gap:5px;overflow:hidden;padding:0 11px}
+.entry{flex:1;border-bottom:1px solid var(--ink2);padding:3px 2px;font-size:13px}
+.entry.ph{color:var(--ink3)}
+.kp{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:3fr 1fr;gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.kp .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:1px}
+.kp .ops{display:grid;grid-template-rows:repeat(5,1fr);background:var(--sunk)}
+.kp b{background:var(--card);display:flex;align-items:center;justify-content:center;height:37px;font-size:17px;font-weight:400}
+.kp .ops b{background:none;height:auto;color:var(--acc);font-size:15px}
+.kp .ic{color:var(--ink)}
+.toast{position:absolute;left:50%;transform:translateX(-50%);bottom:40px;white-space:nowrap;background:var(--sunk);border:1px solid var(--line2);border-radius:18px;padding:7px 14px;font-size:12px;color:var(--ink);box-shadow:0 2px 8px var(--veil)}
+
+/* Карточки справочников: подпись над полем, поле с подчёркиванием, сохранение — кнопкой под формой */
+.form{padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+.form .fld{display:flex;flex-direction:column;gap:2px}
+.form .k{font-size:11px;color:var(--ink3)}
+.form .fld .v{font-size:13.5px;padding:4px 3px;border-bottom:1px solid var(--ink2)}
+.form .fld .v.lock{color:var(--ink2);border-bottom-color:var(--line2)}
+.form .fld .v.plain{border:none;padding:1px 0}
+.dv{height:1px;background:var(--line)}
+.swrow{display:flex;align-items:center;justify-content:space-between;min-height:30px;font-size:13.5px}
+.sw2{width:30px;height:16px;border-radius:8px;background:var(--line2);position:relative;flex:none}
+.sw2.on{background:var(--acc)}
+.sw2 i{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:6px;background:var(--knob)}
+.sw2.on i{left:16px}
+.icorow{display:flex;align-items:center;justify-content:space-between;min-height:30px;font-size:13.5px}
+.icogrid{display:flex;flex-wrap:wrap;gap:2px 0}
+.icogrid .ic{margin:7px 11px}
+.btn{display:block;text-align:center;padding:9px;border-radius:8px;background:var(--acc);color:var(--onacc);font-size:12.5px;font-weight:600}
+.btn.danger{background:var(--neg)}
+.btn.off{opacity:.45}
+
+/* Плавающая кнопка: на балансах — с подписью, в лентах — круглая */
+.fab{position:absolute;right:12px;bottom:64px;width:40px;height:40px;border-radius:20px;background:var(--acc);color:var(--onacc);display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:0 2px 6px var(--veil)}
+.fab.ext{width:auto;padding:0 16px 0 14px;font-size:13px;font-weight:600}
+.pad{height:60px}
+.nav{position:absolute;left:0;right:0;bottom:0;display:flex;height:52px;background:var(--card)}
+.nav a{flex:1;text-align:center;padding:8px 0 0;color:var(--ink3);text-decoration:none}
+.nav a.on{color:var(--acc)}
+.nav a.on span{font-weight:600}
+.nav .ic{display:block;margin:0 auto;width:20px;height:20px;color:inherit}
+.nav span{font-size:10.5px;display:block;margin-top:1px}
+
+/* Отчёт: стрелки месяца круглыми кнопками, доля и полоса под строкой */
+.month{display:flex;align-items:center;justify-content:space-between}
+.month b{font-size:13px;font-weight:600}
+.ibtn{width:29px;height:29px;border-radius:15px;background:var(--card);display:flex;align-items:center;justify-content:center}
+.ibtn.off .ic{color:var(--line2)}
+.share{font-size:10.5px;font-weight:600;color:var(--ink2);min-width:30px;text-align:right}
+.prog{height:3px;background:var(--line);border-radius:2px;overflow:hidden;margin:-2px 11px 6px 37px}
+.prog i{display:block;height:100%;background:var(--acc)}
+.rrow{padding-left:11px;padding-right:11px}
+
+.empty{padding:40px 22px;text-align:center}
+.empty h3{font-size:15px;font-weight:600;margin:0 0 8px}
+.empty p{font-size:12.5px;color:var(--ink2);margin:0 0 14px}
+
+/* Диалог — системный AlertDialog: действия подписями справа */
+.veil{position:absolute;inset:0;background:var(--veil);display:flex;align-items:center;padding:24px}
+.dlg{background:var(--card);border-radius:18px;padding:18px 18px 10px;width:100%}
+.dlg h4{margin:0 0 10px;font-size:15.5px;font-weight:400}
+.dlg p{margin:0 0 12px;font-size:12.5px;color:var(--ink2);line-height:1.45}
+.dlg .acts{display:flex;justify-content:flex-end;gap:20px;padding-right:4px}
+.dlg .acts b{font-size:12.5px;font-weight:600;color:var(--acc);padding:6px 0}
+
+/* Системный календарь: открывается третьим чипом даты */
+.cal{padding:0}
+.cal .top{padding:14px 18px 10px;border-bottom:1px solid var(--line)}
+.cal .top small{display:block;font-size:11px;color:var(--ink2)}
+.cal .top b{display:block;font-size:22px;font-weight:400;margin-top:4px}
+.cal .mo{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 4px}
+.cal .mo b{font-size:12.5px;font-weight:600}
+.cal .wk{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:10.5px;color:var(--ink3);padding:4px 8px}
+.cal .gr{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;text-align:center;padding:0 8px 6px}
+.cal .gr i{font-style:normal;font-size:12px;padding:5px 0;border-radius:14px}
+.cal .gr i.off{color:var(--line2)}
+.cal .gr i.on{background:var(--acc);color:var(--onacc)}
+.cal .gr i.now{color:var(--acc);font-weight:600}
+.cal .acts{padding:4px 18px 10px}
+
+.stat{display:flex;gap:10px}
+.stat .b{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 10px}
+.stat .b .k{font-size:11px;color:var(--ink3)}
+.stat .b .v{font-size:16px;font-weight:600;margin-top:2px}
+.progress{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.progress i{display:block;height:100%;width:62%;background:var(--acc)}
+@media (max-width:420px){.wrap{padding:28px 14px 50px}}

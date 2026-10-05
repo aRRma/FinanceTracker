@@ -70,7 +70,8 @@ public sealed class TransactionFormQuery : ITransactionFormQuery
         {
             options.Add(new AccountOption(
                 account.Key,
-                AccountIcon.For(account.Type, account.ExcludedFromTotals),
+                account.Icon,
+                account.Color,
                 account.Name,
                 account.Balance.Currency,
                 account.Balance,

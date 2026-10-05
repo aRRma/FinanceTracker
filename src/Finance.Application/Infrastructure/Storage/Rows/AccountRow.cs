@@ -20,6 +20,16 @@ internal sealed class AccountRow : EntityRow
     public required AccountType Type { get; set; }
 
     /// <summary>
+    /// Цвет счёта.
+    /// </summary>
+    public required AccountColor Color { get; set; }
+
+    /// <summary>
+    /// Значок по назначению; пусто — значок по типу.
+    /// </summary>
+    public string? Icon { get; set; }
+
+    /// <summary>
     /// Валюта счёта. Из неё же берётся валюта начального остатка и сумм операций.
     /// </summary>
     public required Currency Currency { get; set; }

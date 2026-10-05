@@ -3,6 +3,7 @@ using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
 using Finance.Domain.Entities;
+using Finance.Domain.Enums;
 using Finance.Domain.Errors;
 using Finance.Domain.Rules;
 using Finance.Domain.Values;
@@ -118,8 +119,11 @@ public sealed class WalletImportHandler : IWalletImportHandler
             WalletImportAccount item = source[order];
             NameUniqueness.Ensure(item.Name, accounts.Values.Select(static account => account.Name), RuleText.SubjectAccount);
 
+            // Цвета — той же очередью, что у счетов, заведённых в карточке
+            AccountColor color = AccountColors.Next(accounts.Values.Select(static account => account.Color));
+
             Account account = Account.Create(
-                item.Name, item.Type, item.Currency, item.OpeningBalance, item.OpenedOn,
+                item.Name, item.Type, color, icon: null, item.Currency, item.OpeningBalance, item.OpenedOn,
                 item.ExcludedFromTotals, order, today, now);
 
             context.Accounts.Add(account.ToRow());

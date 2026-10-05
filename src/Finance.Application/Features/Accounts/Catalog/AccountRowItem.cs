@@ -9,7 +9,8 @@ namespace Finance.Application.Features.Accounts.Catalog;
 /// Строка справочника счетов: значок, название, подпись, баланс и признаки.
 /// </summary>
 /// <param name="Key">Ключ счёта.</param>
-/// <param name="Icon">Ключ значка: наличные, карта или накопления.</param>
+/// <param name="Icon">Ключ значка: выбранный руками или по типу.</param>
+/// <param name="Color">Цвет счёта — заливка его знака.</param>
 /// <param name="Name">Наименование счёта.</param>
 /// <param name="Caption">Подпись под названием: тип и валюта.</param>
 /// <param name="Balance">Баланс, уже отформатированный.</param>
@@ -18,6 +19,7 @@ namespace Finance.Application.Features.Accounts.Catalog;
 public sealed record AccountRowItem(
     Guid Key,
     string Icon,
+    AccountColor Color,
     string Name,
     string Caption,
     string Balance,
@@ -41,7 +43,8 @@ public sealed record AccountRowItem(
 
         return new AccountRowItem(
             account.Key,
-            AccountIcon.For(account.Type, account.ExcludedFromTotals),
+            account.Icon,
+            account.Color,
             account.Name,
             $"{kind} · {account.Balance.Currency}",
             account.Balance.Display,

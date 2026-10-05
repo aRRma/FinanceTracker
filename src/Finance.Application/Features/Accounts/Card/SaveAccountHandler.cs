@@ -3,6 +3,7 @@ using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
 using Finance.Domain.Entities;
+using Finance.Domain.Enums;
 using Finance.Domain.Errors;
 using Finance.Domain.Rules;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +46,12 @@ public sealed class SaveAccountHandler : ISaveAccountHandler
             throw new ArgumentException(Faults.NewAccountClosed(), nameof(command));
         }
 
+        // Тоже отказ: Unknown, записанный в базу, рисовался бы серым знаком без цвета
+        if (command.Color is AccountColor.Unknown)
+        {
+            throw new ArgumentException(Faults.AccountColorMissing(), nameof(command));
+        }
+
         return _unitOfWork.ExecuteAsync<Guid>(
             async (context, token) =>
             {
@@ -78,6 +85,8 @@ public sealed class SaveAccountHandler : ISaveAccountHandler
         Account account = Account.Create(
             command.Name,
             command.Type,
+            command.Color,
+            command.Icon,
             command.Currency,
             command.OpeningBalance,
             command.OpenedOn,
@@ -111,6 +120,8 @@ public sealed class SaveAccountHandler : ISaveAccountHandler
         account.Rename(command.Name);
 
         account.ChangeType(command.Type);
+        account.ChangeColor(command.Color);
+        account.ChangeIcon(command.Icon);
 
         if (command.Currency != account.Currency)
         {

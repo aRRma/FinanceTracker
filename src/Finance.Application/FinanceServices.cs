@@ -1,4 +1,5 @@
 using System.Globalization;
+using Finance.Application.Features.Accounts.Badge;
 using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Accounts.Catalog;
 using Finance.Application.Features.Balances;
@@ -141,12 +142,14 @@ public static class FinanceServices
         // Один на приложение: сюда экран выбора кладёт решение, а форма операции
         // забирает его при возвращении. Экраны при этом живут порознь
         services.AddSingleton<TransactionPicks>();
+        services.AddSingleton<AccountBadgeDraft>();
 
         // Модель представления живёт ровно столько, сколько экран: общая на всё
         // приложение держала бы в памяти списки закрытых экранов
         services.AddTransient<BalancesViewModel>();
         services.AddTransient<AccountsViewModel>();
         services.AddTransient<AccountViewModel>();
+        services.AddTransient<AccountBadgeViewModel>();
         services.AddTransient<FeedViewModel>();
         services.AddTransient<TransactionViewModel>();
         services.AddTransient<AccountPickerViewModel>();

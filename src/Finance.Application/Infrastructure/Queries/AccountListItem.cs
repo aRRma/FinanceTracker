@@ -25,6 +25,16 @@ public sealed record AccountListItem
     public required AccountType Type { get; init; }
 
     /// <summary>
+    /// Цвет счёта.
+    /// </summary>
+    public required AccountColor Color { get; init; }
+
+    /// <summary>
+    /// Ключ значка, которым счёт рисуется: выбранный руками или по типу.
+    /// </summary>
+    public required string Icon { get; init; }
+
+    /// <summary>
     /// Баланс на текущий момент: начальный остаток плюс все операции.
     /// </summary>
     public required Money Balance { get; init; }

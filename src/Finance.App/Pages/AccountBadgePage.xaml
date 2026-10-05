@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран «Цвет и значок» из карточки счёта. Сверху предпросмотр — строка балансов
+    и строка общей ленты, обе меняются по каждому касанию. Ниже восемь цветов
+    в два ряда и сетка значков с подсказкой по названию. «Назад» возвращает выбор
+    в карточку, в базу он уходит по «Сохранить» там.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.AccountBadgePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:badge="clr-namespace:Finance.Application.Features.Accounts.Badge;assembly=Finance.Application"
+    x:DataType="badge:AccountBadgeViewModel"
+    Title="{x:Static texts:UiTexts.AccountBadgeTitle}"
+    Shell.TabBarIsVisible="False">
+
+    <ScrollView SafeAreaEdges="Container">
+        <VerticalStackLayout Padding="16,12" Spacing="12">
+
+            <!-- Предпросмотр: счёт, каким он встанет на балансы -->
+            <Border Style="{StaticResource Card}">
+                <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"
+                      MinimumHeightRequest="{StaticResource TouchTarget}">
+                    <controls:AccountBadge Grid.Column="0" Tone="{Binding Mark.Color}" IconKey="{Binding Mark.Icon}" />
+                    <Label Grid.Column="1" Text="{Binding Mark.Name}" VerticalOptions="Center" LineBreakMode="TailTruncation" />
+                    <Label Grid.Column="2" Text="{Binding Balance}" VerticalOptions="Center" Style="{StaticResource AmountLabel}">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding IsNegative}" Value="True">
+                                <Setter Property="Style" Value="{StaticResource AmountNegativeLabel}" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </Grid>
+            </Border>
+
+            <!-- И его последняя операция, как её покажет общая лента — с жетоном в подписи.
+                 У нового счёта и счёта без операций строки нет -->
+            <Border Style="{StaticResource Card}" IsVisible="{Binding HasFeedPreview}">
+                <Grid Padding="14,10" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" RowDefinitions="Auto,Auto"
+                      MinimumHeightRequest="{StaticResource TouchTarget}">
+                    <controls:Icon Grid.Column="0" Grid.RowSpan="2" Key="{Binding FeedRow.Icon}" />
+                    <Label Grid.Column="1" Text="{Binding FeedRow.Title}" LineBreakMode="TailTruncation" />
+                    <controls:FeedCaption Grid.Column="1" Grid.Row="1"
+                                          Text="{Binding FeedRow.Caption}" Account="{Binding FeedRow.CaptionAccount}"
+                                          TargetAccount="{Binding FeedRow.CaptionTargetAccount}" />
+                    <Label Grid.Column="2" Grid.RowSpan="2" Text="{Binding FeedRow.Amount}"
+                           VerticalOptions="Center" Style="{StaticResource AmountLabel}">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding FeedRow.IsPositive}" Value="True">
+                                <Setter Property="Style" Value="{StaticResource AmountPositiveLabel}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Label" Binding="{Binding FeedRow.IsExpense}" Value="True">
+                                <Setter Property="Style" Value="{StaticResource AmountNegativeLabel}" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </Grid>
+            </Border>
+
+            <Label Text="{x:Static texts:UiTexts.AccountBadgeColor}" Style="{StaticResource SectionLabel}" />
+            <Border Style="{StaticResource Card}">
+                <!-- Четыре в ряд: восемь цветов встают в два ряда без прокрутки -->
+                <FlexLayout Padding="6,8" Wrap="Wrap" JustifyContent="SpaceAround"
+                            BindableLayout.ItemsSource="{Binding Colors}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="badge:AccountColorChoice">
+                            <Grid FlexLayout.Basis="25%" HeightRequest="56"
+                                  SemanticProperties.Description="{Binding Description}">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnColorTapped" />
+                                </Grid.GestureRecognizers>
+                                <controls:AccountBadge Mode="Header" HorizontalOptions="Center"
+                                                       Tone="{Binding Color}" IconKey="{Binding Glyph}" />
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </FlexLayout>
+            </Border>
+
+            <Label Text="{x:Static texts:UiTexts.AccountBadgeIcon}" Style="{StaticResource SectionLabel}" />
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="6,8" Spacing="6">
+                    <!-- Подсказка по названию: только предлагает, сам значок не меняется -->
+                    <HorizontalStackLayout Padding="8,0" Spacing="8" IsVisible="{Binding HasHints}">
+                        <Label Text="{x:Static texts:UiTexts.AccountBadgeHints}" VerticalOptions="Center"
+                               Style="{StaticResource SecondaryLabel}" />
+                        <HorizontalStackLayout Spacing="6" BindableLayout.ItemsSource="{Binding Hints}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="badge:AccountIconChoice">
+                                    <Border Style="{StaticResource Badge}" MinimumHeightRequest="{StaticResource TouchTarget}"
+                                            SemanticProperties.Description="{Binding Description}">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnIconTapped" />
+                                        </Border.GestureRecognizers>
+                                        <HorizontalStackLayout Spacing="4">
+                                            <controls:Icon Key="{Binding Key}" Size="16" StrokeThickness="1.6" />
+                                            <Label Text="{Binding Name}" VerticalOptions="Center" Style="{StaticResource CaptionLabel}" />
+                                        </HorizontalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </HorizontalStackLayout>
+                    </HorizontalStackLayout>
+
+                    <!-- Шесть в ряд; выбранный залит цветом счёта — видно, каким выйдет знак -->
+                    <FlexLayout Wrap="Wrap" JustifyContent="SpaceAround" BindableLayout.ItemsSource="{Binding Icons}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="badge:AccountIconChoice">
+                                <Grid FlexLayout.Basis="16.66%" HeightRequest="56"
+                                      SemanticProperties.Description="{Binding Description}">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnIconTapped" />
+                                    </Grid.GestureRecognizers>
+                                    <controls:AccountBadge Mode="Header" HorizontalOptions="Center"
+                                                           IsVisible="{Binding IsSelected}"
+                                                           Tone="{Binding Color}" IconKey="{Binding Key}" />
+                                    <controls:Icon Key="{Binding Key}" HorizontalOptions="Center">
+                                        <controls:Icon.Triggers>
+                                            <DataTrigger TargetType="controls:Icon" Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="IsVisible" Value="False" />
+                                            </DataTrigger>
+                                        </controls:Icon.Triggers>
+                                    </controls:Icon>
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</pages:DataPage>

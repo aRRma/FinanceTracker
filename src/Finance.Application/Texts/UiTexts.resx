@@ -234,6 +234,80 @@
   <data name="AccountClosingWarning" xml:space="preserve">
     <value>Внимание: на счёте ещё {0}.</value>
   </data>
+  <!-- Цвет и значок счёта -->
+  <data name="AccountBadgeTitle" xml:space="preserve">
+    <value>Цвет и значок</value>
+  </data>
+  <data name="AccountBadgeColor" xml:space="preserve">
+    <value>Цвет</value>
+  </data>
+  <data name="AccountBadgeIcon" xml:space="preserve">
+    <value>Значок</value>
+  </data>
+  <data name="AccountBadgeHints" xml:space="preserve">
+    <value>Подходит:</value>
+  </data>
+  <data name="AccountColorBlue" xml:space="preserve">
+    <value>Синий</value>
+  </data>
+  <data name="AccountColorOrange" xml:space="preserve">
+    <value>Оранжевый</value>
+  </data>
+  <data name="AccountColorSky" xml:space="preserve">
+    <value>Голубой</value>
+  </data>
+  <data name="AccountColorGreen" xml:space="preserve">
+    <value>Зелёный</value>
+  </data>
+  <data name="AccountColorViolet" xml:space="preserve">
+    <value>Фиолетовый</value>
+  </data>
+  <data name="AccountColorMagenta" xml:space="preserve">
+    <value>Пурпурный</value>
+  </data>
+  <data name="AccountColorRed" xml:space="preserve">
+    <value>Красный</value>
+  </data>
+  <data name="AccountColorPink" xml:space="preserve">
+    <value>Розовый</value>
+  </data>
+  <!-- Основы слов в названии счёта для подсказки значка, через запятую, строчными -->
+  <data name="AccountIconHintCredit" xml:space="preserve">
+    <value>кредит</value>
+  </data>
+  <data name="AccountIconHintSavings" xml:space="preserve">
+    <value>вклад, накоп, копил</value>
+  </data>
+  <data name="AccountIconHintTravel" xml:space="preserve">
+    <value>отпуск, путеш, поезд</value>
+  </data>
+  <data name="AccountIconHintForeign" xml:space="preserve">
+    <value>евро, доллар, валют</value>
+  </data>
+  <data name="AccountIconHintHome" xml:space="preserve">
+    <value>дом, ипотек, кварт</value>
+  </data>
+  <data name="AccountIconHintCar" xml:space="preserve">
+    <value>авто, машин</value>
+  </data>
+  <data name="AccountIconHintFamily" xml:space="preserve">
+    <value>семь, общ</value>
+  </data>
+  <data name="AccountIconHintGift" xml:space="preserve">
+    <value>подар</value>
+  </data>
+  <data name="AccountIconHintStudy" xml:space="preserve">
+    <value>учёб, учеб, школ</value>
+  </data>
+  <data name="AccountIconHintReserve" xml:space="preserve">
+    <value>резерв, подушк</value>
+  </data>
+  <data name="AccountIconHintPhone" xml:space="preserve">
+    <value>телефон, онлайн</value>
+  </data>
+  <data name="AccountIconHintCash" xml:space="preserve">
+    <value>налич</value>
+  </data>
   <!-- Балансы -->
   <data name="BalancesTitle" xml:space="preserve">
     <value>Балансы</value>

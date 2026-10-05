@@ -26,6 +26,12 @@ public static class Routes
     public const string Account = "account-card";
 
     /// <summary>
+    /// Цвет и значок счёта — экран выбора из карточки счёта. Счёт передаётся
+    /// не параметром, а через общий объект выбора.
+    /// </summary>
+    public const string AccountBadge = "account-badge";
+
+    /// <summary>
     /// Справочник мест.
     /// </summary>
     public const string Places = "places";
@@ -119,6 +125,7 @@ public static class Routes
     {
         Routing.RegisterRoute(Accounts, typeof(AccountsPage));
         Routing.RegisterRoute(Account, typeof(AccountPage));
+        Routing.RegisterRoute(AccountBadge, typeof(AccountBadgePage));
         Routing.RegisterRoute(Places, typeof(PlacesPage));
         Routing.RegisterRoute(Place, typeof(PlacePage));
         Routing.RegisterRoute(Categories, typeof(CategoriesPage));

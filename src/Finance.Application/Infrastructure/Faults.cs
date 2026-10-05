@@ -26,6 +26,11 @@ internal static class Faults
     internal static string NewAccountClosed() => "Новый счёт не заводится заблокированным — блокируют только заведённый";
 
     /// <summary>
+    /// Команда пришла без цвета счёта: цвет есть у каждого, новому его подбирает карточка.
+    /// </summary>
+    internal static string AccountColorMissing() => "Цвет счёта не задан — новому счёту его подбирает карточка по очереди";
+
+    /// <summary>
     /// Место пропало из базы между чтением и переименованием.
     /// </summary>
     /// <param name="key">Ключ места.</param>

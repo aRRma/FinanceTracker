@@ -1,4 +1,5 @@
 using Finance.Application.Features.Feed;
+using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Texts;
 using Finance.Domain.Enums;
@@ -23,7 +24,7 @@ public sealed class FeedRowTests
     {
         FeedRowItem row = FeedRowItem.From(Expense(note: LongNote), showAccount: true);
 
-        Assert.Equal("Еда · Карта", row.Caption);
+        Assert.Equal("Еда · Карта", row.CaptionText);
         Assert.Equal(LongNote, row.Note);
         Assert.True(row.HasNote);
     }
@@ -36,7 +37,7 @@ public sealed class FeedRowTests
     {
         FeedRowItem row = FeedRowItem.From(Expense(note: null), showAccount: true);
 
-        Assert.Equal("Еда · Карта", row.Caption);
+        Assert.Equal("Еда · Карта", row.CaptionText);
         Assert.False(row.HasNote);
     }
 
@@ -49,7 +50,24 @@ public sealed class FeedRowTests
         FeedRowItem row = FeedRowItem.From(Expense(note: LongNote, place: "Пятёрочка"), showAccount: false);
 
         Assert.Equal("Пятёрочка", row.Caption);
+        Assert.Equal("Пятёрочка", row.CaptionText);
+        Assert.Null(row.Account);
         Assert.Equal(LongNote, row.Note);
+    }
+
+    /// <summary>
+    /// В общей ленте счёт — не словом в подписи, а жетоном с названием после текста:
+    /// текст подписи отдельно, знак счёта отдельно.
+    /// </summary>
+    [Fact]
+    public void В_общей_ленте_счёт_идёт_жетоном_после_текста()
+    {
+        FeedRowItem row = FeedRowItem.From(Expense(note: null), showAccount: true);
+
+        Assert.Equal("Еда", row.Caption);
+        Assert.True(row.HasCaptionText);
+        Assert.Equal(new AccountMark("Карта", AccountColor.Blue, "credit-card"), row.Account);
+        Assert.Null(row.TargetAccount);
     }
 
     /// <summary>
@@ -61,7 +79,7 @@ public sealed class FeedRowTests
     {
         FeedItem unsorted = Expense(note: null) with { Title = "Без категории", Group = "Без категории" };
 
-        Assert.Equal("Карта", FeedRowItem.From(unsorted, showAccount: true).Caption);
+        Assert.Equal("Карта", FeedRowItem.From(unsorted, showAccount: true).CaptionText);
         Assert.Equal(string.Empty, FeedRowItem.From(unsorted, showAccount: false).Caption);
         Assert.Equal("Пятёрочка", FeedRowItem.From(unsorted with { Place = "Пятёрочка" }, showAccount: false).Caption);
     }
@@ -77,13 +95,16 @@ public sealed class FeedRowTests
         {
             Kind = TransactionKind.Transfer,
             Title = "Наличные",
-            Group = null
+            Group = null,
+            OtherAccount = new AccountMark("Наличные", AccountColor.Orange, "cash")
         };
 
         FeedRowItem common = FeedRowItem.From(transfer, showAccount: true);
 
         Assert.Equal(UiTexts.KindTransfer, common.Title);
-        Assert.Equal("Карта → Наличные", common.Caption);
+        Assert.Equal("Карта → Наличные", common.CaptionText);
+        Assert.Equal(AccountColor.Blue, common.Account?.Color);
+        Assert.Equal(AccountColor.Orange, common.TargetAccount?.Color);
         Assert.Equal(LongNote, common.Note);
 
         FeedRowItem own = FeedRowItem.From(transfer, showAccount: false);
@@ -101,6 +122,7 @@ public sealed class FeedRowTests
         Amount = Money.Create(-250m, Currency.RUB),
         AccountKey = Guid.CreateVersion7(),
         AccountName = "Карта",
+        Account = new AccountMark("Карта", AccountColor.Blue, "credit-card"),
         Title = "Продукты",
         Group = "Еда",
         Place = place,

@@ -10,7 +10,7 @@ namespace Finance.Application.Features.Feed;
 /// </summary>
 /// <param name="Key">Ключ операции — по нему открывается карточка.</param>
 /// <param name="Title">Подкатегория; у перевода — второй счёт в ленте счёта или «Перевод» в общей ленте.</param>
-/// <param name="Caption">Подпись под заголовком: место или группа, в общей ленте ещё и счёт; у перевода в общей ленте — «откуда → куда».</param>
+/// <param name="Caption">Текст подписи под заголовком: место или группа; у перевода в общей ленте пусто — там подпись из одних счетов.</param>
 /// <param name="Note">Заметка или пусто — своей строкой под подписью.</param>
 /// <param name="Amount">Сумма со знаком, уже отформатированная.</param>
 /// <param name="IsPositive">Сумма положительна — доход или зачисление показывают смысловым цветом.</param>
@@ -35,7 +35,40 @@ public sealed record FeedRowItem(
     /// Подпись есть. Её нет у «Без категории» без места в ленте счёта: группа там
     /// повторила бы заголовок, а пустая строка оставила бы под ним провал.
     /// </summary>
-    public bool HasCaption => Caption.Length > 0;
+    public bool HasCaption => Caption.Length > 0 || Account is not null;
+
+    /// <summary>
+    /// Счёт в конце подписи — жетоном и названием; только в общей ленте: в ленте
+    /// счёта он очевиден из шапки. У перевода — счёт списания.
+    /// </summary>
+    public AccountMark? Account { get; init; }
+
+    /// <summary>
+    /// Счёт зачисления перевода в общей ленте — после стрелки; у остальных пусто.
+    /// </summary>
+    public AccountMark? TargetAccount { get; init; }
+
+    /// <summary>
+    /// Подпись начинается текстом и продолжается счётом — между ними разделитель.
+    /// </summary>
+    public bool HasCaptionText => Caption.Length > 0;
+
+    /// <summary>
+    /// В подписи два счёта — перевод в общей ленте.
+    /// </summary>
+    public bool IsTransferCaption => TargetAccount is not null;
+
+    /// <summary>
+    /// Подпись целиком одной строкой — для озвучивания: знак счёта TalkBack не читает,
+    /// он повторяет название.
+    /// </summary>
+    public string CaptionText => Account switch
+    {
+        null => Caption,
+        _ when TargetAccount is { } target => $"{Account.Name} → {target.Name}",
+        _ when Caption.Length is 0 => Account.Name,
+        _ => $"{Caption} · {Account.Name}"
+    };
 
     /// <summary>
     /// Заметка есть — под подписью её третья строка.
@@ -72,12 +105,16 @@ public sealed record FeedRowItem(
             return new FeedRowItem(
                 item.Key,
                 UiTexts.KindTransfer,
-                $"{item.AccountName} → {item.Title}",
+                string.Empty,
                 note,
                 item.Amount.DisplaySigned,
                 item.Amount.IsPositive,
                 IsExpense: false,
-                TransferIcon);
+                TransferIcon)
+            {
+                Account = item.Account,
+                TargetAccount = item.OtherAccount
+            };
         }
 
         // Группа с тем же названием, что у подкатегории в заголовке, в подписи не
@@ -90,22 +127,17 @@ public sealed record FeedRowItem(
             ? UiTexts.KindTransfer
             : item.Place ?? group;
 
-        string caption = (detail, showAccount) switch
-        {
-            (null, false) => string.Empty,
-            (null, true) => item.AccountName,
-            (_, false) => detail,
-            (_, true) => $"{detail} · {item.AccountName}"
-        };
-
         return new FeedRowItem(
             item.Key,
             item.Title,
-            caption,
+            detail ?? string.Empty,
             note,
             item.Amount.DisplaySigned,
             item.Amount.IsPositive,
             item.Kind is TransactionKind.Expense,
-            item.Kind is TransactionKind.Transfer ? TransferIcon : item.Icon ?? string.Empty);
+            item.Kind is TransactionKind.Transfer ? TransferIcon : item.Icon ?? string.Empty)
+        {
+            Account = showAccount ? item.Account : null
+        };
     }
 }

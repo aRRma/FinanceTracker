@@ -25,9 +25,9 @@
                     <TapGestureRecognizer Tapped="OnAccountTapped" />
                 </Grid.GestureRecognizers>
 
-                <!-- Значок вместо подписи типа: наличные от карты отличают
+                <!-- Знак счёта вместо подписи типа: счёт узнают по цвету и значку
                      взглядом, а строка остаётся однострочной -->
-                <controls:Icon Grid.Column="0" Key="{Binding Icon}" />
+                <controls:AccountBadge Grid.Column="0" Tone="{Binding Color}" IconKey="{Binding Icon}" />
 
                 <Label Grid.Column="1" Text="{Binding Name}" VerticalOptions="Center">
                     <Label.Triggers>

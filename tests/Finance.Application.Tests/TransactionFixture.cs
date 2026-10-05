@@ -63,6 +63,7 @@ internal sealed class TransactionFixture : IAsyncDisposable
         {
             Name = name,
             Type = AccountType.Card,
+            Color = AccountColor.Blue,
             Currency = currency,
             OpeningBalance = openingBalance,
             OpenedOn = openedOn ?? OpenedOn,
@@ -79,6 +80,8 @@ internal sealed class TransactionFixture : IAsyncDisposable
             Key = card.Key,
             Name = card.Name,
             Type = card.Type,
+            Color = card.Color,
+            Icon = card.Icon,
             Currency = card.Currency,
             OpeningBalance = card.OpeningBalance,
             OpenedOn = card.OpenedOn,

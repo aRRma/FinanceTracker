@@ -112,7 +112,8 @@ public sealed partial class AccountPickerViewModel : ObservableObject
 
     private static AccountPickerRow Row(AccountListItem account, Guid? selected) => new(
         account.Key,
-        AccountIcon.For(account.Type, account.ExcludedFromTotals),
+        account.Icon,
+        account.Color,
         account.Name,
         account.ExcludedFromTotals ? UiTexts.PickAccountSavings : string.Empty,
         account.Balance.Display,

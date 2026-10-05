@@ -1,5 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Finance.Application.Infrastructure;
+using Finance.Domain.Enums;
 
 namespace Finance.Docs.Tests;
 
@@ -96,6 +98,39 @@ public sealed partial class ContrastTests
         Assert.True(
             ratio >= Minimum,
             $"{foreground}{theme} на {background}{theme}: контраст {ratio:F2}, нужен не ниже {Minimum:F1}");
+    }
+
+    /// <summary>
+    /// Значок на заливке счёта различим как знак — порог 3 по WCAG для нетекстовых
+    /// элементов. Пары «заливка к карточке» здесь нет намеренно: счёт подписан
+    /// названием, а порог к карточке сделал бы палитру тусклой.
+    /// </summary>
+    /// <param name="color">Цвет счёта.</param>
+    /// <param name="theme">Суффикс темы: <c>Light</c> или <c>Dark</c>.</param>
+    [Theory]
+    [MemberData(nameof(AccountFills))]
+    public void Значок_счёта_различим_на_заливке(AccountColor color, string theme)
+    {
+        string glyph = AccountColors.TakesDarkGlyph(color) ? "AccountGlyphInk" : "AccountGlyphWhite";
+        double ratio = Ratio(glyph, $"Account{color}{theme}");
+
+        Assert.True(ratio >= 3.0, $"{glyph} на Account{color}{theme}: контраст {ratio:F2}, нужен не ниже 3");
+    }
+
+    /// <summary>
+    /// Все цвета очереди в обеих темах.
+    /// </summary>
+    public static TheoryData<AccountColor, string> AccountFills()
+    {
+        TheoryData<AccountColor, string> data = [];
+
+        foreach (AccountColor color in AccountColors.Queue)
+        {
+            data.Add(color, "Light");
+            data.Add(color, "Dark");
+        }
+
+        return data;
     }
 
     /// <summary>

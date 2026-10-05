@@ -1,10 +1,13 @@
+using Finance.Domain.Enums;
+
 namespace Finance.Application.Features.Transactions.Pick;
 
 /// <summary>
 /// Счёт в списке выбора: значок, название, баланс и отметка выбранного.
 /// </summary>
 /// <param name="Key">Ключ счёта.</param>
-/// <param name="Icon">Ключ значка: наличные, карта или накопления.</param>
+/// <param name="Icon">Ключ значка: выбранный руками или по типу.</param>
+/// <param name="Color">Цвет счёта — заливка его знака.</param>
 /// <param name="Name">Наименование.</param>
 /// <param name="Caption">Подпись под названием: «Накопления» у скрытых, иначе пусто.</param>
 /// <param name="Balance">Баланс, уже отформатированный.</param>
@@ -13,6 +16,7 @@ namespace Finance.Application.Features.Transactions.Pick;
 public sealed record AccountPickerRow(
     Guid Key,
     string Icon,
+    AccountColor Color,
     string Name,
     string Caption,
     string Balance,

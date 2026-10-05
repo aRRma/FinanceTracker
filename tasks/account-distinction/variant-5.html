@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Вариант 5 · Цвет и значок — счета различимы с первого взгляда</title>
+<link rel="stylesheet" href="kit/base.css">
+<link rel="stylesheet" href="kit/doc.css">
+<script>if(matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.dataset.theme="dark"</script>
+</head>
+<body>
+<script src="kit/icons.js"></script>
+<div class="wrap doc">
+
+<nav class="docnav"><a href="variants.html">Обзор</a><a href="variant-1.html">1 · Цветная плашка</a><a href="variant-2.html">2 · Кольцо счёта</a><a href="variant-3.html">3 · Мини-карта</a><a href="variant-4.html">4 · Свой значок</a><a class="on" href="variant-5.html">5 · Цвет и значок</a><a href="palette.html">Палитра</a><a href="badges.html">Бейджи</a><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'">Тема страницы</button></nav>
+
+<header class="hero">
+  <div>
+    <div class="kicker">Счета различимы с первого взгляда · вариант 5 — сочетание первого и четвёртого</div>
+    <h1>Цвет и значок</h1>
+    <p>У счёта два признака: <b>цвет</b> — чтобы узнать с первого взгляда, и <b>значок по назначению</b> — чтобы понять, что это за счёт. Процент на голубом — кредитка, самолёт на зелёном — карта для поездок.</p>
+    <p>В списках значок стоит на сплошной плашке цвета счёта. В ленте перед названием счёта — <b>жетон</b>: тот же значок на сплошной заливке цвета. Цвет и значок ставятся сами — по очереди палитры и по типу счёта, а меняются на одном экране с живым предпросмотром.</p>
+  </div>
+  <div class="specimen">
+    <div data-theme="light"><div data-fragment="accounts"></div><div data-fragment="feed"></div></div>
+    <div data-theme="dark"><div data-fragment="accounts"></div><div data-fragment="feed"></div></div>
+  </div>
+</header>
+
+<section class="sec">
+  <h2>Что взято и что улучшено</h2>
+  <div class="cols">
+    <div class="box"><h3>Из варианта 1</h3><ul>
+      <li>Цвет счёта и очередь, в которой он ставится сам. Палитра заменена на «Предельную насыщенность» — <a href="palette.html">разбор</a>.</li>
+      <li>Плашка цвета счёта в списках и полях формы — теперь сплошная, яркой заливкой.</li>
+      <li>Значок категории в ленте остаётся серым — цвет говорит только о счёте.</li>
+    </ul></div>
+    <div class="box"><h3>Из варианта 4</h3><ul>
+      <li>Значок по назначению из восемнадцати силуэтов; по умолчанию — по типу, как сейчас.</li>
+      <li>Значок счёта в ленте стоит рядом с названием, а не вместо него.</li>
+    </ul></div>
+    <div class="box"><h3>Новое</h3><ul>
+      <li><b>Жетон в ленте</b> вместо бледной точки: на 13 точках нужна сплошная заливка, иначе цвет не читается.</li>
+      <li><b>Экран «Цвет и значок»</b> с предпросмотром строки балансов и строки ленты; карточка счёта не растёт.</li>
+      <li><b>Подсказка по названию:</b> «Карта кредитная» — первым предложен процент.</li>
+      <li><b>Второй признак для дальтоников:</b> где цвета сливаются, значки различаются.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Что меняется</h2>
+  <div class="cols">
+    <div class="box"><h3>Меняется</h3><ul>
+      <li>Значок счёта на балансах, в выборе счёта, справочнике и полях формы — выбранный, на плашке цвета счёта. В шапке ленты счёта плашка появляется впервые: сейчас там только название.</li>
+      <li>Подпись строки общей ленты — жетон перед названием счёта, у перевода два.</li>
+      <li>Карточка счёта — строка «Цвет и значок», она открывает отдельный экран.</li>
+    </ul></div>
+    <div class="box"><h3>Остаётся как было</h3><ul>
+      <li>Значок категории в ленте — серый.</li>
+      <li>Тип счёта — он даёт значок по умолчанию и подпись «Карта · RUB».</li>
+      <li>Цвета сумм, разделы балансов, порядок счетов, лента счёта без жетонов.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Цвета и токены</h2>
+  <p class="sub">Палитра «Предельная насыщенность»: самый яркий цвет каждого тона, восемь цветов. Шестнадцать токенов заливки и два токена значка — белый и тёмный. Плашка и жетон залиты цветом счёта целиком, значок на заливке держит контраст не ниже 3 в обеих темах. Подбор, очередь и близкие пары — в <a href="palette.html">разборе палитры</a>.</p>
+  <div data-palette></div>
+  <div class="cols" style="margin-top:22px">
+    <div><h3 style="font-size:14.5px;margin:0 0 4px">Очередь, в которой цвет ставится сам</h3><p class="sub" style="margin:0">Первый цвет, не занятый незаблокированными счетами. Первые три — синий, оранжевый, голубой — различимы и обычным зрением, и при дальтонизме. Четвёртый, зелёный, при дальтонизме близок к оранжевому — их различает значок. Красный — цвет расхода — предпоследний, розовый — последний.</p><div data-order></div></div>
+    <div><h3 style="font-size:14.5px;margin:0 0 4px">Пары, которые сливаются при дальтонизме</h3><p class="sub" style="margin:0">ΔE в OKLab меньше 8 — дейтеранопия сверху, протанопия снизу. У сливающейся пары остаётся значок: процент и самолёт различимы и без цвета. Обычным зрением близкие пары — в <a href="palette.html">разборе</a>.</p><div data-pairs="deutan" data-metric="oklab" data-threshold="8"></div><div data-pairs="protan" data-metric="oklab" data-threshold="8" style="margin-top:6px"></div></div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Набор значков</h2>
+  <p class="sub">Восемнадцать контуров Tabler из <code>data/icon-paths.json</code>: силуэты, а не детали — на 16 dp в жетоне детали пропадают. Семнадцать из них уже есть в наборе категорий, карта — интерфейсный значок; сам список значков счёта свой, и проверка «у каждого ключа есть контур» должна видеть и его. Названия — из <code>IconNames.resx</code>. По умолчанию значок не хранится: его выбирает тип, как сейчас <code>AccountIcon.For</code>.</p>
+  <div class="states" data-theme="light" id="glyphs"></div>
+  <h3 style="font-size:14.5px;margin:22px 0 4px">Подсказка по названию</h3>
+  <p class="sub" style="margin:0 0 10px">На экране «Цвет и значок» первыми стоят до трёх значков, подходящих к названию. Это только подсказка: сам значок по названию не меняется — переименование не должно молча перекрашивать счёт.</p>
+  <table class="tokens" style="max-width:760px"><thead><tr><th>В названии</th><th>Подходит</th></tr></thead><tbody id="hints"></tbody></table>
+</section>
+
+<section class="sec">
+  <h2>Устройство элемента</h2>
+  <p class="sub">Размеры — в dp устройства; 25 точек макета — 36 dp. Форма — скруглённый квадрат, выбран 4 октября 2026; круг, карта и объём — в <a href="badges.html">документе о бейджах</a>.</p>
+  <div class="anat">
+    <div><div class="stage" data-theme="light"><div class="zoom"><span class="tile solid square ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span></div></div>
+      <dl><dt>Плашка</dt><dd>скруглённый квадрат 36 dp, радиус 11 dp, сплошная заливка <code>AccountSky</code></dd><dt>Значок</dt><dd>22 dp, штрих 2, <code>AccountGlyphDark</code> — тёмный: белый на голубом не держит 3, тёмный даёт 6,9</dd><dt>Где</dt><dd>балансы, выбор счёта, справочник, поля формы; 44 dp в шапках</dd></dl></div>
+    <div><div class="stage" data-theme="light"><div class="zoom"><span class="s" style="font-size:11px">· <span class="token square ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span>Карта кре…</span></div></div>
+      <dl><dt>Жетон</dt><dd>скруглённый квадрат 19 dp, радиус 6 dp, заливка <code>AccountSky</code>, значок 13 dp тем же цветом, что на плашке, штрих 2,4</dd><dt>Место</dt><dd>перед названием счёта, по средней линии строки; отступ 6 dp</dd><dt>Почему сплошной</dt><dd>плашка и жетон теперь одного рода — сплошные; жетон — та же плашка, уменьшенная для строки</dd></dl></div>
+    <div><div class="stage" data-theme="dark"><div class="zoom z2"><div class="signgrid solid square ac-sky" style="grid-template-columns:repeat(3,38px)"><span><svg class="ic"><use href="#i-credit-card"/></svg></span><span class="on"><svg class="ic"><use href="#i-percentage"/></svg></span><span><svg class="ic"><use href="#i-plane"/></svg></span></div></div></div>
+      <dl><dt>Сетка значков</dt><dd>ячейка 55 dp — касание не меньше 48; шесть в ряд</dd><dt>Выбранный</dt><dd>залит цветом счёта, значок на нём белый или тёмный — точно как будет на балансах</dd></dl></div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Состояния</h2>
+  <div class="states" data-theme="light">
+    <div class="st"><div class="row"><span class="tile solid square ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><div class="g"><div class="t">Карта кредитная</div></div><span class="num neg">-1 890,00 ₽</span></div><p><b>Выбраны цвет и значок.</b> Голубой процент — кредитка.</p></div>
+    <div class="st"><div class="row"><span class="tile solid square ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта основная</div></div><span class="num">71 920,50 ₽</span></div><p><b>Ничего не выбирали.</b> Цвет — из очереди, значок — по типу. Уже отличается от соседей цветом.</p></div>
+    <div class="st"><div class="row"><span class="tile solid square ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><div class="g"><div class="t dim">Вклад на отпуск</div></div><span class="num">250 000,00 ₽</span></div><p><b>Скрытый.</b> Цвет и значок свои, приглушено название. По умолчанию у скрытых — банк, как сейчас.</p></div>
+    <div class="st"><div class="row"><svg class="ic mut"><use href="#i-lock"/></svg><span class="tile solid square ac-red off"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта старая</div><div class="s">Карта · RUB</div></div><span class="num">0,00 ₽</span></div><p><b>Заблокированный.</b> Плашка вполсилы, цвет свободен для новых счетов.</p></div>
+    <div class="st"><div class="row sel"><span class="tile solid square ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта основная</div></div><span class="num">71 920,50 ₽</span><svg class="ic acc"><use href="#i-check"/></svg></div><p><b>Выбран в выборе счёта.</b> Выбор — фоном и галочкой цвета действия; цвет счёта выбор не обозначает.</p></div>
+    <div class="st"><div class="row fr sel" style="padding-top:2px"><svg class="ic" style="margin-top:10px"><use href="#i-circle-check"/></svg><div class="g"><div><div class="t">Топливо</div><div class="s">Лукойл · <span class="token square ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span>Карта кредитная</div></div><span class="num neg">-2 400,00 ₽</span></div></div><p><b>Выделена в ленте.</b> Галочка на месте значка категории, жетон счёта остаётся.</p></div>
+    <div class="st"><div class="row"><span class="tile solid square ac-red"><svg class="ic"><use href="#i-cash"/></svg></span><div class="g"><div class="t" style="color:var(--ink3)">Название счёта</div><div class="s">Наличные · RUB</div></div></div><p><b>Новый счёт.</b> Цвет — первый свободный: красный, его освободила заблокированная «Карта старая». Значок следует за типом: сменили «Карта» на «Наличные» — сменился и значок, пока его не выбрали руками.</p></div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Экраны</h2>
+  <div class="themerow"><b>Светлая тема</b><span>Цвета — как их раздаст обновление; значки выбраны у кредитки, карты евро, вклада и долларов</span></div>
+  <div data-screens="balances feed account form transfer picker catalog card sign select" data-theme="light"></div>
+  <div class="themerow"><b>Тёмная тема</b></div>
+  <div data-screens="balances feed account form transfer picker catalog card sign select" data-theme="dark"></div>
+</section>
+
+<section class="sec">
+  <h2>Крайние случаи</h2>
+  <p class="sub">Двенадцать счетов: цвета пошли по второму кругу, но значки у повторившихся разные. Длинное название режется, жетон — нет. При дейтеранопии и без цвета счёт узнают по значку — то, чего не хватало первому варианту.</p>
+  <div data-screens="many long deutan gray" data-theme="light" data-captions></div>
+</section>
+
+<section class="sec">
+  <h2>Поведение</h2>
+  <div class="prose"><ul>
+    <li><b>Без настройки.</b> Существующие счета получают цвета миграцией — по порядку, по очереди палитры. Значки остаются по типу. После обновления балансы уже разноцветные, ничего нажимать не нужно.</li>
+    <li><b>Новый счёт</b> открывается с первым свободным цветом и значком по типу. Значок следует за типом, пока его не выбрали руками.</li>
+    <li><b>Экран «Цвет и значок»</b> открывается строкой в карточке счёта. Предпросмотр — строка балансов и строка ленты — меняется по каждому касанию. «Назад» возвращает выбор в карточку, как выбор счёта возвращается в форму операции. В базу всё уходит по «Сохранить» в карточке.</li>
+    <li><b>Подсказка по названию</b> — первые до трёх значков над сеткой. Переименование значок не меняет.</li>
+    <li><b>Одинаковые цвета и значки разрешены.</b> Повтор пользователь видит на балансах сам.</li>
+    <li><b>Блокировка</b> приглушает плашку и освобождает цвет. Разблокированный счёт возвращается со своим цветом.</li>
+    <li><b>Смена цвета</b> перекрашивает знак плавно, за 150 мс; в ленте жетоны меняются при следующем чтении — цвет читается вместе со строкой.</li>
+  </ul></div>
+</section>
+
+<section class="sec">
+  <h2>Доступность</h2>
+  <div class="prose"><ul>
+    <li><b>Три признака:</b> название, цвет и значок. Цвет больше не единственный быстрый признак — у дальтоника остаётся форма.</li>
+    <li><b>TalkBack</b> плашку и жетон не озвучивает: они повторяют название. Строка «Цвет и значок» в карточке читается «Цвет и значок: голубой, процент».</li>
+    <li><b>Сетки выбора</b> озвучивают название цвета или значка и «выбран»; касание — 48 dp.</li>
+    <li><b>Крупный шрифт:</b> жетон растёт вместе со строкой — он задан от размера шрифта подписи; плашка в списках остаётся 36 dp.</li>
+  </ul></div>
+</section>
+
+<section class="sec">
+  <h2>Как это сделать в приложении</h2>
+  <div class="cols">
+    <div class="prose">
+      <p><b>Словарь.</b> «Цвет счёта» и «Значок счёта» в <code>CONTEXT.md</code> до кода.</p>
+      <p><b>Домен.</b> Перечисление цвета: <code>Unknown = 0</code>, явные номера, хранение именем. Ключ значка — необязательная строка; домен его только нормализует, как <code>Category.Icon</code>. Доменного правила нет ни для цвета, ни для значка: одинаковые разрешены, а набор допустимых значков — забота прикладного слоя.</p>
+      <p><b>Набор значков</b> — отдельный список в <code>data/</code>, вшитый в приложение по образцу <code>IconCatalog</code>: неизвестный ключ рисуется значком по типу, ошибкой не считается. Проверка «у каждого ключа есть контур» распространяется и на него.</p>
+      <p><b>База.</b> Две колонки: цвет раздаётся миграцией по <code>sort_order</code>, значок пустой. Резервная копия — как всегда.</p>
+      <p><b>Маппинг.</b> <code>AccountIcon.For</code> принимает выбранный ключ: есть — он, нет — прежнее правило. Его четыре вызова передают ещё и ключ, к ним добавляется цвет; пятый — новая плашка в шапке ленты счёта.</p>
+    </div>
+    <div class="prose">
+      <p><b>Контрол <code>AccountBadge</code></b>: плашка или жетон — один контрол с режимом. Цвет из ресурсов по имени, перекраска по смене темы; модель отдаёт имя цвета — цвета MAUI в прикладном слое нет.</p>
+<pre class="xaml"><span class="c">&lt;!-- подпись строки ленты --&gt;</span>
+&lt;Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="4"&gt;
+  &lt;Label Text="{Binding Prefix}" … /&gt;
+  &lt;controls:AccountBadge Grid.Column="1" Mode="Token"
+      Tone="{Binding Tone}" Icon="{Binding AccountIcon}" /&gt;
+  &lt;Label Grid.Column="2" Text="{Binding AccountName}"
+         LineBreakMode="TailTruncation" /&gt;
+&lt;/Grid&gt;</pre>
+      <p><b>Лента.</b> <code>FeedRowItem.Caption</code> делится на префикс и счёт, у перевода — два счёта. Название счёта — в столбце <code>*</code>: в <code>HorizontalStackLayout</code> ширина не ограничена, и обрезать было бы не до чего. Префикс с длинным местом ограничен половиной строки, иначе он вытеснил бы счёт целиком. Жетон не обрезается никогда.</p>
+      <p><b>Экран выбора</b> — по образцу экранов выбора формы операции: решение возвращается через общий объект, карточка забирает его при появлении.</p>
+      <p><b>Тексты:</b> «Цвет и значок», «Подходит», названия восьми цветов — в <code>UiTexts.resx</code>; названия значков уже есть в <code>IconNames.resx</code>, кроме карты — для неё запись новая.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Плюсы и минусы</h2>
+  <div class="cols">
+    <div class="box plus"><h3>Сильные стороны</h3><ul>
+      <li>Узнаётся с первого взгляда и после обновления — без настройки.</li>
+      <li>Значок говорит о назначении счёта, цвет — о самом счёте.</li>
+      <li>Дальтоник различает счета по значку.</li>
+      <li>В ленте жетон заметнее точки, а значок категории свободен для будущих цветов групп.</li>
+    </ul></div>
+    <div class="box minus"><h3>Цена</h3><ul>
+      <li>Два поля у счёта, свой набор значков, новый экран.</li>
+      <li>Восемнадцать токенов и контрол с перекраской по теме.</li>
+      <li>Подпись строки ленты собирается из частей — правку проверять на прокрутке и на крупном шрифте.</li>
+    </ul></div>
+  </div>
+</section>
+
+</div>
+<script src="kit/kit.js"></script>
+<script>
+const { ic, GLYPH_NAMES } = KIT;
+
+document.getElementById("glyphs").innerHTML = Object.entries(GLYPH_NAMES).map(([k, n]) =>
+  `<div class="st"><div class="row"><span class="tile solid square ac-blue"><svg class="ic"><use href="#i-${k}"/></svg></span><div class="g"><div class="t">${n}</div><div class="s">${k}${k === "credit-card" ? " · по умолчанию у карты" : k === "cash" ? " · по умолчанию у наличных" : k === "building-bank" ? " · по умолчанию у скрытых" : ""}</div></div></div></div>`).join("");
+const HINTS = [["кредит", ["percentage"]], ["вклад, накоп, копил", ["building-bank", "coins"]], ["отпуск, путеш, поезд", ["plane", "beach"]], ["евро, доллар, валют", ["plane", "coins"]],
+  ["дом, ипотек, кварт", ["home", "key"]], ["авто, машин", ["car"]], ["семь, общ", ["users"]], ["подар", ["gift"]], ["учёб, школ", ["school"]], ["резерв, подушк", ["shield"]], ["телефон, онлайн", ["device-mobile"]], ["налич", ["cash"]]];
+document.getElementById("hints").innerHTML = HINTS.map(([w, g]) => `<tr><td>${w}</td><td>${g.map(k => `<span class="chipsw" style="margin-right:12px"><span class="tile neutral" style="width:22px;height:22px">${ic(k)}</span>${GLYPH_NAMES[k]}</span>`).join("")}</td></tr>`).join("");
+
+KIT.render({
+  n: "5",
+  palette: KIT.VIVID,
+  ...KIT.signLook({ solid: true, shape: "square" }),
+  caps: {
+    balances: "Цвет — из очереди палитры, значок — по назначению: процент у кредитки, самолёт у карты евро, пляж у вклада. Наличные и основная карта не настраивались — значок по типу, различает их цвет.",
+    feed: "Жетон перед названием счёта: значок на сплошной заливке цвета. Цепочку трат по голубому проценту видно при прокрутке, а у перевода видны оба счёта.",
+    account: "В ленте счёта жетонов нет — счёт один, его плашка в шапке.",
+    form: "Поле «Счёт» — с плашкой счёта. Перепутанный счёт видно до сохранения.",
+    transfer: "«Откуда» и «Куда» — каждое своей плашкой: перепутанные стороны видны сразу.",
+    picker: "Плашки те же, что на балансах. Выбор — фоном и галочкой цвета действия.",
+    catalog: "Заблокированный счёт — плашка вполсилы, его цвет свободен.",
+    card: "Одна строка «Цвет и значок» вместо двух длинных сеток: карточка не растёт, а выбор живёт на своём экране.",
+    sign: "Предпросмотр сверху — строка балансов и строка ленты — меняется по каждому касанию. Выбранный значок залит цветом счёта. Над сеткой — подсказка по названию.",
+    select: "Галочка выделения — на месте значка категории, жетоны счетов остаются.",
+  },
+});
+</script>
+</body>
+</html>

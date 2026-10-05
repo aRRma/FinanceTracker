@@ -120,6 +120,8 @@ public sealed class FeedQuery : IFeedQuery
                 Amount = Money.Restore(row.TargetAmount!.Value, row.TargetCurrency!.Value),
                 AccountKey = row.TargetAccountKey!.Value,
                 AccountName = row.TargetAccountName!,
+                Account = row.TargetMark!,
+                OtherAccount = row.SourceMark,
                 Title = row.SourceAccountName,
                 Note = row.Note
             };
@@ -135,6 +137,8 @@ public sealed class FeedQuery : IFeedQuery
             Amount = Money.Restore(signed, row.SourceCurrency),
             AccountKey = row.SourceAccountKey,
             AccountName = row.SourceAccountName,
+            Account = row.SourceMark,
+            OtherAccount = row.TargetMark,
 
             // У перевода заголовком служит второй счёт, у остальных — подкатегория.
             // Категория без названия — ссылка на удалённую запись, чего по правилу
@@ -284,9 +288,17 @@ public sealed class FeedQuery : IFeedQuery
             SourceAccountKey = source.Key,
             SourceAccountName = source.Name,
             SourceCurrency = source.Currency,
+            SourceType = source.Type,
+            SourceExcluded = source.ExcludedFromTotals,
+            SourceColor = source.Color,
+            SourceIcon = source.Icon,
             TargetAccountKey = target != null ? target.Key : null,
             TargetAccountName = target != null ? target.Name : null,
             TargetCurrency = target != null ? target.Currency : null,
+            TargetType = target != null ? target.Type : null,
+            TargetExcluded = target != null ? target.ExcludedFromTotals : null,
+            TargetColor = target != null ? target.Color : null,
+            TargetIcon = target != null ? target.Icon : null,
             CategoryName = category != null ? category.Name : null,
             CategoryIcon = category != null ? category.Icon : null,
             GroupName = parent != null ? parent.Name : null,
@@ -318,11 +330,40 @@ public sealed class FeedQuery : IFeedQuery
 
         public required Currency SourceCurrency { get; init; }
 
+        public required AccountType SourceType { get; init; }
+
+        public required bool SourceExcluded { get; init; }
+
+        public required AccountColor SourceColor { get; init; }
+
+        public string? SourceIcon { get; init; }
+
         public Guid? TargetAccountKey { get; init; }
 
         public string? TargetAccountName { get; init; }
 
         public Currency? TargetCurrency { get; init; }
+
+        public AccountType? TargetType { get; init; }
+
+        public bool? TargetExcluded { get; init; }
+
+        public AccountColor? TargetColor { get; init; }
+
+        public string? TargetIcon { get; init; }
+
+        /// <summary>
+        /// Знак счёта списания.
+        /// </summary>
+        public AccountMark SourceMark =>
+            new(SourceAccountName, SourceColor, AccountIcon.For(SourceType, SourceExcluded, SourceIcon));
+
+        /// <summary>
+        /// Знак счёта зачисления; у дохода и расхода пусто.
+        /// </summary>
+        public AccountMark? TargetMark => TargetAccountName is null
+            ? null
+            : new(TargetAccountName, TargetColor!.Value, AccountIcon.For(TargetType!.Value, TargetExcluded!.Value, TargetIcon));
 
         public string? CategoryName { get; init; }
 

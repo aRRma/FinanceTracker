@@ -56,6 +56,7 @@ public sealed class FinanceDbContext : DbContext
         // Перечисления хранятся именем, а не номером: дамп базы читается глазами,
         // а перестановка членов перечисления не переименовывает молча все записи
         configurationBuilder.Properties<AccountType>().HaveConversion<string>();
+        configurationBuilder.Properties<AccountColor>().HaveConversion<string>();
 
         // Длина под код валюты, а не под Unknown: тот значит незаполненную переменную
         // и в базу не попадает. Расширение длины изменило бы модель EF и потребовало бы

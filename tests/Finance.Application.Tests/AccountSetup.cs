@@ -34,6 +34,7 @@ internal static class AccountSetup
         {
             Name = name,
             Type = AccountType.Cash,
+            Color = AccountColor.Blue,
             Currency = Currency.RUB,
             OpeningBalance = openingBalance,
             OpenedOn = OpenedOn,

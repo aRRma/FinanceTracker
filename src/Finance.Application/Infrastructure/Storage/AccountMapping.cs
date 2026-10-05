@@ -21,6 +21,8 @@ internal static class AccountMapping
                 row.Key,
                 row.Name,
                 row.Type,
+                row.Color,
+                row.Icon,
                 row.Currency,
                 row.OpeningBalance,
                 row.OpenedOn,
@@ -50,6 +52,8 @@ internal static class AccountMapping
                 ExternalId = account.ExternalId,
                 Name = account.Name,
                 Type = account.Type,
+                Color = account.Color,
+                Icon = account.Icon,
                 Currency = account.Currency,
                 OpeningBalance = account.OpeningBalance.Amount,
                 OpenedOn = account.OpenedOn,
@@ -67,6 +71,8 @@ internal static class AccountMapping
 
             row.Name = account.Name;
             row.Type = account.Type;
+            row.Color = account.Color;
+            row.Icon = account.Icon;
             row.Currency = account.Currency;
             row.OpeningBalance = account.OpeningBalance.Amount;
             row.OpenedOn = account.OpenedOn;

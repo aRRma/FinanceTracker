@@ -1,6 +1,7 @@
 using Finance.Application.Texts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Finance.Application.Features.Accounts.Badge;
 using Finance.Application.Infrastructure;
 using Finance.Domain.Enums;
 using Finance.Domain.Errors;
@@ -20,6 +21,7 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     private readonly ISaveAccountHandler _handler;
     private readonly IDeleteAccountHandler _delete;
     private readonly IClock _clock;
+    private readonly AccountBadgeDraft _badge;
 
     // Как счёт записан: имя, заблокирован ли и сколько на нём. По ним видно, блокируют ли
     // счёт именно этой правкой и остаются ли на нём деньги, а удаление называет
@@ -30,7 +32,7 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
 
     // Снимок формы на момент загрузки: с ним сравнивается нынешнее состояние,
     // когда экран покидают, не сохранив. У новой формы снимок — её пустое начало
-    private (string, AccountType, Currency, decimal?, string, DateOnly, bool, bool) _saved;
+    private (string Name, AccountType Type, AccountColor Color, string? Icon, Currency Currency, decimal? Opening, string OpeningTyped, DateOnly OpenedOn, bool Excluded, bool Closed) _saved;
 
     /// <summary>
     /// Создаёт модель представления карточки счёта.
@@ -39,17 +41,25 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// <param name="handler">Сохранение счёта.</param>
     /// <param name="delete">Удаление счёта.</param>
     /// <param name="clock">Часы: «сегодня» пользователя.</param>
-    public AccountViewModel(IAccountCardQuery query, ISaveAccountHandler handler, IDeleteAccountHandler delete, IClock clock)
+    /// <param name="badge">Цвет и значок по дороге на экран выбора и обратно.</param>
+    public AccountViewModel(
+        IAccountCardQuery query,
+        ISaveAccountHandler handler,
+        IDeleteAccountHandler delete,
+        IClock clock,
+        AccountBadgeDraft badge)
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(handler);
         ArgumentNullException.ThrowIfNull(delete);
         ArgumentNullException.ThrowIfNull(clock);
+        ArgumentNullException.ThrowIfNull(badge);
 
         _query = query;
         _handler = handler;
         _delete = delete;
         _clock = clock;
+        _badge = badge;
 
         OpenedOn = clock.Today;
     }
@@ -63,6 +73,7 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// Наименование счёта.
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Mark))]
     public partial string Name { get; set; } = string.Empty;
 
     /// <summary>
@@ -70,7 +81,43 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NamePlaceholder))]
+    [NotifyPropertyChangedFor(nameof(Mark))]
+    [NotifyPropertyChangedFor(nameof(BadgeCaption))]
+    [NotifyPropertyChangedFor(nameof(HeaderCaption))]
     public partial AccountType Type { get; set; } = AccountType.Card;
+
+    /// <summary>
+    /// Цвет счёта. Новому подбирается по очереди ещё до набора — карточка сразу
+    /// показывает счёт таким, каким он встанет на балансы.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Mark))]
+    [NotifyPropertyChangedFor(nameof(BadgeCaption))]
+    public partial AccountColor Color { get; private set; } = AccountColor.Blue;
+
+    /// <summary>
+    /// Значок, выбранный руками; пусто — по типу, и тогда он следует за сменой типа.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Mark))]
+    [NotifyPropertyChangedFor(nameof(BadgeCaption))]
+    public partial string? Icon { get; private set; }
+
+    /// <summary>
+    /// Знак счёта в шапке карточки и в строке «Цвет и значок».
+    /// </summary>
+    public AccountMark Mark => new(Name, Color, AccountIcon.For(Type, ExcludedFromTotals, Icon));
+
+    /// <summary>
+    /// Строка «Цвет и значок» словами: «Голубой · процент».
+    /// </summary>
+    public string BadgeCaption => AccountBadgeText.Describe(Color, Mark.Icon);
+
+    /// <summary>
+    /// Подпись под названием в шапке: тип и валюта, как в справочнике счетов.
+    /// </summary>
+    public string HeaderCaption =>
+        $"{(Type is AccountType.Cash ? UiTexts.AccountTypeCash : UiTexts.AccountTypeCard)} · {Currency}";
 
     /// <summary>
     /// Подсказка в пустом поле названия — своя у каждого типа: подсказка карты
@@ -85,6 +132,7 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(OpeningBalanceDisplay))]
+    [NotifyPropertyChangedFor(nameof(HeaderCaption))]
     public partial Currency Currency { get; set; } = Currency.RUB;
 
     private static readonly AccountType[] TypeOrder = [AccountType.Card, AccountType.Cash];
@@ -219,6 +267,8 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// «Скрытый».
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Mark))]
+    [NotifyPropertyChangedFor(nameof(BadgeCaption))]
     public partial bool ExcludedFromTotals { get; set; }
 
     /// <summary>
@@ -269,8 +319,8 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// «0» на пустом поле и «1234,50» вместо «1234,5» ничего не меняют. Строка
     /// идёт в снимок, только пока набор не считается.
     /// </summary>
-    private (string Name, AccountType Type, Currency Currency, decimal? Opening, string OpeningTyped, DateOnly OpenedOn, bool Excluded, bool Closed) Snapshot() =>
-        (Name, Type, Currency, OpeningValue, OpeningValue is null ? OpeningBalance : string.Empty, OpenedOn, ExcludedFromTotals, IsClosed);
+    private (string Name, AccountType Type, AccountColor Color, string? Icon, Currency Currency, decimal? Opening, string OpeningTyped, DateOnly OpenedOn, bool Excluded, bool Closed) Snapshot() =>
+        (Name, Type, Color, Icon, Currency, OpeningValue, OpeningValue is null ? OpeningBalance : string.Empty, OpenedOn, ExcludedFromTotals, IsClosed);
 
     /// <summary>
     /// Заголовок экрана.
@@ -315,21 +365,21 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     [RelayCommand]
     public async Task LoadAsync(Guid? key, CancellationToken cancellationToken = default)
     {
-        if (key is not { } existing)
-        {
-            // Новый счёт: правкой считается всё, что наберут поверх пустой формы
-            _saved = Snapshot();
-
-            return;
-        }
-
         // ConfigureAwait(false) здесь недопустим: следом меняются привязанные
         // свойства, а их правка вне потока интерфейса роняет разметку
-        AccountCard? card = await _query.ReadAsync(existing, cancellationToken);
+        AccountCard? card = key is { } existing ? await _query.ReadAsync(existing, cancellationToken) : null;
 
         if (card is null)
         {
+            // Новый счёт: снимок — пустая форма, снятая до чтения цвета, иначе набранное
+            // за время чтения вошло бы в снимок и правкой не считалось. Подобранный цвет
+            // ставится и в снимок: подставленное формой правкой не считается, и нетронутая
+            // карточка не спросит о несохранённом
             _saved = Snapshot();
+
+            AccountColor color = await _query.ReadFreeColorAsync(cancellationToken);
+            Color = color;
+            _saved.Color = color;
 
             return;
         }
@@ -337,6 +387,8 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
         Key = card.Key;
         Name = card.Name;
         Type = card.Type;
+        Color = card.Color;
+        Icon = card.Icon;
         Currency = card.Currency;
         // Тем же видом, каким набирает клавиатура: с запятой культуры, а не с точкой,
         // иначе стирание и дописывание сломали бы «1234.5»
@@ -398,6 +450,8 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
                         Key = Key,
                         Name = Name,
                         Type = Type,
+                        Color = Color,
+                        Icon = Icon,
                         Currency = Currency,
                         OpeningBalance = openingBalance,
                         OpenedOn = OpenedOn,
@@ -505,4 +559,31 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// </summary>
     [RelayCommand]
     public void ShowKeys() => AreKeysVisible = true;
+
+    /// <summary>
+    /// Карточка уходит на экран «Цвет и значок»: кладёт счёт, как он набран сейчас, —
+    /// предпросмотр там показывает набранное название, а не записанное.
+    /// </summary>
+    public void OpenBadge()
+    {
+        // Баланс — от набранного остатка: правка остатка сдвигает баланс на разницу,
+        // и предпросмотр показывает тот, что встанет на балансы после сохранения.
+        // Недобранный остаток («100+») не считается — остаётся записанный
+        decimal movement = _balance is { } saved ? saved.Amount - (_saved.Opening ?? 0m) : 0m;
+        Money balance = Money.Restore((OpeningValue ?? _saved.Opening ?? 0m) + movement, Currency);
+
+        _badge.Start(Key, Name, Type, ExcludedFromTotals, balance.Display, balance.IsNegative, Color, Icon);
+    }
+
+    /// <summary>
+    /// Карточка вернулась на экран: забирает выбор, если на экране выбора что-то меняли.
+    /// </summary>
+    public void ApplyBadge()
+    {
+        if (_badge.TryTake(out AccountColor color, out string? icon))
+        {
+            Color = color;
+            Icon = icon;
+        }
+    }
 }

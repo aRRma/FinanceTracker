@@ -1,3 +1,4 @@
+using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Domain.Enums;
@@ -39,6 +40,8 @@ public sealed class AccountCardQuery : IAccountCardQuery
                 row.Key,
                 row.Name,
                 row.Type,
+                row.Color,
+                row.Icon,
                 row.Currency,
                 row.OpeningBalance,
                 row.OpenedOn,
@@ -74,6 +77,8 @@ public sealed class AccountCardQuery : IAccountCardQuery
             Key = account.Key,
             Name = account.Name,
             Type = account.Type,
+            Color = account.Color,
+            Icon = account.Icon,
             Currency = account.Currency,
             OpeningBalance = account.OpeningBalance,
             OpenedOn = account.OpenedOn,
@@ -83,5 +88,15 @@ public sealed class AccountCardQuery : IAccountCardQuery
             CurrencyLocked = hasEverHadTransactions,
             EarliestTransactionOn = earliest
         };
+    }
+
+    /// <inheritdoc />
+    public async Task<AccountColor> ReadFreeColorAsync(CancellationToken cancellationToken = default)
+    {
+        await using FinanceDbContext context = await _contexts
+            .CreateDbContextAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return await AccountColors.NextFreeAsync(context, cancellationToken).ConfigureAwait(false);
     }
 }

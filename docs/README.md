@@ -33,6 +33,7 @@
 | Как назвать новое понятие | [../CONTEXT.md](../CONTEXT.md) — сначала словарь, потом код |
 | Перенос истории из других приложений (сборка `Finance.Import`) | [ADR-0014](adr/0014-wallet-import-one-shot-through-domain-path.md) |
 | Выгрузка в файл и восстановление из неё | [ADR-0015](adr/0015-export-is-database-file.md), `FR-SET-05`, `FR-SET-06`, `NFR-27`, сценарий UC-25 |
+| Цвет и значок счёта | [ADR-0016](adr/0016-account-color-and-icon.md), `FR-ACC-07`, экран D-12, сценарии UC-13 и UC-14 |
 | Сборка, тесты, эмулятор, экраны, тексты | навыки в `.claude/skills/` — список и когда какой загружать в [../CLAUDE.md](../CLAUDE.md) |
 
 ## Остальные документы

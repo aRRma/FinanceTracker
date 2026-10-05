@@ -256,13 +256,46 @@ public sealed class AccountInvariantsTests
         // Читающий путь обязан быть непадающим: значение, вернувшееся из базы
         // с лишним нулём или датой вне диапазона, не должно ронять список счетов
         Account account = Account.Restore(
-            Keys.New(), "  Старый счёт  ", AccountType.Cash, Currency.RUB,
+            Keys.New(), "  Старый счёт  ", AccountType.Cash, AccountColor.Unknown, icon: "  ", Currency.RUB,
             openingBalance: 100.000m, openedOn: new DateOnly(1990, 1, 1),
             excludedFromTotals: false, isClosed: false, sortOrder: 0,
             Given.NowUtc, Given.NowUtc, null, null, null);
 
         Assert.Equal(100.000m, account.OpeningBalance.Amount);
         Assert.Equal(new DateOnly(1990, 1, 1), account.OpenedOn);
+        Assert.Equal(AccountColor.Unknown, account.Color);
+        Assert.Equal("  ", account.Icon);
+    }
+
+    [Theory]
+    [InlineData(null, null)]
+    [InlineData("", null)]
+    [InlineData("   ", null)]
+    [InlineData(" plane ", "plane")]
+    public void Пустой_значок_счёта_значит_значок_по_типу(string? icon, string? expected)
+    {
+        Account account = Given.Account();
+
+        account.ChangeIcon(icon);
+
+        Assert.Equal(expected, account.Icon);
+    }
+
+    [Fact]
+    public void Цвет_и_значок_счёта_меняются_без_проверок()
+    {
+        // Одинаковые цвета и значки у разных счетов разрешены: их различает название
+        Account first = Given.Account(name: "Первый");
+        Account second = Given.Account(name: "Второй");
+
+        first.ChangeColor(AccountColor.Green);
+        second.ChangeColor(AccountColor.Green);
+        second.ChangeIcon("plane");
+
+        Assert.Equal(AccountColor.Green, first.Color);
+        Assert.Equal(AccountColor.Green, second.Color);
+        Assert.Null(first.Icon);
+        Assert.Equal("plane", second.Icon);
     }
 
     [Fact]

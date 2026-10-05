@@ -9,7 +9,8 @@ namespace Finance.Application.Features.Transactions.Card;
 /// для расхода, обычно и хотят знать, хватит ли на нём денег.
 /// </summary>
 /// <param name="Key">Ключ счёта.</param>
-/// <param name="Icon">Ключ значка: наличные, карта или накопления.</param>
+/// <param name="Icon">Ключ значка: выбранный руками или по типу.</param>
+/// <param name="Color">Цвет счёта — заливка его знака.</param>
 /// <param name="Name">Наименование.</param>
 /// <param name="Currency">Валюта — вместе со счётом меняется валюта суммы.</param>
 /// <param name="Balance">Баланс на сейчас.</param>
@@ -19,6 +20,7 @@ namespace Finance.Application.Features.Transactions.Card;
 public sealed record AccountOption(
     Guid Key,
     string Icon,
+    AccountColor Color,
     string Name,
     Currency Currency,
     Money Balance,

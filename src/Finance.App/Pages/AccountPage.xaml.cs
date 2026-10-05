@@ -46,7 +46,24 @@ public sealed partial class AccountPage : DataPage
     protected override Task LoadAsync() =>
         _model.LoadAsync(Guid.TryParse(Key, out Guid key) ? key : null);
 
+    /// <summary>
+    /// Вернувшись с экрана «Цвет и значок», карточка забирает выбор: перечитывать
+    /// форму при появлении нельзя — стёрлось бы набранное.
+    /// </summary>
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        _model.ApplyBadge();
+    }
+
     private void OnSave(object? sender, EventArgs e) => Guarded.Run(SaveAsync);
+
+    private void OnBadgeTapped(object? sender, TappedEventArgs e)
+    {
+        _model.AreKeysVisible = false;
+        _model.OpenBadge();
+        Navigator.Go(Routes.AccountBadge);
+    }
 
     private void OnDelete(object? sender, EventArgs e)
     {

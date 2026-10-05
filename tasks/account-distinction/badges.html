@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Бейдж счёта — четыре формы</title>
+<link rel="stylesheet" href="kit/base.css">
+<link rel="stylesheet" href="kit/doc.css">
+<style>
+.lineup{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-radius:18px;overflow:hidden;border:1px solid var(--line2)}
+.lineup>div{padding:22px 16px 18px;background:var(--paper);display:flex;flex-direction:column;align-items:center;gap:12px;font-family:var(--app)}
+.lineup .big{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;transform:scale(1.5);transform-origin:center;margin:14px 0}
+.lineup b{font-size:13px;font-weight:600;color:var(--ink)}
+.lineup .feedline{font-size:11px;color:var(--ink2);white-space:nowrap}
+.shape-sec{border-top:1px solid var(--line2);padding-top:30px}
+.shape-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:30px;align-items:start}
+.shape-head .duo>div{display:flex;flex-direction:column;gap:10px}
+@media (max-width:900px){.lineup{grid-template-columns:1fr 1fr}.shape-head{grid-template-columns:1fr}}
+</style>
+<script>if(matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.dataset.theme="dark"</script>
+</head>
+<body>
+<script src="kit/icons.js"></script>
+<div class="wrap doc">
+
+<nav class="docnav"><a href="variants.html">Обзор</a><a href="variant-1.html">1 · Цветная плашка</a><a href="variant-2.html">2 · Кольцо счёта</a><a href="variant-3.html">3 · Мини-карта</a><a href="variant-4.html">4 · Свой значок</a><a href="variant-5.html">5 · Цвет и значок</a><a href="palette.html">Палитра</a><a class="on" href="badges.html">Бейджи</a><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'">Тема страницы</button></nav>
+
+<header class="sec" style="margin-top:6px">
+  <div class="kicker" style="font-size:13px;color:var(--ink2)">Счета различимы с первого взгляда · вариант 5, палитра «Предельная насыщенность»</div>
+  <h1 style="font-size:34px;font-weight:600;letter-spacing:-.02em;margin:6px 0 10px">Бейдж счёта: четыре формы</h1>
+  <p class="sub" style="max-width:80ch">Цвет, значок и палитра уже выбраны — здесь выбирается только <b>форма</b> бейджа. Плашка в списках и жетон в ленте всегда одной формы: жетон — та же плашка, уменьшенная для строки. Ниже — все четыре рядом, затем каждая подробно на балансах, в ленте и на экране «Цвет и значок».</p>
+  <div class="lineup" id="lineup-light" data-theme="light"></div>
+  <div class="lineup" id="lineup-dark" data-theme="dark" style="margin-top:10px"></div>
+</header>
+
+<section class="sec shape-sec" id="s-circle">
+  <h2>А · Круг</h2>
+  <div class="shape-head">
+    <div class="prose">
+      <p>Форма, с которой начинали. Повторяет круглые значки полей в форме операции, поэтому встаёт в приложение без новой геометрии.</p>
+      <ul><li><b>Размер:</b> плашка 36 dp, жетон 19 dp.</li><li><b>Сильное:</b> спокойный, привычный, не спорит с остальными значками приложения.</li><li><b>Слабое:</b> круг — самая «маленькая» форма: при той же ширине у него меньше всего цвета. Похож на аватар.</li></ul>
+    </div>
+    <div class="box"><h3>Где проще всего</h3><p>MAUI: <code>Border</code> с <code>StrokeShape="RoundRectangle 18"</code> или <code>Ellipse</code>. Ничего нового.</p></div>
+  </div>
+  <div class="themerow"><b>Светлая тема</b></div><div data-screens="balances feed sign" data-theme="light"></div>
+  <div class="themerow"><b>Тёмная тема</b></div><div data-screens="balances feed" data-theme="dark"></div>
+</section>
+
+<section class="sec shape-sec" id="s-square">
+  <h2>Б · Скруглённый квадрат — выбран</h2>
+  <div class="shape-head">
+    <div class="prose">
+      <p>Квадрат со скруглением 30 % — как значки приложений на телефоне. Читается как предмет — карта, счёт, — а не как человек или кнопка.</p>
+      <ul><li><b>Размер:</b> плашка 36 dp, скругление 11 dp; жетон 19 dp, скругление 6 dp.</li><li><b>Сильное:</b> на 17 % больше цвета, чем у круга той же ширины, — ярче без увеличения. Отличается от круглых значков полей формы и от галочки выделения.</li><li><b>Слабое:</b> новая форма в приложении — до этого всё круглое.</li></ul>
+    </div>
+    <div class="box"><h3>Где проще всего</h3><p>MAUI: <code>Border</code> с <code>StrokeShape="RoundRectangle 11"</code>. Так же просто, как круг.</p></div>
+  </div>
+  <div class="themerow"><b>Светлая тема</b></div><div data-screens="balances feed sign" data-theme="light"></div>
+  <div class="themerow"><b>Тёмная тема</b></div><div data-screens="balances feed" data-theme="dark"></div>
+</section>
+
+<section class="sec shape-sec" id="s-plate">
+  <h2>В · Карта</h2>
+  <div class="shape-head">
+    <div class="prose">
+      <p>Горизонтальная плашка 3 : 2 — силуэт банковской карты. Самая буквальная метафора: «это счёт», ещё до цвета и значка.</p>
+      <ul><li><b>Размер:</b> плашка 50 × 33 dp, скругление 7 dp; жетон 26 × 17 dp.</li><li><b>Сильное:</b> сразу понятно, что это счёт; больше всего цвета из четырёх.</li><li><b>Слабое:</b> наличные и вклад в форме карты выглядят натянуто. Плашка шире — названия на балансах сдвигаются вправо на 13 dp, жетон в ленте заметно шире строки текста.</li></ul>
+    </div>
+    <div class="box"><h3>Где проще всего</h3><p>MAUI: <code>Border</code> 50 × 33 с <code>RoundRectangle 7</code>. Колонку под бейдж в списках нужно расширить.</p></div>
+  </div>
+  <div class="themerow"><b>Светлая тема</b></div><div data-screens="balances feed sign" data-theme="light"></div>
+  <div class="themerow"><b>Тёмная тема</b></div><div data-screens="balances feed" data-theme="dark"></div>
+</section>
+
+<section class="sec shape-sec" id="s-glow">
+  <h2>Г · Объём</h2>
+  <div class="shape-head">
+    <div class="prose">
+      <p>Круг с мягким светом сверху-слева и глубиной снизу-справа — бейдж выглядит как леденец или кнопка-камешек. Самый «сочный» вариант для яркой палитры.</p>
+      <ul><li><b>Размер:</b> как у круга — 36 и 19 dp.</li><li><b>Сильное:</b> цвета звучат ещё ярче; бейдж выглядит дорого и живо.</li><li><b>Слабое:</b> весь остальной интерфейс плоский — объём выделяется из стиля приложения. Светлый край снижает контраст белого значка, поэтому значок держится в средней зоне. Тень цвета в длинном списке на Android обходится дорого — в списках без неё.</li></ul>
+    </div>
+    <div class="box"><h3>Где проще всего</h3><p>MAUI: <code>RadialGradientBrush</code> из трёх точек, выведенных из того же токена: светлее, сам цвет, темнее. Новых токенов не нужно — светлую и тёмную точку контрол смешивает сам.</p></div>
+  </div>
+  <div class="themerow"><b>Светлая тема</b></div><div data-screens="balances feed sign" data-theme="light"></div>
+  <div class="themerow"><b>Тёмная тема</b></div><div data-screens="balances feed" data-theme="dark"></div>
+</section>
+
+<section class="sec">
+  <h2>Сравнение</h2>
+  <table class="cmp" style="width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden">
+    <thead><tr style="background:var(--sunk);color:var(--ink2);font-size:12.5px"><th style="text-align:left;padding:9px 12px">Форма</th><th style="text-align:left;padding:9px 12px">Яркость</th><th style="text-align:left;padding:9px 12px">Вписывается в приложение</th><th style="text-align:left;padding:9px 12px">Наличные и вклад</th><th style="text-align:left;padding:9px 12px">Сложность</th></tr></thead>
+    <tbody>
+      <tr><td style="padding:9px 12px;border-top:1px solid var(--line);font-weight:600">А · Круг</td><td style="padding:9px 12px;border-top:1px solid var(--line)">База</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Полностью — как значки полей</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Естественно</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Минимальная</td></tr>
+      <tr><td style="padding:9px 12px;border-top:1px solid var(--line);font-weight:600">Б · Скруглённый квадрат</td><td style="padding:9px 12px;border-top:1px solid var(--line)">+17 % цвета</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Новая форма, но спокойная</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Естественно</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Минимальная</td></tr>
+      <tr><td style="padding:9px 12px;border-top:1px solid var(--line);font-weight:600">В · Карта</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Больше всех</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Шире колонка, названия сдвигаются</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Натянуто</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Низкая</td></tr>
+      <tr><td style="padding:9px 12px;border-top:1px solid var(--line);font-weight:600">Г · Объём</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Самая сочная</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Выделяется из плоского стиля</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Естественно</td><td style="padding:9px 12px;border-top:1px solid var(--line)">Средняя: градиент</td></tr>
+    </tbody>
+  </table>
+  <p class="lead" style="margin-top:14px;max-width:80ch;color:var(--ink2)"><b style="color:var(--ink)">Выбран Б · скруглённый квадрат (4 октября 2026).</b> Он ярче круга той же ширины, читается как предмет, а не аватар или кнопка, и отделяет счёт от круглых значков полей и галочки выделения. Сложность та же, что у круга. Объём — если хочется ещё больше сочности ценой выхода из плоского стиля. Карта хороша для карт, но спорит с наличными.</p>
+</section>
+
+</div>
+<script src="kit/kit.js"></script>
+<script>
+const { ic, VIVID, A } = KIT;
+const SHAPES = [["circle", "А · Круг"], ["square", "Б · Квадрат"], ["plate", "В · Карта"], ["glow", "Г · Объём"]];
+const caps = name => ({
+  balances: `${name}: плашки на балансах.`,
+  feed: `${name}: жетоны в ленте — та же форма, уменьшенная для строки.`,
+  sign: `${name}: выбор цвета и значка — в той же форме.`,
+});
+// Ряд всех форм: три счёта крупно и строка ленты с жетоном
+for (const id of ["lineup-light", "lineup-dark"]) {
+  document.getElementById(id).innerHTML = SHAPES.map(([shape, name]) => {
+    const sample = [["blue", "cash"], ["orange", "credit-card"], ["sky", "percentage"], ["green", "plane"]];
+    return `<div><b>${name}</b><div class="big">${sample.map(([c, g]) => `<span class="tile solid ${shape} ac-${c}">${ic(g)}</span>`).join("")}</div>
+      <div class="feedline">Лукойл · <span class="token ${shape} ac-sky">${ic("percentage")}</span>Карта кредитная</div></div>`;
+  }).join("");
+}
+for (const [shape, name] of SHAPES) {
+  KIT.render({ n: name[0], palette: VIVID, ...KIT.signLook({ solid: true, shape }), caps: caps(name.slice(4)) }, document.getElementById(`s-${shape}`));
+}
+</script>
+</body>
+</html>

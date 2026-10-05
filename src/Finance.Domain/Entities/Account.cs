@@ -16,6 +16,8 @@ public sealed class Account : Entity
         Guid key,
         string name,
         AccountType type,
+        AccountColor color,
+        string? icon,
         Currency currency,
         Money openingBalance,
         DateOnly openedOn,
@@ -31,6 +33,8 @@ public sealed class Account : Entity
     {
         Name = name;
         Type = type;
+        Color = color;
+        Icon = icon;
         Currency = currency;
         OpeningBalance = openingBalance;
         OpenedOn = openedOn;
@@ -48,6 +52,18 @@ public sealed class Account : Entity
     /// Наличные или карта. Влияет только на значок и подпись.
     /// </summary>
     public AccountType Type { get; private set; }
+
+    /// <summary>
+    /// Цвет, по которому счёт узнаётся с первого взгляда. Одинаковые цвета у разных
+    /// счетов разрешены: их различает название и значок.
+    /// </summary>
+    public AccountColor Color { get; private set; }
+
+    /// <summary>
+    /// Значок по назначению, выбранный руками. <see langword="null"/> — значок по типу:
+    /// он следует за сменой типа, пока значок не выбран.
+    /// </summary>
+    public string? Icon { get; private set; }
 
     /// <summary>
     /// Валюта счёта. После первой операции не меняется.
@@ -85,6 +101,8 @@ public sealed class Account : Entity
     /// </summary>
     /// <param name="name">Наименование счёта.</param>
     /// <param name="type">Наличные или карта.</param>
+    /// <param name="color">Цвет счёта.</param>
+    /// <param name="icon">Значок по назначению; пустой — значок по типу.</param>
     /// <param name="currency">Валюта счёта.</param>
     /// <param name="openingBalance">Начальный остаток.</param>
     /// <param name="openedOn">Дата открытия.</param>
@@ -95,6 +113,8 @@ public sealed class Account : Entity
     public static Account Create(
         string name,
         AccountType type,
+        AccountColor color,
+        string? icon,
         Currency currency,
         decimal openingBalance,
         DateOnly openedOn,
@@ -110,6 +130,8 @@ public sealed class Account : Entity
             Keys.New(),
             Names.Normalize(name, RuleText.SubjectAccount),
             type,
+            color,
+            NormalizeIcon(icon),
             currency,
             balance,
             openedOn,
@@ -132,6 +154,8 @@ public sealed class Account : Entity
         Guid key,
         string name,
         AccountType type,
+        AccountColor color,
+        string? icon,
         Currency currency,
         decimal openingBalance,
         DateOnly openedOn,
@@ -143,7 +167,7 @@ public sealed class Account : Entity
         DateTimeOffset? deletedAtUtc,
         DateTimeOffset? syncedAtUtc,
         string? externalId) =>
-        new(key, name, type, currency, Money.Restore(openingBalance, currency), openedOn,
+        new(key, name, type, color, icon, currency, Money.Restore(openingBalance, currency), openedOn,
             excludedFromTotals, isClosed, sortOrder,
             createdAtUtc, updatedAtUtc, deletedAtUtc, syncedAtUtc, externalId);
 
@@ -156,6 +180,16 @@ public sealed class Account : Entity
     /// Меняет тип счёта. На расчёты не влияет.
     /// </summary>
     public void ChangeType(AccountType type) => Type = type;
+
+    /// <summary>
+    /// Перекрашивает счёт. На расчёты не влияет.
+    /// </summary>
+    public void ChangeColor(AccountColor color) => Color = color;
+
+    /// <summary>
+    /// Задаёт значок по назначению; пустой возвращает значок по типу.
+    /// </summary>
+    public void ChangeIcon(string? icon) => Icon = NormalizeIcon(icon);
 
     /// <summary>
     /// Меняет валюту счёта. Запрещено, если по счёту когда-либо была операция —
@@ -268,4 +302,11 @@ public sealed class Account : Entity
 
         return balance;
     }
+
+    /// <summary>
+    /// Приводит ключ значка. По каталогу значок не проверяется — набор задаёт прикладной
+    /// слой; пустота значит «по типу» и хранится как <see langword="null"/>, а не пустой строкой.
+    /// </summary>
+    private static string? NormalizeIcon(string? icon) =>
+        string.IsNullOrWhiteSpace(icon) ? null : icon.Trim();
 }

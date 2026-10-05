@@ -81,6 +81,8 @@ public sealed class AccountsQuery : IAccountsQuery
             row.Key,
             row.Name,
             row.Type,
+            row.Color,
+            row.Icon,
             row.Currency,
             row.OpeningBalance,
             row.OpenedOn,
@@ -94,6 +96,8 @@ public sealed class AccountsQuery : IAccountsQuery
             Key = account.Key,
             Name = account.Name,
             Type = account.Type,
+            Color = account.Color,
+            Icon = AccountIcon.For(account.Type, account.ExcludedFromTotals, account.Icon),
 
             // Restore, а не Create: число уже прошло проверку при вводе,
             // а баланс ещё и не обязан укладываться в предел суммы операции
@@ -110,6 +114,8 @@ public sealed class AccountsQuery : IAccountsQuery
         Guid Key,
         string Name,
         AccountType Type,
+        AccountColor Color,
+        string? Icon,
         Currency Currency,
         decimal OpeningBalance,
         DateOnly OpenedOn,

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Палитра счетов «Предельная насыщенность»</title>
+<link rel="stylesheet" href="kit/base.css">
+<link rel="stylesheet" href="kit/doc.css">
+<script>if(matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.dataset.theme="dark"</script>
+</head>
+<body>
+<script src="kit/icons.js"></script>
+<div class="wrap doc">
+
+<nav class="docnav"><a href="variants.html">Обзор</a><a href="variant-1.html">1 · Цветная плашка</a><a href="variant-2.html">2 · Кольцо счёта</a><a href="variant-3.html">3 · Мини-карта</a><a href="variant-4.html">4 · Свой значок</a><a href="variant-5.html">5 · Цвет и значок</a><a class="on" href="palette.html">Палитра</a><a href="badges.html">Бейджи</a><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'">Тема страницы</button></nav>
+
+<header class="hero">
+  <div>
+    <div class="kicker">Счета различимы с первого взгляда · палитра для варианта 5</div>
+    <h1>Предельная насыщенность</h1>
+    <p>Самый яркий цвет каждого тона — синий, оранжевый, голубой, зелёный, фиолетовый, пурпурный, красный, розовый. Плашка и жетон <b>залиты цветом целиком</b>, а значок на заливке — белый или тёмный, смотря что контрастнее.</p>
+    <p>Такая палитра не проходит строгие нормы скилла <b>dataviz</b> — и не обязана: у счёта всегда есть название и значок. Поэтому работа здесь не в подборе цветов, а в том, чтобы яркость не мешала: в каком порядке цвета раздаются, какой значок ложится на заливку, какие пары близки и что их разводит.</p>
+  </div>
+  <div class="specimen">
+    <div data-theme="light"><div data-fragment="accounts"></div><div data-fragment="feed"></div></div>
+    <div data-theme="dark"><div data-fragment="accounts"></div><div data-fragment="feed"></div></div>
+  </div>
+</header>
+
+<section class="sec">
+  <h2>Почему прежние цвета были тусклыми</h2>
+  <p class="sub">Прошлая палитра подбиралась под одно требование — контраст 4,5 к карточке, как у текста. Цвета ради него темнели в светлой теме и выцветали в пастель в тёмной.</p>
+  <div class="cmpgrid">
+    <div class="box"><span class="verdict bad">светлая тема</span>
+      <div class="strip" id="oldLight"></div>
+      <ul><li>Три цвета ниже порога насыщенности 0,10 — бирюзовый, графитовый, коричневый: глаз читает их серыми.</li>
+      <li>Коричневый и янтарный — ΔE 6 при пороге 15: их путают и при обычном зрении.</li></ul></div>
+    <div class="box"><span class="verdict bad">тёмная тема</span>
+      <div class="strip" id="oldDark" data-theme="dark" style="background:var(--card);padding:8px;border-radius:10px"></div>
+      <ul><li>Светлота 0,76–0,83 — это пастель, отсюда «бледность».</li>
+      <li>Графитовый и коричневый — ниже порога насыщенности.</li></ul></div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Четыре попытки</h2>
+  <p class="sub">Значок на образце — так, как он ляжет на заливку.</p>
+  <div class="cmpgrid">
+    <div class="box"><span class="verdict ok">выбрано</span><h3>Предельная насыщенность</h3>
+      <div class="strip" data-strip="current"></div>
+      <p>Самый насыщенный цвет каждого тона, на 8 % внутри границы sRGB — на самом краю цвет «плывёт» между экранами. Ярко и без полутонов.</p></div>
+    <div class="box"><span class="verdict bad">одна светлота</span><h3>Семья одного веса</h3>
+      <div class="strip" data-strip="#3E8AF6,#B88021,#DF4E92,#27A18F,#26A74B,#A06AEC,#E45A20,#C958C2"></div>
+      <p>Насыщенность до 0,19, светлота у всех 0,64. Гармонично, но восемь цветов не расходятся дальше ΔE 9 — соседи путаются.</p></div>
+    <div class="box"><span class="verdict bad">десять цветов</span><h3>Ступени, десять тонов</h3>
+      <div class="strip" data-strip="#F98378,#BF4A19,#C7A92B,#63811A,#3BCA60,#30BDDA,#1A6FE1,#8851D1,#EB78E3,#C3337A"></div>
+      <p>Десять цветов, попарно различимых обычным зрением, не помещаются: лучший набор — ΔE 13,5 при пороге 15.</p></div>
+    <div class="box"><span class="verdict bad">отклонено</span><h3>Ступени, восемь тонов</h3>
+      <div class="strip" data-strip="#3E8AF6,#C7A92B,#C3337A,#31C4AE,#8851D1,#E45A20,#1E8B3D,#EB78E3"></div>
+      <p>Проходит все нормы, но пригашен: насыщенность не выше 0,19, а у выбранной пять цветов выше 0,2. Строгость здесь не окупает потерю яркости — второй признак у счёта и так есть.</p></div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Как яркость приручена</h2>
+  <div class="cols">
+    <div class="box"><h3>Очередь</h3><p>Цвет ставится сам по очереди. Первые три — синий, оранжевый, голубой — различимы и обычным зрением (худшая пара синий с голубым, 14,3), и при дальтонизме. Четвёртый, зелёный, при дальтонизме близок к оранжевому — 5,0 при минимуме 6: без розового лучшего четвёртого нет, их различает значок. Красный — цвет расхода — седьмой, розовый по просьбе пользователя — последний.</p></div>
+    <div class="box"><h3>Значок на заливке</h3><p>Белый, где он держит контраст не ниже 3, — на синем, розовом, фиолетовом, пурпурном и красном. На оранжевом, зелёном и голубом белый в светлой теме проваливается до 2,5–2,8 — там значок тёмный, и в тёмной теме тоже, хотя на тёмном оранжевом белый держит 3,1: правило одно на обе темы. Выбор один на обе темы — два постоянных токена.</p></div>
+    <div class="box"><h3>Близкие пары</h3><p>Обычным зрением четыре пары ближе нормы 15: красный с оранжевым и с розовым, розовый с пурпурным, синий с голубым. Первые три встречаются только с седьмого-восьмого счёта и различаются значком. Синий с голубым — 14,3, на самом пороге: их разводит разница светлоты.</p></div>
+    <div class="box"><h3>Красный и суммы</h3><p>Красная сумма расхода и красный счёт стоят в разных концах строки: жетон — у названия слева, сумма — справа. А красный счёт появляется только седьмым.</p></div>
+    <div class="box"><h3>Тёмная тема</h3><p>Те же яркие цвета, на тёмном они светятся. Валидатор отмечает выход за полосу светлоты 0,48–0,67 — сознательно: полоса рассчитана на графики, где цвет занимает много места, а у нас это плашка в 36 dp. Текст цветом счёта не пишется нигде.</p></div>
+    <div class="box"><h3>Дальтонизм</h3><p>После четвёртого цвета пары при дейтеранопии и протанопии сближаются: синий с фиолетовым, красный с зелёным и оранжевым. Их различает значок — процент, самолёт, пляж различимы и в оттенках серого.</p></div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Палитра</h2>
+  <p class="sub">Насыщенность у пяти цветов выше 0,2, у пурпурного 0,29 — в полтора раза выше самого насыщенного цвета прежней палитры; голубой — 0,11: насыщеннее этот тон в sRGB не бывает. Заливка к карточке порога не имеет: счёт всегда подписан. Значок на заливке — знак, ему нужно не меньше 3.</p>
+  <div data-palette></div>
+  <div class="cols" style="margin-top:22px">
+    <div><h3 style="font-size:14.5px;margin:0 0 4px">Очередь</h3><p class="sub" style="margin:0">Первый цвет, не занятый незаблокированными счетами. Девятый счёт получает синий снова — со своим значком.</p><div data-order></div></div>
+    <div><h3 style="font-size:14.5px;margin:0 0 4px">Близкие пары</h3><p class="sub" style="margin:0">Обычным зрением ближе 15 (сверху) и при дальтонизме ближе 8 (ниже — дейтеранопия, затем протанопия). ΔE в OKLab ×100, симуляция Machado 2009.</p><div data-pairs="normal" data-metric="oklab" data-threshold="15" data-values></div><div data-pairs="deutan" data-metric="oklab" data-threshold="8" data-values style="margin-top:6px"></div><div data-pairs="protan" data-metric="oklab" data-threshold="8" data-values style="margin-top:6px"></div></div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Значок на заливке</h2>
+  <p class="sub">Белый на пяти цветах, тёмный на трёх — одинаково в светлой и тёмной теме. Токены <code>AccountGlyphLight</code> и <code>AccountGlyphDark</code> постоянные: значок выбирает цвет заливки, а не тема.</p>
+  <div class="duo" id="glyphduo"><div data-theme="light"></div><div data-theme="dark"></div></div>
+</section>
+
+<section class="sec">
+  <h2>Мягкая плашка или сплошная</h2>
+  <p class="sub">С такой палитрой мягкая плашка теряет смысл: яркий цвет на бледной подложке из самого себя выглядит выцветшим, а значок на ней — штрихом. Сплошная отдаёт цвету всю плашку.</p>
+  <div class="cmpgrid">
+    <div class="box"><h3>Мягкая</h3><div class="duo" id="softduo"><div data-theme="light"></div><div data-theme="dark"></div></div><p style="margin-top:8px">Цвет — только в штрихе значка. Яркость палитры пропадает.</p></div>
+    <div class="box"><h3>Сплошная — выбрана</h3><div class="duo" id="solidduo"><div data-theme="light"></div><div data-theme="dark"></div></div><p style="margin-top:8px">Цвет счёта — всей плашкой, узнаётся боковым зрением. Шестнадцать токенов подложки не нужны.</p></div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Экраны</h2>
+  <div class="themerow"><b>Светлая тема</b><span>Цвета — как их раздаст обновление по порядку счетов; значки выбраны у кредитки, карты евро, вклада и долларов</span></div>
+  <div data-screens="balances feed form picker sign" data-theme="light"></div>
+  <div class="themerow"><b>Тёмная тема</b></div>
+  <div data-screens="balances feed form picker sign" data-theme="dark"></div>
+</section>
+
+<section class="sec">
+  <h2>Дальтонизм, без цвета и много счетов</h2>
+  <p class="sub">Первые три цвета различимы и при дальтонизме; с четвёртого, зелёного, пары сближаются, и счёт узнают по значку. На двенадцати счетах цвета идут по второму кругу.</p>
+  <div data-screens="deutan protan gray many" data-theme="light" data-captions></div>
+</section>
+
+<section class="sec">
+  <h2>Что это меняет в приложении</h2>
+  <div class="cols">
+    <div class="prose">
+      <p><b>Токены.</b> Восемь цветов на две темы — шестнадцать токенов <code>Account…Light</code>/<code>Dark</code>, и два токена значка. Подложек нет. Всего восемнадцать.</p>
+      <p><b>ContrastTests.</b> Новые пары — значок на каждой заливке в обеих темах, порог 3. Пара «заливка к карточке» в тест не идёт: счёт всегда подписан, а цвет ради контраста к карточке как раз и тускнел.</p>
+      <p><b>Очередь</b> — восемь цветов по кругу. Цвет хранится именем, поэтому смена палитры позже — правка токенов, а не данных.</p>
+    </div>
+    <div class="prose">
+      <p><b>Тексты.</b> Названия цветов для TalkBack: синий, оранжевый, голубой, зелёный, фиолетовый, пурпурный, красный, розовый.</p>
+      <p><b>Подбор и проверка</b> — <code>tasks/account-distinction/tools/palette.cs</code>: режим <code>list</code> даёт самый насыщенный цвет каждого тона, режим <code>hex</code> — очередь, значок и близкие пары готовой палитры.</p>
+    </div>
+  </div>
+</section>
+
+</div>
+<script src="kit/kit.js"></script>
+<script>
+const { ic, VIVID } = KIT;
+const OLD = [["#1F5FCC", "#93B5FF"], ["#8A6200", "#E9C463"], ["#B8185A", "#FF8FBA"], ["#00727D", "#62D2DC"], ["#2B7A32", "#7DD88F"], ["#6A45C7", "#B9A0FF"], ["#B04C00", "#FFAE70"], ["#5D6873", "#A9B3BC"], ["#87573A", "#D9AC8C"], ["#B3261E", "#FF907F"]];
+const dot = (bg, glyph, fg) => `<i style="background:${bg}"><svg class="ic" style="color:${fg}"><use href="#i-${glyph}"/></svg></i>`;
+const lum = h => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+const glyphFor = h => (1.05 / (lum(h) + 0.05)) >= 3 ? "#FFFFFF" : "#16191C";
+document.getElementById("oldLight").innerHTML = OLD.map(([l]) => dot(l, "credit-card", "#FFFFFF")).join("");
+document.getElementById("oldDark").innerHTML = OLD.map(([, d]) => dot(d, "credit-card", "#1C2124")).join("");
+document.querySelectorAll("[data-strip]").forEach(el => {
+  el.innerHTML = el.dataset.strip === "current"
+    ? VIVID.map(p => dot(p.light, "credit-card", p.on === "light" ? "#FFFFFF" : "#16191C")).join("")
+    : el.dataset.strip.split(",").map(h => dot(h, "credit-card", glyphFor(h))).join("");
+});
+const glyphs = ["cash", "credit-card", "percentage", "plane", "beach", "home", "car", "gift"];
+const tiles = soft => `<div class="card">${VIVID.slice(0, 4).map((p, i) => `<div class="row"><span class="tile square ${soft ? "" : "solid "}ac-${p.key}">${ic(glyphs[i])}</span><div class="g"><div class="t">${["Наличные", "Карта основная", "Карта кредитная", "Карта евро"][i]}</div></div></div>`).join("")}</div>`;
+for (const [id, soft] of [["softduo", true], ["solidduo", false]]) {
+  const [l, d] = document.querySelectorAll(`#${id}>div`);
+  l.innerHTML = tiles(soft); d.innerHTML = tiles(soft);
+}
+const [gl, gd] = document.querySelectorAll("#glyphduo>div");
+const glyphRow = () => `<div class="strip">${VIVID.map((p, i) => `<span class="tile solid square ac-${p.key}" style="width:34px;height:34px">${ic(glyphs[i])}</span>`).join("")}</div>`;
+gl.innerHTML = glyphRow(); gd.innerHTML = glyphRow();
+
+KIT.render({
+  n: "П",
+  palette: VIVID,
+  ...KIT.signLook({ solid: true, shape: "square" }),
+  caps: {
+    balances: "Сплошные яркие плашки: синие наличные, оранжевая основная, голубая кредитка, зелёная карта евро. На оранжевом, голубом и зелёном значок тёмный, на остальных — белый.",
+    feed: "Жетоны — та же плашка, уменьшенная для строки. Голубую цепочку кредитки видно при прокрутке; красная сумма расхода и цвет счёта стоят в разных концах строки.",
+    form: "Поле «Счёт» — с плашкой счёта: перепутанный счёт виден до сохранения.",
+    picker: "Те же плашки, что на балансах. Выбор — фоном и галочкой цвета действия.",
+    sign: "Восемь цветов — два ряда по четыре. Выбранный значок залит цветом счёта, предпросмотр сверху меняется по каждому касанию.",
+  },
+});
+</script>
+</body>
+</html>

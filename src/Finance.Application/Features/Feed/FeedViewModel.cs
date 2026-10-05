@@ -98,6 +98,19 @@ public sealed partial class FeedViewModel : ScreenViewModel, ISelectionModel
     public partial string AccountName { get; private set; } = string.Empty;
 
     /// <summary>
+    /// Знак счёта — плашка рядом с названием в шапке ленты счёта. В строках ленты
+    /// счёта жетонов нет: счёт один, и его знак — здесь.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasAccountMark))]
+    public partial AccountMark? AccountMark { get; private set; }
+
+    /// <summary>
+    /// Счёт прочитан — его знак есть что показать.
+    /// </summary>
+    public bool HasAccountMark => AccountMark is not null;
+
+    /// <summary>
     /// Баланс счёта — подзаголовок ленты счёта.
     /// </summary>
     [ObservableProperty]
@@ -553,6 +566,7 @@ public sealed partial class FeedViewModel : ScreenViewModel, ISelectionModel
         }
 
         AccountName = account.Name;
+        AccountMark = new AccountMark(account.Name, account.Color, account.Icon);
         AccountBalance = account.Balance.Display;
         IsAccountBalanceNegative = account.Balance.IsNegative;
         OpeningBalance = account.OpeningBalance.Display;

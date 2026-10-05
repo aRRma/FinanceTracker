@@ -20,15 +20,18 @@
          место заголовка занимает шапка выделения -->
     <Shell.TitleView>
         <Grid>
-            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4" Margin="0,0,10,0" HorizontalOptions="Fill">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Margin="0,0,10,0" HorizontalOptions="Fill">
                 <Grid.Triggers>
                     <DataTrigger TargetType="Grid" Binding="{Binding IsSelecting}" Value="True">
                         <Setter Property="IsVisible" Value="False" />
                     </DataTrigger>
                 </Grid.Triggers>
-                <Label Grid.Column="0" Text="{Binding AccountName}" Style="{StaticResource BarTitleLabel}"
+                <!-- Знак счёта у названия: в строках ленты счёта жетонов нет, счёт один -->
+                <controls:AccountBadge Grid.Column="0" Mode="Header" IsVisible="{Binding HasAccountMark}"
+                                       Tone="{Binding AccountMark.Color}" IconKey="{Binding AccountMark.Icon}" />
+                <Label Grid.Column="1" Text="{Binding AccountName}" Style="{StaticResource BarTitleLabel}"
                        LineBreakMode="TailTruncation" />
-                <Border Grid.Column="1" Style="{StaticResource IconButton}"
+                <Border Grid.Column="2" Style="{StaticResource IconButton}"
                         SemanticProperties.Description="{x:Static texts:UiTexts.AccountEdit}" AutomationId="EditAccount">
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnEdit" />

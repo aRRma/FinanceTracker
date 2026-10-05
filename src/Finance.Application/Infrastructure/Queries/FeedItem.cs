@@ -43,6 +43,16 @@ public sealed record FeedItem
     public required string AccountName { get; init; }
 
     /// <summary>
+    /// Знак счёта, со стороны которого показана строка.
+    /// </summary>
+    public required AccountMark Account { get; init; }
+
+    /// <summary>
+    /// Знак второго счёта перевода — того, что в <see cref="Title"/>. У дохода и расхода пусто.
+    /// </summary>
+    public AccountMark? OtherAccount { get; init; }
+
+    /// <summary>
     /// Заголовок строки: подкатегория у дохода и расхода, второй счёт у перевода —
     /// тот, что не <see cref="AccountName"/>.
     /// </summary>

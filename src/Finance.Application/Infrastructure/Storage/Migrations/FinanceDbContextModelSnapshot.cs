@@ -23,6 +23,11 @@ namespace Finance.Application.Infrastructure.Storage.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("key");
 
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("color");
+
                     b.Property<string>("CreatedAtUtc")
                         .IsRequired()
                         .HasColumnType("TEXT")
@@ -45,6 +50,10 @@ namespace Finance.Application.Infrastructure.Storage.Migrations
                     b.Property<string>("ExternalId")
                         .HasColumnType("TEXT")
                         .HasColumnName("external_id");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("icon");
 
                     b.Property<bool>("IsClosed")
                         .HasColumnType("INTEGER")
