@@ -2,7 +2,6 @@ using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
 using Finance.Application.Texts;
@@ -14,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Finance.Application.Tests;
 
 /// <summary>
-/// Операции: запись, правка, удаление, места из формы и подстановка счёта.
+/// Операции: запись, правка, удаление и места из формы. Подстановка счёта — в <see cref="DefaultAccountTests"/>.
 /// </summary>
 public sealed class TransactionsTests
 {
@@ -316,46 +315,6 @@ public sealed class TransactionsTests
     }
 
     /// <summary>
-    /// Счёт списания запоминается и подставляется в следующую операцию.
-    /// </summary>
-    [Fact]
-    public async Task Последний_счёт_запоминается()
-    {
-        await using TransactionFixture given = await TransactionFixture.CreateAsync();
-
-        await given.AccountAsync("Наличные");
-        Guid card = await given.AccountAsync("Карта");
-
-        await given.SaveAsync(given.Expense(card, 10m));
-
-        TransactionForm form = await given.Database.Resolve<ITransactionFormQuery>().ReadAsync();
-
-        Assert.Equal(card, form.LastAccountKey);
-        Assert.Equal(card.ToString(), await given.Database.Resolve<ILocalSettings>().GetAsync(SettingName.LastAccountKey));
-    }
-
-    /// <summary>
-    /// Подстановка — для новых операций: правка старой записи последний счёт не трогает.
-    /// </summary>
-    [Fact]
-    public async Task Правка_операции_не_меняет_последний_счёт()
-    {
-        await using TransactionFixture given = await TransactionFixture.CreateAsync();
-
-        Guid cash = await given.AccountAsync("Наличные");
-        Guid card = await given.AccountAsync("Карта");
-
-        Guid old = await given.SaveAsync(given.Expense(cash, 10m));
-        await given.SaveAsync(given.Expense(card, 20m));
-
-        await given.SaveAsync(given.Expense(cash, 15m) with { Key = old });
-
-        TransactionForm form = await given.Database.Resolve<ITransactionFormQuery>().ReadAsync();
-
-        Assert.Equal(card, form.LastAccountKey);
-    }
-
-    /// <summary>
     /// Правка перевода меняет валютность: одновалютный становится разновалютным
     /// и получает вторую сумму, разновалютный — одновалютным и теряет её.
     /// </summary>
@@ -381,26 +340,6 @@ public sealed class TransactionsTests
         Assert.Equal(Money.Create(700m, Currency.RUB), await given.BalanceAsync(cash));
         Assert.Equal(Money.Create(1_300m, Currency.RUB), await given.BalanceAsync(card));
         Assert.Equal(Money.Create(100m, Currency.EUR), await given.BalanceAsync(euro));
-    }
-
-    /// <summary>
-    /// Неудавшееся сохранение не запоминает счёт: подстановка ссылалась бы на операцию, которой нет.
-    /// </summary>
-    [Fact]
-    public async Task Отвергнутая_операция_не_меняет_последний_счёт()
-    {
-        await using TransactionFixture given = await TransactionFixture.CreateAsync();
-
-        Guid cash = await given.AccountAsync("Наличные");
-        Guid card = await given.AccountAsync("Карта");
-
-        await given.SaveAsync(given.Expense(cash, 10m));
-        await Assert.ThrowsAsync<DomainException>(
-            () => given.SaveAsync(given.Expense(card, 10m) with { CategoryKey = given.IncomeCategory }));
-
-        TransactionForm form = await given.Database.Resolve<ITransactionFormQuery>().ReadAsync();
-
-        Assert.Equal(cash, form.LastAccountKey);
     }
 
     /// <summary>

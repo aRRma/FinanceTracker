@@ -22,7 +22,7 @@ public static class SettingName
     public const string Theme = "theme";
 
     /// <summary>
-    /// Ключ последнего использованного счёта — подставляется в форму операции.
+    /// Ключ счёта, явно выбранного счётом по умолчанию. Нет строки — счёт по умолчанию верхний в списке.
     /// </summary>
-    public const string LastAccountKey = "transactions.last_account_key";
+    public const string DefaultAccountKey = "transactions.default_account_key";
 }

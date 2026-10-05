@@ -75,4 +75,15 @@ public sealed record AccountCard
     /// Дата самой ранней операции по счёту — дальше неё открытие не сдвигается.
     /// </summary>
     public required DateOnly? EarliestTransactionOn { get; init; }
+
+    /// <summary>
+    /// Счёт — счёт по умолчанию. Его блокировка и удаление называют в подтверждении,
+    /// какой счёт займёт его место: подстановка в форму сменится без единого касания формы.
+    /// </summary>
+    public required bool IsDefault { get; init; }
+
+    /// <summary>
+    /// Кто станет счётом по умолчанию, если этот уйдёт. Пусто — незаблокированных счетов больше нет.
+    /// </summary>
+    public required string? DefaultSuccessor { get; init; }
 }

@@ -19,7 +19,7 @@ public sealed class TransactionFormQuery : ITransactionFormQuery
     /// </summary>
     /// <param name="contexts">Фабрика контекстов базы.</param>
     /// <param name="accounts">Список счетов с балансами — балансы показаны в выборе счёта.</param>
-    /// <param name="settings">Локальные настройки: последний использованный счёт.</param>
+    /// <param name="settings">Локальные настройки: выбранный счёт по умолчанию.</param>
     public TransactionFormQuery(
         IDbContextFactory<FinanceDbContext> contexts,
         IAccountsQuery accounts,
@@ -39,8 +39,8 @@ public sealed class TransactionFormQuery : ITransactionFormQuery
     {
         IReadOnlyList<AccountListItem> accounts = await _accounts.ReadAsync(cancellationToken).ConfigureAwait(false);
 
-        string? lastAccount = await _settings
-            .GetAsync(SettingName.LastAccountKey, cancellationToken)
+        string? choice = await _settings
+            .GetAsync(SettingName.DefaultAccountKey, cancellationToken)
             .ConfigureAwait(false);
 
         await using FinanceDbContext context = await _contexts
@@ -64,9 +64,15 @@ public sealed class TransactionFormQuery : ITransactionFormQuery
             .ConfigureAwait(false);
 
         List<AccountOption> options = new(accounts.Count);
+        List<OpenAccount> open = new(accounts.Count);
 
         foreach (AccountListItem account in accounts)
         {
+            if (!account.IsClosed)
+            {
+                open.Add(new OpenAccount(account.Key, account.Name));
+            }
+
             options.Add(new AccountOption(
                 account.Key,
                 account.Icon,
@@ -83,7 +89,7 @@ public sealed class TransactionFormQuery : ITransactionFormQuery
         {
             Accounts = options,
             Categories = categories,
-            LastAccountKey = Guid.TryParse(lastAccount, out Guid key) ? key : null
+            DefaultAccountKey = DefaultAccount.Resolve(open, DefaultAccount.Parse(choice))?.Key
         };
     }
 }

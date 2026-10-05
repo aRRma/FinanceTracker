@@ -25,6 +25,11 @@ public sealed record SettingsSummary
     public required bool TimeZoneFromSystem { get; init; }
 
     /// <summary>
+    /// Счёт по умолчанию. Пусто — незаблокированных счетов нет, и подставлять нечего.
+    /// </summary>
+    public required OpenAccount? DefaultAccount { get; init; }
+
+    /// <summary>
     /// Версия приложения из манифеста.
     /// </summary>
     public required string Version { get; init; }

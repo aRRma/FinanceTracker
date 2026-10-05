@@ -1,5 +1,6 @@
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
+using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
 using Finance.Domain.Entities;
@@ -148,6 +149,8 @@ public sealed class SaveAccountHandler : ISaveAccountHandler
         if (command.IsClosed)
         {
             account.Close();
+
+            await DefaultAccount.ForgetAsync(context, key, cancellationToken).ConfigureAwait(false);
         }
         else
         {

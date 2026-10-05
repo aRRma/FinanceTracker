@@ -13,7 +13,7 @@ namespace Finance.Application.Features.Transactions.Card;
 
 /// <summary>
 /// Форма операции: запись и правка одним экраном. Самый частый сценарий приложения,
-/// поэтому всё, что можно подставить, подставлено — последний счёт и сегодняшняя
+/// поэтому всё, что можно подставить, подставлено — счёт по умолчанию и сегодняшняя
 /// дата, — а категория выбирается каждый раз: подставленная не глядя категория
 /// портит отчёт молча.
 /// </summary>
@@ -282,13 +282,13 @@ public sealed partial class TransactionViewModel : FormViewModel
     public bool HasSourceAccount => SourceAccount is not null;
 
     /// <summary>
-    /// Выбирать счёт не из чего: открытых счетов нет. Касание поля ведёт тогда
+    /// Выбирать счёт не из чего: незаблокированных счетов нет. Касание поля ведёт тогда
     /// сразу в карточку нового счёта, а не на пустой экран выбора.
     /// </summary>
     public bool NeedsNewAccount => Accounts.Count is 0;
 
     /// <summary>
-    /// Счёт зачисления выбирать не из чего: кроме счёта списания, открытых счетов нет.
+    /// Счёт зачисления выбирать не из чего: кроме счёта списания, незаблокированных счетов нет.
     /// </summary>
     public bool NeedsNewTargetAccount => TargetAccounts.Count is 0;
 
@@ -526,8 +526,8 @@ public sealed partial class TransactionViewModel : FormViewModel
 
     /// <summary>
     /// Готовит форму: списки выбора, а для правки — саму операцию. Новой операции
-    /// подставляется последний использованный счёт, если он открыт, либо счёт,
-    /// с ленты которого пришли.
+    /// подставляется счёт, с ленты которого пришли, если он не заблокирован, иначе
+    /// счёт по умолчанию.
     /// </summary>
     /// <param name="key">Ключ правимой операции или <c>null</c> для новой.</param>
     /// <param name="accountKey">Счёт для подстановки в новую операцию — с чьей ленты пришли.</param>
@@ -588,11 +588,11 @@ public sealed partial class TransactionViewModel : FormViewModel
                 Kind = wantedKind;
             }
 
-            // Заблокированный последний счёт не подставляется: он не предлагается
-            // и в выборе, а подставленный молча привёл бы к отказу при сохранении
-            Guid? preset = accountKey ?? form.LastAccountKey;
-            SourceAccount = preset is { } wanted ? Find(wanted) : null;
-            SourceAccount ??= Accounts.FirstOrDefault();
+            // Из ленты счёта — этот счёт, иначе счёт по умолчанию. Лента
+            // заблокированного счёта тоже уступает счёту по умолчанию: заблокированный
+            // не предлагается и в выборе, а подставленный привёл бы к отказу при сохранении
+            SourceAccount = (accountKey is { } fromFeed ? Find(fromFeed) : null)
+                ?? (form.DefaultAccountKey is { } byDefault ? Find(byDefault) : null);
         }
 
         _saved = Take();

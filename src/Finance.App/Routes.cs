@@ -109,6 +109,11 @@ public static class Routes
     public const string TimeZone = "settings/time-zone";
 
     /// <summary>
+    /// Выбор счёта по умолчанию.
+    /// </summary>
+    public const string DefaultAccount = "settings/default-account";
+
+    /// <summary>
     /// Версия приложения и номер схемы базы.
     /// </summary>
     public const string About = "settings/about";
@@ -140,6 +145,7 @@ public static class Routes
         Routing.RegisterRoute(ReportSubcategory, typeof(ReportSubcategoryPage));
         Routing.RegisterRoute(Appearance, typeof(AppearancePage));
         Routing.RegisterRoute(TimeZone, typeof(TimeZonePage));
+        Routing.RegisterRoute(DefaultAccount, typeof(DefaultAccountPage));
         Routing.RegisterRoute(About, typeof(AboutPage));
         Routing.RegisterRoute(Export, typeof(ExportPage));
     }

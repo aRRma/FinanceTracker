@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Личный трекер финансов — прототип</title>
 <!-- СГЕНЕРИРОВАНО из mockups.html скриптом tools/build_prototype.py. Руками не править. -->
-<!-- отпечатки источников: mockups.html=c39e16ba86f288f7a4afce13c37ba28e3b171bd323d504eae1f67b05a0ad06a0 build_prototype.py=77f871298aad02248fd8a5c89a87598089d2cc5da5628c96a90c5ad427c2acef -->
+<!-- отпечатки источников: mockups.html=619433226b3e7e0f3716da6ee3c877e37eb61dc2d4af6ca905f9c27239ccb76b build_prototype.py=77f871298aad02248fd8a5c89a87598089d2cc5da5628c96a90c5ad427c2acef -->
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -536,7 +536,7 @@ body{padding:0}
   <div class="body">
     <div class="lbl"><span>Справочники</span></div>
     <div class="card">
-      <div class="row"><svg class="ic"><use href="#i-wallet"/></svg><div class="g"><div class="t">Счета</div><div class="s">5 счетов</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><svg class="ic"><use href="#i-wallet"/></svg><div class="g"><div class="t">Счета</div><div class="s">7 счетов</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-map-pin"/></svg><div class="g"><div class="t">Места</div><div class="s">63 места</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-tag"/></svg><div class="g"><div class="t">Категории</div><div class="s">14 групп, 75 подкатегорий</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     </div>
@@ -544,6 +544,7 @@ body{padding:0}
     <div class="card">
       <div class="row"><svg class="ic"><use href="#i-sun"/></svg><div class="g"><div class="t">Оформление</div><div class="s">Как в системе</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-world"/></svg><div class="g"><div class="t">Часовой пояс</div><div class="s">Как в системе · Europe/Moscow</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Счёт по умолчанию</div><div class="s">Карта основная</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-database"/></svg><div class="g"><div class="t">Данные</div><div class="s">Сохранить в файл или восстановить</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-info-circle"/></svg><div class="g"><div class="t">О программе</div><div class="s">Версия 1.0, схема 5</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     </div>
@@ -601,6 +602,8 @@ body{padding:0}
     <div class="row"><span class="tile ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Накопления</div></div><span class="num">250 000,00 ₽</span></div>
     <div class="lbl" style="padding:10px 11px 6px;margin:0"><span>Евро</span></div>
     <div class="row"><span class="tile ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><div class="g"><div class="t">Карта евро</div></div><span class="num">1 240,00 €</span></div>
+    <div class="lbl" style="padding:10px 11px 6px;margin:0"><span>Доллары</span></div>
+    <div class="row"><span class="tile ac-magenta"><svg class="ic"><use href="#i-home"/></svg></span><div class="g"><div class="t">Доллары дома</div><div class="s">Накопления</div></div><span class="num">1 460,00 $</span></div>
   </div>
 </div>
 </div>
@@ -985,6 +988,7 @@ body{padding:0}
     <div class="lbl"><span>Накопления</span></div>
     <div class="card">
       <div class="row"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><span class="tile ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Карта · RUB</div></div><span class="num">250 000,00 ₽</span></div>
+      <div class="row"><svg class="ic mut"><use href="#i-grip-vertical"/></svg><span class="tile ac-magenta"><svg class="ic"><use href="#i-home"/></svg></span><div class="g"><div class="t">Доллары дома</div><div class="s">Наличные · USD</div></div><span class="num">1 460,00 $</span></div>
     </div>
     <div class="lbl"><span>Заблокированные</span></div>
     <div class="card">
@@ -1300,6 +1304,27 @@ body{padding:0}
 </div>
 </div>
 
+<div class="scr right" data-screen="D-13" title="D-13 · Выбрать счёт по умолчанию">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт по умолчанию</h2></div>
+  <div class="list">
+    <div class="note dim" style="padding:8px 11px 6px">Подставляется в новую операцию</div>
+    <div class="row"><span class="tile ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><div class="g"><div class="t">Наличные</div><div class="s">Наличные · RUB</div></div></div>
+    <div class="row sel"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта основная</div><div class="s">Карта · RUB</div></div><svg class="ic acc"><use href="#i-check"/></svg></div>
+    <div class="row"><span class="tile ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><div class="g"><div class="t">Карта кредитная</div><div class="s">Карта · RUB</div></div></div>
+    <div class="row"><span class="tile ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><div class="g"><div class="t">Карта евро</div><div class="s">Карта · EUR</div></div></div>
+    <div class="row"><span class="tile ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Карта · RUB</div></div></div>
+    <div class="row"><span class="tile ac-magenta"><svg class="ic"><use href="#i-home"/></svg></span><div class="g"><div class="t">Доллары дома</div><div class="s">Наличные · USD</div></div></div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</div>
+
 <div class="scr right" data-screen="E-01" title="E-01 · Разобраться, куда ушли деньги">
 <div class="phone">
   <div class="hd"><h2>Отчёт</h2></div>
@@ -1399,7 +1424,7 @@ body{padding:0}
 </div>
 </div></div></div>
 
-<p class="legend">Зелёный круг — касание. Счётчик считает касания по интерфейсу отдельно от набора цифр: первое зависит от раскладки экранов, второе — от суммы. С клавиатуры: <code>пробел</code> — пауза, <code>←</code> и <code>→</code> — шаг, цифры — первые десять сценариев. Клик по кадру ставит на паузу. Экранов в прототипе столько же, сколько в макетах: 36.</p>
+<p class="legend">Зелёный круг — касание. Счётчик считает касания по интерфейсу отдельно от набора цифр: первое зависит от раскладки экранов, второе — от суммы. С клавиатуры: <code>пробел</code> — пауза, <code>←</code> и <code>→</code> — шаг, цифры — первые десять сценариев. Клик по кадру ставит на паузу. Экранов в прототипе столько же, сколько в макетах: 37.</p>
 </div>
 
 <script>

@@ -234,6 +234,12 @@
   <data name="AccountClosingWarning" xml:space="preserve">
     <value>Внимание: на счёте ещё {0}.</value>
   </data>
+  <data name="AccountDefaultMoves" xml:space="preserve">
+    <value>Счётом по умолчанию станет «{0}».</value>
+  </data>
+  <data name="AccountDefaultGone" xml:space="preserve">
+    <value>Счёта по умолчанию не останется.</value>
+  </data>
   <!-- Цвет и значок счёта -->
   <data name="AccountBadgeTitle" xml:space="preserve">
     <value>Цвет и значок</value>
@@ -770,6 +776,18 @@
   </data>
   <data name="TimeZoneUnavailableTitle" xml:space="preserve">
     <value>Зона недоступна</value>
+  </data>
+  <data name="DefaultAccountTitle" xml:space="preserve">
+    <value>Счёт по умолчанию</value>
+  </data>
+  <data name="DefaultAccountHint" xml:space="preserve">
+    <value>Подставляется в новую операцию</value>
+  </data>
+  <data name="DefaultAccountEmptyTitle" xml:space="preserve">
+    <value>Нет незаблокированных счетов</value>
+  </data>
+  <data name="DefaultAccountEmptyHint" xml:space="preserve">
+    <value>Новый счёт сам станет счётом по умолчанию.</value>
   </data>
   <data name="AboutTitle" xml:space="preserve">
     <value>О программе</value>

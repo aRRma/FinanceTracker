@@ -109,6 +109,22 @@
                     <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
                           MinimumHeightRequest="{StaticResource TouchTarget}">
                         <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnDefaultAccount" />
+                        </Grid.GestureRecognizers>
+
+                        <controls:Icon Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0" Key="credit-card" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="{x:Static texts:UiTexts.DefaultAccountTitle}" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding DefaultAccountCaption}"
+                               LineBreakMode="TailTruncation" Style="{StaticResource SecondaryLabel}" />
+                        <controls:Icon Grid.Column="2" Grid.RowSpan="2" Key="chevron-right"
+                                       Style="{StaticResource MutedIcon}" />
+                    </Grid>
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnExport" />
                         </Grid.GestureRecognizers>
 

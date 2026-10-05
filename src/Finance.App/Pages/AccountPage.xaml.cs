@@ -162,8 +162,8 @@ public sealed partial class AccountPage : DataPage
     }
 
     /// <summary>
-    /// Блокировка счёта с деньгами подтверждается отдельно: домен её не запрещает,
-    /// а остаток молча уходит из «доступно к тратам».
+    /// Блокировка счёта с деньгами или счёта по умолчанию подтверждается отдельно:
+    /// домен её не запрещает, а остаток и подстановка в форму меняются молча.
     /// </summary>
     private async Task SaveAsync()
     {
@@ -192,7 +192,7 @@ public sealed partial class AccountPage : DataPage
             return;
         }
 
-        if (!await DisplayAlertAsync(_model.DeleteTitle, null, UiTexts.CommonDelete, UiTexts.CommonCancel))
+        if (!await DisplayAlertAsync(_model.DeleteTitle, _model.DeleteNote, UiTexts.CommonDelete, UiTexts.CommonCancel))
         {
             return;
         }

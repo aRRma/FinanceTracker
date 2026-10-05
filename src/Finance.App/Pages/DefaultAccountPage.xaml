@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран D-13: счёт по умолчанию — тот, что подставляется в новую операцию.
+    В списке только незаблокированные счета: заблокированный не предлагается
+    и в форме. Строки «Последний использованный» нет — пока есть незаблокированный счёт,
+    счёт по умолчанию есть всегда.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.DefaultAccountPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:defaults="clr-namespace:Finance.Application.Features.Settings.DefaultAccounts;assembly=Finance.Application"
+    x:DataType="defaults:DefaultAccountViewModel"
+    Title="{x:Static texts:UiTexts.DefaultAccountTitle}">
+
+    <!-- Grid корнем, как у часового пояса: .NET 10 пускает страницу под системные
+         полосы, а Grid держит область Container сам -->
+    <Grid>
+        <CollectionView ItemsSource="{Binding Accounts}" SelectionMode="None">
+
+            <!-- Пояснение — шапкой списка, а не над ним: уезжает вместе со строками
+                 и не отнимает места у длинного списка счетов -->
+            <CollectionView.Header>
+                <Label Padding="16,12,16,8" Text="{x:Static texts:UiTexts.DefaultAccountHint}"
+                       Style="{StaticResource SecondaryLabel}" />
+            </CollectionView.Header>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="defaults:DefaultAccountOption">
+                    <Grid Padding="16,10" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"
+                          RowDefinitions="Auto,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnAccountTapped" />
+                        </Grid.GestureRecognizers>
+                        <Grid.Triggers>
+                            <!-- Выбранное видно не только галочкой: строка целиком
+                                 находится быстрее, чем знак у её края -->
+                            <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="BackgroundColor"
+                                        Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}" />
+                            </DataTrigger>
+                        </Grid.Triggers>
+
+                        <controls:AccountBadge Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Tone="{Binding Color}" IconKey="{Binding Icon}" />
+                        <Label Grid.Column="1" Grid.Row="0" Text="{Binding Name}" VerticalOptions="Center"
+                               LineBreakMode="TailTruncation" />
+                        <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}" Style="{StaticResource SecondaryLabel}" />
+
+                        <controls:Icon Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Key="check"
+                                       IsVisible="{Binding IsSelected}"
+                                       SemanticProperties.Description="{x:Static texts:UiTexts.CommonSelected}"
+                                       Style="{StaticResource AccentIcon}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.EmptyView>
+                <ContentView>
+                    <VerticalStackLayout Padding="32" Spacing="12" IsVisible="{Binding IsEmpty}"
+                                         VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label Text="{x:Static texts:UiTexts.DefaultAccountEmptyTitle}" HorizontalTextAlignment="Center"
+                               Style="{StaticResource TitleLabel}" />
+                        <Label Text="{x:Static texts:UiTexts.DefaultAccountEmptyHint}"
+                               HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />
+                    </VerticalStackLayout>
+                </ContentView>
+            </CollectionView.EmptyView>
+        </CollectionView>
+    </Grid>
+
+</pages:DataPage>

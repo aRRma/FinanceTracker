@@ -13,6 +13,7 @@ using Finance.Application.Features.More;
 using Finance.Application.Features.Report;
 using Finance.Application.Features.Settings.About;
 using Finance.Application.Features.Settings.Appearance;
+using Finance.Application.Features.Settings.DefaultAccounts;
 using Finance.Application.Features.Settings.TimeZones;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
@@ -107,6 +108,7 @@ public static class FinanceServices
         services.AddSingleton<ISettingsSummaryQuery, SettingsSummaryQuery>();
         services.AddSingleton<IChangeThemeHandler, ChangeThemeHandler>();
         services.AddSingleton<IChangeTimeZoneHandler, ChangeTimeZoneHandler>();
+        services.AddSingleton<IChangeDefaultAccountHandler, ChangeDefaultAccountHandler>();
         services.AddSingleton<IPlacesQuery, PlacesQuery>();
         services.AddSingleton<IRenamePlaceHandler, RenamePlaceHandler>();
         services.AddSingleton<IDeletePlaceHandler, DeletePlaceHandler>();
@@ -156,6 +158,7 @@ public static class FinanceServices
         services.AddTransient<ReportSubcategoryViewModel>();
         services.AddTransient<AppearanceViewModel>();
         services.AddTransient<TimeZoneViewModel>();
+        services.AddTransient<DefaultAccountViewModel>();
         services.AddTransient<AboutViewModel>();
         services.AddTransient<ExportViewModel>();
     }

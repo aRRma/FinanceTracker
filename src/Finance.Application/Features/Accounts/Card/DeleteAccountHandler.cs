@@ -1,5 +1,6 @@
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
+using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
 using Finance.Domain.Entities;
@@ -54,6 +55,8 @@ public sealed class DeleteAccountHandler : IDeleteAccountHandler
 
                 account.Delete(_clock.NowUtc, hasTransactions);
                 account.CopyTo(row);
+
+                await DefaultAccount.ForgetAsync(context, key, token).ConfigureAwait(false);
 
                 await context.SaveChangesAsync(token).ConfigureAwait(false);
 

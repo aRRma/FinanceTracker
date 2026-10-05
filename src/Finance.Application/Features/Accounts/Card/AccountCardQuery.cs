@@ -1,5 +1,6 @@
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
+using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Domain.Enums;
 using Finance.Domain.Values;
@@ -72,6 +73,8 @@ public sealed class AccountCardQuery : IAccountCardQuery
 
         Money balance = Money.Restore(account.OpeningBalance + movement, account.Currency);
 
+        (IReadOnlyList<OpenAccount> open, OpenAccount? byDefault) = await DefaultAccount.ResolveAsync(context, cancellationToken).ConfigureAwait(false);
+
         return new AccountCard
         {
             Key = account.Key,
@@ -86,7 +89,9 @@ public sealed class AccountCardQuery : IAccountCardQuery
             IsClosed = account.IsClosed,
             Balance = balance,
             CurrencyLocked = hasEverHadTransactions,
-            EarliestTransactionOn = earliest
+            EarliestTransactionOn = earliest,
+            IsDefault = byDefault?.Key == key,
+            DefaultSuccessor = open.FirstOrDefault(other => other.Key != key)?.Name
         };
     }
 

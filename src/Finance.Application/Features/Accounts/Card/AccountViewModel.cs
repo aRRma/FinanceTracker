@@ -22,12 +22,15 @@ public sealed partial class AccountViewModel : FormViewModel
     private readonly IClock _clock;
     private readonly AccountBadgeDraft _badge;
 
-    // Как счёт записан: имя, заблокирован ли и сколько на нём. По ним видно, блокируют ли
-    // счёт именно этой правкой и остаются ли на нём деньги, а удаление называет
-    // счёт записанным именем, а не набранным в поле
+    // Как счёт записан: имя, заблокирован ли, сколько на нём и счёт ли он по умолчанию.
+    // По ним видно, блокируют ли счёт именно этой правкой, остаются ли на нём деньги
+    // и кому он уступит подстановку, а удаление называет счёт записанным именем,
+    // а не набранным в поле
     private string _savedName = string.Empty;
     private bool _savedClosed;
     private Money? _balance;
+    private bool _isDefault;
+    private string? _defaultSuccessor;
 
     // Снимок формы на момент загрузки: с ним сравнивается нынешнее состояние,
     // когда экран покидают, не сохранив. У новой формы снимок — её пустое начало
@@ -322,14 +325,46 @@ public sealed partial class AccountViewModel : FormViewModel
     public string DeleteTitle => string.Format(UiCulture.Current, UiTexts.AccountDeleteConfirmTitle, _savedName);
 
     /// <summary>
-    /// Предупреждение перед блокировкой счёта с деньгами; пусто — подтверждать нечего.
-    /// Домен блокировке с остатком не мешает, но молча увести деньги из «доступно
-    /// к тратам» нельзя: пользователь мог забыть перевести остаток.
+    /// Текст подтверждения удаления: кто станет счётом по умолчанию. Пусто — счёт
+    /// не по умолчанию, последствий нет, и диалог остаётся одним вопросом.
     /// </summary>
-    public string? ClosingWarning =>
-        IsClosed && !_savedClosed && _balance is { Amount: not 0m } balance
-            ? string.Format(UiCulture.Current, UiTexts.AccountClosingWarning, balance.Display)
-            : null;
+    public string? DeleteNote => DefaultSuccession;
+
+    /// <summary>
+    /// Предупреждение перед блокировкой; пусто — подтверждать нечего. Домен блокировке
+    /// с остатком не мешает, но молча увести деньги из «доступно к тратам» нельзя:
+    /// пользователь мог забыть перевести остаток. Блокировка счёта по умолчанию
+    /// называет его преемника — иначе форма молча начала бы подставлять другой счёт.
+    /// </summary>
+    public string? ClosingWarning
+    {
+        get
+        {
+            if (!IsClosed || _savedClosed)
+            {
+                return null;
+            }
+
+            string? money = _balance is { Amount: not 0m } balance
+                ? string.Format(UiCulture.Current, UiTexts.AccountClosingWarning, balance.Display)
+                : null;
+
+            // Каждое последствие — своей строкой: деньги на счёте и смена подстановки не связаны
+            return (money, DefaultSuccession) switch
+            {
+                ({ } left, { } successor) => $"{left}\n{successor}",
+                _ => money ?? DefaultSuccession
+            };
+        }
+    }
+
+    /// <summary>
+    /// Кто займёт место счёта по умолчанию, когда этот уйдёт; пусто — счёт не по умолчанию.
+    /// </summary>
+    private string? DefaultSuccession =>
+        !_isDefault ? null
+        : _defaultSuccessor is { } successor ? string.Format(UiCulture.Current, UiTexts.AccountDefaultMoves, successor)
+        : UiTexts.AccountDefaultGone;
 
     /// <summary>
     /// Загружает счёт для правки. Пустой ключ оставляет форму пустой.
@@ -374,6 +409,8 @@ public sealed partial class AccountViewModel : FormViewModel
         _savedName = card.Name;
         _savedClosed = card.IsClosed;
         _balance = card.Balance;
+        _isDefault = card.IsDefault;
+        _defaultSuccessor = card.DefaultSuccessor;
         _saved = Snapshot();
 
         OnPropertyChanged(nameof(Title));

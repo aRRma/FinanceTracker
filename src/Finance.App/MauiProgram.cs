@@ -118,6 +118,7 @@ public static class MauiProgram
         services.AddTransient<PlacePickerPage>();
         services.AddTransient<AppearancePage>();
         services.AddTransient<TimeZonePage>();
+        services.AddTransient<DefaultAccountPage>();
         services.AddTransient<AboutPage>();
         services.AddTransient<ExportPage>();
     }

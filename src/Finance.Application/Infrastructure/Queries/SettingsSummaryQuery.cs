@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Finance.Application.Infrastructure.Queries;
 
 /// <summary>
-/// Читает состояние настроек: тему, часовой пояс, версию и номер схемы.
+/// Читает состояние настроек: тему, часовой пояс, счёт по умолчанию, версию и номер схемы.
 /// </summary>
 public sealed class SettingsSummaryQuery : ISettingsSummaryQuery
 {
@@ -59,6 +59,8 @@ public sealed class SettingsSummaryQuery : ISettingsSummaryQuery
             .GetAppliedMigrationsAsync(cancellationToken)
             .ConfigureAwait(false);
 
+        (_, OpenAccount? byDefault) = await DefaultAccount.ResolveAsync(context, cancellationToken).ConfigureAwait(false);
+
         return new SettingsSummary
         {
             Theme = Theme.Parse(theme),
@@ -67,6 +69,7 @@ public sealed class SettingsSummaryQuery : ISettingsSummaryQuery
             // обязана называть тот пояс, по которому приложение правда считает
             TimeZoneId = _clock.TimeZone.Id,
             TimeZoneFromSystem = zone is null,
+            DefaultAccount = byDefault,
             Version = _about.Version,
             Schema = applied.Count()
         };

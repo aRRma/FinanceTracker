@@ -1,8 +1,8 @@
 namespace Finance.Application.Features.Transactions.Card;
 
 /// <summary>
-/// Всё, из чего форма операции даёт выбирать: счета, подкатегории и последний
-/// использованный счёт. Читается одним запросом при открытии формы. Мест здесь
+/// Всё, из чего форма операции даёт выбирать: счета, подкатегории и счёт
+/// по умолчанию. Читается одним запросом при открытии формы. Мест здесь
 /// нет: их читает свой экран выбора, и форме держать в памяти весь справочник
 /// ради одной строки незачем.
 /// </summary>
@@ -19,7 +19,7 @@ public sealed record TransactionForm
     public required IReadOnlyList<CategoryOption> Categories { get; init; }
 
     /// <summary>
-    /// Счёт, подставляемый в новую операцию. Пусто — операций ещё не было.
+    /// Счёт по умолчанию — подставляется в новую операцию. Пусто — незаблокированных счетов нет.
     /// </summary>
-    public required Guid? LastAccountKey { get; init; }
+    public required Guid? DefaultAccountKey { get; init; }
 }

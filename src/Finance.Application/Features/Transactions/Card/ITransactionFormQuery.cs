@@ -6,7 +6,7 @@ namespace Finance.Application.Features.Transactions.Card;
 public interface ITransactionFormQuery
 {
     /// <summary>
-    /// Читает счета, подкатегории, места и последний использованный счёт.
+    /// Читает счета, подкатегории и счёт по умолчанию.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     Task<TransactionForm> ReadAsync(CancellationToken cancellationToken = default);

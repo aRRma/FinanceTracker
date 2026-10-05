@@ -1,5 +1,4 @@
 using Finance.Application.Infrastructure;
-using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
 using Finance.Domain.Entities;
@@ -59,21 +58,9 @@ public sealed class SaveTransactionHandler : ISaveTransactionHandler
                 Money amount = Money.Create(command.Amount, source.Currency);
                 Money? targetAmount = target is null ? null : TargetAmount(command, source, target);
 
-                Guid key;
-
-                if (command.Key is { } existing)
-                {
-                    key = await UpdateAsync(context, command, existing, source, target, category, group, amount, targetAmount, placeKey, token).ConfigureAwait(false);
-                }
-                else
-                {
-                    key = Create(context, command, source, target, category, group, amount, targetAmount, placeKey);
-
-                    // Подстановка — для новых операций, поэтому и запоминается счёт
-                    // только у новой: правка старой записи не говорит, куда пользователь
-                    // тратит сейчас
-                    await RememberAccountAsync(context, source.Key, token).ConfigureAwait(false);
-                }
+                Guid key = command.Key is { } existing
+                    ? await UpdateAsync(context, command, existing, source, target, category, group, amount, targetAmount, placeKey, token).ConfigureAwait(false)
+                    : Create(context, command, source, target, category, group, amount, targetAmount, placeKey);
 
                 await context.SaveChangesAsync(token).ConfigureAwait(false);
 
@@ -259,31 +246,5 @@ public sealed class SaveTransactionHandler : ISaveTransactionHandler
         context.Places.Add(created.ToRow());
 
         return (created.Key, true);
-    }
-
-    /// <summary>
-    /// Запоминает счёт списания для следующей операции — в той же транзакции,
-    /// а не отдельной записью после: иначе неудавшееся сохранение оставило бы
-    /// в подстановке счёт операции, которой нет.
-    /// </summary>
-    private static async Task RememberAccountAsync(
-        FinanceDbContext context,
-        Guid accountKey,
-        CancellationToken cancellationToken)
-    {
-        string value = accountKey.ToString();
-
-        SettingRow? row = await context.Settings
-            .FirstOrDefaultAsync(setting => setting.Name == SettingName.LastAccountKey, cancellationToken)
-            .ConfigureAwait(false);
-
-        if (row is null)
-        {
-            context.Settings.Add(new SettingRow { Name = SettingName.LastAccountKey, Value = value });
-        }
-        else
-        {
-            row.Value = value;
-        }
     }
 }

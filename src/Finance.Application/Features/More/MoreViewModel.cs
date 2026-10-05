@@ -23,7 +23,7 @@ public sealed partial class MoreViewModel : ScreenViewModel
     /// <param name="accounts">Список счетов.</param>
     /// <param name="places">Справочник мест.</param>
     /// <param name="categories">Список категорий.</param>
-    /// <param name="settings">Состояние настроек: тема, пояс, версия, схема.</param>
+    /// <param name="settings">Состояние настроек: тема, пояс, счёт по умолчанию, версия, схема.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
     public MoreViewModel(
         IAccountsQuery accounts,
@@ -73,6 +73,12 @@ public sealed partial class MoreViewModel : ScreenViewModel
     /// </summary>
     [ObservableProperty]
     public partial string TimeZoneCaption { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Счёт по умолчанию — имя того счёта, что подставит форма операции.
+    /// </summary>
+    [ObservableProperty]
+    public partial string DefaultAccountCaption { get; private set; } = string.Empty;
 
     /// <summary>
     /// Версия приложения и номер схемы базы.
@@ -125,6 +131,10 @@ public sealed partial class MoreViewModel : ScreenViewModel
         TimeZoneCaption = settings.TimeZoneFromSystem
             ? string.Format(UiCulture.Current, UiTexts.MoreTimeZoneFromSystem, settings.TimeZoneId)
             : settings.TimeZoneId;
+
+        // Без незаблокированных счетов выбирать нечего — подпись говорит почему,
+        // тем же текстом, что пустой экран выбора
+        DefaultAccountCaption = settings.DefaultAccount?.Name ?? UiTexts.DefaultAccountEmptyTitle;
 
         AboutCaption = string.Format(UiCulture.Current, UiTexts.MoreAbout, settings.Version, settings.Schema);
     }
