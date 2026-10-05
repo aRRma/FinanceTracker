@@ -1,8 +1,13 @@
 using Finance.App.Controls;
 using Finance.App.Pages;
 using Finance.Application;
+using Finance.Application.Infrastructure.AppLock;
 using Finance.Application.Infrastructure.Settings;
+#if DEBUG
+// Журнал отладчика подключается только в Debug: в Release этот using лишний,
+// и IDE0005 уронила бы релизную сборку
 using Microsoft.Extensions.Logging;
+#endif
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.LifecycleEvents;
 
@@ -59,6 +64,11 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
+
+        // Защита входа хранит своё на телефоне вне базы — с выгрузкой оно не уезжает
+        builder.Services.AddSingleton<IPinStore, DevicePinStore>();
+        builder.Services.AddSingleton<IDevicePreferences, DevicePreferences>();
+        builder.Services.AddSingleton<IUptime, DeviceUptime>();
 
         // Путь к папке данных знает только платформа: прикладной слой собирается
         // и тестируется без неё и получает путь готовым
@@ -121,5 +131,7 @@ public static class MauiProgram
         services.AddTransient<DefaultAccountPage>();
         services.AddTransient<AboutPage>();
         services.AddTransient<ExportPage>();
+        services.AddTransient<AppLockPage>();
+        services.AddTransient<PinPage>();
     }
 }

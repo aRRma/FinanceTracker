@@ -1,4 +1,5 @@
 using System.Globalization;
+using Finance.Application.Features.AppLock;
 using Finance.Application.Features.Accounts.Badge;
 using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Accounts.Catalog;
@@ -12,12 +13,14 @@ using Finance.Application.Features.Feed;
 using Finance.Application.Features.More;
 using Finance.Application.Features.Report;
 using Finance.Application.Features.Settings.About;
+using Finance.Application.Features.Settings.AppLock;
 using Finance.Application.Features.Settings.Appearance;
 using Finance.Application.Features.Settings.DefaultAccounts;
 using Finance.Application.Features.Settings.TimeZones;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.AppLock;
 using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
@@ -49,7 +52,9 @@ public static class FinanceServices
     /// <remarks>
     /// Поток интерфейса, оформление и версию знает только платформа: команды выполняются в фоне, а экраны
     /// по их итогу правят привязанные коллекции, и вернуть это в свой поток обязана она; что такое тёмное
-    /// оформление окна, знает MAUI, а прикладной слой — только выбранную тему.
+    /// оформление окна, знает MAUI, а прикладной слой — только выбранную тему. Хранилище следа ПИН-кода,
+    /// настройки устройства вне базы и часы с включения телефона (<see cref="IPinStore"/>,
+    /// <see cref="IDevicePreferences"/>, <see cref="IUptime"/>) регистрирует сама платформа.
     /// </remarks>
     public static IServiceCollection AddFinance(
         this IServiceCollection services,
@@ -91,6 +96,8 @@ public static class FinanceServices
         services.AddSingleton<DatabaseBootstrapper>();
         services.AddSingleton<DatabaseInitializer>();
         services.AddSingleton<FinanceStartup>();
+        services.AddSingleton<AppLockService>();
+        services.AddSingleton<AppLockOffer>();
 
         AddFeatures(services);
 
@@ -161,5 +168,8 @@ public static class FinanceServices
         services.AddTransient<DefaultAccountViewModel>();
         services.AddTransient<AboutViewModel>();
         services.AddTransient<ExportViewModel>();
+        services.AddTransient<AppLockViewModel>();
+        services.AddTransient<PinViewModel>();
+        services.AddTransient<LockCoverViewModel>();
     }
 }

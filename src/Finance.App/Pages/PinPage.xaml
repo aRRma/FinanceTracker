@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран D-15: ПИН-код в «Ещё» — задание с повтором, смена и выключение после
+    текущего кода. Набор — тот же контрол, что на заслонке. Панели вкладок нет:
+    касание вкладки посреди набора увело бы с экрана молча.
+-->
+<ContentPage
+    x:Class="Finance.App.Pages.PinPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:appLock="clr-namespace:Finance.Application.Features.Settings.AppLock;assembly=Finance.Application"
+    x:DataType="appLock:PinViewModel"
+    Shell.TabBarIsVisible="False"
+    Title="{x:Static texts:UiTexts.AppLockTitle}">
+
+    <Grid SafeAreaEdges="Container,Container,Container,All">
+        <controls:PinPad x:Name="Pad" />
+    </Grid>
+
+</ContentPage>

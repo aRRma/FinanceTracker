@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Личный трекер финансов — прототип</title>
 <!-- СГЕНЕРИРОВАНО из mockups.html скриптом tools/build_prototype.py. Руками не править. -->
-<!-- отпечатки источников: mockups.html=31eda430a2328b22ab3bcd63c415917ce4d0cc082cc2d271516edd1f27715faf build_prototype.py=77f871298aad02248fd8a5c89a87598089d2cc5da5628c96a90c5ad427c2acef -->
+<!-- отпечатки источников: mockups.html=48b7dbb8b2588de2d4609b0a89774ab0cacf556e86e0d07a1dedd2d57bf07680 build_prototype.py=77f871298aad02248fd8a5c89a87598089d2cc5da5628c96a90c5ad427c2acef -->
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -183,6 +183,22 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .kp b{background:var(--card);display:flex;align-items:center;justify-content:center;height:37px;font-size:17px;font-weight:400}
 .kp .ops b{background:none;height:auto;color:var(--acc);font-size:15px}
 .kp .ic{color:var(--ink)}
+/* Набор ПИН-кода: круглые клавиши посередине экрана, единица сверху, как у телефона.
+   Круг 72 dp — 50, промежутки 28 и 18 dp — 19 и 12 */
+.pinpad{position:absolute;left:50%;transform:translateX(-50%);display:grid;grid-template-columns:repeat(3,50px);grid-auto-rows:50px;column-gap:19px;row-gap:12px}
+.pinpad b{background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:19px;font-weight:400}
+.pinpad b.on{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+.pinpad b.no{background:none;border:none}
+.pinpad .ic{color:var(--ink)}
+.pinpad.off{opacity:.4}
+.pin{position:absolute;left:0;right:0;text-align:center}
+.pin .lock{width:44px;height:44px;margin:0 auto 11px;border-radius:50%;background:var(--accbg);display:flex;align-items:center;justify-content:center}
+.pin .lock .ic{color:var(--acc);width:21px;height:21px}
+.pin h3{margin:0;font-size:15.5px;font-weight:600}
+.pin .dots{display:flex;justify-content:center;gap:14px;margin-top:14px}
+.pin .dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--acc)}
+.pin .dots i.on{background:var(--acc)}
+.pin .msg{margin-top:11px;min-height:17px;font-size:12px;color:var(--neg)}
 .toast{position:absolute;left:50%;transform:translateX(-50%);bottom:40px;white-space:nowrap;background:var(--sunk);border:1px solid var(--line2);border-radius:18px;padding:7px 14px;font-size:12px;color:var(--ink);box-shadow:0 2px 8px var(--veil)}
 
 /* Карточки справочников: подпись над полем, поле с подчёркиванием, сохранение — кнопкой под формой */
@@ -545,6 +561,7 @@ body{padding:0}
       <div class="row"><svg class="ic"><use href="#i-sun"/></svg><div class="g"><div class="t">Оформление</div><div class="s">Как в системе</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-world"/></svg><div class="g"><div class="t">Часовой пояс</div><div class="s">Как в системе · Europe/Moscow</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Счёт по умолчанию</div><div class="s">Карта основная</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><svg class="ic"><use href="#i-lock"/></svg><div class="g"><div class="t">Защита входа</div><div class="s">Включена</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-database"/></svg><div class="g"><div class="t">Данные</div><div class="s">Сохранить в файл или восстановить</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-info-circle"/></svg><div class="g"><div class="t">О программе</div><div class="s">Версия 1.0, схема 5</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     </div>
@@ -974,6 +991,64 @@ body{padding:0}
 </div>
 </div>
 
+<div class="scr right" data-screen="C-10" title="C-10 · Войти по ПИН-коду">
+<div class="phone">
+  <div class="pin" style="top:156px">
+    <div class="lock"><svg class="ic"><use href="#i-lock"/></svg></div>
+    <h3>Введите ПИН-код</h3>
+    <div class="dots"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+    <div class="msg">Неверный ПИН-код</div>
+  </div>
+  <div class="pinpad" style="top:297px">
+    <b>1</b><b>2</b><b>3</b>
+    <b>4</b><b class="on">5</b><b>6</b>
+    <b>7</b><b>8</b><b>9</b>
+    <b class="no"></b><b>0</b><b class="no"><svg class="ic"><use href="#i-backspace"/></svg></b>
+  </div>
+</div>
+</div>
+
+<div class="scr right" data-screen="C-11" title="C-11 · Подождать после неверных попыток">
+<div class="phone">
+  <div class="pin" style="top:156px">
+    <div class="lock"><svg class="ic"><use href="#i-lock"/></svg></div>
+    <h3>Введите ПИН-код</h3>
+    <div class="dots"><i></i><i></i><i></i><i></i></div>
+    <div class="msg">Следующая попытка через 0:25</div>
+  </div>
+  <div class="pinpad off" style="top:297px">
+    <b>1</b><b>2</b><b>3</b>
+    <b>4</b><b>5</b><b>6</b>
+    <b>7</b><b>8</b><b>9</b>
+    <b class="no"></b><b>0</b><b class="no"><svg class="ic"><use href="#i-backspace"/></svg></b>
+  </div>
+</div>
+</div>
+
+<div class="scr right" data-screen="C-12" title="C-12 · Защитить вход при первом запуске">
+<div class="phone">
+  <div class="hd"><h2>Балансы</h2></div>
+  <div class="empty" style="padding-top:190px">
+    <h3>Добавьте первый счёт</h3>
+    <p>Категории уже созданы — останется записать первую операцию.</p>
+    <div class="btn">Добавить счёт</div>
+    <div class="btn" style="background:none;color:var(--ink2)">Восстановить из файла</div>
+  </div>
+  <nav class="nav">
+    <a class="on"><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+  <div class="veil">
+    <div class="dlg">
+      <h4>Защитить вход ПИН-кодом?</h4>
+      <div class="acts"><b class="no">Не сейчас</b><b class="yes">Задать ПИН-код</b></div>
+    </div>
+  </div>
+</div>
+</div>
+
 <div class="scr right" data-screen="D-01" title="D-01 · Упорядочить счета">
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счета</h2><span class="tool">+</span></div>
@@ -1326,6 +1401,46 @@ body{padding:0}
 </div>
 </div>
 
+<div class="scr right" data-screen="D-14" title="D-14 · Защитить вход ПИН-кодом">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Защита входа</h2></div>
+  <div class="body">
+    <div class="card">
+      <div class="row"><svg class="ic"><use href="#i-lock"/></svg><div class="g"><div class="t">Защита входа</div></div><span class="dim">Включена</span></div>
+    </div>
+    <div class="note dim" style="margin:-4px 3px 6px">ПИН-код при запуске и после 5 минут в фоне</div>
+    <div class="card">
+      <div class="row"><div class="g"><div class="t">Сменить ПИН-код</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><div class="g"><div class="t neg">Выключить защиту</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</div>
+
+<div class="scr right" data-screen="D-15" title="D-15 · Задать ПИН-код">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Защита входа</h2></div>
+  <div class="pin" style="top:180px">
+    <div class="lock"><svg class="ic"><use href="#i-lock"/></svg></div>
+    <h3>Придумайте ПИН-код</h3>
+    <div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+    <div class="msg"></div>
+  </div>
+  <div class="pinpad" style="top:321px">
+    <b>1</b><b>2</b><b>3</b>
+    <b>4</b><b>5</b><b>6</b>
+    <b>7</b><b>8</b><b>9</b>
+    <b class="no"></b><b>0</b><b class="no"><svg class="ic"><use href="#i-backspace"/></svg></b>
+  </div>
+</div>
+</div>
+
 <div class="scr right" data-screen="E-01" title="E-01 · Разобраться, куда ушли деньги">
 <div class="phone">
   <div class="hd"><h2>Отчёт</h2></div>
@@ -1425,7 +1540,7 @@ body{padding:0}
 </div>
 </div></div></div>
 
-<p class="legend">Зелёный круг — касание. Счётчик считает касания по интерфейсу отдельно от набора цифр: первое зависит от раскладки экранов, второе — от суммы. С клавиатуры: <code>пробел</code> — пауза, <code>←</code> и <code>→</code> — шаг, цифры — первые десять сценариев. Клик по кадру ставит на паузу. Экранов в прототипе столько же, сколько в макетах: 37.</p>
+<p class="legend">Зелёный круг — касание. Счётчик считает касания по интерфейсу отдельно от набора цифр: первое зависит от раскладки экранов, второе — от суммы. С клавиатуры: <code>пробел</code> — пауза, <code>←</code> и <code>→</code> — шаг, цифры — первые десять сценариев. Клик по кадру ставит на паузу. Экранов в прототипе столько же, сколько в макетах: 42.</p>
 </div>
 
 <script>

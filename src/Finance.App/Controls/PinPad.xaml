@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Набор ПИН-кода с макетов C-10, C-11 и D-15: замок в круге, заголовок, четыре
+    точки цветом действия, ответ на прошлый набор и клавиатура цифр. Общий для заслонки и экрана
+    ПИН-кода в «Ещё».
+
+    Всё одним блоком посередине экрана, клавиши — круги, как у набора кода
+    телефона: это вход, а не ввод суммы, и сплошная клавиатура у нижнего края
+    читалась калькулятором. Цифры с единицей сверху — там, где рука ищет
+    ПИН-код телефона. Кнопки «Готово» нет — код уходит на проверку по набору
+    последней цифры.
+
+    Строка ответа держит своё место и пустой: иначе первая же ошибка сдвигала
+    бы клавиатуру под пальцем.
+
+    На время паузы клавиатура гаснет целиком прозрачностью и не принимает касаний.
+    Не IsEnabled: погашенные кнопки меняли фон своим состоянием, а клавиша
+    стирания — нет, и клавиатура выходила пёстрой. Набор при этом всё равно
+    отвергает модель (CanType).
+-->
+<ContentView
+    x:Class="Finance.App.Controls.PinPad"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
+    xmlns:appLock="clr-namespace:Finance.Application.Infrastructure.AppLock;assembly=Finance.Application"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    x:DataType="appLock:PinPadViewModel">
+
+    <!-- Звёздочки сверху и снизу ставят блок посередине. Блок — около 480 dp и
+         помещается и на тесном экране; ScrollView вокруг ломает центровку:
+         в прокрутке звёздочкам нечего делить -->
+    <Grid RowDefinitions="*,Auto,*">
+            <VerticalStackLayout Grid.Row="1" Padding="0,16" HorizontalOptions="Center">
+
+                <!-- Замок в круге цветом действия: экран узнаётся как вход ещё до того,
+                     как прочитан заголовок -->
+                <Border WidthRequest="64" HeightRequest="64" StrokeThickness="0" StrokeShape="Ellipse"
+                        HorizontalOptions="Center"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}">
+                    <controls:Icon Key="lock" Size="30" Style="{StaticResource AccentIcon}" HorizontalOptions="Center" />
+                </Border>
+
+                <Label Margin="0,16,0,0" Text="{Binding Title}" AutomationId="PinTitle"
+                       Style="{StaticResource TitleLabel}" HorizontalOptions="Center" />
+
+                <!-- Точки цветом действия: пустая — кольцо, набранная — залитая -->
+                <HorizontalStackLayout x:Name="Dots" Margin="0,20,0,0" Spacing="20"
+                                       HorizontalOptions="Center"
+                                       BindableLayout.ItemsSource="{Binding Dots}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="x:Boolean">
+                            <Ellipse WidthRequest="16" HeightRequest="16" StrokeThickness="2"
+                                     Stroke="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}">
+                                <Ellipse.Triggers>
+                                    <DataTrigger TargetType="Ellipse" Binding="{Binding .}" Value="True">
+                                        <Setter Property="Fill"
+                                                Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                    </DataTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </HorizontalStackLayout>
+
+                <Label Margin="16,16,16,0" MinimumHeightRequest="40"
+                       Text="{Binding Message}" AutomationId="PinMessage"
+                       Style="{StaticResource NegativeLabel}"
+                       HorizontalOptions="Center" HorizontalTextAlignment="Center" />
+
+                <Grid Margin="0,16,0,0" RowDefinitions="72,72,72,72" ColumnDefinitions="72,72,72"
+                      RowSpacing="18" ColumnSpacing="28" HorizontalOptions="Center"
+                      InputTransparent="{Binding IsPaused}">
+                    <Grid.Triggers>
+                        <DataTrigger TargetType="Grid" Binding="{Binding IsPaused}" Value="True">
+                            <Setter Property="Opacity" Value="0.4" />
+                        </DataTrigger>
+                    </Grid.Triggers>
+
+                    <Button Grid.Row="0" Grid.Column="0" Text="1" AutomationId="Pin1" Style="{StaticResource PinKey}" Clicked="OnDigit" />
+                    <Button Grid.Row="0" Grid.Column="1" Text="2" AutomationId="Pin2" Style="{StaticResource PinKey}" Clicked="OnDigit" />
+                    <Button Grid.Row="0" Grid.Column="2" Text="3" AutomationId="Pin3" Style="{StaticResource PinKey}" Clicked="OnDigit" />
+
+                    <Button Grid.Row="1" Grid.Column="0" Text="4" AutomationId="Pin4" Style="{StaticResource PinKey}" Clicked="OnDigit" />
+                    <Button Grid.Row="1" Grid.Column="1" Text="5" AutomationId="Pin5" Style="{StaticResource PinKey}" Clicked="OnDigit" />
+                    <Button Grid.Row="1" Grid.Column="2" Text="6" AutomationId="Pin6" Style="{StaticResource PinKey}" Clicked="OnDigit" />
+
+                    <Button Grid.Row="2" Grid.Column="0" Text="7" AutomationId="Pin7" Style="{StaticResource PinKey}" Clicked="OnDigit" />
+                    <Button Grid.Row="2" Grid.Column="1" Text="8" AutomationId="Pin8" Style="{StaticResource PinKey}" Clicked="OnDigit" />
+                    <Button Grid.Row="2" Grid.Column="2" Text="9" AutomationId="Pin9" Style="{StaticResource PinKey}" Clicked="OnDigit" />
+
+                    <!-- Слева от нуля пусто: ноль посередине, как на телефоне -->
+                    <Button Grid.Row="3" Grid.Column="1" Text="0" AutomationId="Pin0" Style="{StaticResource PinKey}" Clicked="OnDigit" />
+
+                    <!-- Стирание — круг без фона: не цифра, и не должно ею выглядеть -->
+                    <Border Grid.Row="3" Grid.Column="2" WidthRequest="72" HeightRequest="72"
+                            StrokeThickness="0" StrokeShape="Ellipse" BackgroundColor="Transparent"
+                            SemanticProperties.Description="{x:Static texts:UiTexts.PinEraseHint}" AutomationId="PinErase">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnErase" />
+                        </Border.GestureRecognizers>
+                        <controls:Icon Key="backspace" Size="28" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+
+            </VerticalStackLayout>
+    </Grid>
+
+</ContentView>

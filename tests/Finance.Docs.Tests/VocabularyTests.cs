@@ -47,6 +47,7 @@ public sealed class VocabularyTests
         (Pattern(@"\bкошел(?:[её]к|ьк)\w*"), "«счёт»"),
         (Pattern(@"\bцифров\w+\s+клавиатур"), "«клавиатура суммы»"),
         (Pattern(@"\bстать(?:я|и|е|ю|[её]й|ям|ями|ях)\b"), "«категория»"),
+        (Pattern(@"\bблокировк\w*\s+приложени"), "«защита входа»"),
     ];
 
     /// <summary>
@@ -98,6 +99,7 @@ public sealed class VocabularyTests
     [InlineData("закрытого счета")]
     [InlineData("цифровой клавиатурой")]
     [InlineData("статьи")]
+    [InlineData("блокировкой приложения")]
     public void Словоформы_запрещённых_слов_ловятся(string wrong) =>
         Assert.Contains(Banned, pair => pair.Wrong.IsMatch(wrong));
 

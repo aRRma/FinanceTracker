@@ -47,6 +47,9 @@ public sealed partial class MorePage : DataPage
     private void OnDefaultAccount(object? sender, TappedEventArgs e) =>
         Navigator.Go(Routes.DefaultAccount);
 
+    private void OnAppLock(object? sender, TappedEventArgs e) =>
+        Navigator.Go(Routes.AppLock);
+
     private void OnExport(object? sender, TappedEventArgs e) =>
         Navigator.Go(Routes.Export);
 

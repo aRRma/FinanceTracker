@@ -124,6 +124,16 @@ public static class Routes
     public const string Export = "settings/data";
 
     /// <summary>
+    /// Защита входа: задать, сменить ПИН-код, выключить.
+    /// </summary>
+    public const string AppLock = "settings/app-lock";
+
+    /// <summary>
+    /// Набор ПИН-кода; зачем — параметром <c>purpose</c>.
+    /// </summary>
+    public const string Pin = "settings/pin";
+
+    /// <summary>
     /// Регистрирует маршруты в каркасе навигации.
     /// </summary>
     public static void Register()
@@ -148,5 +158,7 @@ public static class Routes
         Routing.RegisterRoute(DefaultAccount, typeof(DefaultAccountPage));
         Routing.RegisterRoute(About, typeof(AboutPage));
         Routing.RegisterRoute(Export, typeof(ExportPage));
+        Routing.RegisterRoute(AppLock, typeof(AppLockPage));
+        Routing.RegisterRoute(Pin, typeof(PinPage));
     }
 }

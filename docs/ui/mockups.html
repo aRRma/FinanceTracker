@@ -181,6 +181,22 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .kp b{background:var(--card);display:flex;align-items:center;justify-content:center;height:37px;font-size:17px;font-weight:400}
 .kp .ops b{background:none;height:auto;color:var(--acc);font-size:15px}
 .kp .ic{color:var(--ink)}
+/* Набор ПИН-кода: круглые клавиши посередине экрана, единица сверху, как у телефона.
+   Круг 72 dp — 50, промежутки 28 и 18 dp — 19 и 12 */
+.pinpad{position:absolute;left:50%;transform:translateX(-50%);display:grid;grid-template-columns:repeat(3,50px);grid-auto-rows:50px;column-gap:19px;row-gap:12px}
+.pinpad b{background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:19px;font-weight:400}
+.pinpad b.on{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+.pinpad b.no{background:none;border:none}
+.pinpad .ic{color:var(--ink)}
+.pinpad.off{opacity:.4}
+.pin{position:absolute;left:0;right:0;text-align:center}
+.pin .lock{width:44px;height:44px;margin:0 auto 11px;border-radius:50%;background:var(--accbg);display:flex;align-items:center;justify-content:center}
+.pin .lock .ic{color:var(--acc);width:21px;height:21px}
+.pin h3{margin:0;font-size:15.5px;font-weight:600}
+.pin .dots{display:flex;justify-content:center;gap:14px;margin-top:14px}
+.pin .dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--acc)}
+.pin .dots i.on{background:var(--acc)}
+.pin .msg{margin-top:11px;min-height:17px;font-size:12px;color:var(--neg)}
 .toast{position:absolute;left:50%;transform:translateX(-50%);bottom:40px;white-space:nowrap;background:var(--sunk);border:1px solid var(--line2);border-radius:18px;padding:7px 14px;font-size:12px;color:var(--ink);box-shadow:0 2px 8px var(--veil)}
 
 /* Карточки справочников: подпись над полем, поле с подчёркиванием, сохранение — кнопкой под формой */
@@ -383,7 +399,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="wrap">
 <header class="masthead">
 <h1>Макеты экранов</h1>
-<p>37 экранов: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
+<p>42 экрана: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
 <p>Все экраны одного размера — 330 × 690: экран Samsung Galaxy S25 Ultra (480 × 1040 логических пикселей) под строкой состояния, уменьшенный в 480/330 раза. Нижняя панель и клавиатура прижаты к низу, содержимое длиннее экрана обрезается, как на устройстве.</p>
 <p>Правдой считается приложение: макет сверяется с ним и правится в той же задаче, что и экран. Значки — контуры Tabler из набора приложения, названия категорий — из стартового набора.</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
@@ -482,7 +498,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-04</span><b>Открыть справочники и настройки</b><span class="uc">UC-11 UC-13 UC-18 UC-20 UC-25</span><em>Всё, что открывается реже раза в неделю, двумя карточками: справочники и настройки. Под каждой строкой — её состояние: сколько записей, какая тема, какой пояс, какой счёт по умолчанию; у «Данных» — что там можно сделать.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-04</span><b>Открыть справочники и настройки</b><span class="uc">UC-11 UC-13 UC-18 UC-20 UC-25</span><em>Всё, что открывается реже раза в неделю, двумя карточками: справочники и настройки. Под каждой строкой — её состояние: сколько записей, какая тема, какой пояс, какой счёт по умолчанию, включена ли защита входа [D-14]; у «Данных» — что там можно сделать.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Ещё</h2></div>
   <div class="body">
@@ -497,6 +513,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="row"><svg class="ic"><use href="#i-sun"/></svg><div class="g"><div class="t">Оформление</div><div class="s">Как в системе</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-world"/></svg><div class="g"><div class="t">Часовой пояс</div><div class="s">Как в системе · Europe/Moscow</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Счёт по умолчанию</div><div class="s">Карта основная</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><svg class="ic"><use href="#i-lock"/></svg><div class="g"><div class="t">Защита входа</div><div class="s">Включена</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-database"/></svg><div class="g"><div class="t">Данные</div><div class="s">Сохранить в файл или восстановить</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-info-circle"/></svg><div class="g"><div class="t">О программе</div><div class="s">Версия 1.0, схема 5</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     </div>
@@ -952,6 +969,67 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </div>
 </figure>
 
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-10</span><b>Войти по ПИН-коду</b><span class="uc">UC-26</span><em>Заслонка — при запуске и после пяти минут в фоне. Своё окно поверх всего приложения, включая открытый вопрос: ни шапки, ни вкладок, ни сумм. Код — четыре цифры, клавиши — круги посередине экрана, как у набора кода телефона; над ними замок в круге цветом действия, точки тем же цветом. Нажатая клавиша заливается цветом действия («5» на макете) — цифра принята раньше, чем закрасится точка. Код проверяется по набору последней цифры, кнопки «Готово» нет. Неверный — точки качаются и стираются, «Неверный ПИН-код»; когда до паузы остаётся две попытки и меньше — «Неверный ПИН-код. Осталось 2 попытки». «Назад» сворачивает приложение. После входа — тот же экран, что был, вместе с недописанной операцией. «Забыли ПИН-код?» нет: сбросить код нечем.</em></figcaption>
+<div class="phone">
+  <div class="pin" style="top:156px">
+    <div class="lock"><svg class="ic"><use href="#i-lock"/></svg></div>
+    <h3>Введите ПИН-код</h3>
+    <div class="dots"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+    <div class="msg">Неверный ПИН-код</div>
+  </div>
+  <div class="pinpad" style="top:297px">
+    <b>1</b><b>2</b><b>3</b>
+    <b>4</b><b class="on">5</b><b>6</b>
+    <b>7</b><b>8</b><b>9</b>
+    <b class="no"></b><b>0</b><b class="no"><svg class="ic"><use href="#i-backspace"/></svg></b>
+  </div>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-11</span><b>Подождать после неверных попыток</b><span class="uc">UC-26</span><em>После пятой неверной попытки клавиатура гаснет, а на месте ответа — отсчёт до следующей. Пауза растёт: 30 секунд, минута, 5 минут, 15 минут, дальше час. Перезапуск приложения и телефона её не снимает. Попытка во время паузы не принимается и не засчитывается.</em></figcaption>
+<div class="phone">
+  <div class="pin" style="top:156px">
+    <div class="lock"><svg class="ic"><use href="#i-lock"/></svg></div>
+    <h3>Введите ПИН-код</h3>
+    <div class="dots"><i></i><i></i><i></i><i></i></div>
+    <div class="msg">Следующая попытка через 0:25</div>
+  </div>
+  <div class="pinpad off" style="top:297px">
+    <b>1</b><b>2</b><b>3</b>
+    <b>4</b><b>5</b><b>6</b>
+    <b>7</b><b>8</b><b>9</b>
+    <b class="no"></b><b>0</b><b class="no"><svg class="ic"><use href="#i-backspace"/></svg></b>
+  </div>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-12</span><b>Защитить вход при первом запуске</b><span class="uc">UC-20 UC-26</span><em>Один раз, при первом запуске после установки — поверх экрана первого запуска [C-06], до заведения счёта. Вопрос без текста: последствий у ответа нет, защиту можно включить и потом в «Ещё» [D-14]. «Задать ПИН-код» открывает задание кода [D-15]. Обновлению стоящего приложения и перезапуску после восстановления вопрос не задаётся.</em></figcaption>
+<div class="phone">
+  <div class="hd"><h2>Балансы</h2></div>
+  <div class="empty" style="padding-top:190px">
+    <h3>Добавьте первый счёт</h3>
+    <p>Категории уже созданы — останется записать первую операцию.</p>
+    <div class="btn">Добавить счёт</div>
+    <div class="btn" style="background:none;color:var(--ink2)">Восстановить из файла</div>
+  </div>
+  <nav class="nav">
+    <a class="on"><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+  <div class="veil">
+    <div class="dlg">
+      <h4>Защитить вход ПИН-кодом?</h4>
+      <div class="acts"><b class="no">Не сейчас</b><b class="yes">Задать ПИН-код</b></div>
+    </div>
+  </div>
+</div>
+</figure>
+
 </div>
 
 <div class="band"><h2>D · Справочники</h2><span>Счета и категории — редкое редактирование, но плотные правила</span></div>
@@ -1319,6 +1397,48 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
     <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
   </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">D-14</span><b>Защитить вход ПИН-кодом</b><span class="uc">UC-26</span><em>Защита включена: строки «Сменить ПИН-код» и «Выключить защиту» — обе начинаются с текущего кода [D-15], неверный засчитывается попыткой, как на заслонке. Выключенная — одна строка «Задать ПИН-код». Строки, а не переключатель: каждое действие уводит на экран кода, и переключатель стоял бы в новом положении раньше, чем дело сделано. Выбора времени нет — вход спрашивается после пяти минут в фоне. Защита живёт на телефоне и с выгрузкой не переезжает.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Защита входа</h2></div>
+  <div class="body">
+    <div class="card">
+      <div class="row"><svg class="ic"><use href="#i-lock"/></svg><div class="g"><div class="t">Защита входа</div></div><span class="dim">Включена</span></div>
+    </div>
+    <div class="note dim" style="margin:-4px 3px 6px">ПИН-код при запуске и после 5 минут в фоне</div>
+    <div class="card">
+      <div class="row"><div class="g"><div class="t">Сменить ПИН-код</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><div class="g"><div class="t neg">Выключить защиту</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">D-15</span><b>Задать ПИН-код</b><span class="uc">UC-26</span><em>Тот же набор, что на заслонке [C-10]: код всегда из четырёх цифр, выбора длины нет. Затем «Повторите ПИН-код»; не совпал — «ПИН-коды не совпали» и снова новый код. Совпал — экран уходит, всплывающее сообщение «Защита входа включена». Смена кода начинается с «Введите текущий ПИН-код», выключение — им же и кончается. Панели вкладок нет: касание вкладки посреди набора увело бы с экрана молча.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Защита входа</h2></div>
+  <div class="pin" style="top:180px">
+    <div class="lock"><svg class="ic"><use href="#i-lock"/></svg></div>
+    <h3>Придумайте ПИН-код</h3>
+    <div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+    <div class="msg"></div>
+  </div>
+  <div class="pinpad" style="top:321px">
+    <b>1</b><b>2</b><b>3</b>
+    <b>4</b><b>5</b><b>6</b>
+    <b>7</b><b>8</b><b>9</b>
+    <b class="no"></b><b>0</b><b class="no"><svg class="ic"><use href="#i-backspace"/></svg></b>
+  </div>
 </div>
 </figure>
 

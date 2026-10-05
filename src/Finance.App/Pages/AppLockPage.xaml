@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран D-14: «Защита входа». Выключенная предлагает задать ПИН-код, включённая —
+    сменить его или выключить защиту. Строки, а не переключатель: каждое действие
+    уводит на экран ПИН-кода, и переключатель стоял бы в новом положении раньше,
+    чем дело сделано.
+-->
+<ContentPage
+    x:Class="Finance.App.Pages.AppLockPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:appLock="clr-namespace:Finance.Application.Features.Settings.AppLock;assembly=Finance.Application"
+    x:DataType="appLock:AppLockViewModel"
+    Title="{x:Static texts:UiTexts.AppLockTitle}">
+
+    <ScrollView SafeAreaEdges="Container">
+        <VerticalStackLayout Padding="16,12" Spacing="8">
+
+            <Border Style="{StaticResource Card}">
+                <Grid Padding="14,12" ColumnDefinitions="Auto,*,Auto"
+                      MinimumHeightRequest="{StaticResource TouchTarget}">
+                    <controls:Icon Grid.Column="0" Margin="0,0,12,0" Key="lock" />
+                    <Label Grid.Column="1" Text="{x:Static texts:UiTexts.AppLockTitle}" VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="{x:Static texts:UiTexts.AppLockOn}" AutomationId="AppLockState"
+                           IsVisible="{Binding IsEnabled}" VerticalOptions="Center"
+                           Style="{StaticResource SecondaryLabel}" />
+                    <Label Grid.Column="2" Text="{x:Static texts:UiTexts.AppLockOff}"
+                           IsVisible="{Binding IsDisabled}" VerticalOptions="Center"
+                           Style="{StaticResource SecondaryLabel}" />
+                </Grid>
+            </Border>
+
+            <Label Margin="4,0,4,12" Text="{x:Static texts:UiTexts.AppLockHint}"
+                   Style="{StaticResource SecondaryLabel}" />
+
+            <Border Style="{StaticResource Card}" IsVisible="{Binding IsDisabled}">
+                <Grid Padding="14,12" ColumnDefinitions="*,Auto"
+                      MinimumHeightRequest="{StaticResource TouchTarget}">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCreate" />
+                    </Grid.GestureRecognizers>
+                    <Label Grid.Column="0" Text="{x:Static texts:UiTexts.AppLockCreate}" AutomationId="AppLockCreate"
+                           VerticalOptions="Center" />
+                    <controls:Icon Grid.Column="1" Key="chevron-right" Style="{StaticResource MutedIcon}" />
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource Card}" IsVisible="{Binding IsEnabled}">
+                <VerticalStackLayout>
+                    <Grid Padding="14,12" ColumnDefinitions="*,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnChange" />
+                        </Grid.GestureRecognizers>
+                        <Label Grid.Column="0" Text="{x:Static texts:UiTexts.AppLockChange}" AutomationId="AppLockChange"
+                               VerticalOptions="Center" />
+                        <controls:Icon Grid.Column="1" Key="chevron-right" Style="{StaticResource MutedIcon}" />
+                    </Grid>
+
+                    <BoxView Style="{StaticResource Divider}" />
+
+                    <Grid Padding="14,12" ColumnDefinitions="*,Auto"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnDisable" />
+                        </Grid.GestureRecognizers>
+                        <Label Grid.Column="0" Text="{x:Static texts:UiTexts.AppLockDisable}" AutomationId="AppLockDisable"
+                               VerticalOptions="Center" Style="{StaticResource NegativeLabel}" />
+                        <controls:Icon Grid.Column="1" Key="chevron-right" Style="{StaticResource MutedIcon}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

@@ -2,7 +2,6 @@ using Finance.Application.Features.More;
 using Finance.Application.Features.Settings.Appearance;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Initialization;
-using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Texts;
 
@@ -55,12 +54,7 @@ public sealed class MoreTests
     {
         await using TestDatabase database = await TestDatabase.CreateWithPresetAsync(applicationVersion: "1.0");
 
-        MoreViewModel model = new(
-            database.Resolve<IAccountsQuery>(),
-            database.Resolve<IPlacesQuery>(),
-            database.Resolve<ICategoriesQuery>(),
-            database.Resolve<ISettingsSummaryQuery>(),
-            database.Resolve<IChangeNotifier>());
+        MoreViewModel model = database.Resolve<MoreViewModel>();
 
         await model.LoadAsync();
 
@@ -82,12 +76,7 @@ public sealed class MoreTests
     {
         await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
 
-        MoreViewModel model = new(
-            fixture.Database.Resolve<IAccountsQuery>(),
-            fixture.Database.Resolve<IPlacesQuery>(),
-            fixture.Database.Resolve<ICategoriesQuery>(),
-            fixture.Database.Resolve<ISettingsSummaryQuery>(),
-            fixture.Database.Resolve<IChangeNotifier>());
+        MoreViewModel model = fixture.Database.Resolve<MoreViewModel>();
 
         Guid account = await fixture.AccountAsync("Карта");
         await fixture.SaveAsync(fixture.Expense(account, 100m, place: "Пятёрочка"));

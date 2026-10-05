@@ -52,6 +52,11 @@ public sealed class FinanceStartup
     }
 
     /// <summary>
+    /// База создана этим запуском: приложение только что установлено, а не обновлено.
+    /// </summary>
+    public bool CreatedDatabase { get; private set; }
+
+    /// <summary>
     /// Готовит приложение к работе — один раз за запуск. Экраны зовут её перед
     /// первым чтением и получают одну и ту же задачу: миграции и стартовый набор
     /// не должны накатываться дважды оттого, что вкладок четыре.
@@ -83,7 +88,7 @@ public sealed class FinanceStartup
     private async Task RunOnceAsync(CancellationToken cancellationToken)
     {
         await _bootstrapper.InitializeAsync(cancellationToken).ConfigureAwait(false);
-        await _initializer.InitializeAsync(cancellationToken).ConfigureAwait(false);
+        CreatedDatabase = await _initializer.InitializeAsync(cancellationToken).ConfigureAwait(false);
         await ApplyTimeZoneAsync(cancellationToken).ConfigureAwait(false);
         await ApplyThemeAsync(cancellationToken).ConfigureAwait(false);
     }

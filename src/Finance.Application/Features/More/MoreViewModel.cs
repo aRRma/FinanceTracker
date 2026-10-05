@@ -1,6 +1,7 @@
 ﻿using Finance.Application.Texts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Finance.Application.Infrastructure;
+using Finance.Application.Infrastructure.AppLock;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
 
@@ -16,6 +17,7 @@ public sealed partial class MoreViewModel : ScreenViewModel
     private readonly IPlacesQuery _places;
     private readonly ICategoriesQuery _categories;
     private readonly ISettingsSummaryQuery _settings;
+    private readonly AppLockService _appLock;
 
     /// <summary>
     /// Создаёт модель представления раздела «Ещё».
@@ -24,12 +26,14 @@ public sealed partial class MoreViewModel : ScreenViewModel
     /// <param name="places">Справочник мест.</param>
     /// <param name="categories">Список категорий.</param>
     /// <param name="settings">Состояние настроек: тема, пояс, счёт по умолчанию, версия, схема.</param>
+    /// <param name="appLock">Защита входа: включена ли.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
     public MoreViewModel(
         IAccountsQuery accounts,
         IPlacesQuery places,
         ICategoriesQuery categories,
         ISettingsSummaryQuery settings,
+        AppLockService appLock,
         IChangeNotifier changes)
         : base(changes)
     {
@@ -37,11 +41,13 @@ public sealed partial class MoreViewModel : ScreenViewModel
         ArgumentNullException.ThrowIfNull(places);
         ArgumentNullException.ThrowIfNull(categories);
         ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(appLock);
 
         _accounts = accounts;
         _places = places;
         _categories = categories;
         _settings = settings;
+        _appLock = appLock;
     }
 
     /// <summary>
@@ -79,6 +85,12 @@ public sealed partial class MoreViewModel : ScreenViewModel
     /// </summary>
     [ObservableProperty]
     public partial string DefaultAccountCaption { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Включена ли защита входа.
+    /// </summary>
+    [ObservableProperty]
+    public partial string AppLockCaption { get; private set; } = string.Empty;
 
     /// <summary>
     /// Версия приложения и номер схемы базы.
@@ -135,6 +147,10 @@ public sealed partial class MoreViewModel : ScreenViewModel
         // Без незаблокированных счетов выбирать нечего — подпись говорит почему,
         // тем же текстом, что пустой экран выбора
         DefaultAccountCaption = settings.DefaultAccount?.Name ?? UiTexts.DefaultAccountEmptyTitle;
+
+        // Защита входа живёт вне базы и оповещения об изменении не шлёт:
+        // подпись читается при каждом появлении раздела, как и всё здесь
+        AppLockCaption = _appLock.IsEnabled ? UiTexts.AppLockOn : UiTexts.AppLockOff;
 
         AboutCaption = string.Format(UiCulture.Current, UiTexts.MoreAbout, settings.Version, settings.Schema);
     }

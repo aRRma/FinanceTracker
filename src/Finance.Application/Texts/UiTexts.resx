@@ -965,4 +965,77 @@
   <data name="IconChosen" xml:space="preserve">
     <value>{0}, выбран</value>
   </data>
+  <!-- Защита входа: заслонка, экран в «Ещё», ПИН-код, предложение при первом запуске -->
+  <data name="AppLockTitle" xml:space="preserve">
+    <value>Защита входа</value>
+  </data>
+  <data name="AppLockOn" xml:space="preserve">
+    <value>Включена</value>
+  </data>
+  <data name="AppLockOff" xml:space="preserve">
+    <value>Выключена</value>
+  </data>
+  <data name="AppLockHint" xml:space="preserve">
+    <value>ПИН-код при запуске и после 5 минут в фоне</value>
+  </data>
+  <data name="AppLockCreate" xml:space="preserve">
+    <value>Задать ПИН-код</value>
+  </data>
+  <data name="AppLockChange" xml:space="preserve">
+    <value>Сменить ПИН-код</value>
+  </data>
+  <data name="AppLockDisable" xml:space="preserve">
+    <value>Выключить защиту</value>
+  </data>
+  <data name="AppLockEnabledNotice" xml:space="preserve">
+    <value>Защита входа включена</value>
+  </data>
+  <data name="AppLockDisabledNotice" xml:space="preserve">
+    <value>Защита входа выключена</value>
+  </data>
+  <data name="AppLockOfferTitle" xml:space="preserve">
+    <value>Защитить вход ПИН-кодом?</value>
+  </data>
+  <data name="AppLockOfferLater" xml:space="preserve">
+    <value>Не сейчас</value>
+  </data>
+  <data name="PinEnterTitle" xml:space="preserve">
+    <value>Введите ПИН-код</value>
+  </data>
+  <data name="PinCurrentTitle" xml:space="preserve">
+    <value>Введите текущий ПИН-код</value>
+  </data>
+  <data name="PinNewTitle" xml:space="preserve">
+    <value>Придумайте ПИН-код</value>
+  </data>
+  <data name="PinRepeatTitle" xml:space="preserve">
+    <value>Повторите ПИН-код</value>
+  </data>
+  <data name="PinChangedNotice" xml:space="preserve">
+    <value>ПИН-код изменён</value>
+  </data>
+  <data name="PinWrong" xml:space="preserve">
+    <value>Неверный ПИН-код</value>
+  </data>
+  <data name="PinWrongAttemptsLeft" xml:space="preserve">
+    <value>Неверный ПИН-код. Осталось {0}</value>
+  </data>
+  <data name="PinAttemptsOne" xml:space="preserve">
+    <value>попытка</value>
+  </data>
+  <data name="PinAttemptsFew" xml:space="preserve">
+    <value>попытки</value>
+  </data>
+  <data name="PinAttemptsMany" xml:space="preserve">
+    <value>попыток</value>
+  </data>
+  <data name="PinPause" xml:space="preserve">
+    <value>Следующая попытка через {0}</value>
+  </data>
+  <data name="PinMismatch" xml:space="preserve">
+    <value>ПИН-коды не совпали</value>
+  </data>
+  <data name="PinEraseHint" xml:space="preserve">
+    <value>Стереть цифру</value>
+  </data>
 </root>

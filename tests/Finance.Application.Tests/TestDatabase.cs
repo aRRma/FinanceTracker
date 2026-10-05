@@ -1,3 +1,4 @@
+using Finance.Application.Infrastructure.AppLock;
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;
@@ -107,8 +108,15 @@ internal sealed class TestDatabase : IAsyncDisposable
         string folder = Path.Combine(Path.GetTempPath(), "finance-tests", Guid.CreateVersion7().ToString("N"));
         Directory.CreateDirectory(folder);
 
+        // Телефона в тестах нет: защита входа хранит своё в памяти
+        TestDevice device = new();
+
         IServiceCollection collection = new ServiceCollection()
             .AddSingleton<TimeProvider>(new TestTime())
+            .AddSingleton(device)
+            .AddSingleton<IPinStore>(device)
+            .AddSingleton<IDevicePreferences>(device)
+            .AddSingleton<IUptime>(device)
             .AddFinance(Path.Combine(folder, "finance.db"), applyTheme: applyTheme, applicationVersion: applicationVersion)
             .ConfigureDbContext<FinanceDbContext>(static options => options.AddInterceptors(NoSyncInterceptor.Instance));
         extra?.Invoke(collection);

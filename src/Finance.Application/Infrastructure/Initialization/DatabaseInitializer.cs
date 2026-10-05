@@ -36,7 +36,8 @@ public sealed class DatabaseInitializer
     /// из него, и второй прогон вернул бы удалённое и затёр переименования.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    public async Task InitializeAsync(CancellationToken cancellationToken = default)
+    /// <returns>Набор записан этим вызовом — база новая, приложение только что установлено.</returns>
+    public async Task<bool> InitializeAsync(CancellationToken cancellationToken = default)
     {
         string? applied = await _settings
             .GetAsync(SettingName.PresetVersion, cancellationToken)
@@ -44,7 +45,7 @@ public sealed class DatabaseInitializer
 
         if (applied is not null)
         {
-            return;
+            return false;
         }
 
         Preset preset = Preset.Embedded();
@@ -70,6 +71,8 @@ public sealed class DatabaseInitializer
         });
 
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        return true;
     }
 
     /// <summary>

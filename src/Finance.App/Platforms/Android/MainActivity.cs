@@ -4,6 +4,8 @@ using Android.Content.PM;
 using Android.Content.Res;
 using Android.OS;
 using AndroidX.Core.View;
+using Finance.Application.Features.AppLock;
+using Finance.Application.Infrastructure.AppLock;
 using Microsoft.Maui.Platform;
 
 namespace Finance.App;
@@ -30,6 +32,9 @@ public sealed class MainActivity : MauiAppCompatActivity
     /// </summary>
     private const string AddTransaction = "ru.finance.tracker.action.ADD_TRANSACTION";
 
+    private AppLockService? _appLock;
+    private LockCover? _cover;
+
     /// <summary>
     /// Холодный старт: приложения не было, ярлык поднял его с нуля.
     /// </summary>
@@ -38,11 +43,101 @@ public sealed class MainActivity : MauiAppCompatActivity
     {
         base.OnCreate(savedInstanceState);
 
+        if (IPlatformApplication.Current?.Services is { } services)
+        {
+            _appLock = services.GetRequiredService<AppLockService>();
+            _cover = new LockCover(this, services.GetRequiredService<LockCoverViewModel>());
+
+            // До первого кадра каркаса: при запуске балансы не мелькают даже на миг.
+            // Пересозданная в живом процессе активность решает как возврат из фона.
+            // Ярлык при этом открывает форму под заслонкой — пропуска входа
+            // через намерение нет: подделать его могло бы любое приложение
+            if (_appLock.Start())
+            {
+                _cover.Raise();
+            }
+        }
+
         Accept(Intent);
 
         if (ControlsApplication.Current is { } application)
         {
             application.RequestedThemeChanged += (_, _) => ApplyStatusBar();
+        }
+    }
+
+    /// <summary>
+    /// Миниатюра в списке недавних скрыта, пока защита включена. Решается при
+    /// каждом выходе на экран: защиту включают и выключают на ходу. Заслонка,
+    /// которую не удалось поднять раньше, поднимается здесь же: поднятый признак
+    /// входа без заслонки оставил бы балансы открытыми.
+    /// </summary>
+    protected override void OnResume()
+    {
+        base.OnResume();
+
+        SetRecentsScreenshotEnabled(_appLock?.IsEnabled is not true);
+
+        if (_appLock?.IsLocked is true)
+        {
+            _cover?.Raise();
+        }
+    }
+
+    /// <summary>
+    /// Признак миниатюры обновляется и перед уходом с экрана: защиту включили
+    /// на ходу, и снимок для списка недавних делается раньше следующего показа.
+    /// </summary>
+    protected override void OnPause()
+    {
+        base.OnPause();
+
+        SetRecentsScreenshotEnabled(_appLock?.IsEnabled is not true);
+    }
+
+    /// <summary>
+    /// Уход в фон: отсчёт времени в фоне и заслонка заранее — при возврате первым
+    /// кадром будет она. Вернётся пользователь раньше пяти минут — она уйдёт
+    /// в <see cref="OnRestart"/>, так и не показавшись.
+    /// </summary>
+    protected override void OnStop()
+    {
+        base.OnStop();
+
+        _appLock?.Leave();
+
+        if (_appLock?.IsEnabled is true)
+        {
+            _cover?.Raise();
+        }
+    }
+
+    /// <summary>
+    /// Окно заслонки принадлежит этой активности: оставленное при её уничтожении,
+    /// оно утекло бы. Новая активность поднимет свою, если вход нужен.
+    /// </summary>
+    protected override void OnDestroy()
+    {
+        _cover?.Dismiss();
+
+        base.OnDestroy();
+    }
+
+    /// <summary>
+    /// Возврат из фона: заслонка остаётся, если вход нужен, иначе убирается.
+    /// </summary>
+    protected override void OnRestart()
+    {
+        base.OnRestart();
+
+        if (_appLock?.Return() is true)
+        {
+            // Уже поднятая остаётся как есть; не поднятая в OnStop — поднимается здесь
+            _cover?.Raise();
+        }
+        else
+        {
+            _cover?.Dismiss();
         }
     }
 

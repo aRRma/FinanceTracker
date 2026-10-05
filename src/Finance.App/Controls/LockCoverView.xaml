@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Заслонка с макетов C-10 и C-11: набор ПИН-кода на фоне страницы, без шапки
+    и вкладок. Рисуется в своём окне поверх всего приложения (LockCover), поэтому
+    это не страница навигации, а содержимое окна.
+-->
+<ContentView
+    x:Class="Finance.App.Controls.LockCoverView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    BackgroundColor="{AppThemeBinding Light={StaticResource PaperLight}, Dark={StaticResource PaperDark}}">
+
+    <!-- Отступы под системные полосы ставит окно заслонки (LockCover), а не MAUI:
+         в чужом окне он их не раздаёт -->
+    <controls:PinPad x:Name="Pad" />
+
+</ContentView>
