@@ -1,7 +1,5 @@
-﻿using Finance.Application.Texts;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
@@ -51,7 +49,6 @@ public sealed partial class AppearanceViewModel : ScreenViewModel
     /// Перечитывает выбор.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
         // ConfigureAwait(false) здесь недопустим: следом наполняется привязанная
@@ -68,7 +65,6 @@ public sealed partial class AppearanceViewModel : ScreenViewModel
     /// </summary>
     /// <param name="theme">Выбранная тема.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task SelectAsync(Theme theme, CancellationToken cancellationToken = default)
     {
         if (theme == Current)

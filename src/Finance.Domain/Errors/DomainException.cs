@@ -8,10 +8,7 @@ namespace Finance.Domain.Errors;
 /// как сообщение, а не как падение.
 /// </summary>
 /// <param name="invariant">Нарушенное правило.</param>
-/// <param name="message">
-/// Текст, который увидит пользователь рядом с формой. Пишется его словами:
-/// называет счёт, сумму или дату, а не имя поля или правила.
-/// </param>
+/// <param name="message">Текст для пользователя рядом с формой — его словами: счёт, сумма или дата, а не имя поля или правила.</param>
 public sealed class DomainException(Invariant invariant, string message) : Exception(message)
 {
     /// <summary>

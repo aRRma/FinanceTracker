@@ -153,11 +153,6 @@ internal static class Faults
     internal static string TimeZoneUnknown(string id) => $"Зона «{id}» системе неизвестна";
 
     /// <summary>
-    /// Клавиша клавиатуры суммы названа не одним знаком.
-    /// </summary>
-    internal static string KeypadKeyIsOneSign() => "Клавиша суммы называется одним знаком";
-
-    /// <summary>
     /// Такой клавиши на клавиатуре суммы нет.
     /// </summary>
     internal static string KeypadKeyUnknown() => "Такой клавиши на клавиатуре суммы нет";

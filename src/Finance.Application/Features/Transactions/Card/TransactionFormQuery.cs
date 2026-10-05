@@ -1,4 +1,3 @@
-using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;

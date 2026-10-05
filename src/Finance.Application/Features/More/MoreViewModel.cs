@@ -1,6 +1,5 @@
 ﻿using Finance.Application.Texts;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
@@ -85,7 +84,6 @@ public sealed partial class MoreViewModel : ScreenViewModel
     /// Перечитывает подписи.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
         // Четыре чтения независимы и идут разом: у каждого запроса свой контекст,

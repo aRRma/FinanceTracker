@@ -1,5 +1,4 @@
 using Finance.Application.Features.Categories.Card;
-using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure.Deletion;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;

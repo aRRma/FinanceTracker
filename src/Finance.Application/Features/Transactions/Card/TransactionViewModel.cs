@@ -5,10 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Deletion;
-using Finance.Application.Infrastructure.Queries;
-using Finance.Domain.Entities;
 using Finance.Domain.Enums;
-using Finance.Domain.Errors;
 using Finance.Domain.Rules;
 using Finance.Domain.Values;
 
@@ -20,7 +17,7 @@ namespace Finance.Application.Features.Transactions.Card;
 /// дата, — а категория выбирается каждый раз: подставленная не глядя категория
 /// портит отчёт молча.
 /// </summary>
-public sealed partial class TransactionViewModel : ObservableObject, IFormModel
+public sealed partial class TransactionViewModel : FormViewModel
 {
     // Значки невыбранных полей — ключи набора значков интерфейса
     private const string NoAccountIcon = "wallet";
@@ -240,8 +237,8 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// кнопка не говорит, чего не хватает, а нажатие называет это.
     /// Незакрытое действие сохранению не мешает: записывается тот же итог, что показала бы «=».
     /// </summary>
-    public bool CanSave =>
-        !IsSaving
+    public override bool CanSave =>
+        IsIdle
         && AmountExpression.TryEvaluate(Amount, out decimal amount)
         && amount > 0m
         && (!NeedsTargetAmount
@@ -418,20 +415,8 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     [ObservableProperty]
     public partial string Note { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Текст нарушенного правила. Пусто — сохранять можно.
-    /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasError))]
-    public partial string? Error { get; private set; }
-
-    /// <summary>
-    /// Правило нарушено — сообщение показывается рядом с формой.
-    /// </summary>
-    public bool HasError => !string.IsNullOrEmpty(Error);
-
     /// <inheritdoc />
-    public bool IsDirty => Take() != _saved;
+    public override bool IsDirty => Take() != _saved;
 
     /// <summary>
     /// Правимые поля формы одним значением. Запись сравнивается сама, по всем полям
@@ -462,15 +447,6 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
         string PlaceName,
         DateOnly OccurredOn,
         string Note);
-
-    /// <summary>
-    /// Идёт сохранение или удаление. Кнопки зовут методы напрямую, минуя команду
-    /// с её защитой от повторного запуска: без флага второе нажатие до ухода
-    /// экрана записало бы операцию дважды.
-    /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanSave))]
-    public partial bool IsSaving { get; private set; }
 
     /// <summary>
     /// Вторая сумма нужна: перевод между счетами в разных валютах. При одной валюте
@@ -555,10 +531,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// </summary>
     /// <param name="key">Ключ правимой операции или <c>null</c> для новой.</param>
     /// <param name="accountKey">Счёт для подстановки в новую операцию — с чьей ленты пришли.</param>
-    /// <param name="kind">
-    /// Вид новой операции: им приходят с ярлыка на значке приложения, где вид
-    /// уже выбран. У правки вид берётся из самой записи, и параметр не действует.
-    /// </param>
+    /// <param name="kind">Вид новой операции — с ярлыка на значке приложения; у правки вид берётся из самой записи.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
     public async Task LoadAsync(
         Guid? key,
@@ -626,12 +599,10 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     }
 
     /// <summary>
-    /// Сохраняет операцию. Нарушенное доменное правило показывается текстом рядом
-    /// с формой — это ввод пользователя, а не сбой, и падать приложению не за что.
+    /// Сохраняет операцию.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <returns><c>true</c>, если операция сохранена и экран можно закрыть.</returns>
-    [RelayCommand]
     public async Task<bool> SaveAsync(CancellationToken cancellationToken = default)
     {
         if (IsSaving)
@@ -639,6 +610,7 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
             return false;
         }
 
+        // Сброс до проверок: прежняя карточка рядом со всплывающим сообщением говорила бы не о том
         Error = null;
 
         // Невыбранное поле — счёт или категория — называется всплывающим
@@ -689,44 +661,21 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
             return false;
         }
 
-        IsSaving = true;
-        bool done = false;
-
-        try
+        SaveTransactionCommand command = new()
         {
-            await _save.HandleAsync(
-                new SaveTransactionCommand
-                {
-                    Key = Key,
-                    Kind = Kind,
-                    SourceAccountKey = source.Key,
-                    Amount = amount,
-                    TargetAccountKey = IsTransfer ? TargetAccount?.Key : null,
-                    TargetAmount = targetAmount,
-                    CategoryKey = IsNotTransfer ? Category?.Key : null,
-                    PlaceName = IsNotTransfer ? PlaceName : null,
-                    OccurredOn = OccurredOn,
-                    Note = Note
-                },
-                cancellationToken);
+            Key = Key,
+            Kind = Kind,
+            SourceAccountKey = source.Key,
+            Amount = amount,
+            TargetAccountKey = IsTransfer ? TargetAccount?.Key : null,
+            TargetAmount = targetAmount,
+            CategoryKey = IsNotTransfer ? Category?.Key : null,
+            PlaceName = IsNotTransfer ? PlaceName : null,
+            OccurredOn = OccurredOn,
+            Note = Note
+        };
 
-            done = true;
-
-            return true;
-        }
-        catch (DomainException error)
-        {
-            Error = error.Message;
-
-            return false;
-        }
-        finally
-        {
-            // После удачи флаг остаётся: экран закрывается, и второе нажатие
-            // в этот промежуток записало бы то же самое ещё раз. При неудаче
-            // он снимается — нарушенное правило правят и сохраняют снова
-            IsSaving = done;
-        }
+        return await WriteAsync(token => _save.HandleAsync(command, token), cancellationToken);
     }
 
     /// <summary>
@@ -743,51 +692,16 @@ public sealed partial class TransactionViewModel : ObservableObject, IFormModel
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <returns><c>true</c>, если операция удалена и экран можно закрыть.</returns>
-    [RelayCommand]
-    public async Task<bool> DeleteAsync(CancellationToken cancellationToken = default)
-    {
-        if (Key is not { } key || IsSaving)
-        {
-            return false;
-        }
-
-        IsSaving = true;
-        bool done = false;
-
-        try
-        {
-            await _delete.HandleAsync([key], cancellationToken);
-
-            done = true;
-
-            return true;
-        }
-        finally
-        {
-            // После удачи флаг остаётся: экран закрывается, и второе нажатие
-            // в этот промежуток записало бы то же самое ещё раз. При неудаче
-            // он снимается — нарушенное правило правят и сохраняют снова
-            IsSaving = done;
-        }
-    }
+    public async Task<bool> DeleteAsync(CancellationToken cancellationToken = default) =>
+        Key is { } key && await WriteAsync(token => _delete.HandleAsync([key], token), cancellationToken);
 
     /// <summary>
     /// Нажата клавиша суммы: цифра, запятая или знак действия.
     /// </summary>
     /// <param name="key">Знак на клавише.</param>
-    /// <exception cref="ArgumentException">Клавиша названа не одним знаком.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Клавиши с таким знаком на клавиатуре нет.</exception>
     [RelayCommand]
-    public void PressKey(string key)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(key);
-
-        if (key.Length is not 1)
-        {
-            throw new ArgumentException(Faults.KeypadKeyIsOneSign(), nameof(key));
-        }
-
-        Edit(expression => AmountInput.Append(expression, key[0]));
-    }
+    public void PressKey(char key) => Edit(expression => AmountInput.Append(expression, key));
 
     /// <summary>
     /// Стирает последний набранный знак.

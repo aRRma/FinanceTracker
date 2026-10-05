@@ -1,6 +1,5 @@
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
-using Finance.Domain.Entities;
 using Finance.Domain.Enums;
 using Finance.Domain.Values;
 using Microsoft.EntityFrameworkCore;

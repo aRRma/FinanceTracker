@@ -1,4 +1,3 @@
-using Finance.Domain.Entities;
 using Finance.Domain.Values;
 
 namespace Finance.Application.Features.Report;

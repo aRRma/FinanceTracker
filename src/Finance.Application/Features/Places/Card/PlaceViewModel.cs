@@ -1,9 +1,7 @@
 using Finance.Application.Texts;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain.Errors;
 
 namespace Finance.Application.Features.Places.Card;
 
@@ -12,7 +10,7 @@ namespace Finance.Application.Features.Places.Card;
 /// появляется из формы операции, а сюда приходят исправлять опечатку или
 /// убирать дубль.
 /// </summary>
-public sealed partial class PlaceViewModel : ObservableObject, IFormModel
+public sealed partial class PlaceViewModel : FormViewModel
 {
     private readonly IPlacesQuery _places;
     private readonly IRenamePlaceHandler _rename;
@@ -50,12 +48,6 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
     public partial string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// Текст нарушенного правила. Пусто — сохранять можно.
-    /// </summary>
-    [ObservableProperty]
-    public partial string? Error { get; private set; }
-
-    /// <summary>
     /// Сколько операций у места и в какой подкатегории оно чаще всего. По этой
     /// подписи дубль отличается от исходного места ещё до правки.
     /// </summary>
@@ -63,46 +55,18 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
     public partial string UsageCaption { get; private set; } = string.Empty;
 
     /// <summary>
-    /// Правило нарушено — сообщение показывается рядом с формой.
-    /// </summary>
-    public bool HasError => !string.IsNullOrEmpty(Error);
-
-    /// <summary>
-    /// Идёт сохранение или удаление. Кнопки зовут методы напрямую, минуя команду
-    /// с её защитой от повторного запуска: без флага второе нажатие до ухода
-    /// экрана запустило бы второе действие.
-    /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsIdle))]
-    [NotifyPropertyChangedFor(nameof(CanSave))]
-    public partial bool IsSaving { get; private set; }
-
-    /// <summary>
-    /// Предыдущее действие закончилось — можно начинать следующее. Отдельно
-    /// от <see cref="CanSave"/>: к нему привязана и кнопка удаления, а «можно
-    /// сохранить» о ней ничего не говорит.
-    /// </summary>
-    public bool IsIdle => !IsSaving;
-
-    /// <summary>
-    /// Сохранять можно: предыдущее действие не идёт.
-    /// </summary>
-    public bool CanSave => IsIdle;
-
-    /// <summary>
     /// Место загрузилось — есть что править и что удалять.
     /// </summary>
     public bool IsLoaded => Key is not null;
 
     /// <inheritdoc />
-    public bool IsDirty => !string.Equals(Name.Trim(), _savedName, StringComparison.Ordinal);
+    public override bool IsDirty => !string.Equals(Name.Trim(), _savedName, StringComparison.Ordinal);
 
     /// <summary>
     /// Загружает место для правки.
     /// </summary>
     /// <param name="key">Ключ места.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task LoadAsync(Guid key, CancellationToken cancellationToken = default)
     {
         // ConfigureAwait(false) здесь недопустим: следом меняются привязанные
@@ -140,46 +104,18 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <returns><c>true</c>, если место сохранено и экран можно закрыть.</returns>
-    [RelayCommand]
-    public async Task<bool> SaveAsync(CancellationToken cancellationToken = default)
-    {
-        if (Key is not { } key || IsSaving)
-        {
-            return false;
-        }
+    public async Task<bool> SaveAsync(CancellationToken cancellationToken = default) =>
+        Key is { } key
+        && await WriteAsync(
+            async token =>
+            {
+                await _rename.HandleAsync(key, Name, token);
 
-        IsSaving = true;
-        bool done = false;
-        Error = null;
-        OnPropertyChanged(nameof(HasError));
-
-        try
-        {
-            await _rename.HandleAsync(key, Name, cancellationToken);
-
-            // Записанное имя теперь новое: заголовок удаления обязан назвать его,
-            // а не то, что было до переименования
-            _savedName = Name.Trim();
-
-            done = true;
-
-            return true;
-        }
-        catch (DomainException error)
-        {
-            Error = error.Message;
-            OnPropertyChanged(nameof(HasError));
-
-            return false;
-        }
-        finally
-        {
-            // После удачи флаг остаётся: экран закрывается, и второе нажатие
-            // в этот промежуток записало бы то же самое ещё раз. При неудаче
-            // он снимается — нарушенное правило правят и сохраняют снова
-            IsSaving = done;
-        }
-    }
+                // Записанное имя теперь новое: заголовок удаления обязан назвать его,
+                // а не то, что было до переименования
+                _savedName = Name.Trim();
+            },
+            cancellationToken);
 
     /// <summary>
     /// Заголовок подтверждения удаления. Имя берётся записанное, а не набранное
@@ -210,31 +146,6 @@ public sealed partial class PlaceViewModel : ObservableObject, IFormModel
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <returns><c>true</c>, если место удалено и экран можно закрыть.</returns>
-    [RelayCommand]
-    public async Task<bool> DeleteAsync(CancellationToken cancellationToken = default)
-    {
-        if (Key is not { } key || IsSaving)
-        {
-            return false;
-        }
-
-        IsSaving = true;
-        bool done = false;
-
-        try
-        {
-            await _delete.HandleAsync(key, cancellationToken);
-
-            done = true;
-
-            return true;
-        }
-        finally
-        {
-            // После удачи флаг остаётся: экран закрывается, и второе нажатие
-            // в этот промежуток записало бы то же самое ещё раз. При неудаче
-            // он снимается — нарушенное правило правят и сохраняют снова
-            IsSaving = done;
-        }
-    }
+    public async Task<bool> DeleteAsync(CancellationToken cancellationToken = default) =>
+        Key is { } key && await WriteAsync(token => _delete.HandleAsync(key, token), cancellationToken);
 }

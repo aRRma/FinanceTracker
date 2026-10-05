@@ -27,10 +27,7 @@ public static class RuleTexts
     /// Текст по ключу.
     /// </summary>
     /// <param name="text">Ключ текста.</param>
-    /// <returns>
-    /// Строка ресурса; для ненайденного ключа — его собственное имя: машинное имя
-    /// правила на экране ошибки говорит больше, чем пустая строка.
-    /// </returns>
+    /// <returns>Строка ресурса; для ненайденного ключа — его имя: машинное имя правила говорит больше пустой строки.</returns>
     public static string Of(RuleText text) => Manager.GetString(text.ToString(), Culture) ?? text.ToString();
 
     /// <summary>

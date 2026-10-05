@@ -87,9 +87,9 @@ public sealed class TransactionFormTests
         Assert.Equal("0", model.AmountHero);
         Assert.Equal(AmountTone.Placeholder, model.AmountTone);
 
-        model.PressKey("1");
-        model.PressKey("5");
-        model.PressKey("0");
+        model.PressKey('1');
+        model.PressKey('5');
+        model.PressKey('0');
 
         Assert.Equal("-150", model.AmountHero);
         Assert.Equal(AmountTone.Expense, model.AmountTone);
@@ -106,8 +106,8 @@ public sealed class TransactionFormTests
         Assert.Equal(AmountTone.Plain, model.AmountTone);
 
         // Без валюты дробная часть подчиняется тому же правилу: только после запятой
-        model.PressKey(",");
-        model.PressKey("5");
+        model.PressKey(',');
+        model.PressKey('5');
 
         Assert.Equal("150,50", model.AmountHero);
     }

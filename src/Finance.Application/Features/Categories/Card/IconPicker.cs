@@ -74,7 +74,6 @@ public sealed partial class IconPicker : ObservableObject
     /// Выбирает значок и закрывает сетку.
     /// </summary>
     /// <param name="icon">Ключ выбранного значка.</param>
-    [RelayCommand]
     public void Pick(string icon)
     {
         Selected = _catalog.Resolve(icon);

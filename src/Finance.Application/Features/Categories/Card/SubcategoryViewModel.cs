@@ -1,11 +1,9 @@
 using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain.Enums;
-using Finance.Domain.Errors;
 
 namespace Finance.Application.Features.Categories.Card;
 
@@ -14,7 +12,7 @@ namespace Finance.Application.Features.Categories.Card;
 /// Вид не показывается для выбора — он наследуется от группы, и переезд в группу
 /// другого вида запрещён.
 /// </summary>
-public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
+public sealed partial class SubcategoryViewModel : FormViewModel
 {
     private readonly ICategoriesQuery _categories;
     private readonly ISaveCategoryHandler _handler;
@@ -83,34 +81,6 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
     public partial CategoryGroupOption? Group { get; set; }
 
     /// <summary>
-    /// Текст нарушенного правила. Пусто — сохранять можно.
-    /// </summary>
-    [ObservableProperty]
-    public partial string? Error { get; private set; }
-
-    /// <summary>
-    /// Идёт сохранение или удаление. Кнопки зовут методы напрямую, минуя команду
-    /// с её защитой от повторного запуска: без флага второе нажатие до ухода
-    /// экрана завело бы вторую подкатегорию.
-    /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsIdle))]
-    [NotifyPropertyChangedFor(nameof(CanSave))]
-    public partial bool IsSaving { get; private set; }
-
-    /// <summary>
-    /// Предыдущее действие закончилось — можно начинать следующее. Отдельно
-    /// от <see cref="CanSave"/>: к нему привязана и кнопка удаления, а «можно
-    /// сохранить» о ней ничего не говорит.
-    /// </summary>
-    public bool IsIdle => !IsSaving;
-
-    /// <summary>
-    /// Сохранять можно: предыдущее действие не идёт.
-    /// </summary>
-    public bool CanSave => IsIdle;
-
-    /// <summary>
     /// Выбранная группа — номером в списке.
     /// </summary>
     public int GroupIndex
@@ -135,13 +105,8 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
     /// </summary>
     public bool CanDelete => Key is not null && !_isProtected;
 
-    /// <summary>
-    /// Правило нарушено — сообщение показывается рядом с формой.
-    /// </summary>
-    public bool HasError => !string.IsNullOrEmpty(Error);
-
     /// <inheritdoc />
-    public bool IsDirty => Snapshot() != _saved;
+    public override bool IsDirty => Snapshot() != _saved;
 
     /// <summary>
     /// Правимые поля формы одним значением. Кортеж сравнивается сам, по всем полям
@@ -158,10 +123,6 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
     /// <param name="key">Ключ подкатегории или <c>null</c> для новой.</param>
     /// <param name="group">Группа новой подкатегории. У существующей берётся её собственная.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
-    /// <remarks>
-    /// Без <c>[RelayCommand]</c>: двух параметров генератор команд не принимает,
-    /// а страница зовёт загрузку сама — привязывать её не к чему.
-    /// </remarks>
     public async Task LoadAsync(Guid? key, Guid? group, CancellationToken cancellationToken = default)
     {
         // ConfigureAwait(false) здесь недопустим: следом наполняется привязанная
@@ -209,7 +170,6 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <returns><c>true</c>, если подкатегория сохранена и экран можно закрыть.</returns>
-    [RelayCommand]
     public async Task<bool> SaveAsync(CancellationToken cancellationToken = default)
     {
         if (IsSaving)
@@ -217,52 +177,29 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
             return false;
         }
 
-        Error = null;
-        OnPropertyChanged(nameof(HasError));
-
         if (Group is not { } target)
         {
             Error = UiTexts.SubcategoryGroupNotChosen;
-            OnPropertyChanged(nameof(HasError));
 
             return false;
         }
 
-        IsSaving = true;
-        bool done = false;
+        return await WriteAsync(
+            async token =>
+            {
+                Key = await _handler.HandleAsync(
+                    new SaveCategoryCommand
+                    {
+                        Key = Key,
+                        ParentKey = target.Key,
+                        Name = Name,
+                        Icon = Icon.Selected
+                    },
+                    token);
 
-        try
-        {
-            Key = await _handler.HandleAsync(
-                new SaveCategoryCommand
-                {
-                    Key = Key,
-                    ParentKey = target.Key,
-                    Name = Name,
-                    Icon = Icon.Selected
-                },
-                cancellationToken);
-
-            Refresh();
-
-            done = true;
-
-            return true;
-        }
-        catch (DomainException error)
-        {
-            Error = error.Message;
-            OnPropertyChanged(nameof(HasError));
-
-            return false;
-        }
-        finally
-        {
-            // После удачи флаг остаётся: экран закрывается, и второе нажатие
-            // в этот промежуток записало бы то же самое ещё раз. При неудаче
-            // он снимается — нарушенное правило правят и сохраняют снова
-            IsSaving = done;
-        }
+                Refresh();
+            },
+            cancellationToken);
     }
 
     /// <summary>
@@ -300,42 +237,8 @@ public sealed partial class SubcategoryViewModel : ObservableObject, IFormModel
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <returns><c>true</c>, если подкатегория удалена и экран можно закрыть.</returns>
-    [RelayCommand]
-    public async Task<bool> DeleteAsync(CancellationToken cancellationToken = default)
-    {
-        if (Key is not { } key || IsSaving)
-        {
-            return false;
-        }
-
-        IsSaving = true;
-        bool done = false;
-        Error = null;
-        OnPropertyChanged(nameof(HasError));
-
-        try
-        {
-            await _delete.HandleAsync(key, cancellationToken);
-
-            done = true;
-
-            return true;
-        }
-        catch (DomainException error)
-        {
-            Error = error.Message;
-            OnPropertyChanged(nameof(HasError));
-
-            return false;
-        }
-        finally
-        {
-            // После удачи флаг остаётся: экран закрывается, и второе нажатие
-            // в этот промежуток записало бы то же самое ещё раз. При неудаче
-            // он снимается — нарушенное правило правят и сохраняют снова
-            IsSaving = done;
-        }
-    }
+    public async Task<bool> DeleteAsync(CancellationToken cancellationToken = default) =>
+        Key is { } key && await WriteAsync(token => _delete.HandleAsync(key, token), cancellationToken);
 
     /// <summary>
     /// Переносить можно только в группы того же вида и не в служебные.

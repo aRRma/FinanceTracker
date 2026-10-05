@@ -1,8 +1,6 @@
 using System.Text.RegularExpressions;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
-using Finance.Application.Infrastructure;
-using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Domain.Enums;
 using Microsoft.EntityFrameworkCore;

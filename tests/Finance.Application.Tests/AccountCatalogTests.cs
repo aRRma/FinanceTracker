@@ -1,4 +1,3 @@
-using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Accounts.Catalog;
 using Finance.Application.Infrastructure;
 using Finance.Application.Texts;

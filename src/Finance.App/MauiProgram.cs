@@ -2,7 +2,6 @@ using Finance.App.Controls;
 using Finance.App.Pages;
 using Finance.Application;
 using Finance.Application.Infrastructure.Settings;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.LifecycleEvents;

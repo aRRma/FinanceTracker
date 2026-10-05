@@ -2,10 +2,8 @@ using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Categories.Card;
 using Finance.Application.Features.Places.Card;
 using Finance.Application.Features.Transactions.Card;
-using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Domain.Entities;
 using Finance.Domain.Enums;
 
 namespace Finance.Application.Tests;
@@ -68,7 +66,7 @@ public sealed class UnsavedFormTests
         TransactionViewModel model = Transaction(given);
         await model.LoadAsync(key: null);
 
-        model.PressKey("5");
+        model.PressKey('5');
 
         Assert.True(model.IsDirty);
     }

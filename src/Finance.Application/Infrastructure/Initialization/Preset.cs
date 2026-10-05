@@ -1,4 +1,3 @@
-using Finance.Application.Infrastructure;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;

@@ -10,7 +10,7 @@ namespace Finance.App.Controls;
 public sealed partial class AmountKeypad : ContentView
 {
     /// <summary>
-    /// Команда нажатия клавиши. Знак клавиши приходит параметром.
+    /// Команда нажатия клавиши. Знак клавиши приходит параметром — одним <c>char</c>.
     /// </summary>
     public static readonly BindableProperty KeyCommandProperty =
         BindableProperty.Create(nameof(KeyCommand), typeof(ICommand), typeof(AmountKeypad));
@@ -70,11 +70,12 @@ public sealed partial class AmountKeypad : ContentView
 
     /// <summary>
     /// Знак клавиши берётся из её же подписи: второй список знаков в коде
-    /// разошёлся бы с разметкой при первой же перестановке клавиш.
+    /// разошёлся бы с разметкой при первой же перестановке клавиш. Уходит он
+    /// одним знаком, и моделям не приходится проверять длину строки.
     /// </summary>
     private void OnKey(object? sender, EventArgs e)
     {
-        if (sender is Button { Text: { Length: 1 } key } && KeyCommand is { } command && command.CanExecute(key))
+        if (sender is Button { Text: [char key] } && KeyCommand is { } command && command.CanExecute(key))
         {
             command.Execute(key);
         }

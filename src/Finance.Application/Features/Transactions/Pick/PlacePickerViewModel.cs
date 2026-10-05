@@ -2,7 +2,6 @@ using Finance.Application.Infrastructure;
 using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure.Queries;
 
 namespace Finance.Application.Features.Transactions.Pick;
@@ -108,7 +107,6 @@ public sealed partial class PlacePickerViewModel : ObservableObject
     /// Запоминает выбранное место.
     /// </summary>
     /// <param name="row">Выбранная строка.</param>
-    [RelayCommand]
     public void Pick(PlacePickerRow row)
     {
         ArgumentNullException.ThrowIfNull(row);
@@ -121,13 +119,11 @@ public sealed partial class PlacePickerViewModel : ObservableObject
     /// оно появится вместе с операцией, и брошенная форма не оставит пустышку
     /// в справочнике.
     /// </summary>
-    [RelayCommand]
     public void Create() => _picks.PlaceName = Filter.Trim();
 
     /// <summary>
     /// Снимает место с операции.
     /// </summary>
-    [RelayCommand]
     public void ClearPlace() => _picks.PlaceName = string.Empty;
 
     /// <summary>

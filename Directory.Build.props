@@ -18,11 +18,16 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
-  <!-- Публичные члены обязаны быть прокомментированы: без файла документации
-       CS1591 не выдаётся, и забытый комментарий проходит молча. Тестов и
-       страниц MAUI правило не касается — там публичность техническая. -->
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Finance.Domain' Or '$(MSBuildProjectName)' == 'Finance.Application' Or '$(MSBuildProjectName)' == 'Finance.Import'">
+  <!-- Файл документации нужен всем проектам: без него сборка не выдаёт ни CS1591,
+       ни лишних using (IDE0005 в .editorconfig), и оба проходят молча. -->
+  <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- Публичные члены без комментария роняют сборку только в библиотеках. Тестов
+       и страниц MAUI правило не касается — там публичность техническая. -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' != 'Finance.Domain' And '$(MSBuildProjectName)' != 'Finance.Application' And '$(MSBuildProjectName)' != 'Finance.Import'">
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
 </Project>

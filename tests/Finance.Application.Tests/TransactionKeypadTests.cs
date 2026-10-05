@@ -2,10 +2,8 @@ using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Deletion;
-using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Texts;
 using Finance.Domain.Enums;
-using Finance.Domain.Errors;
 using Finance.Domain.Values;
 using static Finance.Application.Tests.TypedAmount;
 
@@ -129,7 +127,7 @@ public sealed class TransactionKeypadTests
         model.ActivateTargetAmountCommand.Execute(null);
         Press(model, "10÷4");
         model.EvaluateCommand.Execute(null);
-        model.PressKeyCommand.Execute("5");
+        model.PressKeyCommand.Execute('5');
 
         Assert.Equal("2,55", model.TargetAmount);
         Assert.Equal(string.Empty, model.Amount);
@@ -151,8 +149,8 @@ public sealed class TransactionKeypadTests
 
         Assert.Equal(string.Empty, model.Amount);
 
-        model.PressKeyCommand.Execute("7");
-        model.PressKeyCommand.Execute("+");
+        model.PressKeyCommand.Execute('7');
+        model.PressKeyCommand.Execute('+');
         model.EvaluateCommand.Execute(null);
 
         Assert.Equal("7+", model.Amount);
@@ -177,11 +175,11 @@ public sealed class TransactionKeypadTests
         Assert.Equal(string.Empty, model.AmountDisplay);
         Assert.Equal(Whole(Money.Restore(0m, Currency.RUB).Display), model.AmountHero);
 
-        model.PressKeyCommand.Execute("0");
+        model.PressKeyCommand.Execute('0');
 
         Assert.False(model.CanSave);
 
-        model.PressKeyCommand.Execute("5");
+        model.PressKeyCommand.Execute('5');
 
         Assert.True(model.CanSave);
     }
@@ -202,8 +200,8 @@ public sealed class TransactionKeypadTests
         Assert.Equal(Whole(Money.Restore(0m, Currency.RUB).Display), model.AmountHero);
         Assert.Equal(AmountTone.Placeholder, model.AmountTone);
 
-        model.PressKeyCommand.Execute("1");
-        model.PressKeyCommand.Execute("2");
+        model.PressKeyCommand.Execute('1');
+        model.PressKeyCommand.Execute('2');
 
         Assert.Equal(Whole(Money.Restore(-12m, Currency.RUB).DisplaySigned), model.AmountHero);
         Assert.StartsWith("-", model.AmountHero, StringComparison.Ordinal);
@@ -234,12 +232,12 @@ public sealed class TransactionKeypadTests
         TransactionViewModel model = Model(fixture);
         await model.LoadAsync(key: null);
 
-        model.PressKeyCommand.Execute("7");
+        model.PressKeyCommand.Execute('7');
 
         Assert.False(model.HasAmountOperation);
 
-        model.PressKeyCommand.Execute("+");
-        model.PressKeyCommand.Execute("5");
+        model.PressKeyCommand.Execute('+');
+        model.PressKeyCommand.Execute('5');
 
         Assert.True(model.HasAmountOperation);
         Assert.Equal(UiTexts.TransactionPressEquals, model.AmountHero);
@@ -304,7 +302,7 @@ public sealed class TransactionKeypadTests
         model.ActivateTargetAmountCommand.Execute(null);
 
         model.Kind = TransactionKind.Expense;
-        model.PressKeyCommand.Execute("5");
+        model.PressKeyCommand.Execute('5');
 
         Assert.True(model.IsSourceAmountActive);
         Assert.Equal("1005", model.Amount);
@@ -322,8 +320,8 @@ public sealed class TransactionKeypadTests
         TransactionViewModel model = Model(fixture);
         await model.LoadAsync(key: null);
 
-        model.PressKeyCommand.Execute("1");
-        model.PressKeyCommand.Execute("2");
+        model.PressKeyCommand.Execute('1');
+        model.PressKeyCommand.Execute('2');
         model.BackspaceCommand.Execute(null);
 
         Assert.Equal("1", model.Amount);
@@ -363,7 +361,7 @@ public sealed class TransactionKeypadTests
         TransactionViewModel model = Model(fixture, save);
         await model.LoadAsync(key: null);
         model.Category = model.Categories[0];
-        model.PressKeyCommand.Execute("5");
+        model.PressKeyCommand.Execute('5');
 
         Task<bool> first = model.SaveAsync();
         Task<bool> second = model.SaveAsync();
@@ -373,6 +371,32 @@ public sealed class TransactionKeypadTests
         Assert.True(await first);
         Assert.False(await second);
         Assert.Single((await fixture.FeedAsync(card)).Items);
+    }
+
+    /// <summary>
+    /// Нажатие во время записи — не новая попытка: проверки формы на нём не идут,
+    /// и карточка нарушенного правила не появляется, пока первая запись не кончилась.
+    /// </summary>
+    [Fact]
+    public async Task Нажатие_во_время_записи_не_проверяет_форму()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        await fixture.AccountAsync("Карта");
+
+        DelayingSave save = new(fixture.Database.Resolve<ISaveTransactionHandler>());
+        TransactionViewModel model = Model(fixture, save);
+        await model.LoadAsync(key: null);
+        model.Category = model.Categories[0];
+        model.PressKeyCommand.Execute('5');
+
+        Task<bool> first = model.SaveAsync();
+        model.BackspaceCommand.Execute(null);
+
+        Assert.False(await model.SaveAsync());
+        Assert.Null(model.Error);
+
+        save.Delay.SetResult();
+        Assert.True(await first);
     }
 
     /// <summary>
@@ -412,7 +436,7 @@ public sealed class TransactionKeypadTests
     {
         foreach (char key in keys)
         {
-            model.PressKeyCommand.Execute(key.ToString());
+            model.PressKeyCommand.Execute(key);
         }
     }
 

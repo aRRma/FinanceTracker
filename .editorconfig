@@ -1,0 +1,6 @@
+root = true
+
+[*.cs]
+# Лишний using роняет сборку: без этого он копится молча, а подсветка редактора
+# врёт из-за классов, собранных из .resx (навык build)
+dotnet_diagnostic.IDE0005.severity = warning

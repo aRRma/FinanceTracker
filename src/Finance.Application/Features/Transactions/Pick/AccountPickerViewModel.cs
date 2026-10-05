@@ -1,7 +1,6 @@
 using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain.Enums;
@@ -95,7 +94,6 @@ public sealed partial class AccountPickerViewModel : ObservableObject
     /// Запоминает выбор: форма заберёт его, когда вернётся на экран.
     /// </summary>
     /// <param name="row">Выбранная строка.</param>
-    [RelayCommand]
     public void Pick(AccountPickerRow row)
     {
         ArgumentNullException.ThrowIfNull(row);

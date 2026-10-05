@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 
@@ -93,7 +92,6 @@ public sealed partial class AccountsViewModel : ScreenViewModel
     /// виде, в каком он на экране: пользователь видит именно его.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public Task ReorderAsync(CancellationToken cancellationToken = default)
     {
         Guid[] keys =

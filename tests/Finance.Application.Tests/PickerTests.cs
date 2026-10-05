@@ -31,7 +31,7 @@ public sealed class PickerTests
         await form.LoadAsync(key: null);
 
         form.SourceAccount = form.Accounts.First(account => account.Key == rubles);
-        form.PressKey("1");
+        form.PressKey('1');
 
         AccountPickerViewModel picker = AccountPicker(given);
         await picker.LoadAsync(TransactionKind.Expense, selected: rubles, excluded: null, forTarget: false);
@@ -178,7 +178,7 @@ public sealed class PickerTests
 
         TransactionViewModel form = Form(given);
         await form.LoadAsync(key: null);
-        form.PressKey("7");
+        form.PressKey('7');
 
         form.AwaitNewAccount(target: false);
         await form.TakeNewAccountAsync();

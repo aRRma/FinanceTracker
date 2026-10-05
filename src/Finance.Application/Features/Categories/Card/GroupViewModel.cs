@@ -1,12 +1,10 @@
 using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Features.Categories.Catalog;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain.Enums;
-using Finance.Domain.Errors;
 
 namespace Finance.Application.Features.Categories.Card;
 
@@ -15,7 +13,7 @@ namespace Finance.Application.Features.Categories.Card;
 /// заведении и дальше заперт — его наследуют все подкатегории, и смена вида
 /// перевернула бы знак у всей их истории.
 /// </summary>
-public sealed partial class GroupViewModel : ObservableObject, IFormModel
+public sealed partial class GroupViewModel : FormViewModel
 {
     private readonly ICategoriesQuery _categories;
     private readonly ISaveCategoryHandler _handler;
@@ -82,26 +80,6 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     public partial bool IsService { get; private set; }
 
     /// <summary>
-    /// Текст нарушенного правила. Пусто — сохранять можно.
-    /// </summary>
-    [ObservableProperty]
-    public partial string? Error { get; private set; }
-
-    /// <summary>
-    /// Идёт сохранение. Кнопка зовёт метод напрямую, минуя команду с её защитой
-    /// от повторного запуска: без флага второе нажатие до ухода экрана
-    /// завело бы вторую группу.
-    /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanSave))]
-    public partial bool IsSaving { get; private set; }
-
-    /// <summary>
-    /// Сохранять можно: предыдущее сохранение не идёт.
-    /// </summary>
-    public bool CanSave => !IsSaving;
-
-    /// <summary>
     /// Вид уже заперт: группа существует, и её подкатегории им пользуются.
     /// </summary>
     public bool KindLocked => Key is not null;
@@ -164,13 +142,8 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     /// </summary>
     public bool CanAddSubcategory => Key is not null && !IsService;
 
-    /// <summary>
-    /// Правило нарушено — сообщение показывается рядом с формой.
-    /// </summary>
-    public bool HasError => !string.IsNullOrEmpty(Error);
-
     /// <inheritdoc />
-    public bool IsDirty => Snapshot() != _saved;
+    public override bool IsDirty => Snapshot() != _saved;
 
     /// <summary>
     /// Правимые поля формы одним значением. Кортеж сравнивается сам, по всем полям
@@ -185,7 +158,6 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     /// </summary>
     /// <param name="key">Ключ группы или <c>null</c> для новой.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task LoadAsync(Guid? key, CancellationToken cancellationToken = default)
     {
         if (key is not { } existing)
@@ -226,62 +198,32 @@ public sealed partial class GroupViewModel : ObservableObject, IFormModel
     }
 
     /// <summary>
-    /// Сохраняет группу. Нарушенное доменное правило показывается текстом рядом
-    /// с формой: это ввод пользователя, а не сбой, и падать приложению не за что.
+    /// Сохраняет группу.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <returns><c>true</c>, если группа сохранена и экран можно закрыть.</returns>
-    [RelayCommand]
-    public async Task<bool> SaveAsync(CancellationToken cancellationToken = default)
-    {
-        if (IsSaving)
-        {
-            return false;
-        }
+    public Task<bool> SaveAsync(CancellationToken cancellationToken = default) =>
+        WriteAsync(
+            async token =>
+            {
+                Key = await _handler.HandleAsync(
+                    new SaveCategoryCommand
+                    {
+                        Key = Key,
+                        ParentKey = null,
+                        Name = Name,
+                        Icon = Icon.Selected,
 
-        IsSaving = true;
-        bool done = false;
-        Error = null;
-        OnPropertyChanged(nameof(HasError));
+                        // Вид и универсальность читаются только при заведении:
+                        // у существующей группы обработчик их не меняет
+                        Kind = Kind,
+                        AcceptsAnyKind = AcceptsAnyKind
+                    },
+                    token);
 
-        try
-        {
-            Key = await _handler.HandleAsync(
-                new SaveCategoryCommand
-                {
-                    Key = Key,
-                    ParentKey = null,
-                    Name = Name,
-                    Icon = Icon.Selected,
-
-                    // Вид и универсальность читаются только при заведении:
-                    // у существующей группы обработчик их не меняет
-                    Kind = Kind,
-                    AcceptsAnyKind = AcceptsAnyKind
-                },
-                cancellationToken);
-
-            Refresh();
-
-            done = true;
-
-            return true;
-        }
-        catch (DomainException error)
-        {
-            Error = error.Message;
-            OnPropertyChanged(nameof(HasError));
-
-            return false;
-        }
-        finally
-        {
-            // После удачи флаг остаётся: экран закрывается, и второе нажатие
-            // в этот промежуток записало бы то же самое ещё раз. При неудаче
-            // он снимается — нарушенное правило правят и сохраняют снова
-            IsSaving = done;
-        }
-    }
+                Refresh();
+            },
+            cancellationToken);
 
     partial void OnKindChanged(CategoryKind value)
     {

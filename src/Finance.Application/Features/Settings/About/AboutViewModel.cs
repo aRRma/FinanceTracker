@@ -1,6 +1,5 @@
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure.Queries;
 
 namespace Finance.Application.Features.Settings.About;
@@ -44,7 +43,6 @@ public sealed partial class AboutViewModel : ObservableObject
     /// Читает сведения о программе.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
         // ConfigureAwait(false) здесь недопустим: следом меняются привязанные

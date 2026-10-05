@@ -1,11 +1,6 @@
-using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Balances;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Application.Infrastructure.Storage;
-using Finance.Domain.Entities;
-using Finance.Domain.Enums;
-using Finance.Domain.Values;
 using static Finance.Application.Tests.AccountSetup;
 
 namespace Finance.Application.Tests;

@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain.Enums;
@@ -104,7 +103,6 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
     /// целиком, без плавного появления строк.
     /// </remarks>
     /// <param name="line">Строка-шапка группы.</param>
-    [RelayCommand]
     public void Toggle(CategoryLine line)
     {
         ArgumentNullException.ThrowIfNull(line);

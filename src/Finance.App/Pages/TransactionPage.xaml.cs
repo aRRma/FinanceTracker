@@ -1,7 +1,6 @@
 using Finance.Application.Texts;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Infrastructure;
-using Finance.Domain.Entities;
 using Finance.Domain.Enums;
 
 namespace Finance.App.Pages;

@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Features.Accounts.Badge;
 using Finance.Application.Infrastructure;
 using Finance.Domain.Enums;
-using Finance.Domain.Errors;
 using Finance.Domain.Values;
 
 namespace Finance.Application.Features.Accounts.Card;
@@ -15,7 +14,7 @@ namespace Finance.Application.Features.Accounts.Card;
 /// счёт с операциями не удаляется, — потому что узнать о них при сохранении поздно.
 /// Остаток набирается клавиатурой суммы, как сумма операции, а долг — минусом первым.
 /// </summary>
-public sealed partial class AccountViewModel : ObservableObject, IFormModel
+public sealed partial class AccountViewModel : FormViewModel
 {
     private readonly IAccountCardQuery _query;
     private readonly ISaveAccountHandler _handler;
@@ -204,11 +203,6 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
         : null;
 
     /// <summary>
-    /// Правило нарушено — сообщение показывается рядом с формой.
-    /// </summary>
-    public bool HasError => !string.IsNullOrEmpty(Error);
-
-    /// <summary>
     /// Начальный остаток, как он набран на клавиатуре суммы. Пусто — ноль: поле
     /// показывает его суммой с валютой, а минус с пустого поля начинает долг.
     /// </summary>
@@ -289,28 +283,8 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     [ObservableProperty]
     public partial DateOnly? EarliestTransactionOn { get; private set; }
 
-    /// <summary>
-    /// Текст нарушенного правила. Пусто — сохранять можно.
-    /// </summary>
-    [ObservableProperty]
-    public partial string? Error { get; private set; }
-
-    /// <summary>
-    /// Идёт сохранение. Кнопка зовёт метод напрямую, минуя команду с её защитой
-    /// от повторного запуска: без флага второе нажатие до ухода экрана
-    /// завело бы второй счёт.
-    /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanSave))]
-    public partial bool IsSaving { get; private set; }
-
-    /// <summary>
-    /// Сохранять можно: предыдущее сохранение не идёт.
-    /// </summary>
-    public bool CanSave => !IsSaving;
-
     /// <inheritdoc />
-    public bool IsDirty => Snapshot() != _saved;
+    public override bool IsDirty => Snapshot() != _saved;
 
     /// <summary>
     /// Правимые поля формы одним значением. Кортеж сравнивается сам, по всем
@@ -362,7 +336,6 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// </summary>
     /// <param name="key">Ключ счёта или <c>null</c> для нового.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task LoadAsync(Guid? key, CancellationToken cancellationToken = default)
     {
         // ConfigureAwait(false) здесь недопустим: следом меняются привязанные
@@ -414,12 +387,10 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     }
 
     /// <summary>
-    /// Сохраняет счёт. Нарушенное доменное правило показывается текстом рядом
-    /// с формой: это ввод пользователя, а не сбой, и падать приложению не за что.
+    /// Сохраняет счёт.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <returns><c>true</c>, если счёт сохранён и экран можно закрыть.</returns>
-    [RelayCommand]
     public async Task<bool> SaveAsync(CancellationToken cancellationToken = default)
     {
         if (IsSaving)
@@ -427,57 +398,30 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
             return false;
         }
 
-        Error = null;
-        OnPropertyChanged(nameof(HasError));
-
         if (OpeningValue is not { } openingBalance)
         {
             Error = UiTexts.AccountOpeningIncomplete;
-            OnPropertyChanged(nameof(HasError));
 
             return false;
         }
 
-        IsSaving = true;
-        bool done = false;
-
-        try
-        {
-            await _handler
-                .HandleAsync(
-                    new SaveAccountCommand
-                    {
-                        Key = Key,
-                        Name = Name,
-                        Type = Type,
-                        Color = Color,
-                        Icon = Icon,
-                        Currency = Currency,
-                        OpeningBalance = openingBalance,
-                        OpenedOn = OpenedOn,
-                        ExcludedFromTotals = ExcludedFromTotals,
-                        IsClosed = IsClosed
-                    },
-                    cancellationToken);
-
-            done = true;
-
-            return true;
-        }
-        catch (DomainException error)
-        {
-            Error = error.Message;
-            OnPropertyChanged(nameof(HasError));
-
-            return false;
-        }
-        finally
-        {
-            // После удачи флаг остаётся: экран закрывается, и второе нажатие
-            // в этот промежуток записало бы то же самое ещё раз. При неудаче
-            // он снимается — нарушенное правило правят и сохраняют снова
-            IsSaving = done;
-        }
+        return await WriteAsync(
+            token => _handler.HandleAsync(
+                new SaveAccountCommand
+                {
+                    Key = Key,
+                    Name = Name,
+                    Type = Type,
+                    Color = Color,
+                    Icon = Icon,
+                    Currency = Currency,
+                    OpeningBalance = openingBalance,
+                    OpenedOn = OpenedOn,
+                    ExcludedFromTotals = ExcludedFromTotals,
+                    IsClosed = IsClosed
+                },
+                token),
+            cancellationToken);
     }
 
     /// <summary>
@@ -486,61 +430,17 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     /// <returns><c>true</c>, если счёт удалён и экран можно закрыть.</returns>
-    [RelayCommand]
-    public async Task<bool> DeleteAsync(CancellationToken cancellationToken = default)
-    {
-        if (Key is not { } key || IsSaving)
-        {
-            return false;
-        }
-
-        Error = null;
-        OnPropertyChanged(nameof(HasError));
-
-        IsSaving = true;
-        bool done = false;
-
-        try
-        {
-            await _delete.HandleAsync(key, cancellationToken);
-
-            done = true;
-
-            return true;
-        }
-        catch (DomainException error)
-        {
-            Error = error.Message;
-            OnPropertyChanged(nameof(HasError));
-
-            return false;
-        }
-        finally
-        {
-            // Как при сохранении: после удачи экран закрывается, и флаг держит
-            // второе нажатие; после отказа снимается
-            IsSaving = done;
-        }
-    }
+    public async Task<bool> DeleteAsync(CancellationToken cancellationToken = default) =>
+        Key is { } key && await WriteAsync(token => _delete.HandleAsync(key, token), cancellationToken);
 
     /// <summary>
     /// Нажата клавиша суммы: цифра, запятая или знак действия. Минус первой
     /// клавишей начинает отрицательный остаток — долг.
     /// </summary>
     /// <param name="key">Знак на клавише.</param>
-    /// <exception cref="ArgumentException">Клавиша названа не одним знаком.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Клавиши с таким знаком на клавиатуре нет.</exception>
     [RelayCommand]
-    public void PressKey(string key)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(key);
-
-        if (key.Length is not 1)
-        {
-            throw new ArgumentException(Faults.KeypadKeyIsOneSign(), nameof(key));
-        }
-
-        OpeningBalance = AmountInput.Append(OpeningBalance, key[0], signed: true);
-    }
+    public void PressKey(char key) => OpeningBalance = AmountInput.Append(OpeningBalance, key, signed: true);
 
     /// <summary>
     /// Стирает последний набранный знак остатка.
@@ -557,7 +457,6 @@ public sealed partial class AccountViewModel : ObservableObject, IFormModel
     /// <summary>
     /// Показывает клавиатуру суммы — касание остатка.
     /// </summary>
-    [RelayCommand]
     public void ShowKeys() => AreKeysVisible = true;
 
     /// <summary>

@@ -1,4 +1,3 @@
-using Finance.Domain.Entities;
 using Finance.Domain.Enums;
 using Finance.Domain.Values;
 

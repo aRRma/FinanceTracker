@@ -1,4 +1,3 @@
-using Finance.Application.Infrastructure;
 using System.Globalization;
 using Finance.Application.Infrastructure.Settings;
 using Finance.Application.Infrastructure.Storage;

@@ -21,9 +21,6 @@ public static class IconNames
     /// Название значка.
     /// </summary>
     /// <param name="key">Ключ значка из набора.</param>
-    /// <returns>
-    /// Название; для ключа без названия — сам ключ: латиница вслух хуже слова,
-    /// но лучше молчания.
-    /// </returns>
+    /// <returns>Название; для ключа без названия — сам ключ: латиница вслух хуже слова, но лучше молчания.</returns>
     public static string Of(string key) => Manager.GetString(key, UiCulture.Current) ?? key;
 }

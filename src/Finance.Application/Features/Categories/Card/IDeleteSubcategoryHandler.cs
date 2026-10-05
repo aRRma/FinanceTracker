@@ -14,10 +14,10 @@ public interface IDeleteSubcategoryHandler
     /// </summary>
     /// <param name="key">Ключ удаляемой подкатегории.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
-    /// <exception cref="DomainException">
-    /// Удаляют приёмник или служебную категорию (<see cref="Invariant.ProtectedCategoryStays"/>),
-    /// группу (<see cref="Invariant.GroupNotDeleted"/>) или подкатегорию группы
-    /// без приёмника (<see cref="Invariant.GroupHasReceiver"/>).
-    /// </exception>
+    /// <exception cref="DomainException">Категория защищена от удаления — какими правилами, сказано ниже.</exception>
+    /// <remarks>
+    /// Удаляют приёмник или служебную категорию (<see cref="Invariant.ProtectedCategoryStays"/>), группу
+    /// (<see cref="Invariant.GroupNotDeleted"/>) или подкатегорию группы без приёмника (<see cref="Invariant.GroupHasReceiver"/>).
+    /// </remarks>
     Task HandleAsync(Guid key, CancellationToken cancellationToken = default);
 }

@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 
@@ -71,7 +70,6 @@ public sealed partial class TimeZoneViewModel : ScreenViewModel
     /// Перечитывает список зон и текущий выбор.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
         // ConfigureAwait(false) здесь недопустим: следом наполняется привязанная
@@ -102,7 +100,6 @@ public sealed partial class TimeZoneViewModel : ScreenViewModel
     /// </summary>
     /// <param name="option">Строка списка. У «Как в системе» идентификатора нет.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
-    [RelayCommand]
     public async Task SelectAsync(TimeZoneOption option, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(option);

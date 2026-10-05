@@ -1,7 +1,6 @@
 using Finance.Application.Texts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain.Enums;
@@ -197,7 +196,6 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
     /// целиком, без плавного появления строк.
     /// </remarks>
     /// <param name="line">Строка-шапка группы.</param>
-    [RelayCommand]
     public void Toggle(CategoryPickerLine line)
     {
         ArgumentNullException.ThrowIfNull(line);
@@ -247,7 +245,6 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
     /// Запоминает выбор: форма заберёт его, когда вернётся на экран.
     /// </summary>
     /// <param name="line">Выбранная подкатегория или группа из одной подкатегории.</param>
-    [RelayCommand]
     public void Pick(CategoryPickerLine line)
     {
         ArgumentNullException.ThrowIfNull(line);

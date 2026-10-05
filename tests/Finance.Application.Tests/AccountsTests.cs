@@ -2,13 +2,11 @@ using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Accounts.Catalog;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
-using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Texts;
 using Finance.Domain.Entities;
 using Finance.Domain.Enums;
 using Finance.Domain.Errors;
 using Finance.Domain.Values;
-using Microsoft.EntityFrameworkCore;
 using static Finance.Application.Tests.AccountSetup;
 
 namespace Finance.Application.Tests;
