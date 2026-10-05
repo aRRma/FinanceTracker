@@ -41,4 +41,12 @@ public static class Keys
 
         return new Guid(result, bigEndian: true);
     }
+
+    /// <summary>
+    /// Выведен ли ключ из текстового ключа, как у стартового набора и строк, которые
+    /// заводят миграции. Так заведённое пользователем отличается от поставленного
+    /// приложением без отдельного признака в базе.
+    /// </summary>
+    /// <param name="key">Ключ сущности.</param>
+    public static bool IsDerived(Guid key) => key.Version == 5;
 }

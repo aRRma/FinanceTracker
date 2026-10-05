@@ -1,5 +1,7 @@
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
+using Finance.Domain.Enums;
+using Finance.Domain.Values;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -196,10 +198,22 @@ public sealed class RecoveryHandler : IRecoveryHandler
     {
         await using FinanceDbContext context = await _contexts.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
 
+        // «Прочее», которое приложение само заводит в новой группе, не в счёт:
+        // пользователь его не заводил и в числе не узнал бы. Версию ключа база
+        // не прочтёт, поэтому ключи сверяются здесь — их сотни, а не тысячи
+        List<Guid> categories = await context.Categories
+            .AsNoTracking()
+            .Where(static row => row.Role == CategoryRole.Normal)
+            .Select(static row => row.Key)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
         return new RecoverySide
         {
             Accounts = await context.Accounts.CountAsync(cancellationToken).ConfigureAwait(false),
-            Transactions = await context.Transactions.CountAsync(cancellationToken).ConfigureAwait(false)
+            Transactions = await context.Transactions.CountAsync(cancellationToken).ConfigureAwait(false),
+            Categories = categories.Count(static key => !Keys.IsDerived(key)),
+            Places = await context.Places.CountAsync(cancellationToken).ConfigureAwait(false)
         };
     }
 

@@ -17,8 +17,21 @@ public sealed record RecoverySide
     public required int Transactions { get; init; }
 
     /// <summary>
-    /// Есть ли что терять: счёт или операция. Стартовые категории не в счёт —
-    /// они есть в любой базе с первого запуска.
+    /// Сколько категорий завёл пользователь — групп и подкатегорий, без удалённых.
     /// </summary>
-    public bool HasData => Accounts > 0 || Transactions > 0;
+    /// <remarks>
+    /// Стартовые не в счёт: они есть в любой базе с первого запуска и вернутся с файлом.
+    /// «Прочее», заведённое приложением вместе с группой, — тоже.
+    /// </remarks>
+    public required int Categories { get; init; }
+
+    /// <summary>
+    /// Сколько мест, без удалённых.
+    /// </summary>
+    public required int Places { get; init; }
+
+    /// <summary>
+    /// Есть ли что терять: хоть что-то, заведённое пользователем.
+    /// </summary>
+    public bool HasData => Accounts > 0 || Transactions > 0 || Categories > 0 || Places > 0;
 }

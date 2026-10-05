@@ -339,7 +339,7 @@ public sealed class WalletImportTests
 
         // Вердикт — до записи: отвергнутый файл иначе назвал бы себя лишь отказом записи
         Assert.Equal(RecoveryVerdict.Ready, check.Verdict);
-        Assert.Equal(new RecoverySide { Accounts = 0, Transactions = 0 }, check.Current);
+        Assert.Equal(new RecoverySide { Accounts = 0, Transactions = 0, Categories = 0, Places = 0 }, check.Current);
 
         await recovery.RecoverAsync();
 

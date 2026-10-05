@@ -24,6 +24,14 @@ public sealed class KeysTests
     }
 
     [Fact]
+    public void Выведенный_ключ_отличается_от_нового()
+    {
+        Assert.True(Keys.IsDerived(Keys.Derive(DnsNamespace, "food.groceries")));
+        Assert.False(Keys.IsDerived(Keys.New()));
+        Assert.False(Keys.IsDerived(Guid.NewGuid()));
+    }
+
+    [Fact]
     public void Новые_ключи_не_повторяются()
     {
         Guid[] keys = Enumerable.Range(0, 1000).Select(_ => Keys.New()).ToArray();

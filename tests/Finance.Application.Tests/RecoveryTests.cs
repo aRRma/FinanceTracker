@@ -3,6 +3,7 @@ using Finance.Application.Features.Export;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Texts;
+using Finance.Domain.Enums;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using static Finance.Application.Tests.AccountSetup;
@@ -35,7 +36,7 @@ public sealed class RecoveryTests
         await recovery.RecoverAsync();
 
         Assert.Equal(RecoveryVerdict.Ready, check.Verdict);
-        Assert.Equal(new RecoverySide { Accounts = 1, Transactions = 3 }, check.Current);
+        Assert.Equal(new RecoverySide { Accounts = 1, Transactions = 3, Categories = 0, Places = 0 }, check.Current);
         Assert.Equal(await DumpAsync(source.Location.ConnectionString), await DumpAsync(target.Location.ConnectionString));
         Assert.False(Directory.Exists(RecoveryFolder(target)), "Принятый файл остался в кэше.");
     }
@@ -153,25 +154,78 @@ public sealed class RecoveryTests
         bool ready = await model.CheckAsync(stream);
 
         Assert.True(ready);
-        Assert.Equal("1 счёт", model.AccountsToDelete);
-        Assert.Equal("2 операции", model.TransactionsToDelete);
+        Assert.Equal(["1 счёт", "2 операции"], model.ToDelete.Select(static line => line.Text));
+        Assert.Equal([false, true], model.ToDelete.Select(static line => line.HasDivider));
         Assert.True(model.ReplacesData);
     }
 
     [Fact]
     public async Task Счёт_без_операций_тоже_требует_предупреждения()
     {
-        await using TestDatabase source = await TestDatabase.CreateWithPresetAsync();
-        string file = await source.Resolve<IExportHandler>().HandleAsync();
         await using TestDatabase target = await TestDatabase.CreateWithPresetAsync();
         await SaveAsync(target, Command("Карта"));
-        ExportViewModel model = target.Resolve<ExportViewModel>();
 
-        await using FileStream stream = File.OpenRead(file);
-        await model.CheckAsync(stream);
+        ExportViewModel model = await CheckEmptyExportAsync(target);
 
         Assert.True(model.ReplacesData);
-        Assert.Equal("0 операций", model.TransactionsToDelete);
+        Assert.Equal(["1 счёт"], model.ToDelete.Select(static line => line.Text));
+    }
+
+    /// <summary>
+    /// Свои категории без единого счёта — тоже данные: без предупреждения
+    /// замена стёрла бы их молча. Стартовые при этом не в счёт.
+    /// </summary>
+    [Fact]
+    public async Task Свои_категории_требуют_предупреждения()
+    {
+        await using TestDatabase target = await TestDatabase.CreateWithPresetAsync();
+        Guid hobby = await CategorySetup.SaveAsync(target, CategorySetup.Group("Хобби", CategoryKind.Expense));
+        await CategorySetup.SaveAsync(target, CategorySetup.Subcategory(hobby, "Краски"));
+
+        ExportViewModel model = await CheckEmptyExportAsync(target);
+
+        Assert.True(model.ReplacesData);
+        RecoveryLine line = Assert.Single(model.ToDelete);
+        Assert.Equal("2 свои категории", line.Text);
+        Assert.False(line.HasDivider);
+    }
+
+    /// <summary>
+    /// Место остаётся и после удаления всех операций с ним — и тоже требует предупреждения.
+    /// </summary>
+    [Fact]
+    public async Task Место_без_счетов_и_операций_требует_предупреждения()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        Guid account = await fixture.AccountAsync("Карта", 1000m);
+        await fixture.SaveAsync(fixture.Expense(account, 100m, place: "Пятёрочка"));
+        await fixture.Database.ExecuteAsync(
+            "UPDATE transactions SET deleted_at_utc = updated_at_utc;" +
+            "UPDATE accounts SET deleted_at_utc = updated_at_utc");
+
+        ExportViewModel model = await CheckEmptyExportAsync(fixture.Database);
+
+        Assert.True(model.ReplacesData);
+        Assert.Equal(["1 место"], model.ToDelete.Select(static line => line.Text));
+    }
+
+    [Fact]
+    public async Task Удалённые_категории_и_места_не_в_счёт()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        Guid account = await fixture.AccountAsync("Карта", 1000m);
+        await fixture.SaveAsync(fixture.Expense(account, 100m, place: "Пятёрочка"));
+        await CategorySetup.SaveAsync(fixture.Database, CategorySetup.Group("Хобби", CategoryKind.Expense));
+        await fixture.Database.ExecuteAsync(
+            "UPDATE transactions SET deleted_at_utc = updated_at_utc;" +
+            "UPDATE accounts SET deleted_at_utc = updated_at_utc;" +
+            "UPDATE places SET deleted_at_utc = updated_at_utc;" +
+            "UPDATE categories SET deleted_at_utc = updated_at_utc WHERE name = 'Хобби'");
+
+        ExportViewModel model = await CheckEmptyExportAsync(fixture.Database);
+
+        Assert.False(model.ReplacesData);
+        Assert.Empty(model.ToDelete);
     }
 
     [Fact]
@@ -254,7 +308,7 @@ public sealed class RecoveryTests
 
         Assert.False(ready);
         Assert.Equal(UiTexts.RecoveryNotExport, model.RefusalText);
-        Assert.Empty(model.AccountsToDelete);
+        Assert.Empty(model.ToDelete);
     }
 
     [Fact]
@@ -297,7 +351,7 @@ public sealed class RecoveryTests
 
         await Assert.ThrowsAsync<IOException>(() => model.CheckAsync(new BrokenStream()));
 
-        Assert.Empty(model.AccountsToDelete);
+        Assert.Empty(model.ToDelete);
         Assert.Empty(model.RefusalText);
     }
 
@@ -307,6 +361,22 @@ public sealed class RecoveryTests
         await using TestDatabase target = await TestDatabase.CreateWithPresetAsync();
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => target.Resolve<IRecoveryHandler>().RecoverAsync());
+    }
+
+    /// <summary>
+    /// Проверяет на рабочей базе выгрузку пустой базы: само содержимое файла
+    /// предупреждению безразлично, оно описывает то, что будет удалено.
+    /// </summary>
+    private static async Task<ExportViewModel> CheckEmptyExportAsync(TestDatabase target)
+    {
+        await using TestDatabase source = await TestDatabase.CreateWithPresetAsync();
+        string file = await source.Resolve<IExportHandler>().HandleAsync();
+        ExportViewModel model = target.Resolve<ExportViewModel>();
+
+        await using FileStream stream = File.OpenRead(file);
+        Assert.True(await model.CheckAsync(stream));
+
+        return model;
     }
 
     private static async Task<RecoveryCheck> CheckAsync(IRecoveryHandler recovery, string file)

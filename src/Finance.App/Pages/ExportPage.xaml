@@ -107,18 +107,18 @@
                         <!-- Что именно пропадёт — счётом, а не словами «все данные»:
                              по числам видно, есть ли что терять -->
                         <Border Style="{StaticResource Card}" Margin="0,4">
-                            <VerticalStackLayout>
-                                <Grid Padding="14,12" ColumnDefinitions="Auto,*">
-                                    <controls:Icon Grid.Column="0" Margin="0,0,12,0" Key="wallet" />
-                                    <Label Grid.Column="1" AutomationId="AccountsToDelete" Text="{Binding AccountsToDelete}"
-                                           VerticalOptions="Center" />
-                                </Grid>
-                                <BoxView Style="{StaticResource Divider}" />
-                                <Grid Padding="14,12" ColumnDefinitions="Auto,*">
-                                    <controls:Icon Grid.Column="0" Margin="0,0,12,0" Key="receipt" />
-                                    <Label Grid.Column="1" AutomationId="TransactionsToDelete" Text="{Binding TransactionsToDelete}"
-                                           VerticalOptions="Center" />
-                                </Grid>
+                            <VerticalStackLayout AutomationId="ToDelete" BindableLayout.ItemsSource="{Binding ToDelete}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="export:RecoveryLine">
+                                        <VerticalStackLayout>
+                                            <BoxView Style="{StaticResource Divider}" IsVisible="{Binding HasDivider}" />
+                                            <Grid Padding="14,12" ColumnDefinitions="Auto,*">
+                                                <controls:Icon Grid.Column="0" Margin="0,0,12,0" Key="{Binding Icon}" />
+                                                <Label Grid.Column="1" Text="{Binding Text}" VerticalOptions="Center" />
+                                            </Grid>
+                                        </VerticalStackLayout>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
                             </VerticalStackLayout>
                         </Border>
 

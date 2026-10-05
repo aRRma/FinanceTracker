@@ -88,16 +88,11 @@ public sealed partial class ExportViewModel : ObservableObject
     public string RefusalText { get; private set; } = string.Empty;
 
     /// <summary>
-    /// Сколько счетов удалит замена: «2 счёта». Пусто, пока файл не проверен.
+    /// Что удалит замена, по строке на счета, операции, свои категории и места.
+    /// Строки с нулём нет: «0 мест» — шум. Пусто, пока файл не проверен.
     /// </summary>
     [ObservableProperty]
-    public partial string AccountsToDelete { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// Сколько операций удалит замена: «6 операций». Пусто, пока файл не проверен.
-    /// </summary>
-    [ObservableProperty]
-    public partial string TransactionsToDelete { get; private set; } = string.Empty;
+    public partial IReadOnlyList<RecoveryLine> ToDelete { get; private set; } = [];
 
     /// <summary>
     /// Записывает выгрузку.
@@ -133,10 +128,7 @@ public sealed partial class ExportViewModel : ObservableObject
         if (check.Current is { } current)
         {
             ReplacesData = current.HasData;
-            AccountsToDelete = Plural.Of(
-                current.Accounts, UiTexts.RecoveryAccountsOne, UiTexts.RecoveryAccountsFew, UiTexts.RecoveryAccountsMany);
-            TransactionsToDelete = Plural.Of(
-                current.Transactions, UiTexts.RecoveryTransactionsOne, UiTexts.RecoveryTransactionsFew, UiTexts.RecoveryTransactionsMany);
+            ToDelete = LinesOf(current);
         }
 
         return check.Verdict is RecoveryVerdict.Ready;
@@ -198,8 +190,27 @@ public sealed partial class ExportViewModel : ObservableObject
         SecondsLeft = 0;
         ReplacesData = false;
         RefusalText = string.Empty;
-        AccountsToDelete = string.Empty;
-        TransactionsToDelete = string.Empty;
+        ToDelete = [];
+    }
+
+    private static List<RecoveryLine> LinesOf(RecoverySide current)
+    {
+        List<RecoveryLine> lines = [];
+
+        void Add(int count, string icon, string one, string few, string many)
+        {
+            if (count > 0)
+            {
+                lines.Add(new RecoveryLine { Icon = icon, Text = Plural.Of(count, one, few, many), HasDivider = lines.Count > 0 });
+            }
+        }
+
+        Add(current.Accounts, "wallet", UiTexts.RecoveryAccountsOne, UiTexts.RecoveryAccountsFew, UiTexts.RecoveryAccountsMany);
+        Add(current.Transactions, "receipt", UiTexts.RecoveryTransactionsOne, UiTexts.RecoveryTransactionsFew, UiTexts.RecoveryTransactionsMany);
+        Add(current.Categories, "tag", UiTexts.RecoveryCategoriesOne, UiTexts.RecoveryCategoriesFew, UiTexts.RecoveryCategoriesMany);
+        Add(current.Places, "map-pin", UiTexts.RecoveryPlacesOne, UiTexts.RecoveryPlacesFew, UiTexts.RecoveryPlacesMany);
+
+        return lines;
     }
 
     /// <summary>

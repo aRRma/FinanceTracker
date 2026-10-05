@@ -883,6 +883,25 @@
   <data name="RecoveryTransactionsMany" xml:space="preserve">
     <value>операций</value>
   </data>
+  <data name="RecoveryCategoriesOne" xml:space="preserve">
+    <value>своя категория</value>
+    <comment>«Своя» — заведённая пользователем: стартовые вернутся с файлом</comment>
+  </data>
+  <data name="RecoveryCategoriesFew" xml:space="preserve">
+    <value>свои категории</value>
+  </data>
+  <data name="RecoveryCategoriesMany" xml:space="preserve">
+    <value>своих категорий</value>
+  </data>
+  <data name="RecoveryPlacesOne" xml:space="preserve">
+    <value>место</value>
+  </data>
+  <data name="RecoveryPlacesFew" xml:space="preserve">
+    <value>места</value>
+  </data>
+  <data name="RecoveryPlacesMany" xml:space="preserve">
+    <value>мест</value>
+  </data>
   <data name="RecoveryConfirm" xml:space="preserve">
     <value>Удалить и восстановить</value>
   </data>
