@@ -5,6 +5,7 @@ using Finance.Application.Features.Settings.TimeZones;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
+using Finance.Application.Texts;
 
 namespace Finance.Application.Tests;
 
@@ -231,43 +232,90 @@ public sealed class SettingsTests
     }
 
     /// <summary>
-    /// Список зон отбирается по набранным буквам, а первой строкой всегда стоит
-    /// возврат к системному поясу — иначе после ручного выбора вернуться нечем.
+    /// Список короткий: по строке на смещение, по возрастанию, подписанной городами.
+    /// Первой строкой всегда стоит возврат к системному поясу — иначе после ручного
+    /// выбора вернуться нечем.
     /// </summary>
     [Fact]
-    public async Task Список_зон_отбирается_по_буквам()
+    public async Task Список_поясов_по_строке_на_смещение()
     {
         await using TestDatabase database = await TestDatabase.CreateAsync();
 
-        TimeZoneViewModel model = new(
-            database.Resolve<ISettingsSummaryQuery>(),
-            database.Resolve<IChangeTimeZoneHandler>(),
-            database.Resolve<IClock>(),
-            database.Resolve<IChangeNotifier>());
+        TimeZoneViewModel model = database.Resolve<TimeZoneViewModel>();
 
         await model.LoadAsync();
 
-        Assert.True(model.Zones.Count > 1);
         Assert.Null(model.Zones[0].Id);
         Assert.True(model.Zones[0].IsSelected);
 
-        // Зона берётся из самого списка, а не пишется в тесте: идентификаторы
-        // зон задаёт система, и на рабочей машине они не такие, как на устройстве
-        string some = model.Zones[1].Id!;
+        TimeZoneOption[] rows = [.. model.Zones.Skip(1)];
+        TimeSpan[] offsets = [.. rows.Select(static row => TimeZoneInfo.FindSystemTimeZoneById(row.Id!).GetUtcOffset(TestTime.Start))];
 
-        model.Filter = some;
+        // Сотни зон системы сходятся в несколько десятков строк, по одной на смещение
+        Assert.InRange(rows.Length, 30, 45);
+        Assert.Equal(offsets.Order(), offsets);
+        Assert.Equal(offsets.Length, offsets.Distinct().Count());
 
-        Assert.Equal(some, model.Zones[1].Id);
-        Assert.All(model.Zones.Skip(1), zone => Assert.Contains(some, zone.Id!, StringComparison.Ordinal));
+        // Строка ставит первую по приоритету зону своего смещения: перестановка
+        // городов в списке молча сменила бы зону, которую ставит строка
+        string[] expected =
+        [
+            .. offsets.Select(offset => TimeZoneCities.Ids.First(id =>
+                TimeZoneInfo.TryFindSystemTimeZoneById(id, out TimeZoneInfo? zone)
+                && zone.GetUtcOffset(TestTime.Start) == offset))
+        ];
 
-        await model.SelectAsync(model.Zones[1]);
+        Assert.Equal(expected, rows.Select(static row => row.Id));
+
+        // Москва ставит саму себя: города России идут в списке первыми
+        TimeZoneOption moscow = Assert.Single(rows, static row => row.Id == "Europe/Moscow");
+
+        Assert.StartsWith(CityNames.Of("Europe/Moscow"), moscow.Caption, StringComparison.Ordinal);
+        Assert.Equal("UTC+3", moscow.Offset);
+        Assert.Single(rows, static row => row.Offset is "UTC+5:30");
+        Assert.Single(rows, static row => row.Offset is "UTC−3");
+    }
+
+    /// <summary>
+    /// Выбранная строка отмечена, «Как в системе» — нет; обратный выбор возвращает отметку.
+    /// </summary>
+    [Fact]
+    public async Task Выбранная_строка_отмечена()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        TimeZoneViewModel model = database.Resolve<TimeZoneViewModel>();
+
+        await model.LoadAsync();
+        await model.SelectAsync(model.Zones.Single(static row => row.Id == "Asia/Vladivostok"));
 
         Assert.False(model.IsFromSystem);
         Assert.False(model.Zones[0].IsSelected);
-        Assert.True(model.Zones[1].IsSelected);
+        Assert.Equal("Asia/Vladivostok", Assert.Single(model.Zones, static row => row.IsSelected).Id);
 
-        model.Filter = "Атлантида";
+        await model.SelectAsync(model.Zones[0]);
 
-        Assert.True(model.IsFilteredOut);
+        Assert.True(model.IsFromSystem);
+        Assert.Same(model.Zones[0], Assert.Single(model.Zones, static row => row.IsSelected));
+    }
+
+    /// <summary>
+    /// Зона, выбранная до короткого списка и в нём не оставшаяся, не теряет отметку:
+    /// отмечена строка того же смещения — сегодня время у них одно.
+    /// </summary>
+    [Fact]
+    public async Task Зона_вне_списка_отмечает_строку_своего_смещения()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        // Мидуэй в список не входит, а смещение у него то же, что у Паго-Паго
+        await database.Resolve<IChangeTimeZoneHandler>().HandleAsync(FarWest);
+
+        TimeZoneViewModel model = database.Resolve<TimeZoneViewModel>();
+
+        await model.LoadAsync();
+
+        Assert.DoesNotContain(FarWest, TimeZoneCities.Ids);
+        Assert.Equal("Pacific/Pago_Pago", Assert.Single(model.Zones, static row => row.IsSelected).Id);
     }
 }

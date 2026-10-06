@@ -8,17 +8,29 @@ using Finance.Application.Infrastructure.Queries;
 namespace Finance.Application.Features.Settings.TimeZones;
 
 /// <summary>
-/// Экран часового пояса. Зон в системе сотни, поэтому список отбирается по
-/// набранным буквам; первой строкой — возврат к системному поясу, иначе после
-/// ручного выбора вернуться к нему было бы нечем.
+/// Экран часового пояса. Зон в системе сотни, и большинство — дубли и служебные,
+/// поэтому список короткий: по строке на смещение, подписанной городами.
+/// Первой строкой — возврат к системному поясу, иначе после ручного выбора
+/// вернуться к нему было бы нечем.
 /// </summary>
+/// <remarks>
+/// Строка ставит одну зону своего смещения — первую по приоритету. Тому, у кого
+/// переход на летнее время идёт не как у неё, после перехода придётся выбрать
+/// заново: это цена короткого списка.
+/// </remarks>
 public sealed partial class TimeZoneViewModel : ScreenViewModel
 {
+    // Городов в подписи строки не больше трёх: длиннее она уходила бы на третью
+    // строку, а узнают смещение и по первым городам
+    private const int CitiesInCaption = 3;
+
     private readonly ISettingsSummaryQuery _summary;
     private readonly IChangeTimeZoneHandler _change;
     private readonly IClock _clock;
 
-    private IReadOnlyList<TimeZoneInfo> _all = [];
+    // Строки собираются при чтении, а выбор только переставляет отметку:
+    // подписи и смещения до следующего чтения не меняются
+    private IReadOnlyList<(TimeSpan Offset, string[] Ids, TimeZoneOption Row)> _rows = [];
 
     /// <summary>
     /// Создаёт модель представления экрана часового пояса.
@@ -44,15 +56,9 @@ public sealed partial class TimeZoneViewModel : ScreenViewModel
     }
 
     /// <summary>
-    /// Зоны, прошедшие отбор. Первой строкой — «Как в системе».
+    /// Строки списка по возрастанию смещения. Первой строкой — «Как в системе».
     /// </summary>
     public ObservableCollection<TimeZoneOption> Zones { get; } = [];
-
-    /// <summary>
-    /// Набранные буквы идентификатора. Пусто — показываются все зоны.
-    /// </summary>
-    [ObservableProperty]
-    public partial string Filter { get; set; } = string.Empty;
 
     /// <summary>
     /// Пояс взят из системы — ручного выбора не было.
@@ -61,13 +67,7 @@ public sealed partial class TimeZoneViewModel : ScreenViewModel
     public partial bool IsFromSystem { get; private set; } = true;
 
     /// <summary>
-    /// Отбор не нашёл ни одной зоны.
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsFilteredOut { get; private set; }
-
-    /// <summary>
-    /// Перечитывает список зон и текущий выбор.
+    /// Перечитывает список и текущий выбор.
     /// </summary>
     /// <param name="cancellationToken">Признак отмены.</param>
     public async Task LoadAsync(CancellationToken cancellationToken = default)
@@ -78,25 +78,27 @@ public sealed partial class TimeZoneViewModel : ScreenViewModel
 
         IsFromSystem = summary.TimeZoneFromSystem;
 
-        // Список зон читается у системы один раз на заход: он не меняется, пока
-        // приложение живёт, а перебор шестисот зон на каждую набранную букву
-        // сделал бы поиск заметно медленным.
-        // Порядок задаётся заново: система сортирует по зимнему смещению, а на
-        // экране стоит действующее, и на летнем времени список выглядел бы вразнобой
+        // Смещение — на сегодня: зимой и летом города сходятся в строки по-разному,
+        // и постоянное смещение полгода называло бы не то время.
+        // Зону, которой нет в системе устройства, строка не предлагает:
+        // выбор её отверг бы обработчик
         DateTimeOffset now = _clock.NowUtc;
 
-        _all =
+        _rows =
         [
-            .. TimeZoneInfo.GetSystemTimeZones()
-                .OrderBy(zone => zone.GetUtcOffset(now))
-                .ThenBy(zone => zone.Id, StringComparer.Ordinal)
+            .. TimeZoneCities.Ids
+                .Select(static id => TimeZoneInfo.TryFindSystemTimeZoneById(id, out TimeZoneInfo? zone) ? zone : null)
+                .OfType<TimeZoneInfo>()
+                .GroupBy(zone => zone.GetUtcOffset(now))
+                .OrderBy(static bucket => bucket.Key)
+                .Select(static bucket => Row(bucket.Key, [.. bucket.Select(static zone => zone.Id)]))
         ];
 
         Rebuild();
     }
 
     /// <summary>
-    /// Ставит выбранную зону.
+    /// Ставит пояс выбранной строки.
     /// </summary>
     /// <param name="option">Строка списка. У «Как в системе» идентификатора нет.</param>
     /// <param name="cancellationToken">Признак отмены.</param>
@@ -111,61 +113,62 @@ public sealed partial class TimeZoneViewModel : ScreenViewModel
         Rebuild();
     }
 
-    /// <summary>
-    /// Пересобирает список под набранные буквы. Из прочитанного, а не у системы:
-    /// буквы набирают подряд, и каждая стоила бы полного перебора зон.
-    /// </summary>
-    partial void OnFilterChanged(string value) => Rebuild();
-
     private void Rebuild()
     {
         Zones.Clear();
-
-        string current = _clock.TimeZone.Id;
 
         Zones.Add(new TimeZoneOption
         {
             Id = null,
             Caption = UiTexts.TimeZoneSystem,
-            Offset = Offset(TimeZoneInfo.Local),
+            Offset = Offset(TimeZoneInfo.Local.GetUtcOffset(_clock.NowUtc)),
             IsSelected = IsFromSystem
         });
 
-        ReadOnlySpan<char> typed = Filter.AsSpan().Trim();
-        int found = 0;
+        // Зона, выбранная до короткого списка, могла в нём не остаться — тогда
+        // отмечена строка того же смещения: сегодня время у них одно
+        TimeZoneInfo current = _clock.TimeZone;
+        bool listed = _rows.Any(row => row.Ids.Contains(current.Id, StringComparer.Ordinal));
+        TimeSpan currentOffset = current.GetUtcOffset(_clock.NowUtc);
 
-        foreach (TimeZoneInfo zone in _all)
+        foreach ((TimeSpan offset, string[] ids, TimeZoneOption row) in _rows)
         {
-            if (!typed.IsEmpty && !zone.Id.AsSpan().Contains(typed, StringComparison.CurrentCultureIgnoreCase))
-            {
-                continue;
-            }
+            bool chosen = listed ? ids.Contains(current.Id, StringComparer.Ordinal) : offset == currentOffset;
 
-            found++;
-
-            Zones.Add(new TimeZoneOption
-            {
-                Id = zone.Id,
-                Caption = zone.Id,
-                Offset = Offset(zone),
-                IsSelected = !IsFromSystem && string.Equals(zone.Id, current, StringComparison.Ordinal)
-            });
+            Zones.Add(row with { IsSelected = !IsFromSystem && chosen });
         }
-
-        IsFilteredOut = found is 0;
     }
 
     /// <summary>
-    /// Смещение зоны от UTC на сегодня — по нему зону и узнают.
+    /// Строка смещения: ставит первую по приоритету зону, подписана первыми городами.
     /// </summary>
-    private string Offset(TimeZoneInfo zone)
-    {
-        TimeSpan offset = zone.GetUtcOffset(_clock.NowUtc);
-        char sign = offset < TimeSpan.Zero ? '-' : '+';
+    private static (TimeSpan, string[], TimeZoneOption) Row(TimeSpan offset, string[] ids) =>
+        (offset, ids, new TimeZoneOption
+        {
+            Id = ids[0],
+            Caption = string.Join(", ", ids.Take(CitiesInCaption).Select(CityNames.Of)),
+            Offset = Offset(offset),
+            IsSelected = false
+        });
 
-        return string.Create(
-            CultureInfo.InvariantCulture,
-            $"UTC{sign}{offset.Duration():hh\\:mm}");
+    /// <summary>
+    /// Смещение от UTC коротко: «UTC+3», «UTC+5:30», «UTC−3:30». Минуты — только
+    /// у зон, где они есть: нули в каждой строке читались бы шумом.
+    /// </summary>
+    private static string Offset(TimeSpan offset)
+    {
+        if (offset == TimeSpan.Zero)
+        {
+            return "UTC";
+        }
+
+        // Типографский минус: дефис рядом с цифрой читается тире
+        char sign = offset < TimeSpan.Zero ? '−' : '+';
+        TimeSpan size = offset.Duration();
+
+        return size.Minutes is 0
+            ? string.Create(CultureInfo.InvariantCulture, $"UTC{sign}{size.Hours}")
+            : string.Create(CultureInfo.InvariantCulture, $"UTC{sign}{size.Hours}:{size.Minutes:00}");
     }
 
     /// <inheritdoc />

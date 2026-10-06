@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Города, которыми подписан список часовых поясов: идентификатор зоны вроде
+    America/Argentina/Buenos_Aires читается хуже названия. Ключ строки —
+    идентификатор зоны как есть; полноту обеих сторон против списка зон сверяет тест.
+
+    Название — город или место, по которому зону узнают, а не перевод
+    идентификатора: Asia/Kolkata подписана «Дели», Asia/Shanghai — «Пекин».
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Africa/Cairo" xml:space="preserve">
+    <value>Каир</value>
+  </data>
+  <data name="Africa/Lagos" xml:space="preserve">
+    <value>Лагос</value>
+  </data>
+  <data name="America/Anchorage" xml:space="preserve">
+    <value>Анкоридж</value>
+  </data>
+  <data name="America/Argentina/Buenos_Aires" xml:space="preserve">
+    <value>Буэнос-Айрес</value>
+  </data>
+  <data name="America/Bogota" xml:space="preserve">
+    <value>Богота</value>
+  </data>
+  <data name="America/Caracas" xml:space="preserve">
+    <value>Каракас</value>
+  </data>
+  <data name="America/Chicago" xml:space="preserve">
+    <value>Чикаго</value>
+  </data>
+  <data name="America/Denver" xml:space="preserve">
+    <value>Денвер</value>
+  </data>
+  <data name="America/Halifax" xml:space="preserve">
+    <value>Галифакс</value>
+  </data>
+  <data name="America/Los_Angeles" xml:space="preserve">
+    <value>Лос-Анджелес</value>
+  </data>
+  <data name="America/Mexico_City" xml:space="preserve">
+    <value>Мехико</value>
+  </data>
+  <data name="America/New_York" xml:space="preserve">
+    <value>Нью-Йорк</value>
+  </data>
+  <data name="America/Noronha" xml:space="preserve">
+    <value>Фернанду-ди-Норонья</value>
+  </data>
+  <data name="America/Phoenix" xml:space="preserve">
+    <value>Финикс</value>
+  </data>
+  <data name="America/Santiago" xml:space="preserve">
+    <value>Сантьяго</value>
+  </data>
+  <data name="America/Sao_Paulo" xml:space="preserve">
+    <value>Сан-Паулу</value>
+  </data>
+  <data name="America/St_Johns" xml:space="preserve">
+    <value>Сент-Джонс</value>
+  </data>
+  <data name="Asia/Almaty" xml:space="preserve">
+    <value>Алматы</value>
+  </data>
+  <data name="Asia/Baku" xml:space="preserve">
+    <value>Баку</value>
+  </data>
+  <data name="Asia/Bangkok" xml:space="preserve">
+    <value>Бангкок</value>
+  </data>
+  <data name="Asia/Bishkek" xml:space="preserve">
+    <value>Бишкек</value>
+  </data>
+  <data name="Asia/Dhaka" xml:space="preserve">
+    <value>Дакка</value>
+  </data>
+  <data name="Asia/Dubai" xml:space="preserve">
+    <value>Дубай</value>
+  </data>
+  <data name="Asia/Irkutsk" xml:space="preserve">
+    <value>Иркутск</value>
+  </data>
+  <data name="Asia/Kabul" xml:space="preserve">
+    <value>Кабул</value>
+  </data>
+  <data name="Asia/Kamchatka" xml:space="preserve">
+    <value>Камчатка</value>
+  </data>
+  <data name="Asia/Kathmandu" xml:space="preserve">
+    <value>Катманду</value>
+  </data>
+  <data name="Asia/Kolkata" xml:space="preserve">
+    <value>Дели</value>
+  </data>
+  <data name="Asia/Krasnoyarsk" xml:space="preserve">
+    <value>Красноярск</value>
+  </data>
+  <data name="Asia/Magadan" xml:space="preserve">
+    <value>Магадан</value>
+  </data>
+  <data name="Asia/Novosibirsk" xml:space="preserve">
+    <value>Новосибирск</value>
+  </data>
+  <data name="Asia/Omsk" xml:space="preserve">
+    <value>Омск</value>
+  </data>
+  <data name="Asia/Seoul" xml:space="preserve">
+    <value>Сеул</value>
+  </data>
+  <data name="Asia/Shanghai" xml:space="preserve">
+    <value>Пекин</value>
+  </data>
+  <data name="Asia/Singapore" xml:space="preserve">
+    <value>Сингапур</value>
+  </data>
+  <data name="Asia/Tashkent" xml:space="preserve">
+    <value>Ташкент</value>
+  </data>
+  <data name="Asia/Tbilisi" xml:space="preserve">
+    <value>Тбилиси</value>
+  </data>
+  <data name="Asia/Tehran" xml:space="preserve">
+    <value>Тегеран</value>
+  </data>
+  <data name="Asia/Tokyo" xml:space="preserve">
+    <value>Токио</value>
+  </data>
+  <data name="Asia/Vladivostok" xml:space="preserve">
+    <value>Владивосток</value>
+  </data>
+  <data name="Asia/Yakutsk" xml:space="preserve">
+    <value>Якутск</value>
+  </data>
+  <data name="Asia/Yangon" xml:space="preserve">
+    <value>Янгон</value>
+  </data>
+  <data name="Asia/Yekaterinburg" xml:space="preserve">
+    <value>Екатеринбург</value>
+  </data>
+  <data name="Asia/Yerevan" xml:space="preserve">
+    <value>Ереван</value>
+  </data>
+  <data name="Atlantic/Azores" xml:space="preserve">
+    <value>Азорские острова</value>
+  </data>
+  <data name="Atlantic/Cape_Verde" xml:space="preserve">
+    <value>Кабо-Верде</value>
+  </data>
+  <data name="Atlantic/Reykjavik" xml:space="preserve">
+    <value>Рейкьявик</value>
+  </data>
+  <data name="Australia/Adelaide" xml:space="preserve">
+    <value>Аделаида</value>
+  </data>
+  <data name="Australia/Brisbane" xml:space="preserve">
+    <value>Брисбен</value>
+  </data>
+  <data name="Australia/Darwin" xml:space="preserve">
+    <value>Дарвин</value>
+  </data>
+  <data name="Australia/Eucla" xml:space="preserve">
+    <value>Юкла</value>
+  </data>
+  <data name="Australia/Lord_Howe" xml:space="preserve">
+    <value>Лорд-Хау</value>
+  </data>
+  <data name="Australia/Sydney" xml:space="preserve">
+    <value>Сидней</value>
+  </data>
+  <data name="Europe/Athens" xml:space="preserve">
+    <value>Афины</value>
+  </data>
+  <data name="Europe/Berlin" xml:space="preserve">
+    <value>Берлин</value>
+  </data>
+  <data name="Europe/Helsinki" xml:space="preserve">
+    <value>Хельсинки</value>
+  </data>
+  <data name="Europe/Istanbul" xml:space="preserve">
+    <value>Стамбул</value>
+  </data>
+  <data name="Europe/Kaliningrad" xml:space="preserve">
+    <value>Калининград</value>
+  </data>
+  <data name="Europe/London" xml:space="preserve">
+    <value>Лондон</value>
+  </data>
+  <data name="Europe/Minsk" xml:space="preserve">
+    <value>Минск</value>
+  </data>
+  <data name="Europe/Moscow" xml:space="preserve">
+    <value>Москва</value>
+  </data>
+  <data name="Europe/Paris" xml:space="preserve">
+    <value>Париж</value>
+  </data>
+  <data name="Europe/Samara" xml:space="preserve">
+    <value>Самара</value>
+  </data>
+  <data name="Pacific/Auckland" xml:space="preserve">
+    <value>Окленд</value>
+  </data>
+  <data name="Pacific/Chatham" xml:space="preserve">
+    <value>Острова Чатем</value>
+  </data>
+  <data name="Pacific/Fiji" xml:space="preserve">
+    <value>Фиджи</value>
+  </data>
+  <data name="Pacific/Honolulu" xml:space="preserve">
+    <value>Гонолулу</value>
+  </data>
+  <data name="Pacific/Kiritimati" xml:space="preserve">
+    <value>Киритимати</value>
+  </data>
+  <data name="Pacific/Marquesas" xml:space="preserve">
+    <value>Маркизские острова</value>
+  </data>
+  <data name="Pacific/Noumea" xml:space="preserve">
+    <value>Нумеа</value>
+  </data>
+  <data name="Pacific/Pago_Pago" xml:space="preserve">
+    <value>Паго-Паго</value>
+  </data>
+  <data name="Pacific/Tongatapu" xml:space="preserve">
+    <value>Тонга</value>
+  </data>
+</root>

@@ -792,9 +792,6 @@
   <data name="TimeZoneTitle" xml:space="preserve">
     <value>Часовой пояс</value>
   </data>
-  <data name="TimeZoneSearchPlaceholder" xml:space="preserve">
-    <value>Поиск по названию зоны</value>
-  </data>
   <data name="TimeZoneSystem" xml:space="preserve">
     <value>Как в системе</value>
   </data>
