@@ -92,6 +92,34 @@
     <Color x:Key="AccountPinkLight">#F62B97</Color>
     <Color x:Key="AccountPinkDark">#F62B97</Color>
 
+    <!-- Атмосфера — фон экрана в стиле «Изумруд» (docs/ui/style.md): переход
+         сверху вниз от мятного к почти белому, в тёмной — от глубокого зелёного
+         к почти чёрному. Поверх него плывут пятна цветов Sky, Green и Accent -->
+    <Color x:Key="BackdropTopLight">#CBEBE0</Color>
+    <Color x:Key="BackdropMiddleLight">#E4F3EE</Color>
+    <Color x:Key="BackdropBottomLight">#F5F9F8</Color>
+    <Color x:Key="BackdropTopDark">#0D2A22</Color>
+    <Color x:Key="BackdropMiddleDark">#0E1B18</Color>
+    <Color x:Key="BackdropBottomDark">#0E1214</Color>
+
+    <!-- Стекло на атмосфере тёмной темы: заливка и ободок клавиши цветом действия
+         на просвет. В светлой теме клавиша — белая карточка с зелёной тенью.
+         Прозрачные токены в ContrastTests не сверяются: текст на стекле сверяется
+         по непрозрачному фону под ним (Backdrop*) -->
+    <Color x:Key="GlassDark">#2648A78E</Color>
+    <Color x:Key="GlassLineDark">#6148A78E</Color>
+
+    <!-- Тень приподнятой поверхности — цветом действия, а не серая -->
+    <Color x:Key="LiftShadowLight">#0F5C4C</Color>
+
+    <!-- Кольцо, расходящееся от нажатой клавиши -->
+    <Color x:Key="RippleLight">#590F5C4C</Color>
+    <Color x:Key="RippleDark">#7348A78E</Color>
+
+    <!-- Плашка под подписью ответа: держит контраст на любом месте пятен -->
+    <Color x:Key="PillLight">#CCFFFFFF</Color>
+    <Color x:Key="PillDark">#59000000</Color>
+
     <!-- Значок на заливке счёта — белый или тёмный, одинаково в обеих темах:
          какой из двух, решает цвет (AccountColors.TakesDarkGlyph) -->
     <Color x:Key="AccountGlyphWhite">#FFFFFF</Color>

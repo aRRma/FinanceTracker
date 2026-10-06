@@ -29,7 +29,7 @@
 | Отчёт | `FR-RPT-*` в [requirements/03-functional.md](requirements/03-functional.md), экраны `E-01…E-05`, сценарий UC-19 |
 | Схема, миграции, индексы | [requirements/02-domain.md](requirements/02-domain.md), `NFR-01…NFR-08` и `NFR-26` в [requirements/05-quality.md](requirements/05-quality.md), `TECH-*` в [architecture.md](architecture.md) |
 | Инициализация базы | [requirements/04-preset.md](requirements/04-preset.md), [preset-rationale.md](preset-rationale.md), [data/preset.json](../data/preset.json) |
-| Темы, цвета, значки | `NFR-21…NFR-25` в [requirements/05-quality.md](requirements/05-quality.md), переключатель темы в [ui/mockups.html](ui/mockups.html) — эталон палитр; перечень значков — [data/icons.json](../data/icons.json), контуры — [data/icon-paths.json](../data/icon-paths.json), значки макетов собирает `dotnet tools/mockup_icons.cs` |
+| Темы, цвета, значки | `NFR-21…NFR-25` в [requirements/05-quality.md](requirements/05-quality.md), переключатель темы в [ui/mockups.html](ui/mockups.html) — эталон палитр; визуальный стиль «Изумруд» — атмосфера, поверхности, движение — [ui/style.md](ui/style.md); перечень значков — [data/icons.json](../data/icons.json), контуры — [data/icon-paths.json](../data/icon-paths.json), значки макетов собирает `dotnet tools/mockup_icons.cs` |
 | Как назвать новое понятие | [../CONTEXT.md](../CONTEXT.md) — сначала словарь, потом код |
 | Перенос истории из других приложений (сборка `Finance.Import`) | [ADR-0014](adr/0014-wallet-import-one-shot-through-domain-path.md) |
 | Выгрузка в файл и восстановление из неё | [ADR-0015](adr/0015-export-is-database-file.md), `FR-SET-05`, `FR-SET-06`, `NFR-27`, сценарий UC-25 |
@@ -45,5 +45,6 @@
 - [uncovered.md](uncovered.md) — функциональные требования без сценария и причина у каждого
 - [preset-rationale.md](preset-rationale.md) — почему стартовый набор категорий именно такой. Обоснование, не спецификация
 - [../tasks/README.md](../tasks/README.md) — как вести долгую задачу со своим состоянием: папка на задачу, закрытая уходит в архив вне репозитория
+- [ui/style.md](ui/style.md) — визуальный стиль «Изумруд»: приёмы атмосферы, поверхностей и движения и порядок переноса на всё приложение
 - [ui/prototype.html](ui/prototype.html) — интерактивный прототип, динамика сценариев; генерируется из макетов, руками не правится
 - [../PLAN.md](../PLAN.md) — открытое, этап развития, итоги закрытого

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
     Экран D-15: ПИН-код в «Ещё» — задание с повтором, смена и выключение после
-    текущего кода. Набор — тот же контрол, что на заслонке. Панели вкладок нет:
-    касание вкладки посреди набора увело бы с экрана молча.
+    текущего кода. Набор и атмосфера под ним — те же, что на заслонке. Панели
+    вкладок нет: касание вкладки посреди набора увело бы с экрана молча.
 -->
 <ContentPage
     x:Class="Finance.App.Pages.PinPage"
@@ -15,8 +15,13 @@
     Shell.TabBarIsVisible="False"
     Title="{x:Static texts:UiTexts.AppLockTitle}">
 
-    <Grid SafeAreaEdges="Container,Container,Container,All">
-        <controls:PinPad x:Name="Pad" />
+    <!-- Атмосфера уходит под полосу навигации, набор — нет -->
+    <Grid SafeAreaEdges="None">
+        <controls:Backdrop IsDimmed="{Binding IsPaused}" />
+
+        <Grid SafeAreaEdges="Container,Container,Container,All">
+            <controls:PinPad x:Name="Pad" />
+        </Grid>
     </Grid>
 
 </ContentPage>

@@ -49,6 +49,7 @@ public sealed partial class PinPage : ContentPage
 
         _model.Start(Enum.TryParse(Purpose, out PinPurpose purpose) ? purpose : PinPurpose.Create);
         Pad.Resume();
+        Pad.Enter();
     }
 
     private void OnDone(object? sender, string text)

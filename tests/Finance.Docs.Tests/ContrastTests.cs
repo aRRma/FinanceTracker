@@ -56,7 +56,14 @@ public sealed partial class ContrastTests
             // ещё сумма смысловым цветом. Ink3 на этот фон не ставится — до порога
             // он не дотягивает, и заметка выделенной строки перекрашена во вторичный
             ("Ink", "AccentBackground"), ("Ink2", "AccentBackground"),
-            ("Positive", "AccentBackground"), ("Negative", "AccentBackground")
+            ("Positive", "AccentBackground"), ("Negative", "AccentBackground"),
+
+            // Атмосфера стиля «Изумруд»: заголовок и точки набора ПИН-кода прямо на
+            // переходе. Сверяется только переход: пятна полупрозрачны и плывут, и
+            // текст поверх них — основным цветом с запасом; точки и значок цветом
+            // действия — не текст, им хватает порога 3 и на самом светлом пятне
+            ("Ink", "BackdropTop"), ("Ink", "BackdropMiddle"), ("Ink", "BackdropBottom"),
+            ("Accent", "BackdropTop"), ("Accent", "BackdropMiddle"), ("Accent", "BackdropBottom")
         ];
 
         // Пары, встречающиеся только в одной теме. Выбранный сегмент переключателя
@@ -64,7 +71,12 @@ public sealed partial class ContrastTests
         // порога не дотягивает, и там подпись основным текстом — пара выше
         (string Foreground, string Background, string Theme)[] single =
         [
-            ("Accent", "AccentBackground", "Light")
+            ("Accent", "AccentBackground", "Light"),
+
+            // Ответ набора ПИН-кода — на плашке: в светлой она почти белая (пара
+            // Negative/Card выше), в тёмной затемняет атмосферу, и хуже всего подписи
+            // на самой атмосфере без затемнения
+            ("Negative", "BackdropTop", "Dark"), ("Negative", "BackdropMiddle", "Dark"), ("Negative", "BackdropBottom", "Dark")
         ];
 
         TheoryData<string, string, string> data = [];
