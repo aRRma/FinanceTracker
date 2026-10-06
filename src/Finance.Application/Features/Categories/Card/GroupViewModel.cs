@@ -17,8 +17,17 @@ public sealed partial class GroupViewModel : FormViewModel
 {
     private readonly ICategoriesQuery _categories;
     private readonly ISaveCategoryHandler _handler;
+    private readonly IChangeNotifier _changes;
 
     private (string Name, CategoryKind Kind, bool AcceptsAnyKind, string Icon) _saved;
+
+    // Номер изменения категорий, которое список подкатегорий уже учёл;
+    // минус один — группа ещё не прочитана
+    private long _seen = -1;
+
+    // Номер чтения подкатегорий: возврат из фона во время перечитывания
+    // запускает второе, и отставшее не должно перекрыть свежее
+    private int _generation;
 
     /// <summary>
     /// Создаёт модель представления карточки группы.
@@ -26,14 +35,17 @@ public sealed partial class GroupViewModel : FormViewModel
     /// <param name="categories">Список категорий: из него берутся подкатегории группы.</param>
     /// <param name="handler">Сохранение категории.</param>
     /// <param name="icons">Набор значков.</param>
-    public GroupViewModel(ICategoriesQuery categories, ISaveCategoryHandler handler, IconCatalog icons)
+    /// <param name="changes">Оповещение об изменении данных: по нему видно, устарел ли список подкатегорий.</param>
+    public GroupViewModel(ICategoriesQuery categories, ISaveCategoryHandler handler, IconCatalog icons, IChangeNotifier changes)
     {
         ArgumentNullException.ThrowIfNull(categories);
         ArgumentNullException.ThrowIfNull(handler);
         ArgumentNullException.ThrowIfNull(icons);
+        ArgumentNullException.ThrowIfNull(changes);
 
         _categories = categories;
         _handler = handler;
+        _changes = changes;
 
         Icon = new IconPicker(icons);
     }
@@ -142,6 +154,12 @@ public sealed partial class GroupViewModel : FormViewModel
     /// </summary>
     public bool CanAddSubcategory => Key is not null && !IsService;
 
+    /// <summary>
+    /// Пока карточка была скрыта, категории изменились: подкатегорию завели,
+    /// поправили или удалили с экрана поверх карточки. Спрашивать при её возврате.
+    /// </summary>
+    public bool SubcategoriesOutdated => _seen >= 0 && _changes.VersionOf(DataChange.Categories) > _seen;
+
     /// <inheritdoc />
     public override bool IsDirty => Snapshot() != _saved;
 
@@ -167,6 +185,10 @@ public sealed partial class GroupViewModel : FormViewModel
             return;
         }
 
+        // Номер — до чтения: изменение, пришедшее во время чтения, иначе
+        // считалось бы учтённым, хотя прочитанное его могло не застать
+        long version = _changes.VersionOf(DataChange.Categories);
+
         // ConfigureAwait(false) здесь недопустим: следом меняются привязанные
         // свойства, а их правка вне потока интерфейса роняет разметку
         IReadOnlyList<CategoryListItem> categories = await _categories.ReadAsync(cancellationToken);
@@ -185,16 +207,50 @@ public sealed partial class GroupViewModel : FormViewModel
         IsService = group.Role is CategoryRole.Service;
         Icon.Show(group.Icon);
 
-        Subcategories.Clear();
+        ShowSubcategories(categories, group.Key);
 
-        foreach (CategoryListItem subcategory in categories.Where(item => item.ParentKey == group.Key))
-        {
-            Subcategories.Add(CategoryRowItem.From(subcategory));
-        }
-
+        _seen = version;
         _saved = Snapshot();
 
         Refresh();
+    }
+
+    /// <summary>
+    /// Перечитывает только подкатегории, не трогая полей формы: их пользователь
+    /// мог начать править, а список меняют экраны подкатегорий поверх карточки.
+    /// </summary>
+    /// <param name="cancellationToken">Признак отмены.</param>
+    public async Task ReloadSubcategoriesAsync(CancellationToken cancellationToken = default)
+    {
+        if (Key is not { } group)
+        {
+            return;
+        }
+
+        int generation = ++_generation;
+        long version = _changes.VersionOf(DataChange.Categories);
+
+        // ConfigureAwait(false) здесь недопустим: следом наполняется привязанная коллекция
+        IReadOnlyList<CategoryListItem> categories = await _categories.ReadAsync(cancellationToken);
+
+        if (generation != _generation)
+        {
+            return;
+        }
+
+        ShowSubcategories(categories, group);
+
+        _seen = version;
+    }
+
+    private void ShowSubcategories(IReadOnlyList<CategoryListItem> categories, Guid group)
+    {
+        Subcategories.Clear();
+
+        foreach (CategoryListItem subcategory in categories.Where(item => item.ParentKey == group))
+        {
+            Subcategories.Add(CategoryRowItem.From(subcategory));
+        }
     }
 
     /// <summary>

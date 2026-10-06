@@ -41,6 +41,19 @@ public sealed partial class GroupPage : DataPage
     protected override Task LoadAsync() =>
         _model.LoadAsync(Guid.TryParse(Key, out Guid key) ? key : null);
 
+    /// <inheritdoc />
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        // Форма целиком не перечитывается — стёрла бы набранное, — а список
+        // подкатегорий, поправленный с экрана поверх карточки, перечитывается
+        if (_model.SubcategoriesOutdated)
+        {
+            Guarded.Run(() => _model.ReloadSubcategoriesAsync());
+        }
+    }
+
     private void OnSubcategoryTapped(object? sender, TappedEventArgs e)
     {
         if (sender is BindableObject { BindingContext: CategoryRowItem { IsEditable: true } subcategory })
