@@ -55,6 +55,9 @@ public sealed partial class AppShell : Shell
 
         ArgumentNullException.ThrowIfNull(args);
 
+        // Одно место на все переходы, включая «назад» и смену вкладки
+        CrashCatcher.Trail?.Navigated(args.Current?.Location?.OriginalString ?? "");
+
         // Ярлык на значке поднимает приложение раньше, чем появляется каркас,
         // и запрос ждёт здесь — первой навигации, после которой есть куда идти
         ShortcutLaunch.Deliver();

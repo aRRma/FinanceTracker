@@ -59,7 +59,13 @@ public sealed class CrashReports
         _time = time;
         _device = device;
         _fileLimit = fileLimit;
+        Trail = new ActionTrail(time);
     }
+
+    /// <summary>
+    /// След действий: выписывается в каждый отчёт. Создаётся вместе с отчётами — так же раньше контейнера служб.
+    /// </summary>
+    public ActionTrail Trail { get; }
 
     /// <summary>
     /// Текущий файл — его отдаёт «Поделиться».
@@ -132,7 +138,17 @@ public sealed class CrashReports
     }
 
     /// <summary>
-    /// Читает отчёты обоих файлов, от новых к старым.
+    /// Пишет отчёт о прошлом завершении процесса — с моментом самого завершения и без следа: след у этого
+    /// процесса свой, к прошлому он отношения не имеет.
+    /// </summary>
+    /// <param name="atUtc">Когда прошлый процесс завершился.</param>
+    /// <param name="description">Описание, собранное из записи системы.</param>
+    /// <returns><c>true</c>, если отчёт записан.</returns>
+    internal bool WriteExit(DateTimeOffset atUtc, string description) =>
+        Record(CrashKind.ExitReason, atUtc, () => description, []);
+
+    /// <summary>
+    /// Читает отчёты обоих файлов, от новых к старым по моменту сбоя.
     /// </summary>
     /// <param name="cancellationToken">Отмена до начала чтения.</param>
     /// <remarks>
@@ -173,11 +189,14 @@ public sealed class CrashReports
         return false;
     }
 
-    private bool Record(CrashKind kind, Func<string> describe)
+    private bool Record(CrashKind kind, Func<string> describe) =>
+        Record(kind, _time.GetUtcNow(), describe, Trail.Snapshot());
+
+    private bool Record(CrashKind kind, DateTimeOffset atUtc, Func<string> describe, IReadOnlyList<string> trail)
     {
         try
         {
-            byte[] report = Encoding.UTF8.GetBytes(CrashReportFile.Format(_time.GetUtcNow(), kind, _device, describe()));
+            byte[] report = Encoding.UTF8.GetBytes(CrashReportFile.Format(atUtc, kind, _device, describe(), trail));
 
             // Сбой потока и сбой действия приходят одновременно: без блокировки два отчёта
             // перемешались бы, а смена файла потеряла бы один из них
@@ -241,7 +260,10 @@ public sealed class CrashReports
         List<CrashReport> reports = [.. CrashReportFile.Parse(previous), .. CrashReportFile.Parse(current)];
         reports.Reverse();
 
-        return reports;
+        // По моменту сбоя, а не по порядку записи: отчёт о прошлом завершении пишется при следующем
+        // запуске, но с моментом самого завершения и встаёт среди отчётов по нему. Сортировка
+        // устойчивая — при равных моментах позже записанный остаётся выше
+        return [.. reports.OrderByDescending(static report => report.AtUtc)];
     }
 
     private static string ReadText(string path)

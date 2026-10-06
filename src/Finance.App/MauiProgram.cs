@@ -2,6 +2,7 @@ using Finance.App.Controls;
 using Finance.App.Pages;
 using Finance.Application;
 using Finance.Application.Infrastructure.AppLock;
+using Finance.Application.Infrastructure.Diagnostics;
 using Finance.Application.Infrastructure.Settings;
 #if DEBUG
 // Журнал отладчика подключается только в Debug: в Release этот using лишний,
@@ -69,6 +70,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<IPinStore, DevicePinStore>();
         builder.Services.AddSingleton<IDevicePreferences, DevicePreferences>();
         builder.Services.AddSingleton<IUptime, DeviceUptime>();
+
+        // Историю прошлых завершений процесса держит Android
+        builder.Services.AddSingleton<IExitHistory, DeviceExitHistory>();
 
         // Путь к папке данных знает только платформа: прикладной слой собирается
         // и тестируется без неё и получает путь готовым

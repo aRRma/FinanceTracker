@@ -18,19 +18,42 @@ internal static class CrashReportFile
     private const string End = "=== end";
 
     /// <summary>
+    /// Строка, после которой идёт след действий.
+    /// </summary>
+    internal const string TrailHeader = "--- trail";
+
+    /// <summary>
     /// Собирает отчёт в текст для дозаписи в файл.
     /// </summary>
     /// <param name="atUtc">Момент сбоя.</param>
     /// <param name="kind">Вид.</param>
     /// <param name="device">Сборка и устройство.</param>
     /// <param name="description">Сбой.</param>
-    internal static string Format(DateTimeOffset atUtc, CrashKind kind, DeviceInfo device, string description)
+    /// <param name="trail">След действий перед сбоем, от старых к новым.</param>
+    internal static string Format(DateTimeOffset atUtc, CrashKind kind, DeviceInfo device, string description, IReadOnlyList<string> trail)
     {
         StringBuilder text = new();
         text.Append(CultureInfo.InvariantCulture, $"{Marker} {atUtc.ToUniversalTime():O} {kind}\n");
         text.Append(CultureInfo.InvariantCulture, $"app {device.AppVersion} ({device.AppBuild}), android {device.Android}, {device.Model}\n");
 
-        foreach (string line in description.Split('\n'))
+        AppendLines(text, description);
+
+        if (trail.Count > 0)
+        {
+            text.Append(TrailHeader).Append('\n');
+
+            foreach (string entry in trail)
+            {
+                AppendLines(text, entry);
+            }
+        }
+
+        return text.Append(End).Append('\n').ToString();
+    }
+
+    private static void AppendLines(StringBuilder text, string lines)
+    {
+        foreach (string line in lines.Split('\n'))
         {
             if (line.Length is 0)
             {
@@ -39,8 +62,6 @@ internal static class CrashReportFile
 
             text.Append(line.StartsWith(Marker, StringComparison.Ordinal) ? " " : "").Append(line.TrimEnd('\r')).Append('\n');
         }
-
-        return text.Append(End).Append('\n').ToString();
     }
 
     /// <summary>

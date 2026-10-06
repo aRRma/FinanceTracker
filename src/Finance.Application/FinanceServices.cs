@@ -55,8 +55,9 @@ public static class FinanceServices
     /// Поток интерфейса, оформление и версию знает только платформа: команды выполняются в фоне, а экраны
     /// по их итогу правят привязанные коллекции, и вернуть это в свой поток обязана она; что такое тёмное
     /// оформление окна, знает MAUI, а прикладной слой — только выбранную тему. Хранилище следа ПИН-кода,
-    /// настройки устройства вне базы и часы с включения телефона (<see cref="IPinStore"/>,
-    /// <see cref="IDevicePreferences"/>, <see cref="IUptime"/>) регистрирует сама платформа.
+    /// настройки устройства вне базы, часы с включения телефона и записи системы о прошлых завершениях
+    /// (<see cref="IPinStore"/>, <see cref="IDevicePreferences"/>, <see cref="IUptime"/>, <see cref="IExitHistory"/>)
+    /// регистрирует сама платформа.
     /// </remarks>
     public static IServiceCollection AddFinance(
         this IServiceCollection services,
@@ -103,6 +104,9 @@ public static class FinanceServices
                 provider.GetRequiredService<TimeProvider>(),
                 DeviceInfo.Unknown));
         }
+
+        services.AddSingleton(static provider => provider.GetRequiredService<CrashReports>().Trail);
+        services.AddSingleton<PastExits>();
 
         services.AddDbContextFactory<FinanceDbContext>(options => options.UseSqlite(location.ConnectionString));
 

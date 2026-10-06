@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Finance.Application.Texts;
 using CommunityToolkit.Mvvm.Input;
 using Finance.Application.Infrastructure.Storage;
@@ -27,10 +28,23 @@ internal static class Guarded
     /// Выполняет тело обработчика, показывая сбой вместо молчаливого закрытия окна.
     /// </summary>
     /// <param name="action">Тело обработчика.</param>
-    internal static async void Run(Func<Task> action)
+    /// <param name="file">Файл обработчика — для следа действий; подставляет компилятор.</param>
+    /// <param name="member">Имя обработчика — для следа действий; подставляет компилятор.</param>
+    internal static void Run(
+        Func<Task> action,
+        [CallerFilePath] string file = "",
+        [CallerMemberName] string member = "")
     {
         ArgumentNullException.ThrowIfNull(action);
 
+        // Обработчики событий собраны здесь все: одна строка вместо разметки каждой кнопки
+        CrashCatcher.Trail?.Action(file, member);
+
+        RunCore(action);
+    }
+
+    private static async void RunCore(Func<Task> action)
+    {
         try
         {
             await action();
@@ -48,7 +62,12 @@ internal static class Guarded
     /// Поэтому асинхронные команды зовутся из обработчика, а не привязкой.
     /// </summary>
     /// <param name="command">Команда модели.</param>
-    internal static void Execute(IAsyncRelayCommand command)
+    /// <param name="file">Файл обработчика — для следа действий; подставляет компилятор.</param>
+    /// <param name="member">Имя обработчика — для следа действий; подставляет компилятор.</param>
+    internal static void Execute(
+        IAsyncRelayCommand command,
+        [CallerFilePath] string file = "",
+        [CallerMemberName] string member = "")
     {
         ArgumentNullException.ThrowIfNull(command);
 
@@ -56,7 +75,7 @@ internal static class Guarded
         // держится защита от второго нажатия, пока первое ещё не отработало
         if (command.CanExecute(null))
         {
-            Run(() => command.ExecuteAsync(null));
+            Run(() => command.ExecuteAsync(null), file, member);
         }
     }
 
@@ -67,7 +86,7 @@ internal static class Guarded
     /// <param name="title">Заголовок сообщения.</param>
     /// <param name="error">Сбой.</param>
     internal static void Report(string title, Exception error) =>
-        Run(() => ReportAsync(title, error));
+        RunCore(() => ReportAsync(title, error));
 
     /// <summary>
     /// Показывает сбой на текущей странице. Сам показ тоже под перехватом: окно
@@ -80,8 +99,16 @@ internal static class Guarded
         // компилятором, и на телефоне от сбоя не оставалось бы ни строки
         Android.Util.Log.Error(LogTag, error.ToString());
 
-        // Журнал устройства с телефона не достать, а отчёт о сбое уходит кнопкой «Поделиться»
-        CrashCatcher.Caught(error);
+        // Журнал устройства с телефона не достать, а отчёт о сбое уходит кнопкой «Поделиться».
+        // Нарушенное правило — не сбой: в след идёт только его имя
+        if (error is DomainException rule)
+        {
+            CrashCatcher.Trail?.RuleBroken(rule.Invariant);
+        }
+        else
+        {
+            CrashCatcher.Caught(error);
+        }
 
         try
         {

@@ -6,6 +6,7 @@ using Android.OS;
 using AndroidX.Core.View;
 using Finance.Application.Features.AppLock;
 using Finance.Application.Infrastructure.AppLock;
+using Finance.Application.Infrastructure.Diagnostics;
 using Microsoft.Maui.Platform;
 
 namespace Finance.App;
@@ -68,6 +69,8 @@ public sealed class MainActivity : MauiAppCompatActivity
 
     private void OnThemeChanged(object? sender, AppThemeChangedEventArgs e)
     {
+        CrashCatcher.Trail?.Lifecycle(LifecycleEvent.ThemeChanged);
+
         ApplyStatusBar();
         _cover?.Repaint();
     }
@@ -110,6 +113,8 @@ public sealed class MainActivity : MauiAppCompatActivity
     {
         base.OnStop();
 
+        CrashCatcher.Trail?.Lifecycle(LifecycleEvent.Stopped);
+
         _appLock?.Leave();
 
         if (_appLock?.IsEnabled is true)
@@ -140,6 +145,8 @@ public sealed class MainActivity : MauiAppCompatActivity
     {
         base.OnRestart();
 
+        CrashCatcher.Trail?.Lifecycle(LifecycleEvent.Restarted);
+
         if (_appLock?.Return() is true)
         {
             // Уже поднятая остаётся как есть — с набранным
@@ -148,6 +155,22 @@ public sealed class MainActivity : MauiAppCompatActivity
         else
         {
             _cover?.Dismiss();
+        }
+    }
+
+    /// <summary>
+    /// Система просит освободить память — в след действий: следом процесс могут убить в фоне,
+    /// и «открыл, а форма пустая» объясняется этой строкой.
+    /// </summary>
+    /// <param name="level">Насколько памяти мало.</param>
+    public override void OnTrimMemory(TrimMemory level)
+    {
+        base.OnTrimMemory(level);
+
+        // UiHidden приходит при каждом уходе в фон — это не нехватка памяти, а уход уже записан
+        if (level is not TrimMemory.UiHidden)
+        {
+            CrashCatcher.Trail?.Lifecycle(LifecycleEvent.TrimMemory);
         }
     }
 

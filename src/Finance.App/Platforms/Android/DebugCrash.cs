@@ -14,7 +14,8 @@ namespace Finance.App;
 /// сбой повторялся бы на каждом перезапуске. Вызов с уже виденным номером или без номера не делает ничего.
 /// Виды: <c>caught</c> — сбой действия через <see cref="Guarded"/>, <c>ui</c> — исключение .NET на главном потоке,
 /// <c>thread</c> и <c>timer</c> — вне главного потока, <c>task</c> — забытая задача, <c>java</c> — исключение Java
-/// на главном потоке. Сбой приходит через две секунды: к этому времени окно уже на экране.
+/// на главном потоке, <c>anr</c> — главный поток спит минуту: касание по окну через пять секунд даёт окно
+/// «не отвечает». Сбой приходит через две секунды: к этому времени окно уже на экране.
 /// </remarks>
 internal static class DebugCrash
 {
@@ -22,7 +23,7 @@ internal static class DebugCrash
     private const string IdExtra = "debug_crash_id";
     private const int DelayMilliseconds = 2000;
 
-    private static readonly FrozenSet<string> Kinds = FrozenSet.Create("caught", "ui", "thread", "timer", "task", "java");
+    private static readonly FrozenSet<string> Kinds = FrozenSet.Create("caught", "ui", "thread", "timer", "task", "java", "anr");
 
     /// <summary>
     /// Держит таймер до срабатывания: без ссылки сборщик мусора убирает его раньше.
@@ -77,6 +78,9 @@ internal static class DebugCrash
                 break;
             case "java":
                 main.PostDelayed(static () => throw new Java.Lang.IllegalStateException("debug java"), DelayMilliseconds);
+                break;
+            case "anr":
+                main.PostDelayed(static () => Thread.Sleep(TimeSpan.FromMinutes(1)), DelayMilliseconds);
                 break;
         }
     }
