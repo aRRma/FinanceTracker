@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Заставка Android 12+: неоновый рубль, от которого расходятся и тают два контура его же формы —
+     «эхо», как кольцо отклика на клавишах экрана ПИН-кода. Подключена темой Finance.SplashTheme
+     в values/styles.xml поверх заставки MAUI: MauiSplashScreen рисует картинку, а двигаться умеет
+     только векторный значок.
+
+     Система растягивает значок на 192 dp (сверено снимком прежней заставки: её холст лёг ровно в 192 dp)
+     и обрезает кругом. Знак стоит со сдвигом 64 на холсте 384 — меньше половины круга по высоте, —
+     чтобы эхо, выросшее в 1,8 раза (дальняя точка — 157 единиц от центра), не упиралось в край круга (192). Размытия у вектора нет:
+     свечение трубки — стопка широких полупрозрачных обводок, по виду совпадает с размытием в splash.svg.
+     Движение укладывается в секунду: заставку система убирает, как только приложение готово,
+     и долгое движение оборвалось бы на середине.
+
+     Контур повторён в каждом слое, как в Resources/AppIcon/appiconfg.svg; одинаковость сверяет AppIconTests. -->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="192dp"
+            android:height="192dp"
+            android:viewportWidth="384"
+            android:viewportHeight="384">
+            <!-- Отсвет неона: гаснет до края круга, иначе система срезала бы его видимой кромкой -->
+            <path
+                android:name="halo"
+                android:pathData="M22 192 A170 170 0 1 0 362 192 A170 170 0 1 0 22 192 Z">
+                <aapt:attr name="android:fillColor">
+                    <gradient android:type="radial" android:centerX="192" android:centerY="192" android:gradientRadius="170">
+                        <item android:offset="0" android:color="#332CFFA8" />
+                        <item android:offset="1" android:color="#002CFFA8" />
+                    </gradient>
+                </aapt:attr>
+            </path>
+            <!-- Эхо: растёт вокруг центра знака, начальная прозрачность ноль — до начала движения его нет -->
+            <group android:name="echo1" android:pivotX="192" android:pivotY="192">
+                <group android:translateX="64" android:translateY="64">
+                    <path
+                        android:name="echo1Line"
+                        android:pathData="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z"
+                        android:strokeColor="#3CFFB0"
+                        android:strokeWidth="3"
+                        android:strokeAlpha="0"
+                        android:strokeLineJoin="round" />
+                </group>
+            </group>
+            <group android:name="echo2" android:pivotX="192" android:pivotY="192">
+                <group android:translateX="64" android:translateY="64">
+                    <path
+                        android:name="echo2Line"
+                        android:pathData="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z"
+                        android:strokeColor="#3CFFB0"
+                        android:strokeWidth="3"
+                        android:strokeAlpha="0"
+                        android:strokeLineJoin="round" />
+                </group>
+            </group>
+            <group android:translateX="64" android:translateY="64">
+                <!-- Свечение: от широкой и почти прозрачной обводки к узкой и плотной -->
+                <path android:pathData="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" android:strokeColor="#2CFFA8" android:strokeWidth="40" android:strokeAlpha="0.035" android:strokeLineJoin="round" />
+                <path android:pathData="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" android:strokeColor="#2CFFA8" android:strokeWidth="32" android:strokeAlpha="0.05" android:strokeLineJoin="round" />
+                <path android:pathData="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" android:strokeColor="#2CFFA8" android:strokeWidth="25" android:strokeAlpha="0.07" android:strokeLineJoin="round" />
+                <path android:pathData="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" android:strokeColor="#2CFFA8" android:strokeWidth="19" android:strokeAlpha="0.1" android:strokeLineJoin="round" />
+                <path android:pathData="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" android:strokeColor="#2CFFA8" android:strokeWidth="13" android:strokeAlpha="0.14" android:strokeLineJoin="round" />
+                <path android:pathData="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" android:strokeColor="#2CFFA8" android:strokeWidth="8" android:strokeAlpha="0.18" android:strokeLineJoin="round" />
+                <!-- Стекло: просвет чаши — настоящая дыра -->
+                <path
+                    android:pathData="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z"
+                    android:fillType="evenOdd">
+                    <aapt:attr name="android:fillColor">
+                        <gradient android:type="linear" android:startX="68" android:startY="52" android:endX="160" android:endY="204">
+                            <item android:offset="0" android:color="#B31D6B55" />
+                            <item android:offset="1" android:color="#990A3328" />
+                        </gradient>
+                    </aapt:attr>
+                </path>
+                <!-- Блик только внутри стекла. Треугольник до просвета чаши не достаёт, поэтому
+                     обрезка по контуру без дыры совпадает с обрезкой по стеклу -->
+                <group>
+                    <clip-path android:pathData="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" />
+                    <path android:name="glint" android:pathData="M60 40 H120 L60 140 Z" android:fillColor="#FFFFFF" android:fillAlpha="0.18" />
+                </group>
+                <!-- Неон: трубка и светлая сердцевина -->
+                <path android:pathData="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" android:strokeColor="#3CFFB0" android:strokeWidth="4" android:strokeLineJoin="round" />
+                <path android:pathData="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" android:strokeColor="#E6FFF5" android:strokeWidth="1.5" android:strokeLineJoin="round" />
+            </group>
+        </vector>
+    </aapt:attr>
+
+    <target android:name="echo1">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:propertyName="scaleX" android:valueFrom="1" android:valueTo="1.8" android:valueType="floatType" android:duration="750" android:interpolator="@android:interpolator/decelerate_cubic" />
+                <objectAnimator android:propertyName="scaleY" android:valueFrom="1" android:valueTo="1.8" android:valueType="floatType" android:duration="750" android:interpolator="@android:interpolator/decelerate_cubic" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="echo1Line">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="strokeAlpha" android:valueFrom="0.75" android:valueTo="0" android:valueType="floatType" android:duration="750" />
+        </aapt:attr>
+    </target>
+    <target android:name="echo2">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:propertyName="scaleX" android:valueFrom="1" android:valueTo="1.8" android:valueType="floatType" android:startOffset="250" android:duration="750" android:interpolator="@android:interpolator/decelerate_cubic" />
+                <objectAnimator android:propertyName="scaleY" android:valueFrom="1" android:valueTo="1.8" android:valueType="floatType" android:startOffset="250" android:duration="750" android:interpolator="@android:interpolator/decelerate_cubic" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="echo2Line">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="strokeAlpha" android:valueFrom="0.75" android:valueTo="0" android:valueType="floatType" android:startOffset="250" android:duration="750" />
+        </aapt:attr>
+    </target>
+</animated-vector>

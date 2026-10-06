@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <title>Тиснёный рубль</title>
+  <!-- Набросок значка: знак рубля выдавлен из самой плитки, как тиснение на коже; золотая только перекладина —
+       черта, которой рубль отличается от буквы Р. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#17A983"/><stop offset="1" stop-color="#0B5444"/>
+    </linearGradient>
+    <linearGradient id="face" x1="66" y1="52" x2="186" y2="204" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22C597"/><stop offset="1" stop-color="#0E6D57"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="66" y1="158" x2="154" y2="182" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF1B8"/><stop offset="0.5" stop-color="#FFC93C"/><stop offset="1" stop-color="#E08A12"/>
+    </linearGradient>
+    <path id="body" fill-rule="evenodd" d="M86 52 H144 A44 44 0 0 1 144 140 H116 V204 H86 Z M116 80 H142 A16 16 0 0 1 142 112 H116 Z"/>
+  </defs>
+  <rect width="256" height="256" fill="url(#bg)"/>
+  <!-- тень снизу справа и блик сверху слева дают выпуклость -->
+  <use href="#body" fill="#043A2E" opacity="0.55" transform="translate(5 6)"/>
+  <use href="#body" fill="#7DF2CC" opacity="0.6" transform="translate(-3 -3)"/>
+  <use href="#body" fill="url(#face)" stroke="url(#face)" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="66" y="164" width="88" height="24" rx="4" fill="#043A2E" opacity="0.5"/>
+  <rect x="63" y="155" width="94" height="27" rx="6" fill="url(#gold)"/>
+  <path d="M68 159 H150" stroke="#FFFFFF" stroke-opacity="0.75" stroke-width="3" stroke-linecap="round"/>
+</svg>

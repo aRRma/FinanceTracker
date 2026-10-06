@@ -21,4 +21,12 @@
         <item name="android:outlineProvider">none</item>
         <item name="android:stateListAnimator">@null</item>
     </style>
+
+    <!-- Тема запуска: заставка MAUI с подменённым значком. MauiSplashScreen даёт цвет фона
+         и неподвижную картинку, а заставке нужен движущийся векторный значок — drawable/splash_echo.xml.
+         Наследник, а не одноимённая замена: признак maui_splash в родителе переключает
+         активность на основную тему после запуска -->
+    <style name="Finance.SplashTheme" parent="Maui.SplashTheme">
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_echo</item>
+    </style>
 </resources>

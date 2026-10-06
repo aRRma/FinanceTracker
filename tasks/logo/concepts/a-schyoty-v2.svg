@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="title">
+  <title id="title">Счёты</title>
+  <!-- Рама счётов и три спицы; костяшки — узкие, как у настоящих счётов, отсчитано 1, 2, 3.
+       Боковины рамы отличают знак от ползунков настроек. -->
+  <g fill="#111111">
+    <rect x="20" y="28" width="16" height="200" rx="8"/>
+    <rect x="220" y="28" width="16" height="200" rx="8"/>
+    <rect x="36" y="59" width="184" height="10" rx="0"/>
+    <rect x="36" y="123" width="184" height="10" rx="0"/>
+    <rect x="36" y="187" width="184" height="10" rx="0"/>
+    <ellipse cx="57" cy="64" rx="17" ry="25"/>
+    <ellipse cx="91" cy="64" rx="17" ry="25"/>
+    <ellipse cx="199" cy="64" rx="17" ry="25"/>
+    <ellipse cx="57" cy="128" rx="17" ry="25"/>
+    <ellipse cx="165" cy="128" rx="17" ry="25"/>
+    <ellipse cx="199" cy="128" rx="17" ry="25"/>
+    <ellipse cx="131" cy="192" rx="17" ry="25"/>
+    <ellipse cx="165" cy="192" rx="17" ry="25"/>
+    <ellipse cx="199" cy="192" rx="17" ry="25"/>
+  </g>
+</svg>

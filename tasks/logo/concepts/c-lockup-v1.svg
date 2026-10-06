@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 256" width="800" height="256" role="img" aria-labelledby="title">
+  <title id="title">Приход и расход — знак с надписью</title>
+  <!-- Набросок: надпись — живой текст системным шрифтом, имя рабочее. В готовом знаке буквы строятся контурами. -->
+  <g id="symbol" fill="#111111" fill-rule="evenodd">
+    <path d="M120 40 A100 100 0 0 0 120 240 Z M52 128 H108 V150 H52 Z"/>
+    <path d="M136 16 A100 100 0 0 1 136 216 Z M167 88 H189 V105 H206 V127 H189 V144 H167 V127 H150 V105 H167 Z"/>
+  </g>
+  <text id="wordmark" x="276" y="166" fill="#111111" font-family="Segoe UI, Roboto, sans-serif" font-weight="600" font-size="112">Финансы</text>
+</svg>

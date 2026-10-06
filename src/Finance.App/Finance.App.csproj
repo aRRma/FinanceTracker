@@ -52,11 +52,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#0F5C4C" />
+		<!-- App Icon: подложка appicon.svg закрывает слой целиком, Color — середина её градиента на случай
+		     прозрачного края. Значок на рабочем столе собирается из этих слоёв в Platforms/Android/Resources/mipmap-anydpi-v26/launcher.xml -->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#0A281E" />
 
-		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#0F5C4C" BaseSize="128,128" />
+		<!-- Splash Screen: фон — BackdropTopDark стиля «Изумруд» из Resources/Styles/Colors.xaml, верх фона
+		     экрана ПИН-кода и близкий к середине плитки значка. Android 12+ градиента под заставкой не умеет -->
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#0D2A22" BaseSize="128,128" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />

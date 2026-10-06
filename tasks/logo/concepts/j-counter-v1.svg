@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <title>Счётчик</title>
+  <!-- Набросок значка: барабан механического счётчика, цифра на полпути — 0 уходит вверх, 1 входит снизу. Счёт идёт. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1F8BFF"/><stop offset="1" stop-color="#0A3FA8"/>
+    </linearGradient>
+    <linearGradient id="drum" x1="0" y1="44" x2="0" y2="212" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8E9AAF"/><stop offset="0.3" stop-color="#F4F6FA"/><stop offset="0.55" stop-color="#FFFFFF"/><stop offset="1" stop-color="#7D889C"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="44" x2="0" y2="212" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0A1A3A" stop-opacity="0.55"/><stop offset="0.28" stop-color="#0A1A3A" stop-opacity="0"/>
+      <stop offset="0.7" stop-color="#0A1A3A" stop-opacity="0"/><stop offset="1" stop-color="#0A1A3A" stop-opacity="0.5"/>
+    </linearGradient>
+    <clipPath id="window"><rect x="68" y="44" width="120" height="168" rx="26"/></clipPath>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feGaussianBlur stdDeviation="9"/></filter>
+  </defs>
+  <rect width="256" height="256" fill="url(#bg)"/>
+  <rect x="68" y="58" width="120" height="168" rx="26" fill="#03163F" opacity="0.5" filter="url(#shadow)"/>
+  <rect x="68" y="44" width="120" height="168" rx="26" fill="url(#drum)"/>
+  <g clip-path="url(#window)" fill="#14213D">
+    <!-- 0 уходит вверх: видна нижняя часть -->
+    <path fill-rule="evenodd" d="M128 -36 a40 40 0 0 1 40 40 v28 a40 40 0 0 1 -80 0 v-28 a40 40 0 0 1 40 -40 Z M128 -14 a18 18 0 0 0 -18 18 v28 a18 18 0 0 0 36 0 v-28 a18 18 0 0 0 -18 -18 Z"/>
+    <!-- 1 входит снизу: видна верхняя часть -->
+    <path d="M117 150 L139 138 H150 V260 H128 V164 L117 170 Z"/>
+  </g>
+  <rect x="68" y="44" width="120" height="168" rx="26" fill="url(#shade)"/>
+  <rect x="68" y="44" width="120" height="168" rx="26" fill="none" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="2"/>
+</svg>

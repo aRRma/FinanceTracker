@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <title>Стекло · неон</title>
+  <!-- Набросок значка: тёмное стекло на почти чёрном зелёном, по кромке — светящаяся неоновая трубка.
+       Второй вариант: фон светлее сверху и с зелёным отсветом неона — плитка не пропадает на тёмных обоях. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#11402F"/><stop offset="1" stop-color="#03110D"/>
+    </linearGradient>
+    <radialGradient id="spill" cx="128" cy="128" r="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2CFFA8" stop-opacity="0.22"/><stop offset="1" stop-color="#2CFFA8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="glass" x1="68" y1="52" x2="160" y2="204" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1D6B55" stop-opacity="0.7"/><stop offset="1" stop-color="#0A3328" stop-opacity="0.6"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8"/></filter>
+    <path id="rub" fill-rule="evenodd" d="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z"/>
+    <clipPath id="in"><use href="#rub"/></clipPath>
+  </defs>
+  <rect width="256" height="256" fill="url(#bg)"/>
+  <rect width="256" height="256" fill="url(#spill)"/>
+  <use href="#rub" fill="none" stroke="#2CFFA8" stroke-width="14" stroke-linejoin="round" opacity="0.55" filter="url(#glow)"/>
+  <use href="#rub" fill="url(#glass)"/>
+  <path clip-path="url(#in)" d="M60 40 H120 L60 140 Z" fill="#FFFFFF" opacity="0.18"/>
+  <use href="#rub" fill="none" stroke="#3CFFB0" stroke-width="4" stroke-linejoin="round"/>
+  <use href="#rub" fill="none" stroke="#E6FFF5" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>

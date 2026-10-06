@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Значок на рабочем столе — свой адаптивный вместо собранного MauiIcon (@mipmap/appicon).
+     Слои фона и знака те же, их рисует MauiIcon; отличается монохромный: MAUI в .NET 10 кладёт туда
+     сам знак, и тематический значок Android 13+ показал бы силуэт размытого свечения. Здесь — плоский рубль.
+     С .NET 11 у MauiIcon есть MonochromeFile, и этот файл можно убрать, вернув манифест на @mipmap/appicon. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/appicon_background" />
+    <foreground android:drawable="@mipmap/appicon_foreground" />
+    <monochrome android:drawable="@drawable/appicon_monochrome" />
+</adaptive-icon>

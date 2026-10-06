@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <title>Сумма</title>
+  <!-- Набросок значка: Σ — знак суммы, итог дня и месяца. Объём — толщина снизу и мягкая тень, свет сверху слева. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7A3CFF"/><stop offset="1" stop-color="#1F5BF5"/>
+    </linearGradient>
+    <linearGradient id="face" x1="70" y1="50" x2="190" y2="210" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D9E2FF"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="70" cy="40" r="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.35"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feGaussianBlur stdDeviation="9"/></filter>
+  </defs>
+  <rect width="256" height="256" fill="url(#bg)"/>
+  <rect width="256" height="256" fill="url(#glow)"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="34">
+    <path d="M186 74 H78 L134 132 L78 190 H186" stroke="#1A1466" stroke-opacity="0.45" transform="translate(0 16)" filter="url(#shadow)"/>
+    <path d="M186 74 H78 L134 132 L78 190 H186" stroke="#9FB0F5" transform="translate(0 8)"/>
+    <path d="M186 74 H78 L134 132 L78 190 H186" stroke="url(#face)"/>
+  </g>
+</svg>

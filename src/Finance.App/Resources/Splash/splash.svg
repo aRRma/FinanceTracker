@@ -1,8 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Заставка до первой страницы: тот же кошелёк, что на значке. Фон задаёт MauiSplashScreen в проекте. -->
-<svg width="456" height="456" viewBox="0 0 456 456" version="1.1" xmlns="http://www.w3.org/2000/svg">
-    <g transform="translate(108 108) scale(10)" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12"/>
-        <path d="M20 12v4h-4a2 2 0 0 1 0 -4h4"/>
-    </g>
+<!-- Неподвижная заставка MAUI: тот же неоновый рубль, что на значке, но без плитки — фоном служит
+     сплошной цвет MauiSplashScreen в проекте (Android 12+ градиента под заставкой не умеет).
+     На Android 12+ её значок подменяет движущийся Platforms/Android/Resources/drawable/splash_echo.xml
+     (тема Finance.SplashTheme); MauiSplashScreen остаётся ради цвета фона и родительской темы MAUI.
+     Отсвет неона сходит на нет до края холста: система обрезает значок заставки кругом,
+     и обрезанный ореол дал бы видимую кромку. Контур повторён в каждом слое, без <use>, —
+     как в Resources/AppIcon/appiconfg.svg. -->
+<svg width="256" height="256" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <radialGradient id="spill" cx="128" cy="128" r="124" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#2CFFA8" stop-opacity="0.20" />
+            <stop offset="1" stop-color="#2CFFA8" stop-opacity="0" />
+        </radialGradient>
+        <linearGradient id="glass" x1="68" y1="52" x2="160" y2="204" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#1D6B55" stop-opacity="0.7" />
+            <stop offset="1" stop-color="#0A3328" stop-opacity="0.6" />
+        </linearGradient>
+        <!-- Область фильтра — весь холст: долями габарита сборка обрезала свечение справа, см. appiconfg.svg -->
+        <filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
+            <feGaussianBlur stdDeviation="8" />
+        </filter>
+        <clipPath id="in">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" />
+        </clipPath>
+    </defs>
+    <circle cx="128" cy="128" r="124" fill="url(#spill)" />
+    <path filter="url(#glow)" fill="none" stroke="#2CFFA8" stroke-width="14" stroke-linejoin="round" opacity="0.55" d="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" />
+    <path fill="url(#glass)" fill-rule="evenodd" d="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" />
+    <path clip-path="url(#in)" fill="#FFFFFF" opacity="0.18" d="M60 40 H120 L60 140 Z" />
+    <path fill="none" stroke="#3CFFB0" stroke-width="4" stroke-linejoin="round" d="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" />
+    <path fill="none" stroke="#E6FFF5" stroke-width="1.5" stroke-linejoin="round" d="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" />
 </svg>

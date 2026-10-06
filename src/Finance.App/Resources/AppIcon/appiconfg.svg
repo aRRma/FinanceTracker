@@ -1,9 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Знак приложения: контур кошелька из набора значков (Tabler Icons, MIT), белым на акценте.
-     Тот же контур показывают балансы и выбор счёта — значок на рабочем столе узнаётся в приложении. -->
-<svg width="456" height="456" viewBox="0 0 456 456" version="1.1" xmlns="http://www.w3.org/2000/svg">
-    <g transform="translate(108 108) scale(10)" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12"/>
-        <path d="M20 12v4h-4a2 2 0 0 1 0 -4h4"/>
+<!-- Знак приложения: рубль из тёмного стекла с неоновой трубкой по кромке. Подложка — в appicon.svg,
+     плоский силуэт для тематического значка — в Platforms/Android/Resources/drawable/appicon_monochrome.xml,
+     слои собирает в значок Platforms/Android/Resources/mipmap-anydpi-v26/launcher.xml.
+     Холст тот же, что у подложки (весь слой 108 dp, плитка знака сдвинута на 64), — слои совпадают без подгонки.
+     Контур повторён в каждом слое, а не взят через <use>: сборка рисует SVG своей библиотекой,
+     и на ссылки внутри файла полагаться не стоит.
+     Без окружности вокруг: рубль в круге — знак цифрового рубля Банка России. -->
+<svg width="384" height="384" viewBox="0 0 384 384" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="glass" x1="68" y1="52" x2="160" y2="204" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#1D6B55" stop-opacity="0.7" />
+            <stop offset="1" stop-color="#0A3328" stop-opacity="0.6" />
+        </linearGradient>
+        <!-- Область фильтра задана плиткой, а не долями габарита: сборка считает габарит без выпуклости
+             дуги чаши и обрезала свечение справа ровной вертикалью -->
+        <filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
+            <feGaussianBlur stdDeviation="8" />
+        </filter>
+        <!-- Блик живёт только внутри стекла -->
+        <clipPath id="in">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" />
+        </clipPath>
+    </defs>
+    <g transform="translate(64 64)">
+        <!-- Свечение трубки: широкая размытая обводка под стеклом -->
+        <path filter="url(#glow)" fill="none" stroke="#2CFFA8" stroke-width="14" stroke-linejoin="round" opacity="0.55" d="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" />
+        <!-- Стекло: просвет чаши — настоящая дыра, сквозь неё виден фон -->
+        <path fill="url(#glass)" fill-rule="evenodd" d="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" />
+        <path clip-path="url(#in)" fill="#FFFFFF" opacity="0.18" d="M60 40 H120 L60 140 Z" />
+        <!-- Неон: трубка и светлая сердцевина поверх неё -->
+        <path fill="none" stroke="#3CFFB0" stroke-width="4" stroke-linejoin="round" d="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" />
+        <path fill="none" stroke="#E6FFF5" stroke-width="1.5" stroke-linejoin="round" d="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" />
     </g>
 </svg>
