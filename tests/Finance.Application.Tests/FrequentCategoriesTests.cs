@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure.Storage;
@@ -11,7 +10,7 @@ namespace Finance.Application.Tests;
 /// Панель частых подкатегорий над списком выбора: чем она наполняется, что в неё
 /// не попадает и как выбор с панели доезжает до формы операции.
 /// </summary>
-public sealed partial class FrequentCategoriesTests
+public sealed class FrequentCategoriesTests
 {
     /// <summary>
     /// Порядок задан числом операций: чаще записывали — ближе к началу панели.
@@ -220,15 +219,8 @@ public sealed partial class FrequentCategoriesTests
             .Frequent(context, CategoryKind.Expense, given.Today.AddMonths(-3), limit: 8)
             .ToQueryString();
 
-        string alias = TransactionsAlias().Match(sql).Groups[1].Value;
-
-        string plan = await QueryPlan.ExplainAsync(given.Database, sql);
-
-        QueryPlan.NoFullScan(plan, alias);
+        await QueryPlan.NoFullScanOfTransactionsAsync(given.Database, sql);
     }
-
-    [GeneratedRegex("\"transactions\" AS \"(\\w+)\"")]
-    private static partial Regex TransactionsAlias();
 
     private static CategoryPickerViewModel Picker(TransactionFixture fixture) =>
         fixture.Database.Resolve<CategoryPickerViewModel>();

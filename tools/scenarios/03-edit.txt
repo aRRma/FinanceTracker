@@ -1,0 +1,17 @@
+# Правка из ленты: строка открывает записанную операцию, новая сумма видна в ленте.
+# Сумма стирается целиком: в поле правки она записана без копеек, «-250»
+tap Операции
+wait Продукты
+tap Продукты
+wait DeleteTransaction
+tap Backspace
+tap Backspace
+tap Backspace
+tap Backspace
+tap 3
+tap 0
+tap 0
+tap SaveTransaction
+gone SaveTransaction
+wait "-300,00"
+nocrash

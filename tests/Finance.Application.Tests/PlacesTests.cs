@@ -1,5 +1,6 @@
 using Finance.Application.Features.Places.Card;
 using Finance.Application.Features.Transactions.Card;
+using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Domain.Enums;
@@ -50,13 +51,63 @@ public sealed class PlacesTests
 
         Guid account = await fixture.AccountAsync("Карта", 1000m);
 
+        // Три места не в порядке частоты: на двух сравнение с перевёрнутым знаком
+        // случайно давало тот же порядок
         await fixture.SaveAsync(fixture.Expense(account, 10m, place: "Ашан"));
         await fixture.SaveAsync(fixture.Expense(account, 10m, place: "Магнит"));
         await fixture.SaveAsync(fixture.Expense(account, 10m, place: "Магнит"));
+        await fixture.SaveAsync(fixture.Expense(account, 10m, place: "Магнит"));
+        await fixture.SaveAsync(fixture.Expense(account, 10m, place: "Лента"));
+        await fixture.SaveAsync(fixture.Expense(account, 10m, place: "Лента"));
 
         IReadOnlyList<PlaceListItem> places = await fixture.Database.Resolve<IPlacesQuery>().ReadAsync();
 
-        Assert.Equal(["Магнит", "Ашан"], places.Select(static place => place.Name));
+        Assert.Equal(["Магнит", "Лента", "Ашан"], places.Select(static place => place.Name));
+    }
+
+    /// <summary>
+    /// Новое место, заведённое из формы операции, оповещает справочник мест, а знакомое — нет:
+    /// иначе открытый справочник не увидел бы нового места до перезахода.
+    /// </summary>
+    [Fact]
+    public async Task Новое_место_из_операции_оповещает_справочник()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        IChangeNotifier notifier = fixture.Database.Resolve<IChangeNotifier>();
+
+        Guid account = await fixture.AccountAsync("Карта", 1000m);
+        long before = notifier.VersionOf(DataChange.Places);
+
+        await fixture.SaveAsync(fixture.Expense(account, 10m, place: "Пятёрочка"));
+        long afterNew = notifier.VersionOf(DataChange.Places);
+
+        await fixture.SaveAsync(fixture.Expense(account, 10m, place: "пятёрочка"));
+        await fixture.SaveAsync(fixture.Expense(account, 10m));
+
+        Assert.True(afterNew > before);
+        Assert.Equal(afterNew, notifier.VersionOf(DataChange.Places));
+    }
+
+    /// <summary>
+    /// Подпись места — самая частая из его подкатегорий, а не первая и не последняя встреченная.
+    /// </summary>
+    [Fact]
+    public async Task Подпись_места_по_самой_частой_подкатегории()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        Guid account = await fixture.AccountAsync("Карта", 1000m);
+
+        await fixture.SaveAsync(fixture.Income(account, 10m) with { PlaceName = "Пятёрочка" });
+        await fixture.SaveAsync(fixture.Expense(account, 10m, place: "Пятёрочка"));
+        await fixture.SaveAsync(fixture.Expense(account, 10m, place: "Пятёрочка"));
+        await fixture.SaveAsync(fixture.Income(account, 10m) with { PlaceName = "Пятёрочка" });
+        await fixture.SaveAsync(fixture.Expense(account, 10m, place: "Пятёрочка"));
+
+        PlaceListItem place = Assert.Single(await fixture.Database.Resolve<IPlacesQuery>().ReadAsync());
+
+        Assert.Equal(5, place.TransactionCount);
+        Assert.Equal(await CategoryNameAsync(fixture, fixture.ExpenseCategory), place.TopCategoryName);
     }
 
     /// <summary>

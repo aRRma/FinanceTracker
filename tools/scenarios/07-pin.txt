@@ -1,0 +1,33 @@
+# Защита входа: задание кода с повтором, заслонка на холодном старте, неверный код
+# отвергается, верный пускает, выключение — после текущего кода. Кончается выключенной
+# защитой: иначе следующий прогон упёрся бы в заслонку
+tap Ещё
+wait "Защита входа"
+tap "Защита входа"
+wait AppLockCreate
+tap AppLockCreate
+wait PinTitle
+tap Pin1 tap Pin3 tap Pin5 tap Pin7
+wait "Повторите ПИН-код"
+tap Pin1 tap Pin3 tap Pin5 tap Pin7
+wait AppLockState
+wait "Включена"
+# Холодный старт чистит журнал: падение до него проверяется здесь, иначе оно пропало бы
+nocrash
+start
+wait PinTitle
+tap Pin0 tap Pin0 tap Pin0 tap Pin0
+wait "Неверный ПИН-код"
+tap Pin1 tap Pin3 tap Pin5 tap Pin7
+gone PinTitle
+wait AddTransaction
+tap Ещё
+wait "Защита входа"
+tap "Защита входа"
+wait AppLockDisable
+tap AppLockDisable
+wait "Введите текущий ПИН-код"
+tap Pin1 tap Pin3 tap Pin5 tap Pin7
+wait AppLockCreate
+wait "Выключена"
+nocrash

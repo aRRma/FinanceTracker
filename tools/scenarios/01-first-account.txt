@@ -1,0 +1,21 @@
+# Первый счёт на чистой установке: пустые «Балансы», форма счёта, остаток в итоге.
+# Идёт первым: после него в приложении один рублёвый счёт «Card main» с 5 000 ₽.
+# Первый запуск сначала предлагает защиту входа — её задаёт сценарий ПИН-кода
+wait "Защитить вход ПИН-кодом?"
+tap button2
+wait CreateFirstAccount
+tap CreateFirstAccount
+wait SaveAccount
+tap "Например, Сбер зарплатная"
+text "Card main"
+tap OpeningBalance
+wait Backspace
+tap 5
+tap 0
+tap 0
+tap 0
+tap SaveAccount
+gone SaveAccount
+wait "5 000,00"
+wait AddTransaction
+nocrash

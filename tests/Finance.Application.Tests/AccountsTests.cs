@@ -91,6 +91,23 @@ public sealed class AccountsTests
     }
 
     /// <summary>
+    /// Переименование проверяет имя так же, как заведение: в чужое имя счёт не переименовать.
+    /// </summary>
+    [Fact]
+    public async Task Переименование_в_занятое_имя_счёта_отвергается()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        await SaveAsync(database, Command("Наличные", 0m));
+        Guid card = await SaveAsync(database, Command("Карта", 0m));
+
+        DomainException error = await Assert.ThrowsAsync<DomainException>(
+            () => SaveAsync(database, Command("наличные", 0m) with { Key = card }));
+
+        Assert.Equal(Invariant.NameUnique, error.Invariant);
+    }
+
+    /// <summary>
     /// Нарушенное правило снимает занятость: имя правят и сохраняют снова.
     /// Оставшийся поднятым флаг гасил бы кнопку насовсем — форма застревала бы
     /// с подписью «Сохраняю…», и уйти с неё удавалось бы только назад.
@@ -150,6 +167,25 @@ public sealed class AccountsTests
         IReadOnlyList<AccountListItem> accounts = await database.Resolve<IAccountsQuery>().ReadAsync();
 
         Assert.Equal("Наличные", accounts.Single(account => account.Key == key).Name);
+    }
+
+    /// <summary>
+    /// Правка сохраняет тип и признак «скрытый»: скрыть заведённый счёт — обычное
+    /// действие, и от него зависят итоги и отчёт.
+    /// </summary>
+    [Fact]
+    public async Task Правка_меняет_тип_и_скрывает_счёт()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        Guid key = await SaveAsync(database, Command("Вклад", 0m));
+
+        await SaveAsync(database, Command("Вклад", 0m, excludedFromTotals: true) with { Key = key, Type = AccountType.Card });
+
+        AccountListItem edited = (await database.Resolve<IAccountsQuery>().ReadAsync()).Single(account => account.Key == key);
+
+        Assert.Equal(AccountType.Card, edited.Type);
+        Assert.True(edited.ExcludedFromTotals);
     }
 
     /// <summary>

@@ -73,6 +73,20 @@ public sealed class AccountInvariantsTests
 
     [Fact]
     [Trait("Инвариант", nameof(Invariant.OpenedOnNotAfterTransactions))]
+    public void Прежняя_дата_открытия_сохраняется_даже_позже_операций()
+    {
+        // Запрет касается сдвига вперёд, а та же дата — не сдвиг. Счёт с операцией
+        // раньше открытия правилами не заводится, но если он есть, повтор прежней
+        // даты не должен падать: правило не зависит от того, что обработчик его не зовёт
+        Account account = Given.Account(openedOn: new DateOnly(2024, 6, 10));
+
+        account.ChangeOpenedOn(new DateOnly(2024, 6, 10), new DateOnly(2024, 6, 1), Given.Today);
+
+        Assert.Equal(new DateOnly(2024, 6, 10), account.OpenedOn);
+    }
+
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.OpenedOnNotAfterTransactions))]
     public void Дата_открытия_сдвигается_вперёд_если_операций_нет()
     {
         Account account = Given.Account(openedOn: new DateOnly(2024, 1, 1));
@@ -80,6 +94,17 @@ public sealed class AccountInvariantsTests
         account.ChangeOpenedOn(new DateOnly(2025, 1, 1), earliestTransactionOn: null, Given.Today);
 
         Assert.Equal(new DateOnly(2025, 1, 1), account.OpenedOn);
+    }
+
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.OpenedOnNotAfterTransactions))]
+    public void Дата_открытия_сдвигается_вперёд_до_дня_самой_ранней_операции()
+    {
+        Account account = Given.Account(openedOn: new DateOnly(2024, 1, 1));
+
+        account.ChangeOpenedOn(new DateOnly(2024, 6, 1), new DateOnly(2024, 6, 1), Given.Today);
+
+        Assert.Equal(new DateOnly(2024, 6, 1), account.OpenedOn);
     }
 
     [Fact]
@@ -109,6 +134,15 @@ public sealed class AccountInvariantsTests
         Account account = Given.Account(openedOn: Given.Today);
 
         Assert.Equal(Given.Today, account.OpenedOn);
+    }
+
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.OpeningDateInRange))]
+    public void Дата_открытия_на_нижней_границе_принимается()
+    {
+        Account account = Given.Account(openedOn: Dates.Earliest);
+
+        Assert.Equal(Dates.Earliest, account.OpenedOn);
     }
 
     [Fact]

@@ -128,6 +128,7 @@ public sealed class TransactionInvariantsTests
             null, null, null, null, Given.Today, null, Given.Today, Given.NowUtc));
 
         Assert.Equal(Invariant.CategoryOnlyInIncomeAndExpense, error.Invariant);
+        Assert.Equal(RuleTexts.Of(RuleText.CategoryRequiredInIncomeAndExpense), error.Message);
     }
 
     [Fact]
@@ -139,6 +140,7 @@ public sealed class TransactionInvariantsTests
             Cash.Key, Given.Rubles(100m), Groceries.Key, null, Given.Today, null, Given.Today, Given.NowUtc));
 
         Assert.Equal(Invariant.CategoryOnlyInIncomeAndExpense, error.Invariant);
+        Assert.Equal(RuleTexts.Of(RuleText.CategoryNotInTransfer), error.Message);
     }
 
     [Fact]

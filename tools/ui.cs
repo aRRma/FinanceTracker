@@ -91,11 +91,14 @@ internal sealed partial class Ui
           swipe <куда>         up | down — прокрутка на полэкрана
           db <sql>             запрос к базе приложения (копия файлов базы, WAL учтён)
           crash                падения из журнала: Java и .NET
+          nocrash              то же как проверка: есть падение — ошибка, цепочка обрывается
           shot [файл]          снимок экрана, по умолчанию artifacts/shot.png — только для вёрстки
           edges                нижние края прокручиваемых областей и кнопок Add*/Save* — запоминаются
           same                 края снова и сверка с последним edges: сдвиг — ошибка (устаревший отступ снизу)
           transit <цель|back>  переход под замедленной вдесятеро анимацией: кадры подряд, полоса под строкой
                                состояния не должна чернеть; анимации после выключаются
+          script <файл>        цепочка из файла: строка — шаг из одной или нескольких команд, # — комментарий,
+                               аргумент с пробелами — в двойных кавычках; сбой называет номер строки
         """;
 
     private readonly string _adb = Sdk("platform-tools", "adb.exe");
@@ -122,20 +125,112 @@ internal sealed partial class Ui
             case "swipe": await SwipeAsync(Take(queue, command)); break;
             case "db": await QueryAsync(Take(queue, command)); break;
             case "crash": await CrashAsync(); break;
+            case "nocrash": await NoCrashAsync(); break;
             case "shot": await ShotAsync(queue.Count > 0 && !IsCommand(queue.Peek()) ? queue.Dequeue() : "artifacts/shot.png"); break;
             case "edges": _edges = await EdgesAsync(); Console.WriteLine($"края: {_edges}"); break;
             case "same": await SameEdgesAsync(); break;
             case "transit": await TransitAsync(Take(queue, command)); break;
+            case "script": await ScriptAsync(Take(queue, command)); break;
             default: throw new UiException($"неизвестная команда «{command}». Справка: dotnet tools/ui.cs -- help");
         }
     }
 
     private static bool IsCommand(string word) =>
         word is "boot" or "run" or "start" or "stop" or "shortcut" or "dump" or "tap" or "tap2" or "hold"
-            or "wait" or "gone" or "text" or "key" or "swipe" or "db" or "crash" or "shot" or "edges" or "same" or "transit";
+            or "wait" or "gone" or "text" or "key" or "swipe" or "db" or "crash" or "nocrash" or "shot" or "edges" or "same"
+            or "transit" or "script";
 
     private static string Take(Queue<string> queue, string command) =>
         queue.Count > 0 ? queue.Dequeue() : throw new UiException($"команде {command} нужен аргумент");
+
+    /// <summary>
+    /// Сценарий из файла. Строка идёт отдельной цепочкой со своим номером в выводе:
+    /// упавший шаг длинного сценария иначе пришлось бы искать по выводу экрана.
+    /// Запомненные края (<c>edges</c>) живут через строки — <c>same</c> сверяется с ними.
+    /// </summary>
+    private async Task ScriptAsync(string path)
+    {
+        if (!File.Exists(path))
+        {
+            throw new UiException($"нет файла сценария {path}");
+        }
+
+        string[] lines = await File.ReadAllLinesAsync(path);
+
+        for (int i = 0; i < lines.Length; i++)
+        {
+            string line = lines[i].Trim();
+
+            if (line.Length is 0 || line.StartsWith('#'))
+            {
+                continue;
+            }
+
+            Console.WriteLine($"[{Path.GetFileName(path)}:{i + 1}] {line}");
+
+            try
+            {
+                // Разбор строки — внутри try: незакрытая кавычка тоже называет номер строки
+                Queue<string> steps = new(Words(line));
+
+                while (steps.Count > 0)
+                {
+                    await RunAsync(steps.Dequeue(), steps);
+                }
+            }
+            catch (UiException error)
+            {
+                throw new UiException($"{Path.GetFileName(path)}, строка {i + 1}: {error.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Слова строки сценария: пробел делит, двойные кавычки держат вместе — так пишется
+    /// подпись из нескольких слов и запрос к базе.
+    /// </summary>
+    private static List<string> Words(string line)
+    {
+        List<string> words = [];
+        StringBuilder word = new();
+        bool quoted = false;
+        bool started = false;
+
+        foreach (char symbol in line)
+        {
+            if (symbol is '"')
+            {
+                quoted = !quoted;
+                started = true;
+            }
+            else if (char.IsWhiteSpace(symbol) && !quoted)
+            {
+                if (started)
+                {
+                    words.Add(word.ToString());
+                    word.Clear();
+                    started = false;
+                }
+            }
+            else
+            {
+                word.Append(symbol);
+                started = true;
+            }
+        }
+
+        if (quoted)
+        {
+            throw new UiException($"незакрытая кавычка: {line}");
+        }
+
+        if (started)
+        {
+            words.Add(word.ToString());
+        }
+
+        return words;
+    }
 
     /// <summary>
     /// Поднимает эмулятор. Без имени — первый AVD по алфавиту, если ни один не запущен.
@@ -443,7 +538,9 @@ internal sealed partial class Ui
             return byId;
         }
 
-        List<UiNode> exact = nodes.FindAll(node => node.Label == target || node.Parts.Contains(target));
+        target = Plain(target);
+
+        List<UiNode> exact = nodes.FindAll(node => Plain(node.Label) == target || node.Parts.Any(part => Plain(part) == target));
 
         if (exact.Count > 0)
         {
@@ -451,7 +548,7 @@ internal sealed partial class Ui
             return exact.Find(static node => node.Flags.StartsWith('*')) ?? exact[0];
         }
 
-        List<UiNode> partial = nodes.FindAll(node => node.Label.Contains(target, StringComparison.OrdinalIgnoreCase));
+        List<UiNode> partial = Partial(nodes, target);
 
         return partial.Count switch
         {
@@ -460,6 +557,22 @@ internal sealed partial class Ui
             _ => throw new UiException($"«{target}» неоднозначно:\n{Render(partial)}"),
         };
     }
+
+    /// <summary>
+    /// Есть ли цель на экране. Для ожидания неоднозначность — не ошибка: сумма стоит
+    /// и в итоге, и в строке счёта, и обе говорят, что она появилась.
+    /// </summary>
+    private static bool IsPresent(List<UiNode> nodes, string target) =>
+        nodes.Exists(node => node.Id == target) || Partial(nodes, Plain(target)).Count > 0;
+
+    private static List<UiNode> Partial(List<UiNode> nodes, string target) =>
+        nodes.FindAll(node => Plain(node.Label).Contains(target, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>
+    /// Подпись с обычными пробелами. Суммы приложение пишет с неразрывными — между
+    /// разрядами и перед знаком валюты, — а в команде набирают обычный пробел.
+    /// </summary>
+    private static string Plain(string text) => text.Replace(' ', ' ').Replace(' ', ' ');
 
     private static string Render(List<UiNode> nodes) => Format(nodes).TrimEnd();
 
@@ -470,7 +583,7 @@ internal sealed partial class Ui
         while (true)
         {
             List<UiNode> nodes = await DumpAsync();
-            bool found = Find(nodes, target) is not null;
+            bool found = IsPresent(nodes, target);
 
             if (found == present)
             {
@@ -566,17 +679,38 @@ internal sealed partial class Ui
 
     private async Task CrashAsync()
     {
+        string report = await CrashReportAsync();
+
+        Console.WriteLine(report.Length > 0 ? Trim(report, 60) : "падений в журнале нет (журнал чистится командами run, start и shortcut)");
+    }
+
+    /// <summary>
+    /// Проверка сценария: падение молчит — окно просто закрывается, — и шаг за ним
+    /// упал бы по таймауту с непонятной причиной. Поэтому сценарий кончается этой командой.
+    /// </summary>
+    private async Task NoCrashAsync()
+    {
+        string report = await CrashReportAsync();
+
+        if (report.Length > 0)
+        {
+            throw new UiException($"в журнале падения:\n{Trim(report, 30)}");
+        }
+
+        Console.WriteLine("падений нет");
+    }
+
+    private async Task<string> CrashReportAsync()
+    {
         // Буфер crash держит падения процесса, в том числе необработанное исключение .NET,
         // которое доходит до Java обёрткой; сам рантайм пишет своё тегами DOTNET и mono-rt,
         // а сбои, перехваченные приложением и показанные сообщением, — тегом Finance.
         // Тег AndroidRuntime из основного буфера не нужен — он повторил бы буфер crash
         string java = await AdbAsync("logcat", "-d", "-b", "crash");
         string managed = await AdbAsync("logcat", "-d", "DOTNET:E", "mono-rt:E", "Finance:E", "*:S");
-        string report = string.Join('\n', $"{java}\n{managed}".Split('\n')
+        return string.Join('\n', $"{java}\n{managed}".Split('\n')
             .Select(static line => line.TrimEnd())
             .Where(static line => line.Length > 0 && !line.StartsWith("--------- beginning", StringComparison.Ordinal)));
-
-        Console.WriteLine(report.Length > 0 ? Trim(report, 60) : "падений в журнале нет (журнал чистится командами run, start и shortcut)");
     }
 
     private static string Trim(string text, int lines)

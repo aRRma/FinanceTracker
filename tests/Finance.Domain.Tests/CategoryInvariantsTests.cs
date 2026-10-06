@@ -81,7 +81,62 @@ public sealed class CategoryInvariantsTests
             () => groceries.MoveTo(food, home, [], [TransactionKind.Expense, TransactionKind.Income]));
 
         Assert.Equal(Invariant.MoveKeepsKind, error.Invariant);
+        Assert.Equal(RuleTexts.Format(RuleText.MoveRejectsIncome, groceries.Name, home.Name), error.Message);
         Assert.Equal(food.Key, groceries.ParentKey);
+    }
+
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.MoveKeepsKind))]
+    public void Перенос_с_расходами_в_одностороннюю_группу_дохода_отвергается()
+    {
+        // Зеркальный случай: в универсальной группе дохода лежит расход,
+        // и пользователь видит текст про расход, а не про доход
+        Category salary = Given.Group("Зарплата", CategoryKind.Income, acceptsAnyKind: true);
+        Category bonuses = Given.Group("Премии", CategoryKind.Income);
+        Category main = Given.Subcategory(salary, "Основная");
+
+        DomainException error = Assert.Throws<DomainException>(
+            () => main.MoveTo(salary, bonuses, [], [TransactionKind.Income, TransactionKind.Expense]));
+
+        Assert.Equal(Invariant.MoveKeepsKind, error.Invariant);
+        Assert.Equal(RuleTexts.Format(RuleText.MoveRejectsExpense, main.Name, bonuses.Name), error.Message);
+        Assert.Equal(salary.Key, main.ParentKey);
+    }
+
+    [Fact]
+    public void Перенос_из_не_группы_ошибка_вызова()
+    {
+        Category food = Given.Group("Еда");
+        Category home = Given.Group("Жильё");
+        Category groceries = Given.Subcategory(food);
+
+        Assert.Throws<ArgumentException>(
+            () => CategoryRules.EnsureCanMove(groceries, groceries, home, [], []));
+    }
+
+    [Fact]
+    public void Перенос_в_не_группу_ошибка_вызова()
+    {
+        Category food = Given.Group("Еда");
+        Category home = Given.Group("Жильё");
+        Category groceries = Given.Subcategory(food);
+        Category rent = Given.Subcategory(home, "Аренда");
+
+        Assert.Throws<ArgumentException>(
+            () => CategoryRules.EnsureCanMove(groceries, food, rent, [], []));
+    }
+
+    [Fact]
+    public void Перенос_подкатегории_чужой_группы_ошибка_вызова()
+    {
+        // Иначе проверки нового места шли бы от группы, в которой подкатегории нет
+        Category food = Given.Group("Еда");
+        Category home = Given.Group("Жильё");
+        Category transport = Given.Group("Транспорт");
+        Category groceries = Given.Subcategory(food);
+
+        Assert.Throws<ArgumentException>(
+            () => CategoryRules.EnsureCanMove(groceries, home, transport, [], []));
     }
 
     [Fact]
@@ -181,6 +236,43 @@ public sealed class CategoryInvariantsTests
     }
 
     [Fact]
+    public void Приёмник_не_ищется_у_подкатегории()
+    {
+        // С пустым списком соседей принадлежность сверять не с чем: ошибку вызова
+        // ловит только проверка, что передана группа
+        Category food = Given.Group();
+        Category groceries = Given.Subcategory(food);
+
+        Assert.Throws<ArgumentException>(() => CategoryRules.EnsureHasReceiver(groceries, []));
+    }
+
+    [Fact]
+    public void Приёмник_для_подкатегории_чужой_группы_не_ищется()
+    {
+        // Иначе операции подкатегории «Жилья» уехали бы в «Прочее» группы «Еда»
+        Category food = Given.Group("Еда");
+        Category home = Given.Group("Жильё");
+        Category groceries = Given.Subcategory(food);
+        Category other = Given.Subcategory(food, "Прочее", CategoryRole.Other);
+        Category rent = Given.Subcategory(home, "Аренда");
+
+        Assert.Throws<ArgumentException>(() => CategoryRules.ReceiverFor(food, [groceries, other], rent));
+    }
+
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.NameUnique))]
+    public void Занятое_имя_подкатегории_называет_её_группу()
+    {
+        // Подкатегории с одним именем бывают в разных группах, и без названия группы
+        // пользователь не поймёт, с какой из них совпало
+        DomainException error = Assert.Throws<DomainException>(
+            () => NameUniqueness.Ensure("Молоко", ["Молоко"], RuleText.SubjectSubcategoryOfGroup, "Еда"));
+
+        Assert.Equal(Invariant.NameUnique, error.Invariant);
+        Assert.Contains("«Еда»", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
     [Trait("Инвариант", nameof(Invariant.GroupHasReceiver))]
     public void Группа_с_единственным_приёмником_принимается()
     {
@@ -249,6 +341,22 @@ public sealed class CategoryInvariantsTests
 
         Assert.Equal(Invariant.ProtectedCategoryStays, error.Invariant);
         Assert.False(other.IsDeleted);
+    }
+
+    [Fact]
+    [Trait("Инвариант", nameof(Invariant.ProtectedCategoryStays))]
+    public void Приёмник_для_удаления_приёмника_не_ищется()
+    {
+        // Удаление проверяет и Category.Delete, но обработчик сначала ищет приёмник:
+        // приёмником удаляемого приёмника оказался бы он сам, и отказ обязан прийти раньше
+        Category food = Given.Group();
+        Category groceries = Given.Subcategory(food);
+        Category other = Given.Subcategory(food, "Прочее", CategoryRole.Other);
+
+        DomainException error = Assert.Throws<DomainException>(
+            () => CategoryRules.ReceiverFor(food, [groceries, other], other));
+
+        Assert.Equal(Invariant.ProtectedCategoryStays, error.Invariant);
     }
 
     [Fact]

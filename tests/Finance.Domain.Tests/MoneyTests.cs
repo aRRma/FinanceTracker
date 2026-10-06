@@ -114,6 +114,26 @@ public sealed class MoneyTests
     }
 
     [Fact]
+    public void Равные_суммы_не_меньше_и_не_больше_друг_друга()
+    {
+        Money left = Money.Create(5m, Currency.RUB);
+        Money right = Money.Create(5m, Currency.RUB);
+
+        Assert.False(left < right);
+        Assert.False(left > right);
+    }
+
+    [Fact]
+    public void Неравенство_различает_и_сумму_и_валюту()
+    {
+        Money rubles = Money.Create(5m, Currency.RUB);
+
+        Assert.False(rubles != Money.Create(5m, Currency.RUB));
+        Assert.True(rubles != Money.Create(6m, Currency.RUB));
+        Assert.True(rubles != Money.Create(5m, Currency.USD));
+    }
+
+    [Fact]
     public void Отрицательная_сумма_допустима()
     {
         // Баланс уходит в минус штатно и предупреждения не требует

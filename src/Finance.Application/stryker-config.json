@@ -1,0 +1,21 @@
+{
+  "stryker-config": {
+    "test-projects": [
+      "../../tests/Finance.Application.Tests/Finance.Application.Tests.csproj"
+    ],
+    "mutate": [
+      "!**/Migrations/**/*.cs",
+      "!**/DesignTimeFinanceDbContextFactory.cs",
+      "!**/Faults.cs",
+      "!**/*Configuration.cs",
+      "!**/TimeZoneCities.cs"
+    ],
+    "ignore-methods": [
+      "*ThrowIfNull",
+      "*ThrowIfNullOrWhiteSpace",
+      "*ThrowIfNegativeOrZero",
+      "*ConfigureAwait"
+    ],
+    "reporters": [ "html", "json", "progress" ]
+  }
+}

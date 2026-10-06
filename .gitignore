@@ -4,6 +4,8 @@ obj/
 artifacts/
 # Собранные пакеты: папка на сборку. Правило artifacts/ её не ловит
 apk-builds/
+# Отчёты Stryker: папка в каталоге проверяемого проекта, на каждый прогон
+StrykerOutput/
 .vs/
 *.user
 .playwright-mcp/

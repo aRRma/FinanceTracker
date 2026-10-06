@@ -128,7 +128,10 @@ dotnet test                                     # домен, слайсы на 
 dotnet test tests/Finance.Application.Tests/Finance.Application.Tests.csproj --filter "FullyQualifiedName~ИмяКласса"
 dotnet build Finance.slnx                       # только он собирает Finance.App
 dotnet tools/coverage.cs [-- ИмяФайла]          # покрытие тестами: итог или непокрытые строки файла
+dotnet tools/coverage.cs -- --changed           # непокрытые строки только из правки: ветка и рабочее дерево поверх master
+cd src/Finance.Domain && dotnet stryker         # ловят ли тесты ошибки: мутанты, минуты (навык tests)
 dotnet tools/ui.cs -- boot <avd> run dump       # эмулятор, развёртывание, экран текстом; справка — help
+dotnet tools/ui.cs -- script tools/scenarios/01-first-account.txt   # сценарий эмулятора; порядок прогона — навык emulator
 python tools/build_prototype.py                 # после КАЖДОЙ правки mockups.html
 dotnet tools/mockup_icons.cs                    # значки макетов из набора приложения — после новой ссылки #i-ключ
 git tag vX.Y.Z; git push origin vX.Y.Z          # релиз в GitHub Actions: тесты, подпись, APK в Releases — только по просьбе пользователя
@@ -136,7 +139,7 @@ git tag vX.Y.Z; git push origin vX.Y.Z          # релиз в GitHub Actions: 
 
 **Скрипты и разовые команды — на C#:** файловое приложение .NET 10 в `tools/` или во временной папке сессии (`dotnet путь.cs -- аргументы`), разовое выражение — `echo '…' | dotnet run -`, раздача папки — `dotnet tools/serve.cs -- docs/ui 8777`. Python — только в сборщике прототипа; новый — с согласия пользователя. Ловушки файловых приложений — навык `build`.
 
-**Правка, которую видно в интерфейсе, проверяется в эмуляторе, а не одними тестами:** тронул слайс, страницу или разметку — пройди сценарий целиком через `tools/ui.cs`: заведение, правку, удаление и нарушенное правило.
+**Правка, которую видно в интерфейсе, проверяется в эмуляторе, а не одними тестами:** тронул слайс, страницу или разметку — пройди сценарий целиком через `tools/ui.cs`: заведение, правку, удаление и нарушенное правило. Общий обход — готовые сценарии `tools/scenarios` (навык `emulator`), новый экран — свой сценарий там же.
 
 ## Документы
 

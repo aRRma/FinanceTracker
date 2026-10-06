@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Report;
 using Finance.Application.Infrastructure;
@@ -14,7 +13,7 @@ namespace Finance.Application.Tests;
 /// Счета отчёта: суммы по выбранному набору на трёх уровнях, валюта набора, строка
 /// счетов со знаками и экран выбора с «Все активные».
 /// </summary>
-public sealed partial class ReportAccountsTests
+public sealed class ReportAccountsTests
 {
     /// <summary>
     /// Скрытый счёт, добавленный к набору, входит в суммы на всех трёх уровнях —
@@ -512,15 +511,9 @@ public sealed partial class ReportAccountsTests
 
         foreach (string sql in queries)
         {
-            string alias = TransactionsAlias().Match(sql).Groups[1].Value;
-            string plan = await QueryPlan.ExplainAsync(given.Database, sql);
-
-            QueryPlan.NoFullScan(plan, alias);
+            await QueryPlan.NoFullScanOfTransactionsAsync(given.Database, sql);
         }
     }
-
-    [GeneratedRegex("\"transactions\" AS \"(\\w+)\"")]
-    private static partial Regex TransactionsAlias();
 
     private static async Task<ReportViewModel> LoadedAsync(TransactionFixture given)
     {

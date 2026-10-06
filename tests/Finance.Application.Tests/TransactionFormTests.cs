@@ -308,6 +308,81 @@ public sealed class TransactionFormTests
     }
 
     /// <summary>
+    /// Записанная операция открывается со всеми полями, и сохранение без правок
+    /// их не теряет: пропущенное при загрузке поле стёрлось бы первой же правкой суммы.
+    /// </summary>
+    [Fact]
+    public async Task Записанная_операция_открывается_со_всеми_полями()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        Guid card = await fixture.AccountAsync("Карта", 1000m);
+        Guid expense = await fixture.SaveAsync(fixture.Expense(card, 250m, place: "Пятёрочка") with { Note = "к ужину" });
+
+        TransactionViewModel model = fixture.Database.Resolve<TransactionViewModel>();
+        await model.LoadAsync(expense);
+
+        Assert.Equal(fixture.ExpenseCategory, model.Category?.Key);
+        Assert.Equal("Пятёрочка", model.PlaceName);
+        Assert.Equal("к ужину", model.Note);
+        Assert.Equal(AmountInput.Write(250m), model.Amount);
+
+        Assert.True(await model.SaveAsync(), model.Error);
+
+        FeedItem item = Assert.Single((await fixture.FeedAsync()).Items);
+
+        Assert.Equal("Пятёрочка", item.Place);
+        Assert.Equal("к ужину", item.Note);
+    }
+
+    /// <summary>
+    /// У перевода между валютами открывается и сумма зачисления: без неё повторное
+    /// сохранение отказало бы «нет второй суммы».
+    /// </summary>
+    [Fact]
+    public async Task Перевод_между_валютами_открывается_с_суммой_зачисления()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+
+        Guid card = await fixture.AccountAsync("Карта", 10_000m);
+        Guid euros = await fixture.AccountAsync("Валютный", currency: Currency.EUR);
+        Guid transfer = await fixture.SaveAsync(fixture.Transfer(card, euros, 9_000m, targetAmount: 100m));
+
+        TransactionViewModel model = fixture.Database.Resolve<TransactionViewModel>();
+        await model.LoadAsync(transfer);
+
+        Assert.Equal(euros, model.TargetAccount?.Key);
+        Assert.Equal(AmountInput.Write(100m), model.TargetAmount);
+        Assert.True(await model.SaveAsync(), model.Error);
+    }
+
+    /// <summary>
+    /// Расход, переделанный в перевод, теряет категорию и место: у перевода их нет,
+    /// и форма не отправляет их в команду — иначе домен отверг бы сохранение.
+    /// </summary>
+    [Fact]
+    public async Task Расход_переделанный_в_перевод_теряет_категорию_и_место()
+    {
+        await using TransactionFixture fixture = await TransactionFixture.CreateAsync();
+        await fixture.AccountAsync("Карта", 1000m);
+        Guid cash = await fixture.AccountAsync("Наличные");
+
+        TransactionViewModel model = await FilledExpenseAsync(fixture, amount: "100");
+        model.PlaceName = "Пятёрочка";
+
+        model.Kind = TransactionKind.Transfer;
+        model.TargetAccount = model.TargetAccounts.Single(option => option.Key == cash);
+
+        Assert.True(await model.SaveAsync(), model.Error);
+
+        FeedItem item = Assert.Single((await fixture.FeedAsync()).Items);
+
+        Assert.Equal(TransactionKind.Transfer, item.Kind);
+        Assert.Null(item.Place);
+        Assert.Null(item.Group);
+    }
+
+    /// <summary>
     /// Подтверждение удаления называет, каким станет баланс каждого счёта операции:
     /// иначе пользователь подтверждает вслепую.
     /// </summary>

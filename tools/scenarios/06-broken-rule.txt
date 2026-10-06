@@ -1,0 +1,16 @@
+# Нарушенное правило: занятое имя счёта (регистр не спасает) — форма остаётся
+# открытой с текстом правила, выход без сохранения спрашивает подтверждение
+tap Балансы
+wait AddAccount
+tap AddAccount
+wait SaveAccount
+tap "Например, Сбер зарплатная"
+text "card MAIN"
+tap SaveAccount
+wait "уже занято"
+key hide
+key back
+wait "Выйти без сохранения?"
+tap button1
+wait AddAccount
+nocrash

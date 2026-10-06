@@ -4,6 +4,12 @@
 // Покрытие кода тестами: прогон с замером, сведение отчётов, итог текстом.
 // dotnet tools/coverage.cs                          итог по сборкам, папкам и файлам с пробелами
 // dotnet tools/coverage.cs -- ИмяФайла [ещё...]     непокрытые строки и ветвления файлов (без .cs)
+// dotnet tools/coverage.cs -- --changed [ветка]     то же, но только строки src, изменённые в ветке и рабочем
+//                                                   дереве от общего предка с веткой (по умолчанию master),
+//                                                   вместе с новыми файлами
+//
+// Общий процент от одной правки почти не сдвигается: 30 непокрытых строк новой функции
+// тонут в шести тысячах. Режим изменённых строк показывает ровно их.
 //
 // Отчёт Cobertura пишется на каждый тестовый проект отдельно и видит только свои
 // попадания: строка домена, которую покрывают лишь прикладные тесты, в отчёте
@@ -14,6 +20,19 @@ using System.Diagnostics;
 using System.Xml.Linq;
 
 string results = Path.Combine(Path.GetTempPath(), "finance-coverage");
+
+// Изменённые строки читаются до прогона: ошибка git видна сразу, а не через минуту тестов
+Dictionary<string, HashSet<int>>? changed = null;
+
+if (args is ["--changed", ..])
+{
+    changed = await ChangedLinesAsync(args.Length > 1 ? args[1] : "master");
+
+    if (changed is null)
+    {
+        return 1;
+    }
+}
 
 if (Directory.Exists(results))
 {
@@ -27,6 +46,13 @@ if (!await RunTestsAsync(results))
 
 Dictionary<LineKey, LineHit> lines = Merge(Directory.GetFiles(results, "coverage.cobertura.xml", SearchOption.AllDirectories));
 List<KeyValuePair<LineKey, LineHit>> counted = [.. lines.Where(static line => IsWritten(line.Key.File))];
+
+if (changed is not null)
+{
+    PrintChanged(counted, changed);
+
+    return 0;
+}
 
 if (args.Length > 0)
 {
@@ -212,6 +238,155 @@ static void PrintFile(List<KeyValuePair<LineKey, LineHit>> lines, string name)
     if (!found)
     {
         Console.WriteLine($"{name}.cs: в отчётах нет — файл не из src или имя с опечаткой");
+    }
+}
+
+// Строки src, изменённые относительно ветки, по файлам; путь — от папки src, как в отчёте.
+// Сравнивается рабочее дерево, а не коммиты: правка проверяется до коммита. Новые
+// файлы git diff не показывает вовсе — они берутся целиком из списка неотслеживаемых
+static async Task<Dictionary<string, HashSet<int>>?> ChangedLinesAsync(string baseBranch)
+{
+    // От общего предка, а не от вершины ветки: ушедший вперёд master показался бы
+    // правкой этой ветки — его новые строки в дереве «изменены» относительно него
+    (int baseExit, string mergeBase) = await GitAsync("merge-base", baseBranch, "HEAD");
+    (int diffExit, string diff) = await GitAsync("diff", "-U0", "--no-color", mergeBase.Trim(), "--", "src");
+    (int listExit, string untracked) = await GitAsync("ls-files", "--others", "--exclude-standard", "--", "src");
+
+    if (baseExit is not 0 || diffExit is not 0 || listExit is not 0)
+    {
+        Console.Error.WriteLine($"git не отдал изменения относительно {baseBranch}");
+
+        return null;
+    }
+
+    Dictionary<string, HashSet<int>> changed = [];
+    HashSet<int>? current = null;
+
+    foreach (string line in diff.ReplaceLineEndings("\n").Split('\n'))
+    {
+        if (line.StartsWith("+++ ", StringComparison.Ordinal))
+        {
+            // «+++ /dev/null» — файл удалён, строк в нём больше нет
+            current = line is "+++ /dev/null" ? null : Changed(changed, Relative(line[4..]));
+        }
+        else if (line.StartsWith("@@ ", StringComparison.Ordinal) && current is not null)
+        {
+            // «@@ -12,3 +14,5 @@»: новые строки — с 14-й, пять штук; без числа — одна
+            string[] added = line.Split(' ')[2][1..].Split(',');
+            int start = int.Parse(added[0]);
+            int count = added.Length > 1 ? int.Parse(added[1]) : 1;
+
+            for (int number = start; number < start + count; number++)
+            {
+                current.Add(number);
+            }
+        }
+    }
+
+    foreach (string file in untracked.ReplaceLineEndings("\n").Split('\n', StringSplitOptions.RemoveEmptyEntries))
+    {
+        if (file.EndsWith(".cs", StringComparison.Ordinal))
+        {
+            // Путь от корня репозитория, «src/…»: косая спереди — чтобы Relative нашёл /src/
+            HashSet<int> lines = Changed(changed, Relative($"/{file}"));
+
+            // Число строк — один раз: условие цикла перечитывало бы файл на каждой строке
+            int total = File.ReadLines(file).Count();
+
+            for (int number = 1; number <= total; number++)
+            {
+                lines.Add(number);
+            }
+        }
+    }
+
+    return changed;
+
+    static HashSet<int> Changed(Dictionary<string, HashSet<int>> changed, string file)
+    {
+        if (!changed.TryGetValue(file, out HashSet<int>? lines))
+        {
+            lines = [];
+            changed[file] = lines;
+        }
+
+        return lines;
+    }
+}
+
+static async Task<(int ExitCode, string Output)> GitAsync(params string[] arguments)
+{
+    ProcessStartInfo start = new("git")
+    {
+        RedirectStandardOutput = true,
+        RedirectStandardError = true
+    };
+
+    foreach (string argument in arguments)
+    {
+        start.ArgumentList.Add(argument);
+    }
+
+    using Process process = Process.Start(start)!;
+    Task<string> error = process.StandardError.ReadToEndAsync();
+    string output = await process.StandardOutput.ReadToEndAsync();
+    await process.WaitForExitAsync();
+
+    if (process.ExitCode is not 0)
+    {
+        Console.Error.WriteLine(await error);
+    }
+
+    return (process.ExitCode, output);
+}
+
+// Только изменённые строки, которые отчёт считает исполнимыми: комментарии и пустые
+// строки в отчёт не попадают и пробелом не считаются
+static void PrintChanged(List<KeyValuePair<LineKey, LineHit>> lines, Dictionary<string, HashSet<int>> changed)
+{
+    List<KeyValuePair<LineKey, LineHit>> touched =
+        [.. lines.Where(line => changed.TryGetValue(line.Key.File, out HashSet<int>? numbers) && numbers.Contains(line.Key.Number))];
+
+    if (touched.Count is 0)
+    {
+        Console.WriteLine("Изменённых исполнимых строк в src нет.");
+
+        return;
+    }
+
+    Console.WriteLine($"Изменённые строки: {Share(touched)}   {BranchShare(touched)}");
+
+    foreach (IGrouping<string, KeyValuePair<LineKey, LineHit>> file in touched
+                 .GroupBy(static line => line.Key.File)
+                 .OrderBy(static group => group.Key))
+    {
+        int[] missed = [.. file.Where(static line => !line.Value.Hit).Select(static line => line.Key.Number).Order()];
+        string[] partial =
+        [
+            .. file
+                .Where(static line => line.Value.Hit && line.Value.Branches.Covered < line.Value.Branches.Total)
+                .OrderBy(static line => line.Key.Number)
+                .Select(static line => $"{line.Key.Number}({line.Value.Branches.Covered}/{line.Value.Branches.Total})")
+        ];
+
+        if (missed.Length is 0 && partial.Length is 0)
+        {
+            continue;
+        }
+
+        Console.WriteLine();
+        Console.WriteLine(file.Key);
+        Console.WriteLine($"  строки {Share(file)}");
+
+        if (missed.Length > 0)
+        {
+            Console.WriteLine($"  не покрыты: {string.Join(' ', missed)}");
+        }
+
+        if (partial.Length > 0)
+        {
+            Console.WriteLine($"  ветвления частично: {string.Join(' ', partial)}");
+        }
     }
 }
 

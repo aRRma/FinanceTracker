@@ -669,7 +669,7 @@ public sealed partial class ReportTests
         await using FinanceDbContext context = await given.Database.Contexts.CreateDbContextAsync();
 
         string sql = ReportQuery.Groups(context, ReportMonth.Of(given.Today), ReportAccounts.Default).ToQueryString();
-        string alias = TransactionsAlias().Match(sql).Groups[1].Value;
+        string alias = QueryPlan.TransactionsAlias(sql);
         string groupBy = GroupByClause().Match(sql).Groups[1].Value;
 
         Assert.Contains("SUM(", sql, StringComparison.Ordinal);
@@ -682,9 +682,7 @@ public sealed partial class ReportTests
 
     /// <summary>
     /// Суммы месяца не превращаются в полный проход по таблице операций. Имя индекса
-    /// не сверяется: планировщик вправе пойти и от счетов, и оба плана хороши —
-    /// плохо ровно одно, полный проход. Псевдоним таблицы EF выбирает сам, поэтому
-    /// он вынимается из SQL, а не угадывается.
+    /// не сверяется: планировщик вправе пойти и от счетов, и оба плана хороши.
     /// </summary>
     [Fact]
     public async Task Суммы_месяца_не_идут_полным_проходом()
@@ -693,15 +691,9 @@ public sealed partial class ReportTests
         await using FinanceDbContext context = await given.Database.Contexts.CreateDbContextAsync();
 
         string sql = ReportQuery.Groups(context, ReportMonth.Of(given.Today), ReportAccounts.Default).ToQueryString();
-        string alias = TransactionsAlias().Match(sql).Groups[1].Value;
 
-        string plan = await QueryPlan.ExplainAsync(given.Database, sql);
-
-        QueryPlan.NoFullScan(plan, alias);
+        await QueryPlan.NoFullScanOfTransactionsAsync(given.Database, sql);
     }
-
-    [GeneratedRegex("\"transactions\" AS \"(\\w+)\"")]
-    private static partial Regex TransactionsAlias();
 
     [GeneratedRegex("^GROUP BY (.+)$", RegexOptions.Multiline)]
     private static partial Regex GroupByClause();

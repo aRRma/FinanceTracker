@@ -1,0 +1,14 @@
+# Удаление из карточки операции: подтверждение называет баланс после, лента пустеет,
+# баланс вернулся к начальному остатку
+tap Операции
+wait Продукты
+tap Продукты
+wait DeleteTransaction
+tap DeleteTransaction
+wait "станет 5 000,00"
+tap button1
+gone DeleteTransaction
+wait "Операций пока нет"
+tap Балансы
+wait "5 000,00"
+nocrash

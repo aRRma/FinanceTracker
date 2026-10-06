@@ -22,4 +22,16 @@ public sealed class DateTextTests
 
         Assert.Contains(DateText.DayWithYear(date), message, StringComparison.Ordinal);
     }
+
+    /// <summary>
+    /// Шапка дня в ленте пишет год только у чужого года: за этот он был бы шумом в каждой шапке.
+    /// </summary>
+    [Fact]
+    public void Год_пишется_только_у_чужого_года()
+    {
+        DateOnly today = new(2026, 9, 15);
+
+        Assert.Equal("3 февраля", DateText.DayWithYearIfOther(new DateOnly(2026, 2, 3), today));
+        Assert.Equal("3 февраля 2025", DateText.DayWithYearIfOther(new DateOnly(2025, 2, 3), today));
+    }
 }

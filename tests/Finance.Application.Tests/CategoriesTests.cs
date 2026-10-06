@@ -284,6 +284,71 @@ public sealed class CategoriesTests
     }
 
     /// <summary>
+    /// Переименование группы проверяет имя среди групп того же вида, и текст
+    /// называет вид: доходная и расходная группы с одним именем сосуществуют.
+    /// </summary>
+    [Theory]
+    [InlineData(CategoryKind.Income, RuleText.SubjectIncomeGroup)]
+    [InlineData(CategoryKind.Expense, RuleText.SubjectExpenseGroup)]
+    public async Task Переименование_группы_в_занятое_имя_отвергается(CategoryKind kind, RuleText subject)
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        await SaveAsync(database, Group("Подработка", kind));
+        Guid bonus = await SaveAsync(database, Group("Премии", kind));
+
+        DomainException error = await Assert.ThrowsAsync<DomainException>(
+            () => SaveAsync(database, new SaveCategoryCommand { Key = bonus, Name = "подработка", Icon = "cash" }));
+
+        Assert.Equal(Invariant.NameUnique, error.Invariant);
+        Assert.Contains(RuleTexts.Of(subject), error.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Переименование подкатегории проверяет имя среди соседей по группе.
+    /// </summary>
+    [Fact]
+    public async Task Переименование_подкатегории_в_занятое_имя_отвергается()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        Guid transport = await SaveAsync(database, Group("Транспорт", CategoryKind.Expense));
+        await SaveAsync(database, Subcategory(transport, "Такси"));
+        Guid metro = await SaveAsync(database, Subcategory(transport, "Метро"));
+
+        DomainException error = await Assert.ThrowsAsync<DomainException>(
+            () => SaveAsync(database, new SaveCategoryCommand { Key = metro, Name = "такси", Icon = "train" }));
+
+        Assert.Equal(Invariant.NameUnique, error.Invariant);
+    }
+
+    /// <summary>
+    /// Подкатегория правится на месте: новое имя в другом регистре и новый значок
+    /// сохраняются, группа остаётся прежней.
+    /// </summary>
+    [Fact]
+    public async Task Подкатегория_правится_на_месте()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        Guid transport = await SaveAsync(database, Group("Транспорт", CategoryKind.Expense));
+        Guid taxi = await SaveAsync(database, Subcategory(transport, "такси"));
+
+        await SaveAsync(database, new SaveCategoryCommand
+        {
+            Key = taxi,
+            Name = "Такси",
+            Icon = "car"
+        });
+
+        CategoryListItem edited = Assert.Single(await ReadAsync(database), item => item.Key == taxi);
+
+        Assert.Equal("Такси", edited.Name);
+        Assert.Equal("car", edited.Icon);
+        Assert.Equal(transport, edited.ParentKey);
+    }
+
+    /// <summary>
     /// Порядок задаётся запросом, а не экраном: сначала группа, за ней её
     /// подкатегории по алфавиту, «Прочее» — последним.
     /// </summary>

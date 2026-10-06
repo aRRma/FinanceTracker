@@ -1,0 +1,16 @@
+{
+  "stryker-config": {
+    "test-projects": [
+      "../../tests/Finance.Domain.Tests/Finance.Domain.Tests.csproj",
+      "../../tests/Finance.Application.Tests/Finance.Application.Tests.csproj"
+    ],
+    "mutate": [
+      "!**/DomainFaults.cs"
+    ],
+    "ignore-methods": [
+      "*ThrowIfNull",
+      "*ThrowIfNullOrWhiteSpace"
+    ],
+    "reporters": [ "html", "json", "progress" ]
+  }
+}

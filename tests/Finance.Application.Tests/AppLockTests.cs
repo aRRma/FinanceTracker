@@ -223,7 +223,11 @@ public sealed class AppLockTests
         device.Pass(TimeSpan.FromHours(2));
         Assert.Equal(TimeSpan.FromSeconds(30), device.Lock().PauseRemaining());
 
-        device.Pass(TimeSpan.FromSeconds(30));
+        // Заново начатая пауза идёт от момента, когда перезагрузку узнали, а не стоит
+        device.Pass(TimeSpan.FromSeconds(10));
+        Assert.Equal(TimeSpan.FromSeconds(20), device.Lock().PauseRemaining());
+
+        device.Pass(TimeSpan.FromSeconds(20));
         Assert.Equal(TimeSpan.Zero, device.Lock().PauseRemaining());
     }
 
@@ -256,6 +260,10 @@ public sealed class AppLockTests
 
         Assert.Equal(PinCheckOutcome.Accepted, (await appLock.CheckAsync("0000")).Outcome);
         Assert.False(appLock.IsEnabled);
+
+        // И заслонка снята: иначе каждый возврат из фона ставил бы её снова
+        Assert.False(appLock.IsLocked);
+        Assert.False(appLock.Return());
     }
 
     [Fact]

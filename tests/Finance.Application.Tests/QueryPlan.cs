@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +9,7 @@ namespace Finance.Application.Tests;
 /// План запроса от самой SQLite. Общий для ленты и отчёта: по составу колонок
 /// индекса не видно, обслужит ли он сортировку или фильтр, — это видно только плану.
 /// </summary>
-internal static class QueryPlan
+internal static partial class QueryPlan
 {
     /// <summary>
     /// Снимает план запроса. Параметры подставлять незачем: план от их значений
@@ -46,11 +47,29 @@ internal static class QueryPlan
     }
 
     /// <summary>
+    /// Псевдоним таблицы операций в SQL. EF выбирает его сам, поэтому он
+    /// вынимается из запроса, а не угадывается.
+    /// </summary>
+    public static string TransactionsAlias(string sql) => TransactionsAliasPattern().Match(sql).Groups[1].Value;
+
+    /// <summary>
+    /// Сверяет, что запрос не идёт полным проходом по таблице операций. Для сводных
+    /// запросов это единственная сверка плана: планировщик вправе пойти и от счетов,
+    /// и от операций, оба плана хороши — плохо ровно одно, полный проход.
+    /// </summary>
+    public static async Task NoFullScanOfTransactionsAsync(TestDatabase database, string sql)
+    {
+        string plan = await ExplainAsync(database, sql);
+
+        NoFullScan(plan, TransactionsAlias(sql));
+    }
+
+    /// <summary>
     /// Сверяет, что таблица под псевдонимом не идёт полным проходом. Проход бывает
     /// и по индексу — «SCAN t USING INDEX …»: индекс тогда задаёт лишь порядок обхода,
     /// а читается вся таблица. Сверка одного голого «SCAN t» его пропускала.
     /// </summary>
-    public static void NoFullScan(string plan, string alias)
+    private static void NoFullScan(string plan, string alias)
     {
         Assert.False(string.IsNullOrEmpty(alias), "Псевдоним таблицы не найден в SQL.");
 
@@ -61,4 +80,7 @@ internal static class QueryPlan
             Assert.False(line == scan || line.StartsWith($"{scan} ", StringComparison.Ordinal), plan);
         }
     }
+
+    [GeneratedRegex("\"transactions\" AS \"(\\w+)\"")]
+    private static partial Regex TransactionsAliasPattern();
 }

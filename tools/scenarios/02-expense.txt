@@ -1,0 +1,17 @@
+# Расход с «Балансов»: сумма с клавиатуры формы, подкатегория из выбора, баланс уменьшился
+wait AddTransaction
+tap AddTransaction
+wait SaveTransaction
+tap 2
+tap 5
+tap 0
+tap Категория
+wait "Еда · 6"
+tap "Еда · 6"
+wait Продукты
+tap Продукты
+wait SaveTransaction
+tap SaveTransaction
+gone SaveTransaction
+wait "4 750,00"
+nocrash

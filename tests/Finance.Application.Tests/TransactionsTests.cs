@@ -115,6 +115,25 @@ public sealed class TransactionsTests
     }
 
     /// <summary>
+    /// Правка проходит те же межтабличные правила, что и запись: перенести операцию
+    /// на дату раньше открытия счёта нельзя, и в базе остаётся прежняя дата.
+    /// </summary>
+    [Fact]
+    public async Task Правка_не_обходит_правил_счёта()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid cash = await given.AccountAsync("Наличные");
+        Guid key = await given.SaveAsync(given.Expense(cash, 10m));
+
+        DomainException error = await Assert.ThrowsAsync<DomainException>(
+            () => given.SaveAsync(given.Expense(cash, 10m, on: TransactionFixture.OpenedOn.AddDays(-1)) with { Key = key }));
+
+        Assert.Equal(Invariant.TransactionNotBeforeAccountOpened, error.Invariant);
+        Assert.Equal(given.Today, (await given.Database.Resolve<ITransactionCardQuery>().ReadAsync(key))!.OccurredOn);
+    }
+
+    /// <summary>
     /// Заблокированный счёт в новую операцию не попадает, а уже записанная на нём
     /// операция правится свободно: обработчик подал домену прежнее состояние.
     /// </summary>
