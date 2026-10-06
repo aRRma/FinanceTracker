@@ -277,6 +277,29 @@ public sealed class AppLockTests
     }
 
     /// <summary>
+    /// Экран защиты в настройках узнаёт состояние только при появлении: экран ПИН-кода
+    /// меняет его, уходя, и подпись переключателя обязана догнать.
+    /// </summary>
+    [Fact]
+    public async Task Экран_защиты_перечитывает_состояние_при_появлении()
+    {
+        AppLockService appLock = new TestDevice().Lock();
+        AppLockViewModel screen = new(appLock);
+        List<string?> changed = [];
+        screen.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        screen.Load();
+        Assert.True(screen.IsDisabled);
+
+        await appLock.EnableAsync(Pin);
+        screen.Load();
+
+        Assert.True(screen.IsEnabled);
+        Assert.False(screen.IsDisabled);
+        Assert.Contains(nameof(AppLockViewModel.IsDisabled), changed);
+    }
+
+    /// <summary>
     /// Заслонка: неверный код встряхивает точки и стирается, с двумя оставшимися
     /// попытками называет их число, пятый гасит клавиатуру отсчётом. Верный снимает заслонку.
     /// </summary>

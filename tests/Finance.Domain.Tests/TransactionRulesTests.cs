@@ -170,6 +170,24 @@ public sealed class TransactionRulesTests
     }
 
     [Fact]
+    [Trait("Инвариант", nameof(Invariant.ClosedAccountNotInNewTransaction))]
+    public void Записанный_перевод_на_заблокированный_счёт_правится_свободно()
+    {
+        // Заблокирован счёт зачисления, и в прежнем состоянии он тоже был зачислением:
+        // разворот выше этого не ловит — там заблокированный счёт был списанием
+        Account open = Given.Account("Карта");
+        Account closed = Given.Account("Старый", closed: true);
+        Transaction transfer = Given.Transfer(open, closed);
+        Transaction before = Given.Snapshot(transfer);
+
+        transfer.Replace(
+            TransactionKind.Transfer, open.Key, Given.Rubles(250m), closed.Key, Given.Rubles(250m),
+            null, null, Given.Today, null, Given.Today);
+
+        TransactionRules.EnsureValid(transfer, open, closed, null, null, previous: before);
+    }
+
+    [Fact]
     [Trait("Инвариант", nameof(Invariant.CategoryKindMatchesTransaction))]
     public void Расход_в_доходной_категории_отвергается()
     {

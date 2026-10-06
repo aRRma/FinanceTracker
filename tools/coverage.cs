@@ -104,18 +104,27 @@ static Dictionary<LineKey, LineHit> Merge(string[] reports)
     Dictionary<LineKey, LineHit> lines = [];
 
     foreach (string report in reports)
-    foreach (XElement package in XDocument.Load(report).Descendants("package"))
-    foreach (XElement type in package.Descendants("class"))
-    foreach (XElement line in type.Element("lines")!.Elements("line"))
     {
-        LineKey key = new(
-            package.Attribute("name")!.Value,
-            Relative(type.Attribute("filename")!.Value),
-            int.Parse(line.Attribute("number")!.Value));
+        XDocument document = XDocument.Load(report);
 
-        LineHit hit = new(int.Parse(line.Attribute("hits")!.Value) > 0, Branches(line));
+        // Имя файла в отчёте — от его корня <source>, а корень у каждого отчёта свой:
+        // у доменных тестов это папка домена, у прикладных — src. Без корня одна строка
+        // домена числилась бы дважды, под двумя путями, и отчёты не сводились бы
+        string root = document.Descendants("source").Single().Value;
 
-        lines[key] = lines.TryGetValue(key, out LineHit known) ? known.With(hit) : hit;
+        foreach (XElement package in document.Descendants("package"))
+        foreach (XElement type in package.Descendants("class"))
+        foreach (XElement line in type.Element("lines")!.Elements("line"))
+        {
+            LineKey key = new(
+                package.Attribute("name")!.Value,
+                Relative(Path.Combine(root, type.Attribute("filename")!.Value)),
+                int.Parse(line.Attribute("number")!.Value));
+
+            LineHit hit = new(int.Parse(line.Attribute("hits")!.Value) > 0, Branches(line));
+
+            lines[key] = lines.TryGetValue(key, out LineHit known) ? known.With(hit) : hit;
+        }
     }
 
     return lines;

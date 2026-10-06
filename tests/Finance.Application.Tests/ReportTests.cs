@@ -403,6 +403,29 @@ public sealed partial class ReportTests
     }
 
     /// <summary>
+    /// Второй и третий уровни отчёта получают месяц только строкой параметра перехода:
+    /// записанный месяц обязан разобраться обратно в тот же.
+    /// </summary>
+    [Fact]
+    public void Месяц_переживает_параметр_перехода()
+    {
+        ReportMonth february = ReportMonth.Of(new DateOnly(2024, 2, 29));
+
+        Assert.Equal("2024-02", february.ToString());
+        Assert.True(ReportMonth.TryParse(february.ToString(), out ReportMonth parsed));
+        Assert.Equal(february, parsed);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("2024-13")]
+    [InlineData("2024-02-01")]
+    [InlineData("февраль")]
+    public void Испорченный_месяц_перехода_не_разбирается(string? value) =>
+        Assert.False(ReportMonth.TryParse(value, out _));
+
+    /// <summary>
     /// По умолчанию — месяц сегодняшней даты пользователя и расходы.
     /// </summary>
     [Fact]
