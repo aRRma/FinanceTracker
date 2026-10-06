@@ -139,10 +139,13 @@ public sealed partial class MoreViewModel : ScreenViewModel
         ThemeCaption = settings.Theme.Caption;
 
         // У системного пояса называется и то, откуда он взят: иначе непонятно,
-        // почему после переезда подпись сменилась сама
+        // почему после переезда подпись сменилась сама. Зона названа городом, как
+        // в списке поясов; зона без названия — идентификатором
+        string zone = CityNames.Of(settings.TimeZoneId);
+
         TimeZoneCaption = settings.TimeZoneFromSystem
-            ? string.Format(UiCulture.Current, UiTexts.MoreTimeZoneFromSystem, settings.TimeZoneId)
-            : settings.TimeZoneId;
+            ? string.Format(UiCulture.Current, UiTexts.MoreTimeZoneFromSystem, zone)
+            : zone;
 
         // Без незаблокированных счетов выбирать нечего — подпись говорит почему,
         // тем же текстом, что пустой экран выбора

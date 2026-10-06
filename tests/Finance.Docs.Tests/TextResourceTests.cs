@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Finance.Application.Features.Settings.TimeZones;
 using Finance.Application.Texts;
 using Finance.Domain.Errors;
 
@@ -8,9 +9,10 @@ namespace Finance.Docs.Tests;
 
 /// <summary>
 /// Текст, который видит пользователь, лежит в ресурсах, а не в коде. Проверок
-/// пять, и каждая ловит своё: разошедшийся с перечислением ключ правила,
-/// забытую в ресурсе строку, неполную тройку счётных форм и литерал, оставшийся
-/// в коде мимо ресурса, и разошедшуюся с ним подпись ярлыка.
+/// шесть, и каждая ловит своё: разошедшийся с перечислением ключ правила,
+/// разошедшееся со списком поясов название города, забытую в ресурсе строку,
+/// неполную тройку счётных форм, литерал, оставшийся в коде мимо ресурса,
+/// и разошедшуюся с ним подпись ярлыка.
 /// </summary>
 public sealed partial class TextResourceTests
 {
@@ -46,6 +48,23 @@ public sealed partial class TextResourceTests
         Assert.True(
             members.SetEquals(resource),
             $"без текста: {Join(members.Except(resource))}\nбез члена RuleText: {Join(resource.Except(members))}");
+    }
+
+    /// <summary>
+    /// Названия городов заведены ровно на зоны списка поясов. Зона без названия
+    /// подписала бы строку латинским идентификатором, а название выбывшей зоны —
+    /// мёртвая строка.
+    /// </summary>
+    [Fact]
+    public void Названия_городов_совпадают_со_списком_поясов()
+    {
+        HashSet<string> resource = ResourceKeys("src/Finance.Application/Texts/CityNames.resx");
+        HashSet<string> zones = [.. TimeZoneCities.Ids];
+
+        Assert.Equal(zones.Count, TimeZoneCities.Ids.Count);
+        Assert.True(
+            zones.SetEquals(resource),
+            $"без названия: {Join(zones.Except(resource))}\nназвание без зоны: {Join(resource.Except(zones))}");
     }
 
     [Fact]

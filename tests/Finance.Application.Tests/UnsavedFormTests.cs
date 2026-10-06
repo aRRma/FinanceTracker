@@ -2,7 +2,6 @@ using Finance.Application.Features.Accounts.Card;
 using Finance.Application.Features.Categories.Card;
 using Finance.Application.Features.Places.Card;
 using Finance.Application.Features.Transactions.Card;
-using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Domain.Enums;
 
@@ -160,10 +159,7 @@ public sealed class UnsavedFormTests
     {
         await using TestDatabase database = await TestDatabase.CreateAsync();
 
-        GroupViewModel model = new(
-            database.Resolve<ICategoriesQuery>(),
-            database.Resolve<ISaveCategoryHandler>(),
-            database.Resolve<IconCatalog>());
+        GroupViewModel model = database.Resolve<GroupViewModel>();
 
         await model.LoadAsync(key: null);
 

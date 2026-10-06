@@ -242,6 +242,43 @@ public sealed class CategoryScreenTests
     }
 
     /// <summary>
+    /// Подкатегория, заведённая с экрана поверх карточки, видна на ней по возврату,
+    /// а набранное в полях группы остаётся: перечитывается только список.
+    /// </summary>
+    [Fact]
+    public async Task Карточка_группы_видит_заведённую_поверх_неё_подкатегорию()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        Guid food = await SaveAsync(database, Group("Еда", CategoryKind.Expense));
+
+        GroupViewModel model = GroupCard(database);
+
+        // До чтения устаревать нечему: перечитывание раньше загрузки обогнало бы её
+        Assert.False(model.SubcategoriesOutdated);
+
+        await model.LoadAsync(food);
+        model.Name = "Еда и кафе";
+
+        Assert.False(model.SubcategoriesOutdated);
+
+        // Чужая правка список подкатегорий не устаревает
+        await AccountSetup.SaveAsync(database, AccountSetup.Command("Наличные"));
+
+        Assert.False(model.SubcategoriesOutdated);
+
+        await SaveAsync(database, Subcategory(food, "Продукты"));
+
+        Assert.True(model.SubcategoriesOutdated);
+
+        await model.ReloadSubcategoriesAsync();
+
+        Assert.Equal(["Продукты", "Прочее"], model.Subcategories.Select(row => row.Name));
+        Assert.Equal("Еда и кафе", model.Name);
+        Assert.False(model.SubcategoriesOutdated);
+    }
+
+    /// <summary>
     /// Значок новой подкатегории подставляется от группы: свой — уточнение, а не обязанность.
     /// </summary>
     [Fact]
@@ -375,6 +412,40 @@ public sealed class CategoryScreenTests
         Assert.Equal(car, moved.ParentKey);
     }
 
+    /// <summary>
+    /// Отставшее перечитывание подкатегорий не перекрывает свежее: возврат
+    /// из фона во время чтения запускает второе, и первое может вернуться последним.
+    /// </summary>
+    [Fact]
+    public async Task Отставшее_чтение_подкатегорий_не_перекрывает_свежее()
+    {
+        await using TestDatabase database = await TestDatabase.CreateAsync();
+
+        Guid food = await SaveAsync(database, Group("Еда", CategoryKind.Expense));
+
+        DelayingCategories categories = new(database.Resolve<ICategoriesQuery>());
+        GroupViewModel model = new(
+            categories,
+            database.Resolve<ISaveCategoryHandler>(),
+            database.Resolve<IconCatalog>(),
+            database.Resolve<IChangeNotifier>());
+
+        await model.LoadAsync(food);
+        await SaveAsync(database, Subcategory(food, "Продукты"));
+
+        // Первое чтение застаёт одну подкатегорию и держится до отпуска
+        Task stale = await categories.HoldNextAsync(() => model.ReloadSubcategoriesAsync());
+
+        await SaveAsync(database, Subcategory(food, "Кулинария"));
+        await model.ReloadSubcategoriesAsync();
+
+        categories.Release();
+        await stale;
+
+        Assert.Equal(["Кулинария", "Продукты", "Прочее"], model.Subcategories.Select(row => row.Name));
+        Assert.False(model.SubcategoriesOutdated);
+    }
+
     private static CategoriesViewModel Catalog(TestDatabase database) =>
         database.Resolve<CategoriesViewModel>();
 
@@ -397,6 +468,50 @@ public sealed class CategoryScreenTests
             Reads++;
 
             return inner.ReadAsync(cancellationToken);
+        }
+    }
+
+    /// <summary>
+    /// Держит прочитанное до отпуска: на настоящей SQLite чтение завершается
+    /// на месте, и гонку двух чтений иначе не подстроить.
+    /// </summary>
+    private sealed class DelayingCategories(ICategoriesQuery inner) : ICategoriesQuery
+    {
+        private readonly TaskCompletionSource _read = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private readonly TaskCompletionSource _gate = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        private bool _hold;
+
+        /// <summary>
+        /// Запускает чтение, которое будет задержано, и возвращается, когда оно
+        /// уже прочитало базу: правка после этого в него не попадёт.
+        /// </summary>
+        public async Task<Task> HoldNextAsync(Func<Task> read)
+        {
+            _hold = true;
+
+            Task pending = read();
+            await _read.Task;
+
+            return pending;
+        }
+
+        public void Release() => _gate.SetResult();
+
+        public async Task<IReadOnlyList<CategoryListItem>> ReadAsync(CancellationToken cancellationToken = default)
+        {
+            bool hold = _hold;
+            _hold = false;
+
+            IReadOnlyList<CategoryListItem> read = await inner.ReadAsync(cancellationToken);
+
+            if (hold)
+            {
+                _read.SetResult();
+                await _gate.Task;
+            }
+
+            return read;
         }
     }
 }

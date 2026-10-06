@@ -1,5 +1,6 @@
 using Finance.Application.Features.More;
 using Finance.Application.Features.Settings.Appearance;
+using Finance.Application.Features.Settings.TimeZones;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Settings;
@@ -66,6 +67,13 @@ public sealed class MoreTests
         await model.LoadAsync();
 
         Assert.Equal("Тёмная", model.ThemeCaption);
+
+        // Выбранный вручную пояс назван городом, как в списке поясов, а не идентификатором
+        await database.Resolve<IChangeTimeZoneHandler>().HandleAsync("Asia/Vladivostok");
+        await model.LoadAsync();
+
+        Assert.Equal(CityNames.Of("Asia/Vladivostok"), model.TimeZoneCaption);
+        Assert.NotEqual("Asia/Vladivostok", model.TimeZoneCaption);
     }
 
     /// <summary>

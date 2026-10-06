@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
-    Экран D-08: часовой пояс. Зон в системе сотни, поэтому список отбирается
-    по набранным буквам. Первой строкой — возврат к системному поясу: после
-    ручного выбора вернуться к нему иначе нечем.
+    Экран D-08: часовой пояс. По строке на смещение, подписанной городами, —
+    список короткий, и поиск ему не нужен. Первой строкой — возврат к системному
+    поясу: после ручного выбора вернуться к нему иначе нечем.
 -->
 <pages:DataPage
     x:Class="Finance.App.Pages.TimeZonePage"
@@ -15,11 +15,9 @@
     x:DataType="zones:TimeZoneViewModel"
     Title="{x:Static texts:UiTexts.TimeZoneTitle}">
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid>
 
-        <SearchBar Grid.Row="0" Text="{Binding Filter}" Placeholder="{x:Static texts:UiTexts.TimeZoneSearchPlaceholder}" />
-
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Zones}" SelectionMode="None">
+        <CollectionView ItemsSource="{Binding Zones}" SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="zones:TimeZoneOption">
                     <Grid Padding="16,10" ColumnDefinitions="*,Auto,Auto"
@@ -29,7 +27,7 @@
                         </Grid.GestureRecognizers>
                         <Grid.Triggers>
                             <!-- Выбранное видно не только галочкой справа: в списке
-                                 из сотен зон строка целиком находится быстрее -->
+                                 из четырёх десятков строк строка целиком находится быстрее -->
                             <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
                                 <Setter Property="BackgroundColor"
                                         Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}" />
@@ -45,14 +43,6 @@
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-
-            <!-- Подвалом, а не пустым состоянием списка: строка «Как в системе» стоит
-                 в списке всегда, и пустым он не бывает — пустое состояние не показалось бы никогда -->
-            <CollectionView.Footer>
-                <Label Padding="16,24" IsVisible="{Binding IsFilteredOut}"
-                       Text="{x:Static texts:UiTexts.CommonNothingFound}"
-                       Style="{StaticResource SecondaryLabel}" />
-            </CollectionView.Footer>
         </CollectionView>
 
     </Grid>
