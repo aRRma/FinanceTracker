@@ -29,6 +29,7 @@ internal sealed class DevicePinStore : IPinStore
         {
             // Тот же тег, что у Guarded: crash помощника эмулятора читает журнал по нему
             Android.Util.Log.Warn("Finance", error.ToString());
+            CrashCatcher.Warn(error);
 
             SecureStorage.Default.Remove(Name);
 

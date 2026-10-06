@@ -229,6 +229,10 @@ public sealed class MainActivity : MauiAppCompatActivity
 
     private static void Accept(Intent? intent)
     {
+#if DEBUG
+        DebugCrash.Accept(intent);
+#endif
+
         if (intent?.Action != AddTransaction)
         {
             return;

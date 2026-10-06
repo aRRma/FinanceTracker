@@ -22,6 +22,7 @@ using Finance.Application.Features.Transactions.Pick;
 using Finance.Application.Infrastructure;
 using Finance.Application.Infrastructure.AppLock;
 using Finance.Application.Infrastructure.Deletion;
+using Finance.Application.Infrastructure.Diagnostics;
 using Finance.Application.Infrastructure.Initialization;
 using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Settings;
@@ -49,6 +50,7 @@ public static class FinanceServices
     /// <param name="applicationVersion">Версия приложения из манифеста для экрана «О программе».</param>
     /// <param name="culture">Язык текстов, счётных форм и дат; пусто — русский, пока единственный язык приложения.</param>
     /// <param name="cacheFolder">Папка временных файлов: выгрузка, пока её отдают, и присланный файл, пока его проверяют; пусто — папка рядом с базой.</param>
+    /// <param name="crashReports">Отчёты о сбоях, созданные платформой до сборки служб; пусто — рядом с базой, без сведений об устройстве.</param>
     /// <remarks>
     /// Поток интерфейса, оформление и версию знает только платформа: команды выполняются в фоне, а экраны
     /// по их итогу правят привязанные коллекции, и вернуть это в свой поток обязана она; что такое тёмное
@@ -63,7 +65,8 @@ public static class FinanceServices
         Action<Theme>? applyTheme = null,
         string? applicationVersion = null,
         CultureInfo? culture = null,
-        string? cacheFolder = null)
+        string? cacheFolder = null,
+        CrashReports? crashReports = null)
     {
         ArgumentNullException.ThrowIfNull(services);
 
@@ -86,6 +89,20 @@ public static class FinanceServices
         services.TryAddSingleton(TimeProvider.System);
         services.AddSingleton<SystemClock>();
         services.AddSingleton<IClock>(provider => provider.GetRequiredService<SystemClock>());
+
+        // Платформа создаёт отчёты раньше контейнера — перехват сбоев подключается до него —
+        // и передаёт их сюда, чтобы запись и экран делили один файл и одну блокировку
+        if (crashReports is not null)
+        {
+            services.AddSingleton(crashReports);
+        }
+        else
+        {
+            services.AddSingleton(provider => new CrashReports(
+                Path.GetDirectoryName(location.Path) ?? string.Empty,
+                provider.GetRequiredService<TimeProvider>(),
+                DeviceInfo.Unknown));
+        }
 
         services.AddDbContextFactory<FinanceDbContext>(options => options.UseSqlite(location.ConnectionString));
 

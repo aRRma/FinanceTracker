@@ -80,6 +80,9 @@ internal static class Guarded
         // компилятором, и на телефоне от сбоя не оставалось бы ни строки
         Android.Util.Log.Error(LogTag, error.ToString());
 
+        // Журнал устройства с телефона не достать, а отчёт о сбое уходит кнопкой «Поделиться»
+        CrashCatcher.Caught(error);
+
         try
         {
             if (Shell.Current?.CurrentPage is { } page)
@@ -91,6 +94,7 @@ internal static class Guarded
         {
             // Показать было нечем. Роняя процесс отсюда, мы потеряли бы и исходный сбой
             Android.Util.Log.Error(LogTag, failure.ToString());
+            CrashCatcher.Caught(failure);
         }
     }
 

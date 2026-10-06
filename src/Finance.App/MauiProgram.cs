@@ -77,7 +77,8 @@ public static class MauiProgram
             dispatchToInterface: MainThread.BeginInvokeOnMainThread,
             applyTheme: ApplyTheme,
             applicationVersion: AppInfo.Current.VersionString,
-            cacheFolder: FileSystem.CacheDirectory);
+            cacheFolder: FileSystem.CacheDirectory,
+            crashReports: CrashCatcher.Reports);
 
         AddPages(builder.Services);
 

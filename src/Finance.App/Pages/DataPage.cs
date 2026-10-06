@@ -140,6 +140,7 @@ public abstract class DataPage : ContentPage
         {
             // Со старой схемой новый код работать не может, и делать вид,
             // что экран просто пуст, нельзя: данные целы, а приложение — нет
+            CrashCatcher.Caught(error);
             await DisplayAlertAsync(UiTexts.ErrorDatabaseFailedTitle, error.Message, UiTexts.CommonClose);
         }
     }
