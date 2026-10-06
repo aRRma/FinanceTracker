@@ -1,4 +1,5 @@
 using Android.App;
+using Android.Graphics.Drawables;
 using Android.Views;
 using Android.Widget;
 using Android.Window;
@@ -16,7 +17,7 @@ namespace Finance.App;
 /// <remarks>
 /// Окно — полноэкранный <see cref="Dialog"/>: диалоги приложения — такие же окна,
 /// и поднятый позже ложится поверх них. При уходе в фон поднимается не оно, а шторка
-/// цветом фона внутри окна приложения (<see cref="Shade"/>): окно, поднятое заранее
+/// цветом атмосферы внутри окна приложения (<see cref="Shade"/>): окно, поднятое заранее
 /// и убранное при возврате, система показывала до конца анимации открытия, и заслонка
 /// мелькала у того, кому вход не нужен.
 /// </remarks>
@@ -28,6 +29,7 @@ internal sealed class LockCover
     private Dialog? _dialog;
     private LockCoverView? _view;
     private Android.Views.View? _shade;
+    private bool _leaving;
 
     /// <summary>
     /// Создаёт заслонку активности.
@@ -89,10 +91,10 @@ internal sealed class LockCover
 
         // Окно от края до края, а раздавать отступы под системные полосы MAUI
         // умеет только в своём окне: в диалоге клавиатура уходила под жестовую
-        // полосу. Отступы ставит рамка вокруг содержимого
+        // полосу. Отступы получает набор, а атмосфера остаётся под полосами
         FrameLayout frame = new(_activity);
         frame.AddView(content, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent));
-        ViewCompat.SetOnApplyWindowInsetsListener(frame, new BarsPadding());
+        ViewCompat.SetOnApplyWindowInsetsListener(frame, new BarsInset(view));
 
         Dialog dialog = new(_activity, Android.Resource.Style.ThemeDeviceDefaultNoActionBar);
 
@@ -110,6 +112,13 @@ internal sealed class LockCover
             // обязана быть заслонка целиком, а не наплывающая на балансы
             window.SetWindowAnimations(0);
 
+            // Окно с прозрачностью с самого начала: после верного кода заслонка
+            // растворяется, и под ней виден экран приложения. Сменённый на ходу
+            // формат пересоздал бы поверхность окна, и уход мигнул бы. Пока
+            // заслонка на месте, её фон непрозрачен, и разницы не видно
+            window.SetFormat(Android.Graphics.Format.Translucent);
+            window.ClearFlags(WindowManagerFlags.DimBehind);
+
             Paint(window);
         }
 
@@ -119,7 +128,7 @@ internal sealed class LockCover
     }
 
     /// <summary>
-    /// Закрывает содержимое окна приложения шторкой цветом фона — при уходе в фон.
+    /// Закрывает содержимое окна приложения шторкой цветом атмосферы — при уходе в фон.
     /// Последний кадр окна, который система покажет при возврате, — шторка, а не балансы.
     /// </summary>
     /// <remarks>
@@ -133,12 +142,9 @@ internal sealed class LockCover
             return;
         }
 
-        Android.Views.View shade = new(_activity);
-
-        if (Paper() is { } paper)
-        {
-            shade.SetBackgroundColor(paper.ToPlatform());
-        }
+        // Шторка — тот же переход, что у атмосферы: при возврате она сменяется
+        // заслонкой без скачка цвета, проступают только пятна
+        Android.Views.View shade = new(_activity) { Background = Atmosphere() };
 
         decor.AddView(shade, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent));
 
@@ -150,14 +156,18 @@ internal sealed class LockCover
     /// </summary>
     public void Dismiss()
     {
+        Unshade();
+        Release();
+    }
+
+    private void Unshade()
+    {
         if (_shade is { } shade)
         {
             (shade.Parent as ViewGroup)?.RemoveView(shade);
 
             _shade = null;
         }
-
-        Release();
     }
 
     /// <summary>
@@ -178,19 +188,51 @@ internal sealed class LockCover
     /// </summary>
     public void Repaint()
     {
-        if (_shade is { } shade && Paper() is { } paper)
-        {
-            shade.SetBackgroundColor(paper.ToPlatform());
-        }
+        _shade?.Background = Atmosphere();
 
-        if (IsRaised)
+        // Уходящую после верного кода заслонку не пересобирать: новая поднялась бы
+        // для уже открытой модели и осталась бы поверх приложения, а уход закрыл бы
+        // не своё окно
+        if (IsRaised && !_leaving)
         {
             Release();
             Show(fresh: false);
         }
     }
 
-    private void OnUnlocked(object? sender, EventArgs e) => Dismiss();
+    private void OnUnlocked(object? sender, EventArgs e) => Guarded.Run(LeaveAsync);
+
+    /// <summary>
+    /// Верный код: заслонка показывает, что замок открыт, и растворяется над экраном
+    /// приложения. С выключенными в системе анимациями уходит сразу.
+    /// </summary>
+    private async Task LeaveAsync()
+    {
+        _leaving = true;
+
+        try
+        {
+            if (_view is { } view
+                && _dialog?.Window?.DecorView is { } decor
+                && Motion.IsOn)
+            {
+                await view.LeaveAsync(() =>
+                {
+                    // Под растворяющейся заслонкой — экран приложения, а не шторка
+                    // и не подложка окна
+                    Unshade();
+                    decor.SetBackgroundColor(Android.Graphics.Color.Transparent);
+                });
+            }
+        }
+        finally
+        {
+            // Сбой анимации не оставляет заслонку: касаний она уже не принимает,
+            // а вход выполнен
+            _leaving = false;
+            Dismiss();
+        }
+    }
 
     /// <summary>
     /// Убирает окно заслонки, не трогая шторку: под поднимаемым окном она
@@ -223,10 +265,8 @@ internal sealed class LockCover
 
         bool night = application.RequestedTheme is AppTheme.Dark;
 
-        if (Paper() is { } paper)
-        {
-            decor.SetBackgroundColor(paper.ToPlatform());
-        }
+        // Подложка — переход атмосферы: её видно первым кадром, пока MAUI не нарисовал содержимое
+        decor.Background = Atmosphere();
 
         WindowInsetsControllerCompat? controller = WindowCompat.GetInsetsController(window, decor);
 
@@ -236,24 +276,44 @@ internal sealed class LockCover
     }
 
     /// <summary>
-    /// Цвет фона страниц в нынешней теме приложения.
+    /// Переход атмосферы в нынешней теме приложения — тот же, что у <see cref="Backdrop"/>,
+    /// только без пятен. Без токенов — непрозрачный чёрный, а не пустота.
     /// </summary>
-    private static Color? Paper() =>
-        ControlsApplication.Current is { } application
-        && application.Resources.TryGetValue(application.RequestedTheme is AppTheme.Dark ? "PaperDark" : "PaperLight", out object? value)
-            ? value as Color
-            : null;
+    /// <remarks>
+    /// Окно заслонки прозрачно, и шторка с подложкой — единственное, что закрывает балансы:
+    /// опечатка в палитре не должна их открыть.
+    /// </remarks>
+    private static Drawable Atmosphere()
+    {
+        string theme = ControlsApplication.Current?.RequestedTheme is AppTheme.Dark ? "Dark" : "Light";
+
+        if (Backdrop.Tones(theme) is not { } tones)
+        {
+            return new ColorDrawable(Android.Graphics.Color.Black);
+        }
+
+        GradientDrawable drawable = new();
+
+        drawable.SetOrientation(GradientDrawable.Orientation.TopBottom);
+        drawable.SetColors([.. tones.Select(static tone => tone.ToPlatform().ToArgb())], [0f, Backdrop.MiddleStop, 1f]);
+
+        return drawable;
+    }
 
     /// <summary>
-    /// Отступы рамки — под строку состояния и полосу навигации.
+    /// Отступы набора — под строку состояния и полосу навигации. Ставятся набору,
+    /// а не рамке окна: атмосфера под ним уходит под полосы от края до края.
     /// </summary>
-    private sealed class BarsPadding : Java.Lang.Object, IOnApplyWindowInsetsListener
+    private sealed class BarsInset(LockCoverView cover) : Java.Lang.Object, IOnApplyWindowInsetsListener
     {
         public WindowInsetsCompat? OnApplyWindowInsets(Android.Views.View? view, WindowInsetsCompat? insets)
         {
-            if (insets?.GetInsets(WindowInsetsCompat.Type.SystemBars()) is { } bars)
+            if (view is not null && insets?.GetInsets(WindowInsetsCompat.Type.SystemBars()) is { } bars)
             {
-                view?.SetPadding(bars.Left, bars.Top, bars.Right, bars.Bottom);
+                // Отступы приходят в точках экрана, а MAUI меряет в независимых
+                double density = view.Resources?.DisplayMetrics?.Density ?? 1;
+
+                cover.Inset(new Thickness(bars.Left / density, bars.Top / density, bars.Right / density, bars.Bottom / density));
             }
 
             return WindowInsetsCompat.Consumed;

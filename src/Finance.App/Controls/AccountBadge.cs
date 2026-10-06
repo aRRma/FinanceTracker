@@ -122,17 +122,14 @@ public sealed class AccountBadge : ContentView
     {
         string name = $"Account{Tone}";
 
-        if (Resource($"{name}Light") is { } light && Resource($"{name}Dark") is { } dark)
+        // Unknown и цвет без токена остаются без заливки: так пропуск в палитре виден сразу
+        if (Palette.Find($"{name}Light") is { } light && Palette.Find($"{name}Dark") is { } dark)
         {
             _fill.SetAppThemeColor(BackgroundColorProperty, light, dark);
         }
 
-        _icon.Stroke = Resource(AccountColors.TakesDarkGlyph(Tone) ? "AccountGlyphInk" : "AccountGlyphWhite") is { } glyph
+        _icon.Stroke = Palette.Find(AccountColors.TakesDarkGlyph(Tone) ? "AccountGlyphInk" : "AccountGlyphWhite") is { } glyph
             ? new SolidColorBrush(glyph)
             : Brush.White;
     }
-
-    // Unknown и цвет без токена остаются без заливки: так пропуск в палитре виден сразу
-    private static Color? Resource(string key) =>
-        ControlsApplication.Current?.Resources.TryGetValue(key, out object? value) is true ? value as Color : null;
 }

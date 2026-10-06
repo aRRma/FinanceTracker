@@ -193,7 +193,7 @@ public sealed class MainActivity : MauiAppCompatActivity
 
         bool night = application.RequestedTheme is AppTheme.Dark;
 
-        if (application.Resources.TryGetValue(night ? "CardDark" : "CardLight", out object? value) && value is Color card)
+        if (Palette.Now("Card") is { } card)
         {
             // Окно от края до края: строка состояния прозрачна, и под ней видна подложка
             // окна. Контейнер шапки над ней прозрачный (styles.xml), иначе он закрыл бы её
