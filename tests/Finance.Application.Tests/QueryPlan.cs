@@ -44,4 +44,21 @@ internal static class QueryPlan
 
         return plan.ToString();
     }
+
+    /// <summary>
+    /// Сверяет, что таблица под псевдонимом не идёт полным проходом. Проход бывает
+    /// и по индексу — «SCAN t USING INDEX …»: индекс тогда задаёт лишь порядок обхода,
+    /// а читается вся таблица. Сверка одного голого «SCAN t» его пропускала.
+    /// </summary>
+    public static void NoFullScan(string plan, string alias)
+    {
+        Assert.False(string.IsNullOrEmpty(alias), "Псевдоним таблицы не найден в SQL.");
+
+        string scan = $"SCAN {alias}";
+
+        foreach (string line in plan.ReplaceLineEndings("\n").Split('\n'))
+        {
+            Assert.False(line == scan || line.StartsWith($"{scan} ", StringComparison.Ordinal), plan);
+        }
+    }
 }

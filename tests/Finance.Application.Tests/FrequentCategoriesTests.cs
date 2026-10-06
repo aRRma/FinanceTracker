@@ -224,8 +224,7 @@ public sealed partial class FrequentCategoriesTests
 
         string plan = await QueryPlan.ExplainAsync(given.Database, sql);
 
-        Assert.False(string.IsNullOrEmpty(alias), sql);
-        Assert.DoesNotContain($"SCAN {alias}\n", plan.ReplaceLineEndings("\n"), StringComparison.Ordinal);
+        QueryPlan.NoFullScan(plan, alias);
     }
 
     [GeneratedRegex("\"transactions\" AS \"(\\w+)\"")]

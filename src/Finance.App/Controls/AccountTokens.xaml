@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Знаки счетов набора отчёта и «+N», если все не уместились. Общий для строки
+    счетов на первом уровне и подписи двух уровней глубже: знаки там одни и те же,
+    и вторая копия разошлась бы с первой.
+-->
+<ContentView
+    x:Class="Finance.App.Controls.AccountTokens"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:report="clr-namespace:Finance.Application.Features.Report;assembly=Finance.Application"
+    x:DataType="report:ReportAccountsLine">
+
+    <!-- Знаки — отдельным слоем: BindableLayout заменяет всех детей своего слоя,
+         и «+N» рядом с ним молча не нарисовался бы -->
+    <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+        <HorizontalStackLayout Spacing="3" BindableLayout.ItemsSource="{Binding Tokens}">
+            <BindableLayout.ItemTemplate>
+                <DataTemplate x:DataType="report:ReportAccount">
+                    <controls:AccountBadge Mode="Token" Tone="{Binding Color}" IconKey="{Binding Icon}">
+                        <controls:AccountBadge.Triggers>
+                            <!-- Заблокированный — вполсилы, как в справочнике счетов -->
+                            <DataTrigger TargetType="controls:AccountBadge" Binding="{Binding IsClosed}" Value="True">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </DataTrigger>
+                        </controls:AccountBadge.Triggers>
+                    </controls:AccountBadge>
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+        </HorizontalStackLayout>
+        <!-- Цветом выбранного чипа: эта пара сверена и на карточке, и на подсветке -->
+        <Label Text="{Binding More}" IsVisible="{Binding HasMore}" VerticalOptions="Center"
+               FontFamily="OpenSansSemibold" Style="{StaticResource ChipSelectedLabel}" />
+    </HorizontalStackLayout>
+
+</ContentView>

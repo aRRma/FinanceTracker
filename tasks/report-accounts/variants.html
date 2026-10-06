@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Выбор счетов в отчёте — макет</title>
+<style>
+:root{
+  --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
+  --ink:#16191C; --ink2:#4C535A; --ink3:#676D74;
+  --line:#E3E6E9; --line2:#CBD1D6;
+  --acc:#0F5C4C; --accbg:#E2EFEB;
+  --pos:#15784A; --neg:#C9302C; --trf:#2259D6; --negbg:#FBEEEE; --posbg:#E3EFE9; --trfbg:#E4EBFA;
+  --mono:ui-monospace,"SF Mono","Roboto Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  --onacc:#FFFFFF; --knob:#FFFFFF; --veil:rgba(22,25,28,.42);
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --app:"Open Sans",var(--sans);
+  /* Цвет счёта — восемь заливок знака; значок на заливке белый или тёмный, одинаково в обеих темах */
+  --acc-blue:#1F7BF5; --acc-orange:#E87F26; --acc-sky:#2CB0CA; --acc-green:#2DBC55;
+  --acc-violet:#994DF5; --acc-magenta:#F730F0; --acc-red:#F72C2E; --acc-pink:#F62B97;
+  --acc-glyph-white:#FFFFFF; --acc-glyph-ink:#16191C;
+}
+[data-theme="dark"]{
+  --paper:#101315;--card:#1C2124;--sunk:#252B2F;
+  --ink:#E7EAEC;--ink2:#A8AFB5;--ink3:#8A9299;
+  --line:#2F373C;--line2:#3A4147;
+  --acc:#48A78E;--accbg:#1B342D;
+  --pos:#5FD08F;--neg:#FF8A80;--trf:#8AB1FF;--negbg:#453435;--posbg:#284037;--trfbg:#303B4B;
+  --onacc:#0B1310;--knob:#E7EAEC;--veil:rgba(4,6,7,.62);
+  --acc-blue:#3082F6; --acc-orange:#DB7823; --acc-sky:#29A6BF; --acc-green:#29B150;
+  --acc-violet:#9E59F6; --acc-magenta:#EC2DE4; --acc-red:#F72C2E; --acc-pink:#F62B97;
+}
+/* В тёмной теме плавающая кнопка цветом карточки с акцентной обводкой, как в приложении */
+[data-theme="dark"] .fab{background:var(--card);color:var(--acc);border:1px solid var(--acc)}
+[data-theme="dark"] .kinds b.on,[data-theme="dark"] .seg b.on{font-weight:600}
+
+/* Шрифт приложения — Open Sans из его ресурсов; без них — системный */
+@font-face{font-family:"Open Sans";src:url(../../src/Finance.App/Resources/Fonts/OpenSans-Regular.ttf);font-weight:400}
+@font-face{font-family:"Open Sans";src:url(../../src/Finance.App/Resources/Fonts/OpenSans-Semibold.ttf);font-weight:600}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1320px;margin:0 auto;padding:48px 24px 80px}
+.masthead{border-bottom:1px solid var(--line2);padding-bottom:20px;margin-bottom:14px}
+.masthead h1{font-size:26px;font-weight:500;margin:0 0 6px;letter-spacing:-0.01em}
+.masthead p{margin:0 0 4px;color:var(--ink2);font-size:14px;max-width:64ch}
+.band{margin:38px 0 20px;padding-bottom:9px;border-bottom:1px solid var(--line2);display:flex;align-items:baseline;gap:12px}
+.band h2{font-size:15px;font-weight:500;margin:0;letter-spacing:.02em}
+.band span{font-size:13px;color:var(--ink2)}
+.sheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:34px 26px;align-items:start}
+.unit{margin:0}
+.cap{margin:0 0 12px;padding-left:2px}
+.sid{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--acc);background:var(--accbg);padding:2px 6px;border-radius:3px;margin-right:8px}
+.cap b{font-weight:500;font-size:14.5px}
+.cap em{display:block;font-style:normal;color:var(--ink2);font-size:12.5px;line-height:1.5;margin-top:4px}
+.cap .uc{font-family:var(--mono);font-size:11px;color:var(--ink2);margin-left:8px}
+
+/* Экран: 330×690 — экран Samsung Galaxy S25 Ultra (480×1040 dp) под строкой состояния в масштабе 330/480;
+   лишнее обрезается, как на устройстве. Страница — цвета бумаги, шапка и панель вкладок — цвета карточки */
+.phone{position:relative;width:330px;height:690px;background:var(--paper);border:1px solid var(--line2);border-radius:22px;overflow:hidden;font-family:var(--app);font-size:13px;line-height:1.4;color:var(--ink)}
+.ic{width:17px;height:17px;flex:none;color:var(--ink2);stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ic.sm{width:14px;height:14px}
+.ic.lg{width:20px;height:20px}
+.ic.acc{color:var(--acc)}
+.ic.mut{color:var(--ink3)}
+.ic.back{transform:rotate(180deg)}
+
+/* Шапка — панель Shell: стрелка «назад», заголовок, действия справа */
+.hd{display:flex;align-items:center;gap:22px;height:46px;padding:0 12px 0 14px;background:var(--card)}
+.hd .ic{color:var(--ink)}
+.hd h2{font-size:16.5px;font-weight:600;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .tool{font-size:17px;font-weight:600;padding:0 4px}
+.hd .save{background:var(--acc);color:var(--onacc);font-size:12px;font-weight:600;padding:6px 12px;border-radius:13px;white-space:nowrap}
+.hd .save.off{opacity:.4}
+.hd .del{color:var(--neg);font-size:12px;font-weight:600;margin-right:-10px}
+
+.body{padding:8px 11px;display:flex;flex-direction:column;gap:11px}
+.lbl{display:flex;justify-content:space-between;font-size:10.5px;font-weight:600;color:var(--ink3);padding:0 1px;margin-bottom:-5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.row{display:flex;align-items:center;gap:9px;padding:8px 10px;min-height:34px}
+.card .row+.row{border-top:1px solid var(--line)}
+.row .g{flex:1;min-width:0}
+.row.sel{background:var(--accbg)}
+.row.child{padding-left:37px}
+.row .k{font-size:13px;color:var(--ink2)}
+.row .v{flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .v.none{color:var(--ink3);font-size:12px}
+.t{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s{font-size:11px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.num{font-size:13px;white-space:nowrap}
+.pos{color:var(--pos)}
+.neg{color:var(--neg)}
+.dim{color:var(--ink2)}
+.faint{color:var(--ink3)}
+.accent{color:var(--acc)}
+.total{font-size:19px;font-weight:600;text-align:right;padding:0 1px;white-space:nowrap}
+.note{font-size:11px;color:var(--ink3);line-height:1.45}
+.note.dim{color:var(--ink2)}
+.badge{font-size:10.5px;color:var(--ink3);background:var(--sunk);border-radius:6px;padding:1px 6px}
+.list{padding-top:2px}
+
+/* Поиск — системная строка поиска на утоплённом фоне */
+.search{display:flex;align-items:center;gap:12px;height:36px;padding:0 12px;background:var(--sunk);color:var(--ink3);font-size:12.5px}
+.search .ic{color:var(--ink)}
+.search span{flex:1;border-bottom:1px solid var(--ink2);padding:6px 0 5px}
+.search .typed{color:var(--ink)}
+
+/* Лента: шапка дня утоплена, строки цвета карточки, разделитель — от текста до края */
+.date{display:flex;justify-content:space-between;padding:6px 11px 5px;background:var(--sunk);font-size:10.5px;font-weight:600;color:var(--ink3)}
+.row.fr{align-items:stretch;padding:0 0 0 11px;background:var(--card);min-height:0}
+.row.fr>.ic{margin-top:10px}
+.row.fr .g{display:flex;align-items:center;gap:9px;padding:6px 11px 6px 0;border-bottom:1px solid var(--line)}
+.row.fr .g>div{flex:1;min-width:0}
+/* Заметка — третьей строкой, мельче и тише подписи: в подписи она вытесняла бы группу и счёт */
+.row.fr .n{font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Выделение в ленте: панель над списком, отмеченная строка — бледным фоном действия и знаком на месте значка */
+.row.fr.sel{background:var(--accbg)}
+.row.fr.sel>.ic{color:var(--acc)}
+.row.fr.sel .n{color:var(--ink2)}
+/* Смахнутая влево строка: под ней «Удалить» */
+.swiped{display:flex;overflow:hidden}
+.swiped .row.fr{flex:0 0 100%;margin-left:-66px}
+.swiped .rm{flex:0 0 66px;display:flex;align-items:center;justify-content:center;background:var(--neg);color:var(--onacc);font-size:11.5px;font-weight:600}
+.balrow{display:flex;justify-content:space-between;align-items:center;padding:8px 11px;font-size:12px;color:var(--ink2)}
+.balrow b{font-size:13.5px;font-weight:600;color:var(--ink)}
+
+/* Сегменты: справочник — плашкой акцента; вид операции и отчёт — своим цветом и знаком */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px}
+.seg b{text-align:center;padding:8px 0;font-size:12.5px;font-weight:400;border-radius:7px;color:var(--ink2)}
+.seg b.on{background:var(--accbg);color:var(--acc)}
+.kinds{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;height:34px;border-bottom:1px solid var(--line)}
+.kinds.boxed{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.kinds b{display:flex;align-items:center;justify-content:center;gap:5px;font-size:12.5px;font-weight:400}
+.kinds b .ic{color:inherit}
+.kinds b.exp{color:var(--neg)}
+.kinds b.inc{color:var(--pos)}
+.kinds b.trf{color:var(--trf)}
+.kinds b.on{color:var(--onacc);font-weight:600}
+.kinds b.exp.on{background:var(--neg)}
+.kinds b.inc.on{background:var(--pos)}
+.kinds b.trf.on{background:var(--trf)}
+
+/* Форма операции: итог крупно по центру, выражение над ним, счёт и категория пополам */
+.amt{display:grid;grid-template-rows:20px auto 20px;padding:0 11px;text-align:center}
+.amt.on{background:var(--sunk)}
+.amt .expr{grid-row:1;align-self:end;font-size:12px;color:var(--ink2)}
+.amt .v{grid-row:2;font-size:30px;font-weight:600;line-height:1.2;white-space:nowrap}
+.amt .v.exp{color:var(--neg)}
+.amt .v.inc{color:var(--pos)}
+.amt .v.zero{color:var(--ink3)}
+.amt .v.wait{font-size:12.5px;font-weight:400;color:var(--ink3);line-height:36px}
+.amt .lb{grid-row:1;align-self:end;display:flex;justify-content:space-between;font-size:11px;color:var(--ink3)}
+.amt+.amt{border-top:1px solid var(--line)}
+.cells{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.cells .fld{display:flex;align-items:center;gap:7px;padding:6px 8px;min-height:42px;min-width:0}
+.cells .fld+.fld{border-left:1px solid var(--line)}
+.cells .fld>span:last-child{min-width:0}
+.cells .k{display:block;font-size:10.5px;color:var(--ink3)}
+.cells .v{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cells .v.ask{color:var(--acc)}
+.ico{width:25px;height:25px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--sunk)}
+/* Незаполненное обязательное поле — тихая метка: кольцо у значка, точка у подписи */
+.fld.req .ico{background:var(--card);box-shadow:inset 0 0 0 1.2px var(--acc);color:var(--acc)}
+.fld.req .k::after{content:"";display:inline-block;width:4px;height:4px;border-radius:2px;background:var(--acc);margin-left:4px;vertical-align:1px}
+.ico .ic{width:15px;height:15px}
+.ico.exp{background:var(--negbg)}
+.ico.exp .ic{color:var(--neg)}
+.ico.inc{background:var(--posbg)}
+.ico.inc .ic{color:var(--pos)}
+.hint{font-size:10.5px;color:var(--ink3);padding:4px 10px 6px;border-top:1px solid var(--line)}
+.chips{display:flex;gap:4px;flex:none}
+.chip{font-size:11px;font-weight:400;padding:3px 8px;border:1px solid var(--line);border-radius:11px;color:var(--ink2);white-space:nowrap;display:flex;align-items:center;gap:4px}
+.chip.on{background:var(--accbg);border-color:transparent;color:var(--acc)}
+.chip .ic{width:13px;height:13px}
+.chiprow{display:flex;gap:5px;overflow:hidden;padding:0 11px}
+.entry{flex:1;border-bottom:1px solid var(--ink2);padding:3px 2px;font-size:13px}
+.entry.ph{color:var(--ink3)}
+.kp{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:3fr 1fr;gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.kp .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:1px}
+.kp .ops{display:grid;grid-template-rows:repeat(5,1fr);background:var(--sunk)}
+.kp b{background:var(--card);display:flex;align-items:center;justify-content:center;height:37px;font-size:17px;font-weight:400}
+.kp .ops b{background:none;height:auto;color:var(--acc);font-size:15px}
+.kp .ic{color:var(--ink)}
+/* Набор ПИН-кода: круглые клавиши посередине экрана, единица сверху, как у телефона.
+   Круг 72 dp — 50, промежутки 28 и 18 dp — 19 и 12 */
+.pinpad{position:absolute;left:50%;transform:translateX(-50%);display:grid;grid-template-columns:repeat(3,50px);grid-auto-rows:50px;column-gap:19px;row-gap:12px}
+.pinpad b{background:var(--accbg);border:1px solid var(--accbg);color:var(--acc);display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:19px;font-weight:400}
+.pinpad b.on{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+.pinpad b.no{background:none;border:none}
+.pinpad .ic{color:var(--acc)}
+[data-theme="dark"] .pinpad b{background:var(--card);border-color:var(--line);color:var(--ink)}
+[data-theme="dark"] .pinpad b.on{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+[data-theme="dark"] .pinpad b.no{background:none;border:none}
+[data-theme="dark"] .pinpad .ic{color:var(--ink2)}
+.pinpad.off{opacity:.4}
+.pin{position:absolute;left:0;right:0;text-align:center}
+.pin .lock{width:44px;height:44px;margin:0 auto 11px;border-radius:50%;background:var(--accbg);display:flex;align-items:center;justify-content:center}
+.pin .lock .ic{color:var(--acc);width:21px;height:21px}
+.pin h3{margin:0;font-size:15.5px;font-weight:600}
+.pin .dots{display:flex;justify-content:center;gap:14px;margin-top:14px}
+.pin .dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--acc)}
+.pin .dots i.on{background:var(--acc)}
+.pin .msg{margin-top:11px;min-height:17px;font-size:12px;color:var(--neg)}
+.toast{position:absolute;left:50%;transform:translateX(-50%);bottom:40px;white-space:nowrap;background:var(--sunk);border:1px solid var(--line2);border-radius:18px;padding:7px 14px;font-size:12px;color:var(--ink);box-shadow:0 2px 8px var(--veil)}
+
+/* Карточки справочников: подпись над полем, поле с подчёркиванием, сохранение — кнопкой под формой */
+.form{padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+.form .fld{display:flex;flex-direction:column;gap:2px}
+.form .k{font-size:11px;color:var(--ink3)}
+.form .fld .v{font-size:13.5px;padding:4px 3px;border-bottom:1px solid var(--ink2)}
+.form .fld .v.lock{color:var(--ink2);border-bottom-color:var(--line2)}
+.form .fld .v.plain{border:none;padding:1px 0}
+.dv{height:1px;background:var(--line)}
+.swrow{display:flex;align-items:center;justify-content:space-between;min-height:30px;font-size:13.5px}
+.sw2{width:30px;height:16px;border-radius:8px;background:var(--line2);position:relative;flex:none}
+.sw2.on{background:var(--acc)}
+.sw2 i{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:6px;background:var(--knob)}
+.sw2.on i{left:16px}
+.icorow{display:flex;align-items:center;justify-content:space-between;min-height:30px;font-size:13.5px}
+.icogrid{display:flex;flex-wrap:wrap;gap:2px 0}
+.icogrid .ic{margin:7px 11px}
+.btn{display:block;text-align:center;padding:9px;border-radius:8px;background:var(--acc);color:var(--onacc);font-size:12.5px;font-weight:600}
+.btn.danger{background:var(--neg)}
+.btn.off{opacity:.45}
+
+/* Плавающая кнопка: на балансах — с подписью, в лентах — круглая */
+.fab{position:absolute;right:12px;bottom:64px;width:40px;height:40px;border-radius:20px;background:var(--acc);color:var(--onacc);display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:0 2px 6px var(--veil)}
+.fab.ext{width:auto;padding:0 16px 0 14px;font-size:13px;font-weight:600}
+.pad{height:60px}
+.nav{position:absolute;left:0;right:0;bottom:0;display:flex;height:52px;background:var(--card)}
+.nav a{flex:1;text-align:center;padding:8px 0 0;color:var(--ink3);text-decoration:none}
+.nav a.on{color:var(--acc)}
+.nav a.on span{font-weight:600}
+.nav .ic{display:block;margin:0 auto;width:20px;height:20px;color:inherit}
+.nav span{font-size:10.5px;display:block;margin-top:1px}
+
+/* Отчёт: стрелки месяца круглыми кнопками, доля и полоса под строкой */
+.month{display:flex;align-items:center;justify-content:space-between}
+.month b{font-size:13px;font-weight:600}
+.ibtn{width:29px;height:29px;border-radius:15px;background:var(--card);display:flex;align-items:center;justify-content:center}
+.ibtn.off .ic{color:var(--line2)}
+.share{font-size:10.5px;font-weight:600;color:var(--ink2);min-width:30px;text-align:right}
+.prog{height:3px;background:var(--line);border-radius:2px;overflow:hidden;margin:-2px 11px 6px 37px}
+.prog i{display:block;height:100%;background:var(--acc)}
+.rrow{padding-left:11px;padding-right:11px}
+
+.empty{padding:40px 22px;text-align:center}
+.empty h3{font-size:15px;font-weight:600;margin:0 0 8px}
+.empty p{font-size:12.5px;color:var(--ink2);margin:0 0 14px}
+
+/* Диалог — системный AlertDialog: действия подписями справа */
+.veil{position:absolute;inset:0;background:var(--veil);display:flex;align-items:center;padding:24px}
+.dlg{background:var(--card);border-radius:18px;padding:18px 18px 10px;width:100%}
+.dlg h4{margin:0 0 10px;font-size:15.5px;font-weight:400}
+.dlg p{margin:0 0 12px;font-size:12.5px;color:var(--ink2);line-height:1.45}
+.dlg .acts{display:flex;justify-content:flex-end;gap:20px;padding-right:4px}
+.dlg .acts b{font-size:12.5px;font-weight:600;color:var(--acc);padding:6px 0}
+
+/* Системный календарь: открывается третьим чипом даты */
+.cal{padding:0}
+.cal .top{padding:14px 18px 10px;border-bottom:1px solid var(--line)}
+.cal .top small{display:block;font-size:11px;color:var(--ink2)}
+.cal .top b{display:block;font-size:22px;font-weight:400;margin-top:4px}
+.cal .mo{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 4px}
+.cal .mo b{font-size:12.5px;font-weight:600}
+.cal .wk{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:10.5px;color:var(--ink3);padding:4px 8px}
+.cal .gr{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;text-align:center;padding:0 8px 6px}
+.cal .gr i{font-style:normal;font-size:12px;padding:5px 0;border-radius:14px}
+.cal .gr i.off{color:var(--line2)}
+.cal .gr i.on{background:var(--acc);color:var(--onacc)}
+.cal .gr i.now{color:var(--acc);font-weight:600}
+.cal .acts{padding:4px 18px 10px}
+
+.stat{display:flex;gap:10px}
+.stat .b{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 10px}
+.stat .b .k{font-size:11px;color:var(--ink3)}
+.stat .b .v{font-size:16px;font-weight:600;margin-top:2px}
+.progress{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.progress i{display:block;height:100%;width:62%;background:var(--acc)}
+/* Знак счёта: скруглённый квадрат, залитый цветом счёта, значок белый или тёмный. Размеры в масштабе
+   экрана (330/480 от dp): плашка 36 dp — 25, шапка 44 dp — 30, жетон 19 dp — 13. Цвет — класс ac-…:
+   он задаёт заливку --c и цвет значка --on, цвета самих токенов живут только в палитре выше */
+.ac-blue{--c:var(--acc-blue);--on:var(--acc-glyph-white)}
+.ac-orange{--c:var(--acc-orange);--on:var(--acc-glyph-ink)}
+.ac-sky{--c:var(--acc-sky);--on:var(--acc-glyph-ink)}
+.ac-green{--c:var(--acc-green);--on:var(--acc-glyph-ink)}
+.ac-violet{--c:var(--acc-violet);--on:var(--acc-glyph-white)}
+.ac-magenta{--c:var(--acc-magenta);--on:var(--acc-glyph-white)}
+.ac-red{--c:var(--acc-red);--on:var(--acc-glyph-white)}
+.ac-pink{--c:var(--acc-pink);--on:var(--acc-glyph-white)}
+.tile{width:25px;height:25px;border-radius:7.5px;display:inline-flex;align-items:center;justify-content:center;flex:none;background:var(--c)}
+.tile .ic{width:15px;height:15px;color:var(--on);stroke-width:2}
+.tile.lg{width:30px;height:30px;border-radius:9px}
+.tile.lg .ic{width:17px;height:17px}
+/* Заблокированный счёт — знак вполсилы, его цвет считается свободным */
+.tile.off{opacity:.5}
+.token{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:4px;background:var(--c);vertical-align:-2.5px;margin:0 4px 0 1px;flex:none}
+.token .ic{width:9px;height:9px;color:var(--on);stroke-width:2.4}
+/* Название счёта в шапке ленты: знак слева от заголовка, ближе к стрелке «назад», чем обычные 22 */
+.hdt{display:flex;align-items:center;gap:10px;flex:1;min-width:0;margin-left:-8px}
+/* Шапка карточки счёта: знак, название, подпись «тип · валюта» */
+.preview{display:flex;align-items:center;gap:10px;padding:4px 2px 2px}
+.preview .t{font-weight:600;font-size:13.5px}
+/* Строка «Цвет и значок» в карточке счёта: знак, «цвет · значок», шеврон */
+.signrow{display:flex;align-items:center;gap:10px;min-height:38px}
+.signrow .v{flex:1;font-size:13.5px}
+.form .fld .signrow .v{border:none;padding:0}
+/* Экран «Цвет и значок»: предпросмотр на странице, цвета 4×2, сетка значков по шесть */
+.signprev{background:var(--paper);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.signprev .card .row{min-height:36px}
+.lbl.sp{margin:2px 0 -6px}
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 0;justify-items:center;padding:6px 0 4px}
+.swatches i{width:28px;height:28px;border-radius:30%;background:var(--c);display:flex;align-items:center;justify-content:center}
+.swatches i.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--c)}
+.swatches i .ic{width:15px;height:15px;color:var(--on);stroke-width:3}
+.signgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px 4px;justify-items:center;padding:4px 0 2px}
+.signgrid span{width:38px;height:38px;border-radius:30%;display:flex;align-items:center;justify-content:center;background:var(--sunk)}
+.signgrid span.on{background:var(--c)}
+.signgrid span.on .ic{color:var(--on)}
+.suggest{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--ink3);padding:2px 0 4px}
+.suggest b{display:inline-flex;align-items:center;gap:4px;font-weight:400;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:2px 8px 2px 3px}
+.suggest b .ic{width:13px;height:13px;color:var(--ink2)}
+@media (max-width:420px){.wrap{padding:28px 14px 50px}}
+</style>
+<script>if(matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.dataset.theme="dark"</script></head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="h-tab-balances" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10.5h18"/><circle cx="17" cy="14.8" r="1.1"/></symbol>
+<symbol id="h-tab-feed" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+<symbol id="h-tab-report" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+<symbol id="h-tab-more" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/></symbol>
+<symbol id="h-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+<symbol id="h-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8L20.5 20.5"/></symbol>
+<symbol id="h-sync" viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3.5v5h-5"/></symbol>
+<symbol id="h-alert" viewBox="0 0 24 24"><path d="M12 4.5l8.5 15.5h-17z"/><path d="M12 10.5v4M12 17.2h.01"/></symbol>
+<symbol id="i-adjustments" viewBox="0 0 24 24"><path d="M4 10a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M6 4v4 M6 12v8 M10 16a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M12 4v10 M12 18v2 M16 7a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M18 4v1 M18 9v11"/></symbol>
+<symbol id="i-alert-triangle" viewBox="0 0 24 24"><path d="M12 4.5l8.5 15.5h-17z M12 10.5v4 M12 17.2h.01"/></symbol>
+<symbol id="i-arrow-down-left" viewBox="0 0 24 24"><path d="M17 7l-10 10 M16 17h-9v-9"/></symbol>
+<symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M17 7l-10 10 M8 7h9v9"/></symbol>
+<symbol id="i-baby-carriage" viewBox="0 0 24 24"><path d="M6 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M16 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M2 5h2.5l1.632 4.897a6 6 0 0 0 5.693 4.103h2.675a5.5 5.5 0 0 0 0 -11h-.5v6 M6 9h14 M9 17l1 -3 M16 14l1 3"/></symbol>
+<symbol id="i-backspace" viewBox="0 0 24 24"><path d="M20 6a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-11l-5 -5a1.5 1.5 0 0 1 0 -2l5 -5z M12 10l4 4 M16 10l-4 4"/></symbol>
+<symbol id="i-beach" viewBox="0 0 24 24"><path d="M17.553 16.75a7.5 7.5 0 0 0 -10.606 0 M18 3.804a6 6 0 0 0 -8.196 2.196l10.392 6a6 6 0 0 0 -2.196 -8.196 M16.732 10c1.658 -2.87 2.225 -5.644 1.268 -6.196c-.957 -.552 -3.075 1.326 -4.732 4.196 M15 9l-3 5.196 M3 19.25a2.4 2.4 0 0 1 1 -.25a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 1 .25"/></symbol>
+<symbol id="i-building-bank" viewBox="0 0 24 24"><path d="M3 21l18 0 M3 10l18 0 M5 6l7 -3l7 3 M4 10l0 11 M20 10l0 11 M8 14l0 3 M12 14l0 3 M16 14l0 3"/></symbol>
+<symbol id="i-bus" viewBox="0 0 24 24"><path d="M4 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M16 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M4 17h-2v-11a1 1 0 0 1 1 -1h14a5 7 0 0 1 5 7v5h-2m-4 0h-8 M16 5l1.5 7l4.5 0 M2 10l15 0 M7 5l0 5 M12 5l0 5"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z M16 3v4 M8 3v4 M4 11h16 M11 15h1 M12 15v3"/></symbol>
+<symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M5 17h-2v-6l2 -5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5"/></symbol>
+<symbol id="i-cash" viewBox="0 0 24 24"><path d="M7 15h-3a1 1 0 0 1 -1 -1v-8a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v3 M7 10a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1l0 -8 M12 14a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5l10 -10"/></symbol>
+<symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6l6 -6"/></symbol>
+<symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6"/></symbol>
+<symbol id="i-circle-check" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M9 12l2 2 M11 14l4 -4"/></symbol>
+<symbol id="i-coffee" viewBox="0 0 24 24"><path d="M3 14c.83 .642 2.077 1.017 3.5 1c1.423 .017 2.67 -.358 3.5 -1c.83 -.642 2.077 -1.017 3.5 -1c1.423 -.017 2.67 .358 3.5 1 M8 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2 M12 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2 M3 10h14v5a6 6 0 0 1 -6 6h-2a6 6 0 0 1 -6 -6v-5 M16.746 16.726a3 3 0 1 0 .252 -5.555"/></symbol>
+<symbol id="i-coins" viewBox="0 0 24 24"><path d="M9 14c0 1.657 2.686 3 6 3s6 -1.343 6 -3s-2.686 -3 -6 -3s-6 1.343 -6 3 M9 14v4c0 1.656 2.686 3 6 3s6 -1.344 6 -3v-4 M3 6c0 1.072 1.144 2.062 3 2.598s4.144 .536 6 0c1.856 -.536 3 -1.526 3 -2.598c0 -1.072 -1.144 -2.062 -3 -2.598s-4.144 -.536 -6 0c-1.856 .536 -3 1.526 -3 2.598 M3 6v10c0 .888 .772 1.45 2 2 M3 11c0 .888 .772 1.45 2 2"/></symbol>
+<symbol id="i-credit-card" viewBox="0 0 24 24"><path d="M3 8a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-8 M3 10h18 M7 15h.01 M11 15h2"/></symbol>
+<symbol id="i-database" viewBox="0 0 24 24"><path d="M4 6a8 3 0 1 0 16 0a8 3 0 1 0 -16 0 M4 6v12 M20 6v12 M4 12a8 3 0 0 0 16 0 M4 18a8 3 0 0 0 16 0"/></symbol>
+<symbol id="i-device-mobile" viewBox="0 0 24 24"><path d="M6 5a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-14 M11 4h2 M12 17v.01"/></symbol>
+<symbol id="i-dots" viewBox="0 0 24 24"><path d="M4 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M18 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M4 17v2 M4 19a2 2 0 0 0 2 2 M6 21h12 M18 21a2 2 0 0 0 2 -2 M20 19v-2 M7 11l5 5l5 -5 M12 4v12"/></symbol>
+<symbol id="i-gas-station" viewBox="0 0 24 24"><path d="M14 11h1a2 2 0 0 1 2 2v3a1.5 1.5 0 0 0 3 0v-7l-3 -3 M4 20v-14a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v14 M3 20l12 0 M18 7v1a1 1 0 0 0 1 1h1 M4 11l10 0"/></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><path d="M3 9a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1l0 -2 M12 8l0 13 M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7 M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5"/></symbol>
+<symbol id="i-grip-vertical" viewBox="0 0 24 24"><path d="M8 5a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M8 12a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M8 19a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M14 5a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M14 12a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M14 19a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"/></symbol>
+<symbol id="i-heart-handshake" viewBox="0 0 24 24"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572 M12 6l-3.293 3.293a1 1 0 0 0 0 1.414l.543 .543c.69 .69 1.81 .69 2.5 0l1 -1a3.182 3.182 0 0 1 4.5 0l2.25 2.25 M12.5 15.5l2 2 M15 13l2 2"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0 M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7 M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></symbol>
+<symbol id="i-info-circle" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M12 9h.01 M11 12h1v4h1"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0 M15 9h.01"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6 M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M8 11v-4a4 4 0 1 1 8 0v4"/></symbol>
+<symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0 M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0"/></symbol>
+<symbol id="i-mood-happy" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M9 9l.01 0 M15 9l.01 0 M8 13a4 4 0 1 0 8 0h-8"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/></symbol>
+<symbol id="i-paw" viewBox="0 0 24 24"><path d="M14.7 13.5c-1.1 -2 -1.441 -2.5 -2.7 -2.5c-1.259 0 -1.736 .755 -2.836 2.747c-.942 1.703 -2.846 1.845 -3.321 3.291c-.097 .265 -.145 .677 -.143 .962c0 1.176 .787 2 1.8 2c1.259 0 3 -1 4.5 -1s3.241 1 4.5 1c1.013 0 1.8 -.823 1.8 -2c0 -.285 -.049 -.697 -.146 -.962c-.475 -1.451 -2.512 -1.835 -3.454 -3.538 M20.188 8.082a1.039 1.039 0 0 0 -.406 -.082h-.015c-.735 .012 -1.56 .75 -1.993 1.866c-.519 1.335 -.28 2.7 .538 3.052c.129 .055 .267 .082 .406 .082c.739 0 1.575 -.742 2.011 -1.866c.516 -1.335 .273 -2.7 -.54 -3.052l-.001 0 M9.474 9c.055 0 .109 0 .163 -.011c.944 -.128 1.533 -1.346 1.32 -2.722c-.203 -1.297 -1.047 -2.267 -1.932 -2.267c-.055 0 -.109 0 -.163 .011c-.944 .128 -1.533 1.346 -1.32 2.722c.204 1.293 1.048 2.267 1.933 2.267 M16.456 6.733c.214 -1.376 -.375 -2.594 -1.32 -2.722a1.164 1.164 0 0 0 -.162 -.011c-.885 0 -1.728 .97 -1.93 2.267c-.214 1.376 .375 2.594 1.32 2.722c.054 .007 .108 .011 .162 .011c.885 0 1.73 -.974 1.93 -2.267 M5.69 12.918c.816 -.352 1.054 -1.719 .536 -3.052c-.436 -1.124 -1.271 -1.866 -2.009 -1.866c-.14 0 -.277 .027 -.407 .082c-.816 .352 -1.054 1.719 -.536 3.052c.436 1.124 1.271 1.866 2.009 1.866c.14 0 .277 -.027 .407 -.082"/></symbol>
+<symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4 M13.5 6.5l4 4"/></symbol>
+<symbol id="i-percentage" viewBox="0 0 24 24"><path d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M6 18l12 -12"/></symbol>
+<symbol id="i-pill" viewBox="0 0 24 24"><path d="M4.5 12.5l8 -8a4.94 4.94 0 0 1 7 7l-8 8a4.94 4.94 0 0 1 -7 -7 M8.5 8.5l7 7"/></symbol>
+<symbol id="i-plane" viewBox="0 0 24 24"><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3l4 7"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14 M5 12h14"/></symbol>
+<symbol id="i-question-mark" viewBox="0 0 24 24"><path d="M8 8a3.5 3 0 0 1 3.5 -3h1a3.5 3 0 0 1 3.5 3a3 3 0 0 1 -2 3a3 4 0 0 0 -2 4 M12 19l0 .01"/></symbol>
+<symbol id="i-receipt" viewBox="0 0 24 24"><path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2m4 -14h6m-6 4h6m-2 4h2"/></symbol>
+<symbol id="i-school" viewBox="0 0 24 24"><path d="M22 9l-10 -4l-10 4l10 4l10 -4v6 M6 10.6v5.4a6 3 0 0 0 12 0v-5.4"/></symbol>
+<symbol id="i-scooter" viewBox="0 0 24 24"><path d="M16 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M4 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M8 17h5a6 6 0 0 1 5 -5v-5a2 2 0 0 0 -2 -2h-1"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><path d="M3 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0 M15 6a3 3 0 1 0 6 0a3 3 0 1 0 -6 0 M15 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0 M8.7 10.7l6.6 -3.4 M8.7 13.3l6.6 3.4"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/></symbol>
+<symbol id="i-shopping-bag" viewBox="0 0 24 24"><path d="M6.331 8h11.339a2 2 0 0 1 1.977 2.304l-1.255 8.152a3 3 0 0 1 -2.966 2.544h-6.852a3 3 0 0 1 -2.965 -2.544l-1.255 -8.152a2 2 0 0 1 1.977 -2.304 M9 11v-5a3 3 0 0 1 6 0v5"/></symbol>
+<symbol id="i-shopping-cart" viewBox="0 0 24 24"><path d="M4 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M15 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M17 17h-11v-14h-2 M6 5l14 1l-1 7h-13"/></symbol>
+<symbol id="i-soup" viewBox="0 0 24 24"><path d="M4 11h16a1 1 0 0 1 1 1v.5c0 1.5 -2.517 5.573 -4 6.5v1a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-1c-1.687 -1.054 -4 -5 -4 -6.5v-.5a1 1 0 0 1 1 -1 M12 4a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2 M16 4a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2 M8 4a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/></symbol>
+<symbol id="i-steering-wheel" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M10 12a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M12 14l0 7 M10 12l-6.75 -2 M14 12l6.75 -2"/></symbol>
+<symbol id="i-stethoscope" viewBox="0 0 24 24"><path d="M6 4h-1a2 2 0 0 0 -2 2v3.5a5.5 5.5 0 0 0 11 0v-3.5a2 2 0 0 0 -2 -2h-1 M8 15a6 6 0 1 0 12 0v-3 M11 3v2 M6 3v2 M18 10a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><path d="M14.828 14.828a4 4 0 1 0 -5.656 -5.656a4 4 0 0 0 5.656 5.656z M6.343 17.657l-1.414 1.414 M6.343 6.343l-1.414 -1.414 M17.657 6.343l1.414 -1.414 M17.657 17.657l1.414 1.414 M4 12h-2 M12 4v-2 M20 12h2 M12 20v2"/></symbol>
+<symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 10h14l-4 -4 M17 14h-14l4 4"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M6.5 7.5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0 M3 6v5.172a2 2 0 0 0 .586 1.414l7.71 7.71a2.41 2.41 0 0 0 3.408 0l5.592 -5.592a2.41 2.41 0 0 0 0 -3.408l-7.71 -7.71a2 2 0 0 0 -1.414 -.586h-5.172a3 3 0 0 0 -3 3"/></symbol>
+<symbol id="i-ticket" viewBox="0 0 24 24"><path d="M15 5l0 2 M15 11l0 2 M15 17l0 2 M5 5h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-3a2 2 0 0 0 0 -4v-3a2 2 0 0 1 2 -2"/></symbol>
+<symbol id="i-tools-kitchen-2" viewBox="0 0 24 24"><path d="M19 3v12h-5c-.023 -3.681 .184 -7.406 5 -12m0 12v6h-1v-3m-10 -14v17m-3 -17v3a3 3 0 1 0 6 0v-3"/></symbol>
+<symbol id="i-train" viewBox="0 0 24 24"><path d="M21 13c0 -3.87 -3.37 -7 -10 -7h-8 M3 15h16a2 2 0 0 0 2 -2 M3 6v5h17.5 M3 11v4 M8 11v-5 M13 11v-4.5 M3 19h18"/></symbol>
+<symbol id="i-trending-up" viewBox="0 0 24 24"><path d="M3 17l6 -6l4 4l8 -8 M14 7l7 0l0 7"/></symbol>
+<symbol id="i-truck-delivery" viewBox="0 0 24 24"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5 M3 9l4 0"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M4 17v2 M4 19a2 2 0 0 0 2 2 M6 21h12 M18 21a2 2 0 0 0 2 -2 M20 19v-2 M7 9l5 -5l5 5 M12 4v12"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0 -8 0 M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2 M16 3.13a4 4 0 0 1 0 7.75 M21 21v-2a4 4 0 0 0 -3 -3.85"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12 M20 12v4h-4a2 2 0 0 1 0 -4h4"/></symbol>
+<symbol id="i-wifi" viewBox="0 0 24 24"><path d="M12 18l.01 0 M9.172 15.172a4 4 0 0 1 5.656 0 M6.343 12.343a8 8 0 0 1 11.314 0 M3.515 9.515c4.686 -4.687 12.284 -4.687 17 0"/></symbol>
+<symbol id="i-world" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M3.6 9h16.8 M3.6 15h16.8 M11.5 3a17 17 0 0 0 0 18 M12.5 3a17 17 0 0 1 0 18"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6l-12 12 M6 6l12 12"/></symbol>
+</defs></svg>
+
+<style>
+/* Строка счетов под месяцем: подпись, знаки счетов, шеврон. Умолчание тихое, свой набор — цветом действия */
+.accline{display:flex;align-items:center;gap:8px;padding:6px 10px;min-height:34px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:12.5px;color:var(--ink2)}
+.accline>span:first-child{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.accline.on{background:var(--accbg);border-color:transparent;color:var(--acc);font-weight:600}
+.accline.on .ic{color:var(--acc)}
+.tokens{flex:none;display:flex;align-items:center;gap:3px}
+.tokens .token{margin:0}
+.tokens .more{font-size:11px;font-weight:600;margin-left:1px}
+.token.off{opacity:.5}
+/* Знаки набора на втором и третьем уровне — в строке подписи */
+.capline{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2)}
+.capline>span:first-child{flex:1}
+/* Отметка множественного выбора */
+.chk{width:17px;height:17px;border-radius:4px;border:1.6px solid var(--ink3);flex:none;display:flex;align-items:center;justify-content:center}
+.chk.on{background:var(--acc);border-color:var(--acc)}
+.chk.on .ic{width:12px;height:12px;color:var(--onacc);stroke-width:3}
+/* Раздел валюты: подпись слева, «Все активные» справа */
+.sec{display:flex;justify-content:space-between;align-items:center;font-size:10.5px;font-weight:600;color:var(--ink3);padding:12px 11px 6px;min-height:22px}
+.allact{font-size:11px;font-weight:600;color:var(--acc);background:var(--accbg);border-radius:11px;padding:3px 10px}
+.allact.off{background:none;color:var(--ink3);font-weight:400;padding:3px 0}
+.row.press{background:var(--sunk)}
+/* Пометки к макетам */
+.vlead{margin:0 0 18px;color:var(--ink2);font-size:13.5px;max-width:92ch}
+.vhead{margin:40px 0 6px;font-size:18px;font-weight:600}
+.mark{outline:2px dashed var(--trf);outline-offset:2px;border-radius:6px}
+.issues{max-width:92ch;font-size:13.5px;color:var(--ink)}
+.issues li{margin-bottom:8px}
+.issues b{font-weight:600}
+</style>
+
+<div class="wrap">
+<header class="masthead">
+<h1>Выбор счетов в отчёте</h1>
+<p>Макет к задаче tasks/report-accounts: строка счетов под месяцем со знаками счетов, экран «Счета отчёта» с разделами по валютам и кнопкой «Все активные» у каждого раздела.</p>
+<p>Счета из макетов: рублёвые «Наличные», «Карта основная», «Карта кредитная», «Карта старая» (заблокирована); «Карта евро»; в накоплениях — «Вклад на отпуск» в рублях и «Доллары дома» в долларах. Активный счёт здесь — не в накоплениях; заблокированный тоже активный, как и сейчас в отчёте.</p>
+<p>Макет согласован 6 октября 2026. Пунктирной рамкой отмечено новое относительно разбора — правила в конце.</p>
+<p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
+</header>
+
+<div class="vhead">Экран отчёта</div>
+<p class="vlead">Строка под месяцем называет набор и показывает знаки его счетов их цветами — какой набор выбран, видно без перехода. Умолчание — тихая строка «Активные счета · ₽». Всё прочее подсвечено цветом действия. Касание строки открывает «Счета отчёта».</p>
+<div class="sheet">
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">1</span><b>Отчёт по умолчанию</b><em>Активные рублёвые счета — как сейчас. Знак заблокированного счёта — вполсилы, как на балансах.</em></figcaption>
+<div class="phone">
+  <div class="hd"><h2>Отчёт</h2></div>
+  <div class="body" style="gap:8px">
+    <div class="kinds boxed"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расходы</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доходы</b></div>
+    <div class="month"><span class="ibtn"><svg class="ic back"><use href="#i-chevron-right"/></svg></span><b>Август 2026</b><span class="ibtn off"><svg class="ic"><use href="#i-chevron-right"/></svg></span></div>
+    <div class="accline"><span>Активные счета · ₽</span><span class="tokens"><span class="token ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><span class="token ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><span class="token ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><span class="token ac-red off"><svg class="ic"><use href="#i-credit-card"/></svg></span></span><svg class="ic sm mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="total neg">-84 260,00 ₽</div>
+  </div>
+  <div class="row rrow"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Еда</div></div><span class="num neg">-31 480,00 ₽</span><span class="share">37%</span></div>
+  <div class="prog"><i style="width:37%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-home"/></svg><div class="g"><div class="t">Жильё</div></div><span class="num neg">-18 900,00 ₽</span><span class="share">22%</span></div>
+  <div class="prog"><i style="width:22%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-shopping-bag"/></svg><div class="g"><div class="t">Покупки</div></div><span class="num neg">-14 200,00 ₽</span><span class="share">17%</span></div>
+  <div class="prog"><i style="width:17%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-train"/></svg><div class="g"><div class="t">Транспорт</div></div><span class="num neg">-9 340,00 ₽</span><span class="share">11%</span></div>
+  <div class="prog"><i style="width:11%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-mood-happy"/></svg><div class="g"><div class="t">Отдых</div></div><span class="num neg">-6 100,00 ₽</span><span class="share">7%</span></div>
+  <div class="prog"><i style="width:7%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-stethoscope"/></svg><div class="g"><div class="t">Здоровье</div></div><span class="num neg">-4 240,00 ₽</span><span class="share">5%</span></div>
+  <div class="prog"><i style="width:5%"></i></div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">2</span><b>Свой набор</b><em>К активным добавлен «Вклад на отпуск»: строка подсвечена, пишет число счетов. Больше пяти знаков — первые четыре и «+N».</em></figcaption>
+<div class="phone">
+  <div class="hd"><h2>Отчёт</h2></div>
+  <div class="body" style="gap:8px">
+    <div class="kinds boxed"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расходы</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доходы</b></div>
+    <div class="month"><span class="ibtn"><svg class="ic back"><use href="#i-chevron-right"/></svg></span><b>Август 2026</b><span class="ibtn off"><svg class="ic"><use href="#i-chevron-right"/></svg></span></div>
+    <div class="accline on"><span>5 счетов</span><span class="tokens"><span class="token ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><span class="token ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><span class="token ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><span class="token ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><span class="token ac-red off"><svg class="ic"><use href="#i-credit-card"/></svg></span></span><svg class="ic sm"><use href="#i-chevron-right"/></svg></div>
+    <div class="total neg">-124 260,00 ₽</div>
+  </div>
+  <div class="row rrow"><svg class="ic"><use href="#i-mood-happy"/></svg><div class="g"><div class="t">Отдых</div></div><span class="num neg">-46 100,00 ₽</span><span class="share">37%</span></div>
+  <div class="prog"><i style="width:37%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Еда</div></div><span class="num neg">-31 480,00 ₽</span><span class="share">25%</span></div>
+  <div class="prog"><i style="width:25%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-home"/></svg><div class="g"><div class="t">Жильё</div></div><span class="num neg">-18 900,00 ₽</span><span class="share">15%</span></div>
+  <div class="prog"><i style="width:15%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-shopping-bag"/></svg><div class="g"><div class="t">Покупки</div></div><span class="num neg">-14 200,00 ₽</span><span class="share">11%</span></div>
+  <div class="prog"><i style="width:11%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-train"/></svg><div class="g"><div class="t">Транспорт</div></div><span class="num neg">-9 340,00 ₽</span><span class="share">8%</span></div>
+  <div class="prog"><i style="width:8%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-stethoscope"/></svg><div class="g"><div class="t">Здоровье</div></div><span class="num neg">-4 240,00 ₽</span><span class="share">3%</span></div>
+  <div class="prog"><i style="width:3%"></i></div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">3</span><b>Все активные в евро</b><em>Набор, совпадающий с активными счетами одной валюты, называется так же, как умолчание, только своей валютой — и подсвечен: это не умолчание.</em></figcaption>
+<div class="phone">
+  <div class="hd"><h2>Отчёт</h2></div>
+  <div class="body" style="gap:8px">
+    <div class="kinds boxed"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расходы</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доходы</b></div>
+    <div class="month"><span class="ibtn"><svg class="ic back"><use href="#i-chevron-right"/></svg></span><b>Август 2026</b><span class="ibtn off"><svg class="ic"><use href="#i-chevron-right"/></svg></span></div>
+    <div class="accline on"><span>Активные счета · €</span><span class="tokens"><span class="token ac-green"><svg class="ic"><use href="#i-plane"/></svg></span></span><svg class="ic sm"><use href="#i-chevron-right"/></svg></div>
+    <div class="total neg">-160,00 €</div>
+  </div>
+  <div class="row rrow"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Еда</div></div><span class="num neg">-86,40 €</span><span class="share">54%</span></div>
+  <div class="prog"><i style="width:54%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-train"/></svg><div class="g"><div class="t">Транспорт</div></div><span class="num neg">-42,00 €</span><span class="share">26%</span></div>
+  <div class="prog"><i style="width:26%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-shopping-bag"/></svg><div class="g"><div class="t">Покупки</div></div><span class="num neg">-31,60 €</span><span class="share">20%</span></div>
+  <div class="prog"><i style="width:20%"></i></div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">4</span><b>Один счёт</b><em>Выбран один счёт — строка пишет его имя: знаки и так читают счета, имя ничего не стоит.</em></figcaption>
+<div class="phone">
+  <div class="hd"><h2>Отчёт</h2></div>
+  <div class="body" style="gap:8px">
+    <div class="kinds boxed"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расходы</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доходы</b></div>
+    <div class="month"><span class="ibtn"><svg class="ic back"><use href="#i-chevron-right"/></svg></span><b>Август 2026</b><span class="ibtn off"><svg class="ic"><use href="#i-chevron-right"/></svg></span></div>
+    <div class="accline on"><span>Доллары дома</span><span class="tokens"><span class="token ac-magenta"><svg class="ic"><use href="#i-home"/></svg></span></span><svg class="ic sm"><use href="#i-chevron-right"/></svg></div>
+    <div class="total neg">-534,00 $</div>
+  </div>
+  <div class="row rrow"><svg class="ic"><use href="#i-mood-happy"/></svg><div class="g"><div class="t">Отдых</div></div><span class="num neg">-320,00 $</span><span class="share">60%</span></div>
+  <div class="prog"><i style="width:60%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-shopping-bag"/></svg><div class="g"><div class="t">Покупки</div></div><span class="num neg">-150,00 $</span><span class="share">28%</span></div>
+  <div class="prog"><i style="width:28%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Еда</div></div><span class="num neg">-64,00 $</span><span class="share">12%</span></div>
+  <div class="prog"><i style="width:12%"></i></div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">5</span><b>Месяц без операций по набору</b><em>Один заголовок вместо двух нынешних: строка счетов стоит прямо над ним, и фраза верна при любом выборе.</em></figcaption>
+<div class="phone">
+  <div class="hd"><h2>Отчёт</h2></div>
+  <div class="body" style="gap:8px">
+    <div class="kinds boxed"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расходы</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доходы</b></div>
+    <div class="month"><span class="ibtn"><svg class="ic back"><use href="#i-chevron-right"/></svg></span><b>Февраль 2026</b><span class="ibtn"><svg class="ic"><use href="#i-chevron-right"/></svg></span></div>
+    <div class="accline on"><span>Доллары дома</span><span class="tokens"><span class="token ac-magenta"><svg class="ic"><use href="#i-home"/></svg></span></span><svg class="ic sm"><use href="#i-chevron-right"/></svg></div>
+  </div>
+  <div class="empty" style="padding-top:110px">
+    <h3>Нет операций по этим счетам</h3>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">6</span><b>Уровень глубже при своём наборе</b><em>Знаки набора — справа в строке подписи, только при своём наборе: иначе на втором и третьем уровне не видно, что суммы посчитаны не как обычно. Выбор отсюда не меняется.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Отдых</h2></div>
+  <div class="body" style="gap:4px">
+    <div class="capline mark"><span>август 2026 · 37% расходов</span><span class="tokens"><span class="token ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><span class="token ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><span class="token ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><span class="token ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><span class="token ac-red off"><svg class="ic"><use href="#i-credit-card"/></svg></span></span></div>
+    <div class="total neg">-46 100,00 ₽</div>
+  </div>
+  <div class="row rrow"><svg class="ic"><use href="#i-plane"/></svg><div class="g"><div class="t">Путешествия</div></div><span class="num neg">-40 000,00 ₽</span><span class="share">87%</span></div>
+  <div class="prog"><i style="width:87%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-ticket"/></svg><div class="g"><div class="t">Кино и концерты</div></div><span class="num neg">-3 600,00 ₽</span><span class="share">8%</span></div>
+  <div class="prog"><i style="width:8%"></i></div>
+  <div class="row rrow"><svg class="ic"><use href="#i-dots"/></svg><div class="g"><div class="t">Прочее</div></div><span class="num neg">-2 500,00 ₽</span><span class="share">5%</span></div>
+  <div class="prog"><i style="width:5%"></i></div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+</div>
+
+<div class="vhead">Экран «Счета отчёта»</div>
+<p class="vlead">Разделы по валютам, в каждом — все неудалённые счета в порядке справочника, подпись у накоплений и заблокированных. Касание строки ставит или снимает отметку, выбор применяется сразу, выход — стрелкой «назад». «Все активные» у раздела заменяет весь выбор активными счетами этой валюты — в том числе переводит отчёт в другую валюту одним касанием. У раздела без активных счетов кнопки нет. Отдельная «Сбросить» не нужна: её делает «Все активные» в рублях.</p>
+<div class="sheet">
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">7</span><b>Открыть при умолчании</b><em>Отмечены активные рубли. Их «Все активные» ничего бы не изменила и стоит тихой подписью «Выбраны».</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счета отчёта</h2></div>
+  <div class="list">
+    <div class="sec"><span>Рубли</span><span class="allact off mark">Выбраны</span></div>
+    <div class="row"><span class="tile ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><div class="g"><div class="t">Наличные</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта основная</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><div class="g"><div class="t">Карта кредитная</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Накопления</div></div><span class="chk"></span></div>
+    <div class="row"><span class="tile ac-red off"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта старая</div><div class="s">Заблокирован</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="sec"><span>Евро</span><span class="allact">Все активные</span></div>
+    <div class="row"><span class="tile ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><div class="g"><div class="t">Карта евро</div></div><span class="chk"></span></div>
+    <div class="sec"><span>Доллары</span></div>
+    <div class="row"><span class="tile ac-magenta"><svg class="ic"><use href="#i-home"/></svg></span><div class="g"><div class="t">Доллары дома</div><div class="s">Накопления</div></div><span class="chk"></span></div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">8</span><b>Добавить вклад</b><em>Отмечен «Вклад на отпуск». У рублей снова «Все активные» — она вернёт умолчание, то есть работает как сброс.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счета отчёта</h2></div>
+  <div class="list">
+    <div class="sec"><span>Рубли</span><span class="allact">Все активные</span></div>
+    <div class="row"><span class="tile ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><div class="g"><div class="t">Наличные</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта основная</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><div class="g"><div class="t">Карта кредитная</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row press"><span class="tile ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Накопления</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-red off"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта старая</div><div class="s">Заблокирован</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="sec"><span>Евро</span><span class="allact">Все активные</span></div>
+    <div class="row"><span class="tile ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><div class="g"><div class="t">Карта евро</div></div><span class="chk"></span></div>
+    <div class="sec"><span>Доллары</span></div>
+    <div class="row"><span class="tile ac-magenta"><svg class="ic"><use href="#i-home"/></svg></span><div class="g"><div class="t">Доллары дома</div><div class="s">Накопления</div></div><span class="chk"></span></div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">9</span><b>Перейти на евро</b><em>Касание «Все активные» у евро: рублёвые отметки снялись, отмечена «Карта евро». Отчёт за спиной — уже в евро (экран 3).</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счета отчёта</h2></div>
+  <div class="list">
+    <div class="sec"><span>Рубли</span><span class="allact">Все активные</span></div>
+    <div class="row"><span class="tile ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><div class="g"><div class="t">Наличные</div></div><span class="chk"></span></div>
+    <div class="row"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта основная</div></div><span class="chk"></span></div>
+    <div class="row"><span class="tile ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><div class="g"><div class="t">Карта кредитная</div></div><span class="chk"></span></div>
+    <div class="row"><span class="tile ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Накопления</div></div><span class="chk"></span></div>
+    <div class="row"><span class="tile ac-red off"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта старая</div><div class="s">Заблокирован</div></div><span class="chk"></span></div>
+    <div class="sec"><span>Евро</span><span class="allact off">Выбраны</span></div>
+    <div class="row"><span class="tile ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><div class="g"><div class="t">Карта евро</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="sec"><span>Доллары</span></div>
+    <div class="row"><span class="tile ac-magenta"><svg class="ic"><use href="#i-home"/></svg></span><div class="g"><div class="t">Доллары дома</div><div class="s">Накопления</div></div><span class="chk"></span></div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">10</span><b>Отметить счёт чужой валюты</b><em>Касание «Доллары дома» при отмеченных рублях: отметка не ставится, всплывает сообщение. У долларов нет активных счетов и нет кнопки — перейти на них можно, только сняв рублёвые отметки.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счета отчёта</h2></div>
+  <div class="list">
+    <div class="sec"><span>Рубли</span><span class="allact">Все активные</span></div>
+    <div class="row"><span class="tile ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><div class="g"><div class="t">Наличные</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта основная</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><div class="g"><div class="t">Карта кредитная</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Накопления</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-red off"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта старая</div><div class="s">Заблокирован</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="sec"><span>Евро</span><span class="allact">Все активные</span></div>
+    <div class="row"><span class="tile ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><div class="g"><div class="t">Карта евро</div></div><span class="chk"></span></div>
+    <div class="sec"><span>Доллары</span></div>
+    <div class="row press mark"><span class="tile ac-magenta"><svg class="ic"><use href="#i-home"/></svg></span><div class="g"><div class="t">Доллары дома</div><div class="s">Накопления</div></div><span class="chk"></span></div>
+  </div>
+  <div class="toast" style="bottom:70px">Допускаются счета только с одинаковой валютой</div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+</div>
+
+<div class="vhead">Правила, которые задаёт макет</div>
+<ol class="issues">
+<li><b>Активный счёт — не в накоплениях;</b> заблокированный считается активным, как сейчас в отчёте: в прошлых месяцах по нему есть операции. «Все активные» отмечает и его.</li>
+<li><b>«Все активные» заменяет выбор целиком,</b> а не добавляет к нему: иначе в другую валюту одним касанием не перейти. Набор и так уже из активных этой валюты — вместо кнопки тихая подпись «Выбраны». У валюты без активных счетов кнопки нет.</li>
+<li><b>«Сбросить» в шапке убрана:</b> её делает «Все активные» в рублях. Набор, равный активным рублям, хранится как умолчание — правилом, а не списком: новый счёт сам попадёт в отчёт.</li>
+<li><b>Подпись строки на экране отчёта:</b> умолчание — «Активные счета · ₽», тихо; все активные другой валюты — «Активные счета · €», подсвечено; один счёт — его имя; иначе «N счетов». Знаков — до пяти, дальше четыре и «+N».</li>
+<li><b>Знаки на втором и третьем уровне</b> — только при своём наборе (экран 6).</li>
+<li><b>Пустой выбор при выходе</b> — умолчание, как в разборе. Отмечать чужую валюту по-прежнему нельзя, сообщение — дословно ваше.</li>
+<li><b>Выбор живёт до перезапуска приложения;</b> после него отчёт снова по активным рублям.</li>
+</ol>
+
+</div>
+
+</body>
+</html>

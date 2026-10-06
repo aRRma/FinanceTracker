@@ -69,11 +69,12 @@ public sealed record ReportRowItem(
     /// перевалили бы в сумме за сотню.
     /// </summary>
     /// <param name="rows">Строки уровня одного вида.</param>
-    public static Money ShareBase(IEnumerable<ReportTotal> rows)
+    /// <param name="currency">Валюта отчёта: у уровня без строк базе больше неоткуда её взять.</param>
+    public static Money ShareBase(IEnumerable<ReportTotal> rows, Currency currency)
     {
         ArgumentNullException.ThrowIfNull(rows);
 
-        Money sum = Money.Zero(Currency.RUB);
+        Money sum = Money.Zero(currency);
 
         foreach (ReportTotal row in rows)
         {

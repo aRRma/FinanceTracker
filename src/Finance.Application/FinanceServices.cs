@@ -134,6 +134,7 @@ public static class FinanceServices
         services.AddSingleton<IDeleteTransactionsHandler, DeleteTransactionsHandler>();
         services.AddSingleton<ITransactionDeletionQuery, TransactionDeletionQuery>();
         services.AddSingleton<IReportQuery, ReportQuery>();
+        services.AddSingleton<IReportAccountsQuery, ReportAccountsQuery>();
         services.AddSingleton<IFrequentCategoriesQuery, FrequentCategoriesQuery>();
         services.AddSingleton<IExportHandler, ExportHandler>();
         services.AddSingleton<IRecoveryHandler, RecoveryHandler>();
@@ -142,6 +143,10 @@ public static class FinanceServices
         // забирает его при возвращении. Экраны при этом живут порознь
         services.AddSingleton<TransactionPicks>();
         services.AddSingleton<AccountBadgeDraft>();
+
+        // Выбор счетов отчёта — тоже один на приложение, и только в памяти:
+        // перезапуск возвращает отчёт к активным рублёвым счетам
+        services.AddSingleton<ReportChoice>();
 
         // Модель представления живёт ровно столько, сколько экран: общая на всё
         // приложение держала бы в памяти списки закрытых экранов
@@ -163,6 +168,7 @@ public static class FinanceServices
         services.AddTransient<ReportViewModel>();
         services.AddTransient<ReportGroupViewModel>();
         services.AddTransient<ReportSubcategoryViewModel>();
+        services.AddTransient<ReportAccountsViewModel>();
         services.AddTransient<AppearanceViewModel>();
         services.AddTransient<TimeZoneViewModel>();
         services.AddTransient<DefaultAccountViewModel>();

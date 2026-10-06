@@ -16,6 +16,8 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
 {
     private readonly IReportQuery _report;
     private readonly ICategoriesQuery _categories;
+    private readonly IReportAccountsQuery _accounts;
+    private readonly ReportChoice _choice;
 
     private Guid _subcategoryKey;
     private int _generation;
@@ -25,16 +27,33 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
     /// </summary>
     /// <param name="report">Суммы и операции отчёта.</param>
     /// <param name="categories">Справочник категорий — за названием подкатегории.</param>
+    /// <param name="accounts">Счета — знаки набора в подписи.</param>
+    /// <param name="choice">Выбор счетов отчёта.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
-    public ReportSubcategoryViewModel(IReportQuery report, ICategoriesQuery categories, IChangeNotifier changes)
+    public ReportSubcategoryViewModel(
+        IReportQuery report,
+        ICategoriesQuery categories,
+        IReportAccountsQuery accounts,
+        ReportChoice choice,
+        IChangeNotifier changes)
         : base(changes)
     {
         ArgumentNullException.ThrowIfNull(report);
         ArgumentNullException.ThrowIfNull(categories);
+        ArgumentNullException.ThrowIfNull(accounts);
+        ArgumentNullException.ThrowIfNull(choice);
 
         _report = report;
         _categories = categories;
+        _accounts = accounts;
+        _choice = choice;
     }
+
+    /// <summary>
+    /// Знаки счетов набора справа в подписи — только при своём наборе.
+    /// </summary>
+    [ObservableProperty]
+    public partial ReportAccountsLine Accounts { get; private set; } = ReportAccountsLine.Empty;
 
     /// <summary>
     /// Операции подкатегории, от новых к старым.
@@ -104,29 +123,34 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
         // Номер чтения: перечитывание по чужой правке может обогнать первое чтение,
         // и строки более раннего запроса легли бы поверх более свежих
         int generation = ++_generation;
+        ReportAccounts accounts = _choice.Accounts;
 
         // Название — из справочника: он читается целиком и весь помещается
-        // в памяти, и заводить ради одного поля четвёртый запрос незачем.
-        // Оба чтения независимы и идут разом: у каждого свой контекст
-        Task<IReadOnlyList<ReportTransaction>> itemsTask = _report.ReadTransactionsAsync(subcategoryKey, month, cancellationToken);
+        // в памяти, и заводить ради одного поля отдельный запрос незачем.
+        // Чтения независимы и идут разом: у каждого свой контекст.
+        // Счета нужны только знакам своего набора — при обычном их не читают
+        Task<IReadOnlyList<ReportTransaction>> itemsTask = _report.ReadTransactionsAsync(subcategoryKey, month, accounts, cancellationToken);
         Task<IReadOnlyList<CategoryListItem>> categoriesTask = _categories.ReadAsync(cancellationToken);
+        Task<IReadOnlyList<ReportAccount>> listTask = ReportAccountsLine.ReadForTokensAsync(_accounts, accounts, cancellationToken);
 
         // ConfigureAwait(false) здесь недопустим: дальше наполняются
         // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-        await Task.WhenAll(itemsTask, categoriesTask);
+        await Task.WhenAll(itemsTask, categoriesTask, listTask);
 
         IReadOnlyList<ReportTransaction> items = await itemsTask;
         IReadOnlyList<CategoryListItem> categories = await categoriesTask;
+        IReadOnlyList<ReportAccount> list = await listTask;
 
         if (generation != _generation)
         {
             return;
         }
 
-        Rebuild(items, categories);
+        Accounts = ReportAccountsLine.Of(accounts, list);
+        Rebuild(items, categories, accounts.Currency);
     }
 
-    private void Rebuild(IReadOnlyList<ReportTransaction> items, IReadOnlyList<CategoryListItem> categories)
+    private void Rebuild(IReadOnlyList<ReportTransaction> items, IReadOnlyList<CategoryListItem> categories, Currency currency)
     {
         Rows.Clear();
 
@@ -143,7 +167,7 @@ public sealed partial class ReportSubcategoryViewModel : ScreenViewModel
         // Итог складывается из показанных строк, и это верно ровно потому, что
         // страниц у третьего уровня нет: получены все операции месяца.
         // Появится дочитывание — итог обязан уехать в базу
-        Money total = Money.Zero(Currency.RUB);
+        Money total = Money.Zero(currency);
 
         foreach (ReportTransaction item in items)
         {

@@ -3,6 +3,7 @@
     Экраны E-01 и E-04: отчёт за месяц по группам. Полоса под строкой даёт
     сравнение глазом, без чтения процентов. Пустое состояние вместо списка нулей:
     строки по нулю рублей читаются как ошибка расчёта, а не как отсутствие трат.
+    Под месяцем — строка счетов отчёта: по ней видно, по какому набору счетов он посчитан.
 -->
 <pages:DataPage
     x:Class="Finance.App.Pages.ReportPage"
@@ -16,7 +17,7 @@
     x:DataType="report:ReportViewModel"
     Title="{x:Static texts:UiTexts.ReportTitle}">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
 
         <!-- Своим цветом и знаком, как вид операции в форме: общая плашка цветом
              действия под словом «Расходы» читалась цветом дохода -->
@@ -61,7 +62,36 @@
             </Border>
         </Grid>
 
-        <Label Grid.Row="2" Padding="16,4,16,8" Text="{Binding Total}" HorizontalTextAlignment="End"
+        <!-- Строка счетов: по каким счетам посчитан отчёт. Знаки называют набор без
+             перехода; касание открывает выбор. До первого чтения скрыта — иначе
+             подпись мелькнула бы пустой карточкой -->
+        <Border Grid.Row="2" Margin="16,4,16,0" Style="{StaticResource ReportAccountsBar}"
+                IsVisible="{Binding IsLoaded}" AutomationId="ReportAccounts">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnAccountsTapped" />
+            </Border.GestureRecognizers>
+            <Border.Triggers>
+                <DataTrigger TargetType="Border" Binding="{Binding Accounts.IsCustom}" Value="True">
+                    <Setter Property="Style" Value="{StaticResource ReportAccountsBarCustom}" />
+                </DataTrigger>
+            </Border.Triggers>
+
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                <Label Grid.Column="0" Text="{Binding Accounts.Title}" VerticalOptions="Center"
+                       LineBreakMode="TailTruncation" Style="{StaticResource ChipLabel}">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding Accounts.IsCustom}" Value="True">
+                            <Setter Property="Style" Value="{StaticResource ChipSelectedLabel}" />
+                            <Setter Property="FontFamily" Value="OpenSansSemibold" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+                <controls:AccountTokens Grid.Column="1" BindingContext="{Binding Accounts}" />
+                <controls:Icon Grid.Column="2" Key="chevron-right" Style="{StaticResource MutedIcon}" />
+            </Grid>
+        </Border>
+
+        <Label Grid.Row="3" Padding="16,4,16,8" Text="{Binding Total}" HorizontalTextAlignment="End"
                IsVisible="{Binding HasItems}" Style="{StaticResource TotalLabel}">
             <Label.Triggers>
                 <!-- Цвет, а не стиль: у итога свой шрифт, и подмена стиля его потеряла бы -->
@@ -79,7 +109,7 @@
         <!-- Признак жеста свой, а не занятость модели: RefreshView на каждый его подъём
              запускает обновление, и чтение, поднявшее признак само, запускало бы второе.
              Обработчик, а не команда: сбой команды из разметки закрыл бы окно молча -->
-        <RefreshView Grid.Row="3" IsRefreshing="{Binding IsRefreshing}" Refreshing="OnRefreshing">
+        <RefreshView Grid.Row="4" IsRefreshing="{Binding IsRefreshing}" Refreshing="OnRefreshing">
 
             <CollectionView ItemsSource="{Binding Rows}" SelectionMode="None">
                 <CollectionView.ItemTemplate>
@@ -126,7 +156,7 @@
                     <ContentView>
                         <VerticalStackLayout IsVisible="{Binding IsEmpty}" Padding="32" Spacing="12"
                                              VerticalOptions="Center" HorizontalOptions="Center">
-                            <Label Text="{Binding EmptyTitle}" HorizontalTextAlignment="Center"
+                            <Label Text="{x:Static texts:UiTexts.ReportEmptyTitle}" HorizontalTextAlignment="Center"
                                    Style="{StaticResource TitleLabel}" />
                             <Label Text="{Binding EmptyHint}" IsVisible="{Binding HasEmptyHint}"
                                    HorizontalTextAlignment="Center" Style="{StaticResource SecondaryLabel}" />

@@ -172,10 +172,10 @@ internal sealed class TransactionFixture : IAsyncDisposable
         Database.Resolve<IFeedQuery>().ReadAsync(account, after, take);
 
     /// <summary>
-    /// Первый уровень отчёта за месяц; пусто — за текущий.
+    /// Первый уровень отчёта за месяц; пусто — за текущий, по активным рублёвым счетам.
     /// </summary>
-    public Task<IReadOnlyList<ReportTotal>> ReportAsync(ReportMonth? month = null) =>
-        Database.Resolve<IReportQuery>().ReadGroupsAsync(month ?? ReportMonth.Of(Today));
+    public Task<IReadOnlyList<ReportTotal>> ReportAsync(ReportMonth? month = null, ReportAccounts? accounts = null) =>
+        Database.Resolve<IReportQuery>().ReadGroupsAsync(month ?? ReportMonth.Of(Today), accounts ?? ReportAccounts.Default);
 
     /// <summary>
     /// Метка изменения операции прямо из базы: по ней видно, тронула ли правка

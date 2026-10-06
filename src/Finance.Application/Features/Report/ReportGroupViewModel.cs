@@ -15,6 +15,8 @@ namespace Finance.Application.Features.Report;
 public sealed partial class ReportGroupViewModel : ScreenViewModel
 {
     private readonly IReportQuery _report;
+    private readonly IReportAccountsQuery _accounts;
+    private readonly ReportChoice _choice;
 
     private Guid _groupKey;
     private int _generation;
@@ -23,14 +25,31 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
     /// Создаёт модель представления группы отчёта.
     /// </summary>
     /// <param name="report">Суммы отчёта.</param>
+    /// <param name="accounts">Счета — знаки набора в подписи.</param>
+    /// <param name="choice">Выбор счетов отчёта.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
-    public ReportGroupViewModel(IReportQuery report, IChangeNotifier changes)
+    public ReportGroupViewModel(
+        IReportQuery report,
+        IReportAccountsQuery accounts,
+        ReportChoice choice,
+        IChangeNotifier changes)
         : base(changes)
     {
         ArgumentNullException.ThrowIfNull(report);
+        ArgumentNullException.ThrowIfNull(accounts);
+        ArgumentNullException.ThrowIfNull(choice);
 
         _report = report;
+        _accounts = accounts;
+        _choice = choice;
     }
+
+    /// <summary>
+    /// Знаки счетов набора справа в подписи — только при своём наборе: иначе здесь
+    /// не видно, что суммы посчитаны не как обычно.
+    /// </summary>
+    [ObservableProperty]
+    public partial ReportAccountsLine Accounts { get; private set; } = ReportAccountsLine.Empty;
 
     /// <summary>
     /// Подкатегории группы, по убыванию суммы.
@@ -102,33 +121,38 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
         // Номер чтения: перечитывание по чужой правке может обогнать первое чтение,
         // и строки более раннего запроса легли бы поверх более свежих
         int generation = ++_generation;
+        ReportAccounts accounts = _choice.Accounts;
 
-        // Оба чтения независимы и идут разом: у каждого свой контекст,
-        // а последовательно экран ждал бы сумму двух обращений к базе
-        Task<IReadOnlyList<ReportTotal>> groupsTask = _report.ReadGroupsAsync(month, cancellationToken);
-        Task<IReadOnlyList<ReportTotal>> rowsTask = _report.ReadSubcategoriesAsync(groupKey, month, cancellationToken);
+        // Чтения независимы и идут разом: у каждого свой контекст,
+        // а последовательно экран ждал бы сумму обращений к базе.
+        // Счета нужны только знакам своего набора — при обычном их не читают
+        Task<IReadOnlyList<ReportTotal>> groupsTask = _report.ReadGroupsAsync(month, accounts, cancellationToken);
+        Task<IReadOnlyList<ReportTotal>> rowsTask = _report.ReadSubcategoriesAsync(groupKey, month, accounts, cancellationToken);
+        Task<IReadOnlyList<ReportAccount>> listTask = ReportAccountsLine.ReadForTokensAsync(_accounts, accounts, cancellationToken);
 
         // ConfigureAwait(false) здесь недопустим: дальше наполняются
         // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-        await Task.WhenAll(groupsTask, rowsTask);
+        await Task.WhenAll(groupsTask, rowsTask, listTask);
 
         IReadOnlyList<ReportTotal> groups = await groupsTask;
         IReadOnlyList<ReportTotal> rows = await rowsTask;
+        IReadOnlyList<ReportAccount> list = await listTask;
 
         if (generation != _generation)
         {
             return;
         }
 
-        Rebuild(groups, rows);
+        Accounts = ReportAccountsLine.Of(accounts, list);
+        Rebuild(groups, rows, accounts.Currency);
     }
 
-    private void Rebuild(IReadOnlyList<ReportTotal> groups, IReadOnlyList<ReportTotal> rows)
+    private void Rebuild(IReadOnlyList<ReportTotal> groups, IReadOnlyList<ReportTotal> rows, Currency currency)
     {
         Rows.Clear();
 
         ReportTotal? self = null;
-        Money monthTotal = Money.Zero(Currency.RUB);
+        Money monthTotal = Money.Zero(currency);
 
         foreach (ReportTotal group in groups)
         {
@@ -141,7 +165,7 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
         // База доли — по виду этой группы: доля расходной группы в доходах бессмысленна
         if (self is not null)
         {
-            monthTotal = ReportRowItem.ShareBase(groups.Where(group => group.Kind == self.Kind));
+            monthTotal = ReportRowItem.ShareBase(groups.Where(group => group.Kind == self.Kind), currency);
         }
 
         IsEmpty = self is null || rows.Count is 0;
@@ -154,7 +178,7 @@ public sealed partial class ReportGroupViewModel : ScreenViewModel
             return;
         }
 
-        Money shareBase = ReportRowItem.ShareBase(rows);
+        Money shareBase = ReportRowItem.ShareBase(rows, currency);
 
         foreach (ReportTotal row in rows)
         {

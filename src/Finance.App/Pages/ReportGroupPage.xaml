@@ -16,8 +16,14 @@
 
     <Grid RowDefinitions="Auto,Auto,*">
 
-        <Label Grid.Row="0" Padding="16,12,16,0" Text="{Binding Caption}"
-               Style="{StaticResource SecondaryLabel}" />
+        <!-- Знаки набора — только при своём наборе: иначе здесь не видно,
+             что суммы посчитаны не как обычно -->
+        <Grid Grid.Row="0" Padding="16,12,16,0" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Label Grid.Column="0" Text="{Binding Caption}" VerticalOptions="Center"
+                   Style="{StaticResource SecondaryLabel}" />
+            <controls:AccountTokens Grid.Column="1" BindingContext="{Binding Accounts}"
+                                    IsVisible="{Binding IsCustom, x:DataType=report:ReportAccountsLine}" />
+        </Grid>
 
         <Label Grid.Row="1" Padding="16,4,16,8" Text="{Binding Total}" HorizontalTextAlignment="End"
                IsVisible="{Binding HasItems}" Style="{StaticResource TotalLabel}">

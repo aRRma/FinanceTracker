@@ -35,6 +35,8 @@ public sealed partial class ReportPage : DataPage
 
     private void OnNextMonth(object? sender, TappedEventArgs e) => Guarded.Execute(_model.NextMonthCommand);
 
+    private void OnAccountsTapped(object? sender, TappedEventArgs e) => Navigator.Go(Routes.ReportAccounts);
+
     private void OnRowTapped(object? sender, TappedEventArgs e)
     {
         if (sender is BindableObject { BindingContext: ReportRowItem row })

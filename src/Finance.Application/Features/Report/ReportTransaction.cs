@@ -19,7 +19,7 @@ public sealed record ReportTransaction
     public required DateOnly OccurredOn { get; init; }
 
     /// <summary>
-    /// Сумма со знаком: расход минусом, доход плюсом. Всегда в рублях.
+    /// Сумма со знаком: расход минусом, доход плюсом. В валюте счетов отчёта.
     /// </summary>
     public required Money Amount { get; init; }
 

@@ -99,6 +99,11 @@ public static class Routes
     public const string ReportSubcategory = "reports/subcategory";
 
     /// <summary>
+    /// Выбор счетов отчёта. Без параметров: выбор живёт в общем объекте, а не в адресе.
+    /// </summary>
+    public const string ReportAccounts = "reports/accounts";
+
+    /// <summary>
     /// Выбор темы оформления.
     /// </summary>
     public const string Appearance = "settings/appearance";
@@ -153,6 +158,7 @@ public static class Routes
         Routing.RegisterRoute(PickPlace, typeof(PlacePickerPage));
         Routing.RegisterRoute(ReportGroup, typeof(ReportGroupPage));
         Routing.RegisterRoute(ReportSubcategory, typeof(ReportSubcategoryPage));
+        Routing.RegisterRoute(ReportAccounts, typeof(ReportAccountsPage));
         Routing.RegisterRoute(Appearance, typeof(AppearancePage));
         Routing.RegisterRoute(TimeZone, typeof(TimeZonePage));
         Routing.RegisterRoute(DefaultAccount, typeof(DefaultAccountPage));

@@ -10,8 +10,8 @@ namespace Finance.Application.Features.Report;
 
 /// <summary>
 /// Суммы отчёта. Что входит и что нет, задано одним сборщиком операций месяца:
-/// переводы, счета вне сумм, чужие валюты и категории вне отчётов отсеиваются
-/// в нём, и три уровня по построению считают одно и то же.
+/// переводы, счета вне набора — а с ними и чужие валюты — и категории вне отчётов
+/// отсеиваются в нём, и три уровня по построению считают одно и то же.
 /// </summary>
 public sealed class ReportQuery : IReportQuery
 {
@@ -31,47 +31,56 @@ public sealed class ReportQuery : IReportQuery
     /// <inheritdoc />
     public async Task<IReadOnlyList<ReportTotal>> ReadGroupsAsync(
         ReportMonth month,
+        ReportAccounts accounts,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(accounts);
+
         await using FinanceDbContext context = await _contexts
             .CreateDbContextAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        List<Bucket> buckets = await Groups(context, month)
+        List<Bucket> buckets = await Groups(context, month, accounts)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return ToTotals(buckets);
+        return ToTotals(buckets, accounts.Currency);
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<ReportTotal>> ReadSubcategoriesAsync(
         Guid groupKey,
         ReportMonth month,
+        ReportAccounts accounts,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(accounts);
+
         await using FinanceDbContext context = await _contexts
             .CreateDbContextAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        List<Bucket> buckets = await Subcategories(context, groupKey, month)
+        List<Bucket> buckets = await Subcategories(context, groupKey, month, accounts)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return ToTotals(buckets);
+        return ToTotals(buckets, accounts.Currency);
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<ReportTransaction>> ReadTransactionsAsync(
         Guid subcategoryKey,
         ReportMonth month,
+        ReportAccounts accounts,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(accounts);
+
         await using FinanceDbContext context = await _contexts
             .CreateDbContextAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        List<Line> lines = await Transactions(context, subcategoryKey, month)
+        List<Line> lines = await Transactions(context, subcategoryKey, month, accounts)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
@@ -86,7 +95,7 @@ public sealed class ReportQuery : IReportQuery
             {
                 Key = line.Key,
                 OccurredOn = line.OccurredOn,
-                Amount = Money.Restore(signed, Currency.RUB),
+                Amount = Money.Restore(signed, accounts.Currency),
                 AccountName = line.AccountName,
                 Place = line.Place,
                 Note = line.Note
@@ -97,8 +106,13 @@ public sealed class ReportQuery : IReportQuery
     }
 
     /// <inheritdoc />
-    public async Task<bool> HasUncountedAsync(ReportMonth month, CancellationToken cancellationToken = default)
+    public async Task<bool> HasUncountedAsync(
+        ReportMonth month,
+        ReportAccounts accounts,
+        CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(accounts);
+
         await using FinanceDbContext context = await _contexts
             .CreateDbContextAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -106,14 +120,14 @@ public sealed class ReportQuery : IReportQuery
         DateOnly first = month.First;
         DateOnly last = month.Last;
 
-        // Левое соединение с учитываемыми счетами: операция без пары — как раз та,
+        // Левое соединение со счетами отчёта: операция без пары — как раз та,
         // что в суммы не вошла
         return await (
                 from row in context.Transactions.AsNoTracking()
                 where row.Kind != TransactionKind.Transfer
                       && row.OccurredOn >= first
                       && row.OccurredOn <= last
-                join account in CountedAccounts.Of(context) on row.SourceAccountKey equals account.Key into counted
+                join account in Chosen(context, accounts) on row.SourceAccountKey equals account.Key into counted
                 from account in counted.DefaultIfEmpty()
                 where account == null
                 select row.Key)
@@ -127,8 +141,8 @@ public sealed class ReportQuery : IReportQuery
     /// Соединение с местом левое: место могло быть удалено из справочника,
     /// и такая операция показывается как операция без места. Открыт тестам — сверяется план.
     /// </summary>
-    internal static IQueryable<Line> Transactions(FinanceDbContext context, Guid subcategoryKey, ReportMonth month) =>
-        from row in Counted(context, month)
+    internal static IQueryable<Line> Transactions(FinanceDbContext context, Guid subcategoryKey, ReportMonth month, ReportAccounts accounts) =>
+        from row in Counted(context, month, accounts)
         where row.CategoryKey == subcategoryKey
         join account in context.Accounts.AsNoTracking() on row.SourceAccountKey equals account.Key
         join place in context.Places.AsNoTracking() on row.PlaceKey equals place.Key into places
@@ -149,8 +163,8 @@ public sealed class ReportQuery : IReportQuery
     /// Суммы по подкатегориям одной группы за месяц. Соединение с группой остаётся:
     /// у подкатегории нет своего вида, и нужен флаг «вне отчётов» самой группы.
     /// </summary>
-    internal static IQueryable<Bucket> Subcategories(FinanceDbContext context, Guid groupKey, ReportMonth month) =>
-        from row in Counted(context, month)
+    internal static IQueryable<Bucket> Subcategories(FinanceDbContext context, Guid groupKey, ReportMonth month, ReportAccounts accounts) =>
+        from row in Counted(context, month, accounts)
         join category in context.Categories.AsNoTracking() on row.CategoryKey equals category.Key
         join parent in context.Categories.AsNoTracking() on category.ParentKey equals parent.Key
         where category.ParentKey == groupKey
@@ -174,8 +188,8 @@ public sealed class ReportQuery : IReportQuery
     /// Суммы по группам за месяц. Открыт тестам, чтобы сверить SQL и план запроса:
     /// сложение, уехавшее из базы в память, тестом на числа не отличить.
     /// </summary>
-    internal static IQueryable<Bucket> Groups(FinanceDbContext context, ReportMonth month) =>
-        from row in Counted(context, month)
+    internal static IQueryable<Bucket> Groups(FinanceDbContext context, ReportMonth month, ReportAccounts accounts) =>
+        from row in Counted(context, month, accounts)
         join category in context.Categories.AsNoTracking() on row.CategoryKey equals category.Key
         join parent in context.Categories.AsNoTracking() on category.ParentKey equals parent.Key
         // Флаг «вне отчётов» проверяется на обоих уровнях: он ставится и группе
@@ -196,12 +210,12 @@ public sealed class ReportQuery : IReportQuery
         };
 
     /// <summary>
-    /// Операции месяца, попадающие в суммы: по счетам в рублях без признака «скрытый».
-    /// Перевод отсеян и соединением с категорией — её у перевода нет, — но условие
-    /// написано явно: правило «переводы не входят в отчёт» слишком дорого, чтобы
-    /// держаться на чужом инварианте.
+    /// Операции месяца, попадающие в суммы: по счетам отчёта. Перевод отсеян
+    /// и соединением с категорией — её у перевода нет, — но условие написано явно:
+    /// правило «переводы не входят в отчёт» слишком дорого, чтобы держаться на чужом
+    /// инварианте.
     /// </summary>
-    private static IQueryable<TransactionRow> Counted(FinanceDbContext context, ReportMonth month)
+    private static IQueryable<TransactionRow> Counted(FinanceDbContext context, ReportMonth month, ReportAccounts accounts)
     {
         DateOnly first = month.First;
         DateOnly last = month.Last;
@@ -210,8 +224,30 @@ public sealed class ReportQuery : IReportQuery
                where row.Kind != TransactionKind.Transfer
                      && row.OccurredOn >= first
                      && row.OccurredOn <= last
-               join account in CountedAccounts.Of(context) on row.SourceAccountKey equals account.Key
+               join account in Chosen(context, accounts) on row.SourceAccountKey equals account.Key
                select row;
+    }
+
+    /// <summary>
+    /// Счета отчёта в базе. «Все активные» — общий предикат учитываемых счетов той же
+    /// валюты, что и у итога дня; выбранные руками — по ключам и с той же валютой:
+    /// счёт, сменивший валюту после выбора, выпадает, а не смешивает валюты в одной сумме.
+    /// </summary>
+    private static IQueryable<AccountRow> Chosen(FinanceDbContext context, ReportAccounts accounts)
+    {
+        Currency currency = accounts.Currency;
+
+        if (accounts.Keys is not { } keys)
+        {
+            return CountedAccounts.Of(context, currency);
+        }
+
+        // Список, а не множество: Contains списка EF переводит в IN по параметрам
+        List<Guid> chosen = [.. keys];
+
+        return context.Accounts
+            .AsNoTracking()
+            .Where(account => chosen.Contains(account.Key) && account.Currency == currency);
     }
 
     /// <summary>
@@ -225,7 +261,7 @@ public sealed class ReportQuery : IReportQuery
     /// Вид у группы обязан быть заполнен. Пустой — испорченные данные: строка
     /// молча пропала бы из обоих списков, а операции на ней остались.
     /// </remarks>
-    private static List<ReportTotal> ToTotals(List<Bucket> buckets)
+    private static List<ReportTotal> ToTotals(List<Bucket> buckets, Currency currency)
     {
         Dictionary<Guid, ReportTotal> totals = new(buckets.Count);
 
@@ -235,7 +271,7 @@ public sealed class ReportQuery : IReportQuery
                                 ?? throw new InvalidOperationException(Faults.GroupKindMissing(bucket.Name));
 
             bool own = (bucket.OperationKind is TransactionKind.Income) == (kind is CategoryKind.Income);
-            Money signed = Money.Restore(own ? bucket.Total : -bucket.Total, Currency.RUB);
+            Money signed = Money.Restore(own ? bucket.Total : -bucket.Total, currency);
 
             totals[bucket.Key] = totals.TryGetValue(bucket.Key, out ReportTotal? seen)
                 ? seen with { Total = seen.Total + signed }

@@ -179,8 +179,8 @@ public sealed class FeedQuery : IFeedQuery
         var totals = await (
                 from row in context.Transactions.AsNoTracking()
                 where row.OccurredOn >= earliest && row.OccurredOn <= latest
-                join source in CountedAccounts.Of(context) on row.SourceAccountKey equals source.Key
-                join target in CountedAccounts.Of(context) on row.TargetAccountKey equals target.Key into targets
+                join source in CountedAccounts.Of(context, Currency.RUB) on row.SourceAccountKey equals source.Key
+                join target in CountedAccounts.Of(context, Currency.RUB) on row.TargetAccountKey equals target.Key into targets
                 from target in targets.DefaultIfEmpty()
                 group new { row.Kind, row.Amount, TargetCounted = target != null } by row.OccurredOn into bucket
                 select new

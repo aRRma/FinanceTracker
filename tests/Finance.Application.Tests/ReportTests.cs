@@ -261,7 +261,7 @@ public sealed partial class ReportTests
         await given.SaveAsync(given.Income(card, 300m, category: subcategory));
         await given.SaveAsync(given.Expense(card, 1_000m));
 
-        ReportGroupViewModel model = new(given.Database.Resolve<IReportQuery>(), given.Database.Resolve<IChangeNotifier>());
+        ReportGroupViewModel model = given.Database.Resolve<ReportGroupViewModel>();
 
         await model.LoadAsync(group, ReportMonth.Of(given.Today));
 
@@ -464,9 +464,9 @@ public sealed partial class ReportTests
     }
 
     /// <summary>
-    /// Пустой отчёт при валютном счёте говорит, что операций нет по активным счетам,
-    /// и не советует листать месяцы: операции в этом месяце есть, просто по счетам,
-    /// которые в отчёт не входят. Месяц без операций вовсе — просто «нет операций».
+    /// Пустой отчёт при операциях по счетам вне набора не советует листать месяцы:
+    /// операции в этом месяце есть, другой месяц тут не поможет. Месяц без операций
+    /// вовсе — совет есть.
     /// </summary>
     [Fact]
     public async Task Пустой_отчёт_при_валютном_счёте_не_советует_листать()
@@ -476,7 +476,6 @@ public sealed partial class ReportTests
         Guid euro = await given.AccountAsync("Карта евро", 1_000m, Currency.EUR);
 
         ReportViewModel before = await LoadedModelAsync(given);
-        Assert.Equal(UiTexts.ReportEmptyTitle, before.EmptyTitle);
         Assert.Equal(UiTexts.ReportEmptyOtherMonth, before.EmptyHint);
         Assert.True(before.HasEmptyHint);
 
@@ -485,7 +484,6 @@ public sealed partial class ReportTests
         ReportViewModel after = await LoadedModelAsync(given);
 
         Assert.True(after.IsEmpty);
-        Assert.Equal(UiTexts.ReportEmptyUncounted, after.EmptyTitle);
         Assert.False(after.HasEmptyHint, "Операции месяца есть, а пустой отчёт советует сменить месяц.");
     }
 
@@ -498,7 +496,7 @@ public sealed partial class ReportTests
         await using TransactionFixture given = await TransactionFixture.CreateAsync();
 
         CountingReport report = new(given.Database.Resolve<IReportQuery>());
-        ReportViewModel model = new(report, given.Database.Resolve<IClock>(), given.Database.Resolve<IChangeNotifier>());
+        ReportViewModel model = ModelOver(given, report);
 
         await model.LoadAsync();
         model.Kind = CategoryKind.Income;
@@ -525,7 +523,7 @@ public sealed partial class ReportTests
         await given.SaveAsync(given.Expense(card, 999m));
 
         IReadOnlyList<ReportTotal> rows = await given.Database.Resolve<IReportQuery>()
-            .ReadSubcategoriesAsync(food, ReportMonth.Of(given.Today));
+            .ReadSubcategoriesAsync(food, ReportMonth.Of(given.Today), ReportAccounts.Default);
         ReportTotal group = (await given.ReportAsync()).Single(item => item.Key == food);
 
         Assert.Equal(["Кафе", "Продукты"], rows.Select(row => row.Name));
@@ -550,7 +548,7 @@ public sealed partial class ReportTests
         await given.SaveAsync(given.Expense(card, 300m, category: cafe));
         await given.SaveAsync(given.Expense(card, 600m));
 
-        ReportGroupViewModel model = new(given.Database.Resolve<IReportQuery>(), given.Database.Resolve<IChangeNotifier>());
+        ReportGroupViewModel model = given.Database.Resolve<ReportGroupViewModel>();
 
         await model.LoadAsync(food, ReportMonth.Of(given.Today));
 
@@ -579,7 +577,7 @@ public sealed partial class ReportTests
         await given.SaveAsync(given.Expense(euro, 4m, on: today));
 
         IReadOnlyList<ReportTransaction> items = await given.Database.Resolve<IReportQuery>()
-            .ReadTransactionsAsync(given.ExpenseCategory, ReportMonth.Of(today));
+            .ReadTransactionsAsync(given.ExpenseCategory, ReportMonth.Of(today), ReportAccounts.Default);
 
         Assert.Equal([second, first, old], items.Select(item => item.Key));
         Assert.Equal("Самокат", items[^1].Place);
@@ -600,10 +598,7 @@ public sealed partial class ReportTests
         Guid saved = await given.SaveAsync(given.Expense(card, 890m, place: "Самокат"));
         await given.SaveAsync(given.Expense(card, 1_140m));
 
-        ReportSubcategoryViewModel model = new(
-            given.Database.Resolve<IReportQuery>(),
-            given.Database.Resolve<ICategoriesQuery>(),
-            given.Database.Resolve<IChangeNotifier>());
+        ReportSubcategoryViewModel model = given.Database.Resolve<ReportSubcategoryViewModel>();
 
         await model.LoadAsync(given.ExpenseCategory, ReportMonth.Of(given.Today));
 
@@ -632,7 +627,7 @@ public sealed partial class ReportTests
 
         string plan = await QueryPlan.ExplainAsync(
             given.Database,
-            ReportQuery.Transactions(context, given.ExpenseCategory, ReportMonth.Of(given.Today)));
+            ReportQuery.Transactions(context, given.ExpenseCategory, ReportMonth.Of(given.Today), ReportAccounts.Default));
 
         Assert.Contains("ix_transactions_category_occurred_on", plan, StringComparison.Ordinal);
     }
@@ -650,7 +645,7 @@ public sealed partial class ReportTests
         await using TransactionFixture given = await TransactionFixture.CreateAsync();
         await using FinanceDbContext context = await given.Database.Contexts.CreateDbContextAsync();
 
-        string sql = ReportQuery.Groups(context, ReportMonth.Of(given.Today)).ToQueryString();
+        string sql = ReportQuery.Groups(context, ReportMonth.Of(given.Today), ReportAccounts.Default).ToQueryString();
         string alias = TransactionsAlias().Match(sql).Groups[1].Value;
         string groupBy = GroupByClause().Match(sql).Groups[1].Value;
 
@@ -674,13 +669,12 @@ public sealed partial class ReportTests
         await using TransactionFixture given = await TransactionFixture.CreateAsync();
         await using FinanceDbContext context = await given.Database.Contexts.CreateDbContextAsync();
 
-        string sql = ReportQuery.Groups(context, ReportMonth.Of(given.Today)).ToQueryString();
+        string sql = ReportQuery.Groups(context, ReportMonth.Of(given.Today), ReportAccounts.Default).ToQueryString();
         string alias = TransactionsAlias().Match(sql).Groups[1].Value;
 
         string plan = await QueryPlan.ExplainAsync(given.Database, sql);
 
-        Assert.False(string.IsNullOrEmpty(alias), sql);
-        Assert.DoesNotContain($"SCAN {alias}\n", plan.ReplaceLineEndings("\n"), StringComparison.Ordinal);
+        QueryPlan.NoFullScan(plan, alias);
     }
 
     [GeneratedRegex("\"transactions\" AS \"(\\w+)\"")]
@@ -691,15 +685,22 @@ public sealed partial class ReportTests
 
     private static async Task<ReportViewModel> LoadedModelAsync(TransactionFixture given)
     {
-        ReportViewModel model = new(
-            given.Database.Resolve<IReportQuery>(),
-            given.Database.Resolve<IClock>(),
-            given.Database.Resolve<IChangeNotifier>());
+        ReportViewModel model = given.Database.Resolve<ReportViewModel>();
 
         await model.LoadAsync();
 
         return model;
     }
+
+    /// <summary>
+    /// Модель отчёта поверх подменённого запроса сумм; остальное — из контейнера.
+    /// </summary>
+    private static ReportViewModel ModelOver(TransactionFixture given, IReportQuery report) => new(
+        report,
+        given.Database.Resolve<IReportAccountsQuery>(),
+        given.Database.Resolve<ReportChoice>(),
+        given.Database.Resolve<IClock>(),
+        given.Database.Resolve<IChangeNotifier>());
 
     private static async Task<Guid> SubcategoryOfNewGroupAsync(
         TransactionFixture given,
@@ -741,7 +742,7 @@ public sealed partial class ReportTests
         await given.SaveAsync(given.Expense(card, 700m, on: monthBefore));
 
         DelayingReport report = new(given.Database.Resolve<IReportQuery>());
-        ReportViewModel model = new(report, given.Database.Resolve<IClock>(), given.Database.Resolve<IChangeNotifier>());
+        ReportViewModel model = ModelOver(given, report);
 
         await model.LoadAsync();
 
@@ -767,24 +768,24 @@ public sealed partial class ReportTests
     {
         public TaskCompletionSource? Delay { get; set; }
 
-        public async Task<IReadOnlyList<ReportTotal>> ReadGroupsAsync(ReportMonth month, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<ReportTotal>> ReadGroupsAsync(ReportMonth month, ReportAccounts accounts, CancellationToken cancellationToken = default)
         {
             if (Delay is { } delay)
             {
                 await delay.Task;
             }
 
-            return await inner.ReadGroupsAsync(month, cancellationToken);
+            return await inner.ReadGroupsAsync(month, accounts, cancellationToken);
         }
 
-        public Task<IReadOnlyList<ReportTotal>> ReadSubcategoriesAsync(Guid groupKey, ReportMonth month, CancellationToken cancellationToken = default) =>
-            inner.ReadSubcategoriesAsync(groupKey, month, cancellationToken);
+        public Task<IReadOnlyList<ReportTotal>> ReadSubcategoriesAsync(Guid groupKey, ReportMonth month, ReportAccounts accounts, CancellationToken cancellationToken = default) =>
+            inner.ReadSubcategoriesAsync(groupKey, month, accounts, cancellationToken);
 
-        public Task<IReadOnlyList<ReportTransaction>> ReadTransactionsAsync(Guid subcategoryKey, ReportMonth month, CancellationToken cancellationToken = default) =>
-            inner.ReadTransactionsAsync(subcategoryKey, month, cancellationToken);
+        public Task<IReadOnlyList<ReportTransaction>> ReadTransactionsAsync(Guid subcategoryKey, ReportMonth month, ReportAccounts accounts, CancellationToken cancellationToken = default) =>
+            inner.ReadTransactionsAsync(subcategoryKey, month, accounts, cancellationToken);
 
-        public Task<bool> HasUncountedAsync(ReportMonth month, CancellationToken cancellationToken = default) =>
-            inner.HasUncountedAsync(month, cancellationToken);
+        public Task<bool> HasUncountedAsync(ReportMonth month, ReportAccounts accounts, CancellationToken cancellationToken = default) =>
+            inner.HasUncountedAsync(month, accounts, cancellationToken);
     }
 
     /// <summary>
@@ -794,30 +795,30 @@ public sealed partial class ReportTests
     {
         public int Reads { get; private set; }
 
-        public Task<IReadOnlyList<ReportTotal>> ReadGroupsAsync(ReportMonth month, CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<ReportTotal>> ReadGroupsAsync(ReportMonth month, ReportAccounts accounts, CancellationToken cancellationToken = default)
         {
             Reads++;
 
-            return inner.ReadGroupsAsync(month, cancellationToken);
+            return inner.ReadGroupsAsync(month, accounts, cancellationToken);
         }
 
-        public Task<IReadOnlyList<ReportTotal>> ReadSubcategoriesAsync(Guid groupKey, ReportMonth month, CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<ReportTotal>> ReadSubcategoriesAsync(Guid groupKey, ReportMonth month, ReportAccounts accounts, CancellationToken cancellationToken = default)
         {
             Reads++;
 
-            return inner.ReadSubcategoriesAsync(groupKey, month, cancellationToken);
+            return inner.ReadSubcategoriesAsync(groupKey, month, accounts, cancellationToken);
         }
 
-        public Task<IReadOnlyList<ReportTransaction>> ReadTransactionsAsync(Guid subcategoryKey, ReportMonth month, CancellationToken cancellationToken = default)
+        public Task<IReadOnlyList<ReportTransaction>> ReadTransactionsAsync(Guid subcategoryKey, ReportMonth month, ReportAccounts accounts, CancellationToken cancellationToken = default)
         {
             Reads++;
 
-            return inner.ReadTransactionsAsync(subcategoryKey, month, cancellationToken);
+            return inner.ReadTransactionsAsync(subcategoryKey, month, accounts, cancellationToken);
         }
 
         // Подсказка пустого состояния читается вместе с группами и к переключателю
         // видов отношения не имеет — в счёт обращений не идёт
-        public Task<bool> HasUncountedAsync(ReportMonth month, CancellationToken cancellationToken = default) =>
-            inner.HasUncountedAsync(month, cancellationToken);
+        public Task<bool> HasUncountedAsync(ReportMonth month, ReportAccounts accounts, CancellationToken cancellationToken = default) =>
+            inner.HasUncountedAsync(month, accounts, cancellationToken);
     }
 }

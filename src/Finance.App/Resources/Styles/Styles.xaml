@@ -496,6 +496,20 @@
                 Value="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource InkDark}}" />
     </Style>
 
+    <!-- Строка счетов отчёта под месяцем: обычный отчёт — тихой карточкой, свой набор —
+         подсветкой выбранного чипа, чтобы не принять его за обычный -->
+    <Style x:Key="ReportAccountsBar" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="MinimumHeightRequest" Value="{StaticResource TouchTarget}" />
+    </Style>
+
+    <Style x:Key="ReportAccountsBarCustom" TargetType="Border" BasedOn="{StaticResource ReportAccountsBar}">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}" />
+        <Setter Property="Stroke" Value="Transparent" />
+    </Style>
+
     <!-- Круглая кнопка со значком: стрелки месяца в отчёте. 40 dp — символ
          тонкой гарнитурой пальцем не поймать, а погашенный не разглядеть -->
     <Style x:Key="IconButton" TargetType="Border">

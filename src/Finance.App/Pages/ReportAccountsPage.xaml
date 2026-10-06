@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран E-05: выбор счетов отчёта. Разделы — валюты: отчёт считается в одной валюте,
+    и границу видно до касания. Касание строки ставит или снимает отметку, «Все активные»
+    у раздела заменяет выбор активными счетами этой валюты. Выбор применяется сразу,
+    кнопки «Готово» нет — выход стрелкой «назад».
+
+    Список — BindableLayout в ScrollView, а не CollectionView: счетов единицы,
+    виртуализация не нужна, а сгруппированный список не любит правок шапок раздела.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.ReportAccountsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:report="clr-namespace:Finance.Application.Features.Report;assembly=Finance.Application"
+    x:DataType="report:ReportAccountsViewModel"
+    Title="{x:Static texts:UiTexts.ReportAccountsTitle}"
+    Shell.TabBarIsVisible="False">
+
+    <!-- Grid корнем: .NET 10 пускает страницу под системные полосы, а Grid держит
+         область Container сам; ScrollView ей не задать -->
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="0,0,0,16" BindableLayout.ItemsSource="{Binding Sections}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="report:ReportAccountsSection">
+                        <VerticalStackLayout>
+
+                            <!-- Шапка раздела: валюта и «Все активные». Кнопка гаснет в тихую
+                                 подпись, когда отмечены ровно активные счета этой валюты -->
+                            <Grid Padding="16,8,16,0" ColumnDefinitions="*,Auto" MinimumHeightRequest="{StaticResource TouchTarget}">
+                                <Label Grid.Column="0" Text="{Binding Title}" VerticalOptions="Center"
+                                       Style="{StaticResource SectionLabel}" />
+
+                                <Border Grid.Column="1" Style="{StaticResource ChipSelected}" IsVisible="{Binding OffersAllActive}"
+                                        AutomationId="AllActive">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnAllActiveTapped" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="{x:Static texts:UiTexts.ReportAccountsAllActive}"
+                                           FontFamily="OpenSansSemibold" Style="{StaticResource ChipSelectedLabel}" />
+                                </Border>
+                                <Label Grid.Column="1" Text="{x:Static texts:UiTexts.ReportAccountsAllChosen}"
+                                       IsVisible="{Binding IsAllActive}" VerticalOptions="Center"
+                                       Style="{StaticResource CaptionLabel}" />
+                            </Grid>
+
+                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding .}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="report:ReportAccountRow">
+                                        <Grid Padding="16,10" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"
+                                              RowDefinitions="Auto,Auto"
+                                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnAccountTapped" />
+                                            </Grid.GestureRecognizers>
+
+                                            <controls:AccountBadge Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
+                                                                   Tone="{Binding Color}" IconKey="{Binding Icon}">
+                                                <controls:AccountBadge.Triggers>
+                                                    <DataTrigger TargetType="controls:AccountBadge" Binding="{Binding IsClosed}" Value="True">
+                                                        <Setter Property="Opacity" Value="0.5" />
+                                                    </DataTrigger>
+                                                </controls:AccountBadge.Triggers>
+                                            </controls:AccountBadge>
+                                            <Label Grid.Column="1" Grid.Row="0" Text="{Binding Name}"
+                                                   VerticalOptions="Center" LineBreakMode="TailTruncation" />
+                                            <Label Grid.Column="1" Grid.Row="1" Text="{Binding Caption}"
+                                                   IsVisible="{Binding HasCaption}" Style="{StaticResource SecondaryLabel}" />
+
+                                            <!-- Отметку ставит касание строки целиком: флажок его не перехватывает -->
+                                            <CheckBox Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" InputTransparent="True"
+                                                      IsChecked="{Binding IsChecked, Mode=OneWay}" VerticalOptions="Center"
+                                                      Color="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</pages:DataPage>

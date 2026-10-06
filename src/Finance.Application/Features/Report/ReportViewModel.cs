@@ -16,9 +16,15 @@ namespace Finance.Application.Features.Report;
 public sealed partial class ReportViewModel : ScreenViewModel
 {
     private readonly IReportQuery _report;
+    private readonly IReportAccountsQuery _accounts;
+    private readonly ReportChoice _choice;
     private readonly IClock _clock;
 
     private IReadOnlyList<ReportTotal> _all = [];
+
+    // Валюта прочитанного: переключатель вида пересобирает строки без чтения,
+    // и итог обязан сложиться в той же валюте, в какой их прочитали
+    private Currency _currency = Currency.RUB;
 
     // Номер чтения: по нему завершившееся чтение узнаёт, что месяц за время
     // запроса сменили ещё раз и его строки уже не к месту. Без него два быстрых
@@ -29,18 +35,35 @@ public sealed partial class ReportViewModel : ScreenViewModel
     /// Создаёт модель представления отчёта.
     /// </summary>
     /// <param name="report">Суммы отчёта.</param>
+    /// <param name="accounts">Счета — подпись и знаки строки счетов.</param>
+    /// <param name="choice">Выбор счетов отчёта.</param>
     /// <param name="clock">Часы приложения: от них зависит, какой месяц текущий.</param>
     /// <param name="changes">Оповещение об изменении данных.</param>
-    public ReportViewModel(IReportQuery report, IClock clock, IChangeNotifier changes)
+    public ReportViewModel(
+        IReportQuery report,
+        IReportAccountsQuery accounts,
+        ReportChoice choice,
+        IClock clock,
+        IChangeNotifier changes)
         : base(changes)
     {
         ArgumentNullException.ThrowIfNull(report);
+        ArgumentNullException.ThrowIfNull(accounts);
+        ArgumentNullException.ThrowIfNull(choice);
         ArgumentNullException.ThrowIfNull(clock);
 
         _report = report;
+        _accounts = accounts;
+        _choice = choice;
         _clock = clock;
         Month = ReportMonth.Current(clock);
     }
+
+    /// <summary>
+    /// Строка счетов под месяцем: по каким счетам посчитан отчёт.
+    /// </summary>
+    [ObservableProperty]
+    public partial ReportAccountsLine Accounts { get; private set; } = ReportAccountsLine.Empty;
 
     /// <summary>
     /// Группы выбранного вида, по убыванию суммы.
@@ -101,16 +124,10 @@ public sealed partial class ReportViewModel : ScreenViewModel
     public string MonthTitle => Month.Title;
 
     /// <summary>
-    /// Заголовок пустого состояния. Когда операции месяца есть, но в суммы не вошли,
-    /// он говорит об этом, а не «нет операций»: иначе пользователь с валютным счётом
-    /// принял бы пустой отчёт за поломку.
-    /// </summary>
-    [ObservableProperty]
-    public partial string EmptyTitle { get; private set; } = UiTexts.ReportEmptyTitle;
-
-    /// <summary>
     /// Подсказка под заголовком пустого состояния — сменить месяц. Пуста, когда
-    /// операции месяца есть, но в суммы не вошли: другой месяц тут не поможет.
+    /// операции месяца есть, но по счетам вне отчёта: другой месяц тут не поможет.
+    /// Заголовок же один — «Нет операций по этим счетам»: строка счетов стоит прямо
+    /// над ним, и фраза верна при любом выборе.
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasEmptyHint))]
@@ -136,12 +153,38 @@ public sealed partial class ReportViewModel : ScreenViewModel
     {
         int generation = ++_generation;
 
+        // Выбор берётся один раз на чтение: все запросы этого чтения обязаны
+        // считать по одному набору, даже если выбор сменят посреди него
+        ReportAccounts accounts = _choice.Accounts;
+
+        // Суммы и счета строки независимы и идут разом: у каждого свой контекст.
         // ConfigureAwait(false) здесь недопустим: дальше наполняются
         // привязанные коллекции, а их правка вне потока интерфейса роняет разметку
-        IReadOnlyList<ReportTotal> all = await _report.ReadGroupsAsync(Month, cancellationToken);
+        Task<IReadOnlyList<ReportTotal>> groupsTask = _report.ReadGroupsAsync(Month, accounts, cancellationToken);
+        Task<IReadOnlyList<ReportAccount>> listTask = _accounts.ReadAsync(cancellationToken);
 
-        // Второй запрос только когда отчёт пуст целиком: при строках пустое состояние не видно
-        bool hasUncounted = all.Count is 0 && await _report.HasUncountedAsync(Month, cancellationToken);
+        await Task.WhenAll(groupsTask, listTask);
+
+        IReadOnlyList<ReportTotal> all = await groupsTask;
+        IReadOnlyList<ReportAccount> list = await listTask;
+
+        // Ни одного счёта набора не осталось — удалены, сменили валюту или, у «всех
+        // активных» другой валюты, ушли в накопления: такой набор ни о чём, и отчёт
+        // возвращается к умолчанию, а не показывает пустоту с подписью «0 счетов»
+        // или «Активные счета · €» без единого счёта
+        if (!accounts.IsDefault && !list.Any(accounts.Includes))
+        {
+            if (generation == _generation && ReferenceEquals(_choice.Accounts, accounts))
+            {
+                _choice.Accounts = ReportAccounts.Default;
+                await LoadAsync(cancellationToken);
+            }
+
+            return;
+        }
+
+        // Третий запрос только когда отчёт пуст целиком: при строках пустое состояние не видно
+        bool hasUncounted = all.Count is 0 && await _report.HasUncountedAsync(Month, accounts, cancellationToken);
 
         if (generation != _generation)
         {
@@ -149,7 +192,8 @@ public sealed partial class ReportViewModel : ScreenViewModel
         }
 
         _all = all;
-        EmptyTitle = hasUncounted ? UiTexts.ReportEmptyUncounted : UiTexts.ReportEmptyTitle;
+        _currency = accounts.Currency;
+        Accounts = ReportAccountsLine.Of(accounts, list);
         EmptyHint = hasUncounted ? string.Empty : UiTexts.ReportEmptyOtherMonth;
 
         Rebuild();
@@ -191,7 +235,7 @@ public sealed partial class ReportViewModel : ScreenViewModel
         Rows.Clear();
 
         List<ReportTotal> shown = [];
-        Money total = Money.Zero(Currency.RUB);
+        Money total = Money.Zero(_currency);
 
         foreach (ReportTotal row in _all)
         {
@@ -205,7 +249,7 @@ public sealed partial class ReportViewModel : ScreenViewModel
         // Итог — сложение показанных строк, а не второй запрос: строки уровня
         // получены все до одной, страниц у него нет, и повторный проход по той же
         // таблице дал бы ровно это число
-        Money shareBase = ReportRowItem.ShareBase(shown);
+        Money shareBase = ReportRowItem.ShareBase(shown, _currency);
 
         foreach (ReportTotal row in shown)
         {

@@ -243,6 +243,23 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 .prog{height:3px;background:var(--line);border-radius:2px;overflow:hidden;margin:-2px 11px 6px 37px}
 .prog i{display:block;height:100%;background:var(--acc)}
 .rrow{padding-left:11px;padding-right:11px}
+/* Строка счетов отчёта: подпись, знаки набора, шеврон. Обычный отчёт — тихой карточкой,
+   свой набор — подсветкой выбранного чипа */
+.accline{display:flex;align-items:center;gap:8px;padding:0 10px;min-height:33px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:12.5px;color:var(--ink2)}
+.accline>span:first-child{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.accline.on{background:var(--accbg);border-color:transparent;color:var(--acc);font-weight:600}
+[data-theme="dark"] .accline.on{color:var(--ink)}
+.tokens{flex:none;display:flex;align-items:center;gap:3px}
+.tokens .token{margin:0}
+.token.off{opacity:.5}
+/* Экран «Счета отчёта»: раздел валюты с «Все активные», флажок отметки */
+.sec{display:flex;justify-content:space-between;align-items:center;font-size:10.5px;font-weight:600;color:var(--ink3);padding:12px 11px 6px;min-height:22px}
+.allact{font-size:11px;font-weight:600;color:var(--acc);background:var(--accbg);border-radius:11px;padding:3px 10px}
+[data-theme="dark"] .allact{color:var(--ink)}
+.allact.off{background:none;color:var(--ink3);font-weight:400;padding:3px 0}
+.chk{width:15px;height:15px;border-radius:3px;border:1.6px solid var(--acc);flex:none;display:flex;align-items:center;justify-content:center}
+.chk.on{background:var(--acc)}
+.chk.on .ic{width:11px;height:11px;color:var(--onacc);stroke-width:3}
 
 .empty{padding:40px 22px;text-align:center}
 .empty h3{font-size:15px;font-weight:600;margin:0 0 8px}
@@ -403,7 +420,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="wrap">
 <header class="masthead">
 <h1>Макеты экранов</h1>
-<p>42 экрана: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
+<p>43 экрана: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
 <p>Все экраны одного размера — 330 × 690: экран Samsung Galaxy S25 Ultra (480 × 1040 логических пикселей) под строкой состояния, уменьшенный в 480/330 раза. Нижняя панель и клавиатура прижаты к низу, содержимое длиннее экрана обрезается, как на устройстве.</p>
 <p>Правдой считается приложение: макет сверяется с ним и правится в той же задаче, что и экран. Значки — контуры Tabler из набора приложения, названия категорий — из стартового набора.</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
@@ -1452,12 +1469,13 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">E-01</span><b>Разобраться, куда ушли деньги</b><span class="uc">UC-19</span><em>Первый уровень отвечает на вопрос «куда ушли деньги». Переключатель видов — своим цветом и знаком, как в форме операции. Полоса под строкой даёт сравнение глазом, без чтения процентов; стрелка «вперёд» гаснет на текущем месяце.</em></figcaption>
+<figcaption class="cap"><span class="sid">E-01</span><b>Разобраться, куда ушли деньги</b><span class="uc">UC-19</span><em>Первый уровень отвечает на вопрос «куда ушли деньги». Переключатель видов — своим цветом и знаком, как в форме операции. Полоса под строкой даёт сравнение глазом, без чтения процентов; стрелка «вперёд» гаснет на текущем месяце. Под месяцем — строка счетов отчёта: подпись набора и знаки его счетов их цветами, касание открывает выбор [E-05]. Обычный отчёт — «Активные счета · ₽», тихо, знак заблокированного счёта вполсилы. Свой набор подсвечен и называется «Активные счета · €», именем единственного счёта или числом — «5 счетов»; знаков не больше пяти, а если счетов больше — четыре знака и «+N». Свой набор виден и глубже: его знаки стоят в подписи второго и третьего уровня. Выбор живёт до перезапуска приложения.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Отчёт</h2></div>
   <div class="body" style="gap:8px">
     <div class="kinds boxed"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расходы</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доходы</b></div>
     <div class="month"><span class="ibtn" id="e1-prev"><svg class="ic back"><use href="#i-chevron-right"/></svg></span><b>Август 2026</b><span class="ibtn off"><svg class="ic"><use href="#i-chevron-right"/></svg></span></div>
+    <div class="accline" id="e1-accounts"><span>Активные счета · ₽</span><span class="tokens"><span class="token ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><span class="token ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><span class="token ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><span class="token ac-red off"><svg class="ic"><use href="#i-credit-card"/></svg></span></span><svg class="ic sm mut"><use href="#i-chevron-right"/></svg></div>
     <div class="total neg">-84 260,00 ₽</div>
   </div>
   <div class="row rrow"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Еда</div></div><span class="num neg">-31 480,00 ₽</span><span class="share">37%</span></div>
@@ -1483,7 +1501,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">E-02</span><b>Разобраться, на что именно</b><span class="uc">UC-19</span><em>Второй уровень отвечает «на что именно». Доли пересчитаны внутри группы, а не от общего расхода: иначе все числа были бы мелкими и несравнимыми между собой. Месяц и доля группы — строкой под шапкой.</em></figcaption>
+<figcaption class="cap"><span class="sid">E-02</span><b>Разобраться, на что именно</b><span class="uc">UC-19</span><em>Второй уровень отвечает «на что именно». Доли пересчитаны внутри группы, а не от общего расхода: иначе все числа были бы мелкими и несравнимыми между собой. Месяц и доля группы — строкой под шапкой; при своём наборе счетов справа в ней знаки набора, как в строке счетов [E-01]. Здесь — обычный отчёт, знаков нет.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Еда</h2></div>
   <div class="body" style="gap:4px">
@@ -1510,7 +1528,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">E-03</span><b>Найти операцию через отчёт</b><span class="uc">UC-19 UC-07</span><em>Третий уровень — операции подкатегории за месяц. Свой запрос, а не лента: валютные операции в отчёт не входят вовсе, и общий запрос дал бы итог, не сходящийся со строками. Строка открывает ту же карточку операции, что и лента.</em></figcaption>
+<figcaption class="cap"><span class="sid">E-03</span><b>Найти операцию через отчёт</b><span class="uc">UC-19 UC-07</span><em>Третий уровень — операции подкатегории за месяц. Свой запрос, а не лента: операции по счетам вне отчёта в него не входят, и общий запрос дал бы итог, не сходящийся со строками. Знаки своего набора счетов — в подписи, как на [E-02]. Строка открывает ту же карточку операции, что и лента.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Доставка еды</h2></div>
   <div class="body" style="gap:4px">
@@ -1531,15 +1549,16 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">E-04</span><b>Открыть месяц без операций</b><span class="uc">UC-19</span><em>Пустое состояние вместо списка нулей: шесть строк по нулю рублей читаются как ошибка расчёта, а не как отсутствие трат. Если операции месяца есть, но в суммы не вошли — валютные или скрытые, — заголовок «Нет операций по активным счетам», без совета сменить месяц.</em></figcaption>
+<figcaption class="cap"><span class="sid">E-04</span><b>Открыть месяц без операций</b><span class="uc">UC-19</span><em>Пустое состояние вместо списка нулей: шесть строк по нулю рублей читаются как ошибка расчёта, а не как отсутствие трат. Заголовок один — «Нет операций по этим счетам»: строка счетов стоит прямо над ним, и фраза верна при любом выборе. Если операции месяца есть, но по счетам вне отчёта, совета сменить месяц нет.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Отчёт</h2></div>
   <div class="body" style="gap:8px">
     <div class="kinds boxed"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расходы</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доходы</b></div>
     <div class="month"><span class="ibtn"><svg class="ic back"><use href="#i-chevron-right"/></svg></span><b>Февраль 2026</b><span class="ibtn"><svg class="ic"><use href="#i-chevron-right"/></svg></span></div>
+    <div class="accline"><span>Активные счета · ₽</span><span class="tokens"><span class="token ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><span class="token ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><span class="token ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><span class="token ac-red off"><svg class="ic"><use href="#i-credit-card"/></svg></span></span><svg class="ic sm mut"><use href="#i-chevron-right"/></svg></div>
   </div>
   <div class="empty" style="padding-top:120px">
-    <h3>Нет операций</h3>
+    <h3>Нет операций по этим счетам</h3>
     <p>Выберите другой месяц стрелками вверху.</p>
   </div>
   <nav class="nav">
@@ -1548,6 +1567,25 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
     <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
   </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">E-05</span><b>Выбрать счета отчёта</b><span class="uc">UC-19</span><em>Разделы — валюты, как при выборе счёта в форме операции: отчёт считается в одной валюте, и границу видно до касания. В разделе все неудалённые счета: сначала обычные, затем накопления, затем заблокированные — с подписью. Касание строки ставит или снимает отметку, выбор применяется сразу, кнопки «Готово» нет. Счёт другой валюты, чем уже отмеченные, не отмечается: всплывает «Допускаются счета только с одинаковой валютой». «Все активные» у раздела заменяет выбор активными счетами этой валюты — так отчёт переходит на евро одним касанием, а у рублей та же кнопка возвращает обычный отчёт; отдельной «Сбросить» нет. Отмечены ровно активные — вместо кнопки тихое «Выбраны»; у валюты одних накоплений кнопки нет. Пустой выбор — обычный отчёт. Панели вкладок нет, как на других экранах выбора.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счета отчёта</h2></div>
+  <div class="list">
+    <div class="sec"><span>Рубли</span><span class="allact">Все активные</span></div>
+    <div class="row"><span class="tile ac-blue"><svg class="ic"><use href="#i-cash"/></svg></span><div class="g"><div class="t">Наличные</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта основная</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><div class="g"><div class="t">Карта кредитная</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-violet"><svg class="ic"><use href="#i-beach"/></svg></span><div class="g"><div class="t">Вклад на отпуск</div><div class="s">Накопления</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="row"><span class="tile ac-red off"><svg class="ic"><use href="#i-credit-card"/></svg></span><div class="g"><div class="t">Карта старая</div><div class="s">Заблокированный</div></div><span class="chk on"><svg class="ic"><use href="#i-check"/></svg></span></div>
+    <div class="sec"><span>Евро</span><span class="allact">Все активные</span></div>
+    <div class="row"><span class="tile ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><div class="g"><div class="t">Карта евро</div></div><span class="chk"></span></div>
+    <div class="sec"><span>Доллары</span></div>
+    <div class="row"><span class="tile ac-magenta"><svg class="ic"><use href="#i-home"/></svg></span><div class="g"><div class="t">Доллары дома</div><div class="s">Накопления</div></div><span class="chk"></span></div>
+  </div>
 </div>
 </figure>
 

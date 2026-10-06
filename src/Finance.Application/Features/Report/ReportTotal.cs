@@ -31,7 +31,7 @@ public sealed record ReportTotal
     public required CategoryKind Kind { get; init; }
 
     /// <summary>
-    /// Сумма за месяц в рублях, всегда положительная.
+    /// Сумма за месяц в валюте счетов отчёта, всегда положительная.
     /// </summary>
     public required Money Total { get; init; }
 }

@@ -675,15 +675,39 @@
   <data name="ReportHint" xml:space="preserve">
     <value>Переводы между своими счетами в отчёт не входят</value>
   </data>
+  <!-- Строка счетов стоит прямо над заголовком: «этим» — тем, что в ней названы -->
   <data name="ReportEmptyTitle" xml:space="preserve">
-    <value>Нет операций</value>
+    <value>Нет операций по этим счетам</value>
   </data>
   <data name="ReportEmptyOtherMonth" xml:space="preserve">
     <value>Выберите другой месяц стрелками вверху.</value>
   </data>
-  <!-- Операции месяца есть, но только по счетам вне отчёта: накопления и валютные -->
-  <data name="ReportEmptyUncounted" xml:space="preserve">
-    <value>Нет операций по активным счетам</value>
+  <!-- Счета отчёта: строка под месяцем и экран выбора -->
+  <data name="ReportAccountsTitle" xml:space="preserve">
+    <value>Счета отчёта</value>
+  </data>
+  <!-- {0} — знак валюты: «Активные счета · ₽» -->
+  <data name="ReportAccountsActive" xml:space="preserve">
+    <value>Активные счета · {0}</value>
+  </data>
+  <data name="ReportAccountsCountOne" xml:space="preserve">
+    <value>счёт</value>
+  </data>
+  <data name="ReportAccountsCountFew" xml:space="preserve">
+    <value>счёта</value>
+  </data>
+  <data name="ReportAccountsCountMany" xml:space="preserve">
+    <value>счетов</value>
+  </data>
+  <data name="ReportAccountsAllActive" xml:space="preserve">
+    <value>Все активные</value>
+  </data>
+  <!-- На месте «Все активные», когда отмечены ровно они -->
+  <data name="ReportAccountsAllChosen" xml:space="preserve">
+    <value>Выбраны</value>
+  </data>
+  <data name="ReportAccountsOneCurrency" xml:space="preserve">
+    <value>Допускаются счета только с одинаковой валютой</value>
   </data>
   <data name="ReportGroupEmptyTitle" xml:space="preserve">
     <value>Операций больше нет</value>
