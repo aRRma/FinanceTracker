@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <title>Белка-векша</title>
+  <!-- Набросок на плитке: белка с монетой. В древней Руси беличья шкурка — векша — ходила как деньги,
+       а белка ещё и запасает впрок. Хвост — серп из двух окружностей. -->
+  <rect width="256" height="256" fill="#0B4D40"/>
+  <circle cx="156" cy="112" r="84" fill="#FF8A2A"/>
+  <circle cx="132" cy="132" r="66" fill="#0B4D40"/>
+  <ellipse cx="118" cy="186" rx="52" ry="46" fill="#0B4D40"/>
+  <ellipse cx="118" cy="186" rx="46" ry="40" fill="#F26A1B"/>
+  <circle cx="88" cy="118" r="40" fill="#0B4D40"/>
+  <circle cx="88" cy="118" r="34" fill="#F26A1B"/>
+  <path d="M96 90 L116 56 L124 98 Z" fill="#F26A1B"/>
+  <circle cx="78" cy="112" r="6" fill="#0B4D40"/>
+  <circle cx="66" cy="176" r="20" fill="#0B4D40"/>
+  <circle cx="66" cy="176" r="15" fill="#FFC22E"/>
+</svg>

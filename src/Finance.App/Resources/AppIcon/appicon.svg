@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Подложка значка: сплошной акцент. Цвет совпадает с AccentLight из Resources/Styles/Colors.xaml. -->
-<svg width="456" height="456" viewBox="0 0 456 456" version="1.1" xmlns="http://www.w3.org/2000/svg">
-    <rect x="0" y="0" width="456" height="456" fill="#0F5C4C" />
+<!-- Подложка значка: тёмно-зелёная плитка с зелёным отсветом неона. Знака здесь нет — он в appiconfg.svg.
+     Холст — весь слой адаптивного значка (108 dp), лаунчер показывает только середину 72 dp:
+     плитка знака 256 × 256 стоит в ней со сдвигом 64, а градиент тянется за край, чтобы маска любой формы
+     срезала одинаковый фон. Отсвет — от неона: без него почти чёрная плитка пропадает на тёмных обоях. -->
+<svg width="384" height="384" viewBox="0 0 384 384" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="bg" x1="64" y1="64" x2="320" y2="320" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#11402F" />
+            <stop offset="1" stop-color="#03110D" />
+        </linearGradient>
+        <radialGradient id="spill" cx="192" cy="192" r="150" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#2CFFA8" stop-opacity="0.22" />
+            <stop offset="1" stop-color="#2CFFA8" stop-opacity="0" />
+        </radialGradient>
+    </defs>
+    <rect x="0" y="0" width="384" height="384" fill="url(#bg)" />
+    <rect x="0" y="0" width="384" height="384" fill="url(#spill)" />
 </svg>

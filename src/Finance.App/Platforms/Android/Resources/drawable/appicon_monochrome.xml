@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Плоский силуэт знака для тематического значка Android 13+: система красит его сама в цвета обоев,
+     поэтому цвет здесь любой, важна только форма. Стекло и неон в одном цвете не читаются — остаётся
+     залитый рубль с просветом чаши. Холст и сдвиг те же, что у Resources/AppIcon/appiconfg.svg,
+     чтобы при включении темы знак не прыгал. MauiIcon в .NET 10 свой монохромный слой не принимает,
+     поэтому адаптивный значок с ним описан руками — mipmap-anydpi-v26/launcher.xml. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="384"
+    android:viewportHeight="384">
+    <group android:translateX="64" android:translateY="64">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M88 52 H146 A42 42 0 0 1 146 136 H114 V154 H152 V176 H114 V204 H88 V176 H68 V154 H88 Z M114 76 H146 A18 18 0 0 1 146 112 H114 Z" />
+    </group>
+</vector>

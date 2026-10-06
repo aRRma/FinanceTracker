@@ -20,7 +20,7 @@ namespace Finance.App;
 /// </remarks>
 [Activity(
     Name = "ru.finance.tracker.MainActivity",
-    Theme = "@style/Maui.SplashTheme",
+    Theme = "@style/Finance.SplashTheme",
     MainLauncher = true,
     LaunchMode = LaunchMode.SingleTop,
     ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]

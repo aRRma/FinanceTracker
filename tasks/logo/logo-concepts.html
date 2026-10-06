@@ -1,0 +1,231 @@
+<title>Знак трекера финансов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* Макет: изумрудный стеклянный рубль с тремя уровнями обводки рядом, затем на телефоне, по размерам и на заставке. */
+  :root {
+    --paper: #EFF4F1;
+    --card: #FFFFFF;
+    --ink: #10201B;
+    --muted: #586A63;
+    --line: #D8E2DD;
+    --pick: #E8A400;
+    --display: "Unbounded", "Golos Text", system-ui, sans-serif;
+    --body: "Golos Text", "Segoe UI", Roboto, system-ui, sans-serif;
+    --mono: "JetBrains Mono", Consolas, ui-monospace, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0D1411; --card: #151E1A; --ink: #E5EEEA; --muted: #93A59E; --line: #26332E; --pick: #FFC22E; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0D1411; --card: #151E1A; --ink: #E5EEEA; --muted: #93A59E; --line: #26332E; --pick: #FFC22E; color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 64px; display: grid; gap: 56px; }
+
+  h1, h2 { font-family: var(--display); font-weight: 700; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+  h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.1; }
+  h2 { font-size: clamp(20px, 3vw, 26px); }
+  h3 { font-family: var(--display); font-weight: 500; font-size: 18px; margin: 0; }
+  p { margin: 0; max-width: 65ch; }
+  .lead { color: var(--muted); font-size: 17px; }
+  .label { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .note { color: var(--muted); font-size: 14px; }
+  section { display: grid; gap: 20px; }
+  .section-head { display: grid; gap: 6px; }
+  header { display: grid; gap: 16px; }
+
+  .concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .concept { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+  .concept.pick { border: 2px solid var(--pick); padding: 21px; }
+  .concept-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .badge { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; background: var(--pick); color: #10201B; border-radius: 6px; padding: 3px 8px; white-space: nowrap; }
+  .icon { display: block; border-radius: 23%; box-shadow: 0 10px 30px rgb(5 40 30 / 0.2), 0 0 0 1px rgb(0 0 0 / 0.05); }
+  .icon.hero { width: 200px; max-width: 100%; aspect-ratio: 1; justify-self: center; margin-block: 6px; }
+  .effect { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+  .phones { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .home { border-radius: 28px; padding: 26px 16px 22px; display: grid; gap: 20px; min-width: 0; }
+  .home.light { background: linear-gradient(160deg, #DCEBF5 0%, #F4E7D6 100%); color: #10201B; }
+  .home.dark { background: linear-gradient(160deg, #1B2433 0%, #2A1E2B 100%); color: #F2F2F2; }
+  .home .row { display: grid; grid-template-columns: repeat(3, 1fr); row-gap: 18px; column-gap: 8px; justify-items: center; }
+  .app { display: grid; gap: 6px; justify-items: center; text-align: center; font-size: 12px; line-height: 1.2; }
+  .app img { width: 58px; height: 58px; display: block; }
+  .circle img { border-radius: 50%; }
+  .squircle img { border-radius: 30%; }
+  .home .cap { font-family: var(--mono); font-size: 11px; opacity: 0.7; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  .ladders { display: grid; gap: 12px; }
+  .ladder { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 20px; display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; }
+  .ladder h3 { font-size: 15px; width: 170px; align-self: center; }
+  .ladder figure { margin: 0; display: grid; gap: 4px; justify-items: center; }
+  .ladder figcaption { font-family: var(--mono); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .ladder img { display: block; border-radius: 23%; }
+
+  .splashes { display: flex; flex-wrap: wrap; gap: 14px; }
+  .splash { display: grid; gap: 8px; justify-items: center; }
+  .screen { width: 140px; max-width: 100%; aspect-ratio: 9 / 19.5; border-radius: 20px; border: 6px solid #0B0F14; display: grid; place-items: center; overflow: hidden; background: linear-gradient(160deg, #109172, #052E24); }
+  .screen img { width: 50%; display: block; border-radius: 23%; }
+
+  .next { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 24px; display: grid; gap: 14px; }
+  .next ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+</style>
+
+<main class="wrap">
+
+  <header>
+    <span class="label">Логотип · изумруд · 6 октября 2026</span>
+    <h1>Изумруд и неон</h1>
+    <p class="lead">Изумрудный стеклянный рубль с контрастной обводкой — три уровня рядом. Ниже второе направление, неон: его плитка теперь видна и на тёмных обоях.</p>
+  </header>
+
+  <section>
+    <div class="section-head">
+      <span class="label">Обводка</span>
+      <h2>Было и стало</h2>
+    </div>
+    <div class="concepts">
+      <article class="concept">
+        <div class="concept-top"><h3>Было</h3></div>
+        <img class="icon hero" src="icons/before.svg" alt="Стеклянный рубль с тонкой белой кромкой">
+        <span class="effect">белая кромка 2 · без канта</span>
+        <p>Край стекла растворяется в свечении.</p>
+      </article>
+      <article class="concept pick">
+        <div class="concept-top"><h3>Контрастнее</h3><span class="badge">Рекомендую</span></div>
+        <img class="icon hero" src="icons/more.svg" alt="Стеклянный рубль с тёмным кантом и белой кромкой">
+        <span class="effect">белая кромка 3 · тёмный кант 2</span>
+        <p>Знак чётко отделён от фона и остаётся стеклянным.</p>
+      </article>
+      <article class="concept">
+        <div class="concept-top"><h3>Ещё контрастнее</h3></div>
+        <img class="icon hero" src="icons/most.svg" alt="Стеклянный рубль с широким тёмным кантом и толстой белой кромкой">
+        <span class="effect">белая кромка 4 · тёмный кант 3,5</span>
+        <p>Читается лучше всех в мелком размере, но начинает выглядеть наклейкой.</p>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="label">Второе направление</span>
+      <h2>Неон</h2>
+      <p class="note">У неона обводка и так самая контрастная. Его слабое место было в другом: на тёмных обоях почти чёрная плитка пропадала. Во втором варианте фон светлее сверху и подсвечен неоном.</p>
+    </div>
+    <div class="concepts">
+      <article class="concept">
+        <div class="concept-top"><h3>Неон · было</h3></div>
+        <img class="icon hero" src="icons/neon.svg" alt="Неоновый стеклянный рубль на почти чёрной плитке">
+        <span class="effect">почти чёрный фон</span>
+        <p>Самый эффектный, но плитка сливается с тёмными обоями.</p>
+      </article>
+      <article class="concept pick">
+        <div class="concept-top"><h3>Неон · с отсветом</h3><span class="badge">Рекомендую</span></div>
+        <img class="icon hero" src="icons/neon2.svg" alt="Неоновый стеклянный рубль на тёмно-зелёной плитке с зелёным отсветом">
+        <span class="effect">фон светлее · отсвет неона на плитке</span>
+        <p>Плитка видна на любых обоях, неон светит по-прежнему.</p>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="label">Значок</span>
+      <h2>На рабочем столе</h2>
+      <p class="note">Последний — нынешний кошелёк для сравнения.</p>
+    </div>
+    <div class="phones">
+      <div class="home light">
+        <span class="cap">Светлые обои · круг</span>
+        <div class="row circle">
+          <div class="app"><img src="icons/before.svg" alt="">Было</div>
+          <div class="app"><img src="icons/more.svg" alt="">Контрастнее</div>
+          <div class="app"><img src="icons/most.svg" alt="">Ещё</div>
+          <div class="app"><img src="icons/neon.svg" alt="">Неон</div>
+          <div class="app"><img src="icons/neon2.svg" alt="">Неон с отсветом</div>
+          <div class="app"><img src="icons/now.svg" alt="">Сейчас</div>
+        </div>
+      </div>
+      <div class="home dark">
+        <span class="cap">Тёмные обои · скруглённый квадрат</span>
+        <div class="row squircle">
+          <div class="app"><img src="icons/before.svg" alt="">Было</div>
+          <div class="app"><img src="icons/more.svg" alt="">Контрастнее</div>
+          <div class="app"><img src="icons/most.svg" alt="">Ещё</div>
+          <div class="app"><img src="icons/neon.svg" alt="">Неон</div>
+          <div class="app"><img src="icons/neon2.svg" alt="">Неон с отсветом</div>
+          <div class="app"><img src="icons/now.svg" alt="">Сейчас</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="label">Размеры</span>
+      <h2>От крупного к мелкому</h2>
+      <p class="note">Разница в обводке заметнее всего на 32 и 24.</p>
+    </div>
+    <div class="ladders">
+      <div class="ladder"><h3>Было</h3>
+        <figure><img src="icons/before.svg" width="96" height="96" alt=""><figcaption>96</figcaption></figure>
+        <figure><img src="icons/before.svg" width="64" height="64" alt=""><figcaption>64</figcaption></figure>
+        <figure><img src="icons/before.svg" width="48" height="48" alt=""><figcaption>48</figcaption></figure>
+        <figure><img src="icons/before.svg" width="32" height="32" alt=""><figcaption>32</figcaption></figure>
+        <figure><img src="icons/before.svg" width="24" height="24" alt=""><figcaption>24</figcaption></figure>
+      </div>
+      <div class="ladder"><h3>Контрастнее</h3>
+        <figure><img src="icons/more.svg" width="96" height="96" alt=""><figcaption>96</figcaption></figure>
+        <figure><img src="icons/more.svg" width="64" height="64" alt=""><figcaption>64</figcaption></figure>
+        <figure><img src="icons/more.svg" width="48" height="48" alt=""><figcaption>48</figcaption></figure>
+        <figure><img src="icons/more.svg" width="32" height="32" alt=""><figcaption>32</figcaption></figure>
+        <figure><img src="icons/more.svg" width="24" height="24" alt=""><figcaption>24</figcaption></figure>
+      </div>
+      <div class="ladder"><h3>Ещё контрастнее</h3>
+        <figure><img src="icons/most.svg" width="96" height="96" alt=""><figcaption>96</figcaption></figure>
+        <figure><img src="icons/most.svg" width="64" height="64" alt=""><figcaption>64</figcaption></figure>
+        <figure><img src="icons/most.svg" width="48" height="48" alt=""><figcaption>48</figcaption></figure>
+        <figure><img src="icons/most.svg" width="32" height="32" alt=""><figcaption>32</figcaption></figure>
+        <figure><img src="icons/most.svg" width="24" height="24" alt=""><figcaption>24</figcaption></figure>
+      </div>
+      <div class="ladder"><h3>Неон с отсветом</h3>
+        <figure><img src="icons/neon2.svg" width="96" height="96" alt=""><figcaption>96</figcaption></figure>
+        <figure><img src="icons/neon2.svg" width="64" height="64" alt=""><figcaption>64</figcaption></figure>
+        <figure><img src="icons/neon2.svg" width="48" height="48" alt=""><figcaption>48</figcaption></figure>
+        <figure><img src="icons/neon2.svg" width="32" height="32" alt=""><figcaption>32</figcaption></figure>
+        <figure><img src="icons/neon2.svg" width="24" height="24" alt=""><figcaption>24</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="label">Заставка</span>
+      <h2>При запуске</h2>
+    </div>
+    <div class="splashes">
+      <div class="splash"><div class="screen"><img src="icons/before.svg" alt=""></div><span class="label">Было</span></div>
+      <div class="splash"><div class="screen"><img src="icons/more.svg" alt=""></div><span class="label">Контрастнее</span></div>
+      <div class="splash"><div class="screen"><img src="icons/most.svg" alt=""></div><span class="label">Ещё</span></div>
+      <div class="splash"><div class="screen" style="background:linear-gradient(160deg,#11402F,#03110D)"><img src="icons/neon2.svg" alt=""></div><span class="label">Неон</span></div>
+    </div>
+  </section>
+
+  <section class="next">
+    <span class="label">Дальше</span>
+    <h2>Собрать набор</h2>
+    <p>Когда выбраны направление и уровень обводки:</p>
+    <ul>
+      <li>значок Android из двух слоёв — фон и стекло — и плоский силуэт для тематического значка;</li>
+      <li>заставка в тех же цветах;</li>
+      <li>замена в приложении и проверка в эмуляторе на светлой и тёмной теме;</li>
+      <li>короткие правила: поля, минимальный размер, что делать нельзя.</li>
+    </ul>
+  </section>
+
+</main>

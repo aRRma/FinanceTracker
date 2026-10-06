@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Значок ярлыка «Записать расход»: плитка мягким градиентом цвета смысла, белый знак с отсветом.
+     Адаптивный, как значок приложения: обычную картинку лаунчер уменьшает и кладёт на белый кружок,
+     и знак становился мелким. Слой — 108 dp, лаунчер показывает середину 72 dp (18…90) своей маской,
+     поэтому плитка залита до края, а знак нарисован в квадрате 100 и вписан в видимую середину.
+     Цвета — не токены темы: ярлык рисует лаунчер, тема приложения до него не доходит.
+     Свечения у вектора нет — отсвет знака сложен из трёх полупрозрачных обводок.
+     Ярлыки дохода и перевода устроены так же. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt">
+    <background>
+        <aapt:attr name="android:drawable">
+            <vector android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+                <path android:pathData="M0 0 H108 V108 H0 Z">
+                    <aapt:attr name="android:fillColor">
+                        <gradient android:type="linear" android:startX="18" android:startY="18" android:endX="90" android:endY="90">
+                            <item android:offset="0" android:color="#D2554E" />
+                            <item android:offset="1" android:color="#8F2E2A" />
+                        </gradient>
+                    </aapt:attr>
+                </path>
+                <!-- Мягкий блик сверху: плитка читается выпуклой, а не плоской -->
+                <path android:pathData="M0 0 H108 V108 H0 Z">
+                    <aapt:attr name="android:fillColor">
+                        <gradient android:type="linear" android:startX="0" android:startY="18" android:endX="0" android:endY="58">
+                            <item android:offset="0" android:color="#38FFFFFF" />
+                            <item android:offset="1" android:color="#00FFFFFF" />
+                        </gradient>
+                    </aapt:attr>
+                </path>
+            </vector>
+        </aapt:attr>
+    </background>
+    <foreground>
+        <aapt:attr name="android:drawable">
+            <vector android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+                <group android:translateX="18" android:translateY="18" android:scaleX="0.72" android:scaleY="0.72">
+                    <path android:pathData="M28 50 H72" android:strokeColor="#FFA39A" android:strokeWidth="20" android:strokeAlpha="0.12" android:strokeLineCap="round" android:strokeLineJoin="round" />
+                    <path android:pathData="M28 50 H72" android:strokeColor="#FFA39A" android:strokeWidth="16" android:strokeAlpha="0.2" android:strokeLineCap="round" android:strokeLineJoin="round" />
+                    <path android:pathData="M28 50 H72" android:strokeColor="#FFA39A" android:strokeWidth="12" android:strokeAlpha="0.3" android:strokeLineCap="round" android:strokeLineJoin="round" />
+                    <path android:pathData="M28 50 H72" android:strokeColor="#FFFFFF" android:strokeWidth="8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+                </group>
+            </vector>
+        </aapt:attr>
+    </foreground>
+</adaptive-icon>
