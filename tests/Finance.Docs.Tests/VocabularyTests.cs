@@ -48,6 +48,7 @@ public sealed class VocabularyTests
         (Pattern(@"\bцифров\w+\s+клавиатур"), "«клавиатура суммы»"),
         (Pattern(@"\bстать(?:я|и|е|ю|[её]й|ям|ями|ях)\b"), "«категория»"),
         (Pattern(@"\bблокировк\w*\s+приложени"), "«защита входа»"),
+        (Pattern(@"\bжурнал\w*\s+сбо(?:й|я|ю|ем|е|и|ев|ям|ями|ях)\b"), "«отчёты о сбоях»"),
     ];
 
     /// <summary>
@@ -100,8 +101,19 @@ public sealed class VocabularyTests
     [InlineData("цифровой клавиатурой")]
     [InlineData("статьи")]
     [InlineData("блокировкой приложения")]
+    [InlineData("журнала сбоев")]
     public void Словоформы_запрещённых_слов_ловятся(string wrong) =>
         Assert.Contains(Banned, pair => pair.Wrong.IsMatch(wrong));
+
+    /// <summary>
+    /// Запрет держит только словоформы понятия, а не всё, что начинается так же:
+    /// «журнал сборки» — законная фраза о сборке, а не другое имя отчётов о сбоях.
+    /// </summary>
+    [Theory]
+    [InlineData("журнал сборки")]
+    [InlineData("журнал сбора данных")]
+    public void Законные_фразы_не_ловятся(string right) =>
+        Assert.DoesNotContain(Banned, pair => pair.Wrong.IsMatch(right));
 
     // Словарь перечисляет запрещённые слова по делу, а решения объясняют, почему
     // от них отказались, — цитата в них законна. Прототип собирается из макетов
