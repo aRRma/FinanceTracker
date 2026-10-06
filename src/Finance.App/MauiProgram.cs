@@ -136,6 +136,7 @@ public static class MauiProgram
         services.AddTransient<TimeZonePage>();
         services.AddTransient<DefaultAccountPage>();
         services.AddTransient<AboutPage>();
+        services.AddTransient<CrashReportsPage>();
         services.AddTransient<ExportPage>();
         services.AddTransient<AppLockPage>();
         services.AddTransient<PinPage>();

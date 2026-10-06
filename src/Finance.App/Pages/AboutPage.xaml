@@ -59,6 +59,19 @@
 
                         <BoxView Style="{StaticResource Divider}" />
 
+                        <Grid Padding="14,12" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8"
+                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnCrashReportsTapped" />
+                            </Grid.GestureRecognizers>
+                            <Label Grid.Column="0" Text="{x:Static texts:UiTexts.CrashReportsTitle}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{Binding CrashReportCount}" VerticalOptions="Center"
+                                   Style="{StaticResource SecondaryLabel}" />
+                            <controls:Icon Grid.Column="2" Key="chevron-right" VerticalOptions="Center" />
+                        </Grid>
+
+                        <BoxView Style="{StaticResource Divider}" />
+
                         <VerticalStackLayout Padding="14,12" Spacing="8">
                             <Label Text="{x:Static texts:UiTexts.AboutPrivacy}"
                                    Style="{StaticResource SecondaryLabel}" />

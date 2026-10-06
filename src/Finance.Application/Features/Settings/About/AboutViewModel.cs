@@ -1,5 +1,6 @@
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Finance.Application.Infrastructure.Diagnostics;
 using Finance.Application.Infrastructure.Queries;
 
 namespace Finance.Application.Features.Settings.About;
@@ -10,22 +11,34 @@ namespace Finance.Application.Features.Settings.About;
 /// </summary>
 /// <remarks>
 /// Наследовать <c>ScreenViewModel</c> незачем: ни версия, ни схема не меняются,
-/// пока приложение открыто, и подписываться на изменения данных нечему.
+/// пока приложение открыто, и подписываться на изменения данных нечему. Число
+/// отчётов о сбоях перечитывается при каждом появлении — после очистки на экране
+/// отчётов строка обязана показать ноль.
 /// </remarks>
 public sealed partial class AboutViewModel : ObservableObject
 {
     private readonly ISettingsSummaryQuery _summary;
+    private readonly CrashReports _reports;
 
     /// <summary>
     /// Создаёт модель представления экрана «О программе».
     /// </summary>
     /// <param name="summary">Состояние настроек.</param>
-    public AboutViewModel(ISettingsSummaryQuery summary)
+    /// <param name="reports">Отчёты о сбоях — для их числа в строке.</param>
+    public AboutViewModel(ISettingsSummaryQuery summary, CrashReports reports)
     {
         ArgumentNullException.ThrowIfNull(summary);
+        ArgumentNullException.ThrowIfNull(reports);
 
         _summary = summary;
+        _reports = reports;
     }
+
+    /// <summary>
+    /// Сколько отчётов о сбоях лежит на телефоне.
+    /// </summary>
+    [ObservableProperty]
+    public partial string CrashReportCount { get; private set; } = string.Empty;
 
     /// <summary>
     /// Версия приложения.
@@ -51,5 +64,14 @@ public sealed partial class AboutViewModel : ObservableObject
 
         Version = summary.Version;
         Schema = summary.Schema.ToString(CultureInfo.InvariantCulture);
+        // Отчёты — побочная строка: не прочитался их файл — без числа, но версия и схема остаются на экране
+        try
+        {
+            CrashReportCount = (await _reports.ReadAsync(cancellationToken)).Count.ToString(CultureInfo.InvariantCulture);
+        }
+        catch (Exception failure) when (failure is IOException or UnauthorizedAccessException)
+        {
+            CrashReportCount = string.Empty;
+        }
     }
 }

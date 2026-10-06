@@ -16,6 +16,7 @@ using Finance.Application.Features.Settings.About;
 using Finance.Application.Features.Settings.AppLock;
 using Finance.Application.Features.Settings.Appearance;
 using Finance.Application.Features.Settings.DefaultAccounts;
+using Finance.Application.Features.Settings.Diagnostics;
 using Finance.Application.Features.Settings.TimeZones;
 using Finance.Application.Features.Transactions.Card;
 using Finance.Application.Features.Transactions.Pick;
@@ -194,6 +195,7 @@ public static class FinanceServices
         services.AddTransient<TimeZoneViewModel>();
         services.AddTransient<DefaultAccountViewModel>();
         services.AddTransient<AboutViewModel>();
+        services.AddTransient<CrashReportsViewModel>();
         services.AddTransient<ExportViewModel>();
         services.AddTransient<AppLockViewModel>();
         services.AddTransient<PinViewModel>();

@@ -132,7 +132,7 @@ public sealed class ActionTrailTests : IDisposable
 
         CrashReport report = Assert.Single(await reports.ReadAsync(CancellationToken.None));
         Assert.Equal("System.TimeoutException", report.Headline);
-        Assert.EndsWith("--- trail\n12:00:00.001 nav //report\n12:00:00.002 run ReportPage.OnGroupTapped", report.Text, StringComparison.Ordinal);
+        Assert.EndsWith("--- trail (UTC)\n12:00:00.001 nav //report\n12:00:00.002 run ReportPage.OnGroupTapped", report.Text, StringComparison.Ordinal);
     }
 
     /// <inheritdoc />

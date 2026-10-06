@@ -831,6 +831,37 @@
   <data name="AboutIcons" xml:space="preserve">
     <value>Значки — Tabler Icons, лицензия MIT.</value>
   </data>
+  <!-- Отчёты о сбоях -->
+  <data name="CrashReportsTitle" xml:space="preserve">
+    <value>Отчёты о сбоях</value>
+  </data>
+  <data name="CrashReportsEmptyTitle" xml:space="preserve">
+    <value>Отчётов нет</value>
+  </data>
+  <data name="CrashReportsEmptyHint" xml:space="preserve">
+    <value>Они появятся, если приложение закроется с ошибкой.</value>
+  </data>
+  <data name="CrashReportsShare" xml:space="preserve">
+    <value>Поделиться</value>
+  </data>
+  <data name="CrashReportsClear" xml:space="preserve">
+    <value>Очистить</value>
+  </data>
+  <data name="CrashReportsClearQuestion" xml:space="preserve">
+    <value>Удалить отчёты о сбоях?</value>
+  </data>
+  <data name="CrashKindCaught" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="CrashKindFatal" xml:space="preserve">
+    <value>Падение</value>
+  </data>
+  <data name="CrashKindWarning" xml:space="preserve">
+    <value>Предупреждение</value>
+  </data>
+  <data name="CrashKindExitReason" xml:space="preserve">
+    <value>Прошлое завершение</value>
+  </data>
   <!-- Выгрузка и восстановление из неё -->
   <data name="ExportTitle" xml:space="preserve">
     <value>Данные</value>

@@ -28,4 +28,6 @@ public sealed partial class AboutPage : DataPage
 
     /// <inheritdoc />
     protected override Task LoadAsync() => _model.LoadAsync();
+
+    private void OnCrashReportsTapped(object? sender, TappedEventArgs e) => Navigator.Go(Routes.CrashReports);
 }

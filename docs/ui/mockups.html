@@ -449,7 +449,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="wrap">
 <header class="masthead">
 <h1>Макеты экранов</h1>
-<p>43 экрана: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
+<p>44 экрана: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
 <p>Все экраны одного размера — 330 × 690: экран Samsung Galaxy S25 Ultra (480 × 1040 логических пикселей) под строкой состояния, уменьшенный в 480/330 раза. Нижняя панель и клавиатура прижаты к низу, содержимое длиннее экрана обрезается, как на устройстве.</p>
 <p>Правдой считается приложение: макет сверяется с ним и правится в той же задаче, что и экран. Значки — контуры Tabler из набора приложения, названия категорий — из стартового набора.</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
@@ -1330,7 +1330,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-09</span><b>Посмотреть версию</b><span class="uc">UC-20</span><em>Номер схемы нужен не из любопытства: по нему видно, накатилась ли миграция после обновления приложения. Оформление — стиль «Изумруд»: атмосфера экрана ПИН-кода под всем экраном и знак приложения без плитки. В тёмной теме знак неоновый, в светлой — дневной: светлое стекло с кромкой цветом действия, потому что неон на светлом гаснет. Пояснения — в карточке, а не на атмосфере: пятна плывут, и мелкий текст попадал бы на разные участки.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-09</span><b>Посмотреть версию</b><span class="uc">UC-20</span><em>Номер схемы нужен не из любопытства: по нему видно, накатилась ли миграция после обновления приложения. Оформление — стиль «Изумруд»: атмосфера экрана ПИН-кода под всем экраном и знак приложения без плитки. В тёмной теме знак неоновый, в светлой — дневной: светлое стекло с кромкой цветом действия, потому что неон на светлом гаснет. Пояснения — в карточке, а не на атмосфере: пятна плывут, и мелкий текст попадал бы на разные участки. Строка «Отчёты о сбоях» ведёт на их список [D-16], справа — сколько их.</em></figcaption>
 <div class="phone">
   <div class="atmo" style="top:46px"></div>
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>О программе</h2></div>
@@ -1363,6 +1363,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="card">
       <div class="row"><div class="g"><div class="t">Версия</div></div><span class="s">1.0</span></div>
       <div class="row"><div class="g"><div class="t">Схема базы</div></div><span class="s">5</span></div>
+      <div class="row"><div class="g"><div class="t">Отчёты о сбоях</div></div><span class="s">3</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><div class="g"><div class="note dim">Данные хранятся на этом устройстве и никуда не передаются.</div><div class="note dim">Значки — Tabler Icons, лицензия MIT.</div></div></div>
     </div>
   </div>
@@ -1518,6 +1519,33 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <b>7</b><b>8</b><b>9</b>
     <b class="no"></b><b>0</b><b class="no"><svg class="ic"><use href="#i-backspace"/></svg></b>
   </div>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">D-16</span><b>Отправить отчёт о сбое</b><span class="uc">UC-20</span><em>Открывается строкой «Отчёты о сбоях» в «О программе» [D-09]. Отчёты от новых к старым: вид сбоя, когда и первая строка — тип исключения или причина завершения. Касание раскрывает отчёт целиком: версии приложения и Android, стек и след последних действий; сумм, имён и заметок в нём нет. «Поделиться» отдаёт файл отчётов — в Telegram или почту; «Очистить» удаляет все после вопроса. Сам экран о падении не напоминает: после сбоя приложение запускается как обычно. Пусто — «Отчётов нет».</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Отчёты о сбоях</h2></div>
+  <div class="body">
+    <div class="card">
+      <div class="row"><div class="g"><div class="t">Падение</div><div class="s">6 октября, 22:41 · System.InvalidOperationException</div><div class="note dim" style="font-family:ui-monospace,monospace;font-size:9.5px;white-space:pre-wrap;margin-top:6px">app 1.0.5 (10005), android 16, samsung SM-S938B
+System.InvalidOperationException
+   at Finance.App.Pages.FeedPage.OnRefreshing()
+--- trail (UTC)
+19:40:58 nav //feed
+19:41:02 run FeedPage.OnRefreshing</div></div></div>
+      <div class="row"><div class="g"><div class="t">Прошлое завершение</div><div class="s">6 октября, 22:39 · exit CrashNative status 11</div></div></div>
+      <div class="row"><div class="g"><div class="t">Ошибка</div><div class="s">6 октября, 21:51 · System.TimeoutException</div></div></div>
+    </div>
+    <div class="btn" style="margin-top:12px">Поделиться</div>
+    <div class="btn danger" style="margin-top:8px">Очистить</div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
 </div>
 </figure>
 

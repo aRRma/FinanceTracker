@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран D-16: отчёты о сбоях. Список от новых к старым, касание раскрывает отчёт
+    целиком; «Поделиться» отдаёт файл, «Очистить» удаляет все после вопроса.
+    Открывается строкой в «О программе» [D-09].
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.CrashReportsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:diagnostics="clr-namespace:Finance.Application.Features.Settings.Diagnostics;assembly=Finance.Application"
+    x:DataType="diagnostics:CrashReportsViewModel"
+    Title="{x:Static texts:UiTexts.CrashReportsTitle}">
+
+    <Grid RowDefinitions="*,Auto">
+        <CollectionView Grid.Row="0" ItemsSource="{Binding Items}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="diagnostics:CrashReportItem">
+                    <Grid Padding="16,10" RowDefinitions="Auto,Auto,Auto" RowSpacing="2"
+                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnReportTapped" />
+                        </Grid.GestureRecognizers>
+                        <Label Grid.Row="0" Text="{Binding Kind}" />
+                        <Label Grid.Row="1" Text="{Binding Caption}" LineBreakMode="TailTruncation"
+                               Style="{StaticResource SecondaryLabel}" />
+                        <!-- Моноширинный: стек и след читаются столбцами, как в журнале устройства -->
+                        <Label Grid.Row="2" Text="{Binding Text}" IsVisible="{Binding IsExpanded}"
+                               FontFamily="monospace" FontSize="11" Margin="0,6,0,0"
+                               Style="{StaticResource SecondaryLabel}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <!-- Пустое состояние — внутри списка: соседом в той же ячейке его перекрыл бы пустой список -->
+            <CollectionView.EmptyView>
+                <ContentView>
+                    <VerticalStackLayout Padding="16,24" Spacing="8" IsVisible="{Binding IsEmpty}">
+                        <Label Text="{x:Static texts:UiTexts.CrashReportsEmptyTitle}" Style="{StaticResource TitleLabel}" />
+                        <Label Text="{x:Static texts:UiTexts.CrashReportsEmptyHint}" Style="{StaticResource SecondaryLabel}" />
+                    </VerticalStackLayout>
+                </ContentView>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+        <VerticalStackLayout Grid.Row="1" Padding="16,8,16,12" Spacing="8">
+            <Button Text="{x:Static texts:UiTexts.CrashReportsShare}" IsEnabled="{Binding HasReports}"
+                    AutomationId="ShareCrashReports" Clicked="OnShareClicked" />
+            <Button Text="{x:Static texts:UiTexts.CrashReportsClear}" IsEnabled="{Binding HasReports}"
+                    AutomationId="ClearCrashReports" Clicked="OnClearClicked"
+                    Style="{StaticResource DangerButton}" />
+        </VerticalStackLayout>
+    </Grid>
+
+</pages:DataPage>

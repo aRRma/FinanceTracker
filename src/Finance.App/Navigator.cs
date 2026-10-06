@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Finance.App;
 
 /// <summary>
@@ -15,7 +17,17 @@ internal static class Navigator
     /// Переходит по маршруту из обработчика события; сбой показывается через <see cref="Guarded"/>.
     /// </summary>
     /// <param name="route">Маршрут <c>Shell</c>.</param>
-    internal static void Go(string route) => Guarded.Run(() => GoAsync(route));
+    /// <param name="file">Файл обработчика — для следа действий; подставляет компилятор.</param>
+    /// <param name="member">Имя обработчика — для следа действий; подставляет компилятор.</param>
+    /// <remarks>
+    /// Имя вызвавшего передаётся дальше: иначе след записал бы каждый переход как <c>Navigator.Go</c>,
+    /// и не было бы видно, какую строку нажали.
+    /// </remarks>
+    internal static void Go(
+        string route,
+        [CallerFilePath] string file = "",
+        [CallerMemberName] string member = "") =>
+        Guarded.Run(() => GoAsync(route), file, member);
 
     /// <summary>
     /// Переходит по маршруту, если другой переход не идёт прямо сейчас.

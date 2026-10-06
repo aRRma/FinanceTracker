@@ -160,6 +160,23 @@ public sealed class CrashReports
         Task.Run(Read, cancellationToken);
 
     /// <summary>
+    /// Сводит оба файла в один — для «Поделиться»: отправить файлом удобнее, чем двумя.
+    /// </summary>
+    /// <param name="path">Куда положить сведённый файл.</param>
+    /// <remarks>
+    /// Под той же блокировкой, что запись: смена файла посреди копирования потеряла бы отчёты.
+    /// </remarks>
+    public void CopyTo(string path)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+
+        lock (_gate)
+        {
+            File.WriteAllText(path, ReadText(PreviousPath) + ReadText(CurrentPath), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+        }
+    }
+
+    /// <summary>
     /// Удаляет все отчёты.
     /// </summary>
     public void Clear()

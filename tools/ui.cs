@@ -80,6 +80,7 @@ internal sealed partial class Ui
           start                холодный старт: force-stop и запуск с ожиданием первого кадра
           stop                 force-stop приложения
           shortcut <вид>       открыть приложение ярлыком: Expense | Income | Transfer (после force-stop)
+          debugcrash <вид>     нарочный сбой отладочной сборки: caught | ui | thread | timer | task | java | anr
           dump                 экран списком: * нажимаемый, x,y центра, id, подпись, [состояния]
           tap <цель>           нажать: AutomationId, точная подпись, часть подписи или x,y
           tap2 <цель>          два нажатия подряд (проверка защиты от повторного сохранения)
@@ -114,6 +115,7 @@ internal sealed partial class Ui
             case "start": await StartAsync(); break;
             case "stop": await AdbAsync("shell", "am", "force-stop", Package); break;
             case "shortcut": await ShortcutAsync(Take(queue, command)); break;
+            case "debugcrash": await DebugCrashAsync(Take(queue, command)); break;
             case "dump": Print(await DumpAsync()); break;
             case "tap": await TapAsync(Take(queue, command), times: 1); break;
             case "tap2": await TapAsync(Take(queue, command), times: 2); break;
@@ -136,7 +138,7 @@ internal sealed partial class Ui
     }
 
     private static bool IsCommand(string word) =>
-        word is "boot" or "run" or "start" or "stop" or "shortcut" or "dump" or "tap" or "tap2" or "hold"
+        word is "boot" or "run" or "start" or "stop" or "shortcut" or "debugcrash" or "dump" or "tap" or "tap2" or "hold"
             or "wait" or "gone" or "text" or "key" or "swipe" or "db" or "crash" or "nocrash" or "shot" or "edges" or "same"
             or "transit" or "script";
 
@@ -344,6 +346,17 @@ internal sealed partial class Ui
         await AdbAsync("logcat", "-c");
         string output = await AdbAsync("shell", "am", "start", "-W", "-n", Activity, "-a", ShortcutAction, "--es", "kind", kind);
         Console.WriteLine($"ярлык {kind}: {TotalTime(output)} мс");
+    }
+
+    /// <summary>
+    /// Нарочный сбой отладочной сборки (<c>DebugCrash</c>): намерение с видом и новым номером — с прежним
+    /// приложение сбой не повторит. Сбой приходит через две секунды, поэтому команда ждёт пять.
+    /// </summary>
+    private async Task DebugCrashAsync(string kind)
+    {
+        await AdbAsync("shell", "am", "start", "-n", Activity, "--es", "debug_crash", kind, "--es", "debug_crash_id", Guid.NewGuid().ToString("N"));
+        await Task.Delay(TimeSpan.FromSeconds(5));
+        Console.WriteLine($"отладочный сбой {kind}");
     }
 
     private static string TotalTime(string output) =>

@@ -35,6 +35,22 @@ public static class DateText
         date.Year == today.Year ? Day(date) : DayWithYear(date);
 
     /// <summary>
+    /// Момент в зоне пользователя: «6 октября, 22:41», год — только чужой.
+    /// </summary>
+    /// <param name="moment">Момент.</param>
+    /// <param name="zone">Часовой пояс пользователя.</param>
+    /// <param name="today">Сегодняшняя дата пользователя.</param>
+    public static string Moment(DateTimeOffset moment, TimeZoneInfo zone, DateOnly today)
+    {
+        ArgumentNullException.ThrowIfNull(zone);
+
+        DateTimeOffset local = TimeZoneInfo.ConvertTime(moment, zone);
+        CultureInfo culture = UiCulture.Current;
+
+        return string.Create(culture, $"{DayWithYearIfOther(DateOnly.FromDateTime(local.DateTime), today)}, {local.ToString("HH:mm", culture)}");
+    }
+
+    /// <summary>
     /// Месяц с годом строчными: «август 2026».
     /// </summary>
     /// <param name="date">Любой день месяца.</param>

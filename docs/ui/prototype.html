@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Личный трекер финансов — прототип</title>
 <!-- СГЕНЕРИРОВАНО из mockups.html скриптом tools/build_prototype.py. Руками не править. -->
-<!-- отпечатки источников: mockups.html=b8c4ee649bd8c624f3f9b3a69151a7578fe3cad50e8a924b02b794af09707849 build_prototype.py=c4117922eb79d50153b038589f1404b8b52e172c7e165499ea27eaa2d6cb669c -->
+<!-- отпечатки источников: mockups.html=a5240e3d1ca3565b063d8d267c594ef0d583a86e3a2984574ff153a44aa36b13 build_prototype.py=c4117922eb79d50153b038589f1404b8b52e172c7e165499ea27eaa2d6cb669c -->
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -1368,6 +1368,7 @@ body{padding:0}
     <div class="card">
       <div class="row"><div class="g"><div class="t">Версия</div></div><span class="s">1.0</span></div>
       <div class="row"><div class="g"><div class="t">Схема базы</div></div><span class="s">5</span></div>
+      <div class="row"><div class="g"><div class="t">Отчёты о сбоях</div></div><span class="s">3</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><div class="g"><div class="note dim">Данные хранятся на этом устройстве и никуда не передаются.</div><div class="note dim">Значки — Tabler Icons, лицензия MIT.</div></div></div>
     </div>
   </div>
@@ -1520,6 +1521,32 @@ body{padding:0}
 </div>
 </div>
 
+<div class="scr right" data-screen="D-16" title="D-16 · Отправить отчёт о сбое">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Отчёты о сбоях</h2></div>
+  <div class="body">
+    <div class="card">
+      <div class="row"><div class="g"><div class="t">Падение</div><div class="s">6 октября, 22:41 · System.InvalidOperationException</div><div class="note dim" style="font-family:ui-monospace,monospace;font-size:9.5px;white-space:pre-wrap;margin-top:6px">app 1.0.5 (10005), android 16, samsung SM-S938B
+System.InvalidOperationException
+   at Finance.App.Pages.FeedPage.OnRefreshing()
+--- trail (UTC)
+19:40:58 nav //feed
+19:41:02 run FeedPage.OnRefreshing</div></div></div>
+      <div class="row"><div class="g"><div class="t">Прошлое завершение</div><div class="s">6 октября, 22:39 · exit CrashNative status 11</div></div></div>
+      <div class="row"><div class="g"><div class="t">Ошибка</div><div class="s">6 октября, 21:51 · System.TimeoutException</div></div></div>
+    </div>
+    <div class="btn" style="margin-top:12px">Поделиться</div>
+    <div class="btn danger" style="margin-top:8px">Очистить</div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</div>
+
 <div class="scr right" data-screen="E-01" title="E-01 · Разобраться, куда ушли деньги">
 <div class="phone">
   <div class="hd"><h2>Отчёт</h2></div>
@@ -1639,7 +1666,7 @@ body{padding:0}
 </div>
 </div></div></div>
 
-<p class="legend">Зелёный круг — касание. Счётчик считает касания по интерфейсу отдельно от набора цифр: первое зависит от раскладки экранов, второе — от суммы. С клавиатуры: <code>пробел</code> — пауза, <code>←</code> и <code>→</code> — шаг, цифры — первые десять сценариев. Клик по кадру ставит на паузу. Экранов в прототипе столько же, сколько в макетах: 43.</p>
+<p class="legend">Зелёный круг — касание. Счётчик считает касания по интерфейсу отдельно от набора цифр: первое зависит от раскладки экранов, второе — от суммы. С клавиатуры: <code>пробел</code> — пауза, <code>←</code> и <code>→</code> — шаг, цифры — первые десять сценариев. Клик по кадру ставит на паузу. Экранов в прототипе столько же, сколько в макетах: 44.</p>
 </div>
 
 <script>

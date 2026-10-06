@@ -18,9 +18,10 @@ internal static class CrashReportFile
     private const string End = "=== end";
 
     /// <summary>
-    /// Строка, после которой идёт след действий.
+    /// Строка, после которой идёт след действий. Время следа — UTC, а экран подписывает отчёт временем
+    /// пользователя: без пометки 20:27 в следе и 23:28 в подписи читались бы как разные часы.
     /// </summary>
-    internal const string TrailHeader = "--- trail";
+    internal const string TrailHeader = "--- trail (UTC)";
 
     /// <summary>
     /// Собирает отчёт в текст для дозаписи в файл.
