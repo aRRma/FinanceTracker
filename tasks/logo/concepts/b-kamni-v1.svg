@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="title">
-  <title id="title">Равновесие</title>
-  <!-- Три камня друг на друге, меньший сверху, со сдвигом: равновесие держится, хотя стопка не ровная. -->
-  <g fill="#111111">
-    <ellipse cx="128" cy="194" rx="96" ry="36"/>
-    <ellipse cx="120" cy="114" rx="68" ry="28"/>
-    <ellipse cx="134" cy="48" rx="42" ry="22"/>
-  </g>
-</svg>

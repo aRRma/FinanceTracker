@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="title">
-  <title id="title">Приход и расход</title>
-  <!-- Круг, разрезанный пополам и разведённый: левая половина — расход (минус), правая — приход (плюс). -->
-  <g fill="#111111" fill-rule="evenodd">
-    <path d="M122 38 A100 100 0 0 0 122 238 Z M54 130 H106 V146 H54 Z"/>
-    <path d="M134 18 A100 100 0 0 1 134 218 Z M168 92 H184 V110 H202 V126 H184 V144 H168 V126 H150 V110 H168 Z"/>
-  </g>
-</svg>
