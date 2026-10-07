@@ -36,6 +36,7 @@
 | Цвет и значок счёта | [ADR-0016](adr/0016-account-color-and-icon.md), `FR-ACC-07`, экран D-12, сценарии UC-13 и UC-14 |
 | Счёт по умолчанию | `FR-SET-07`, `FR-TRX-06`, экран D-13, сценарий UC-20 |
 | Защита входа ПИН-кодом | [ADR-0017](adr/0017-entry-protection-own-pin-outside-database.md), `FR-SET-08`, `NFR-28`, `NFR-29`, `TECH-19` в [architecture.md](architecture.md), экраны C-10…C-12, D-14, D-15, сценарий UC-26 |
+| Отчёты о сбоях | `FR-SET-09`, `TECH-20` в [architecture.md](architecture.md), раздел «Сбои» в [../CONTEXT.md](../CONTEXT.md), экраны D-16, D-17, сценарий UC-20; как достать и читать отчёты на эмуляторе — раздел «Отчёты о сбоях» навыка `emulator` |
 | Сборка, тесты, эмулятор, экраны, тексты | навыки в `.claude/skills/` — список и когда какой загружать в [../CLAUDE.md](../CLAUDE.md) |
 
 ## Остальные документы
