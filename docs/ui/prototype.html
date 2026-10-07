@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Личный трекер финансов — прототип</title>
 <!-- СГЕНЕРИРОВАНО из mockups.html скриптом tools/build_prototype.py. Руками не править. -->
-<!-- отпечатки источников: mockups.html=ea1360b0319ae05b94af5c79c1c342cb76862982f053048c1a40f75875c35831 build_prototype.py=c4117922eb79d50153b038589f1404b8b52e172c7e165499ea27eaa2d6cb669c -->
+<!-- отпечатки источников: mockups.html=f29e2f293fd19405722db41f1b34db2e2ff28f6316a632b586a675de45bb5b8d build_prototype.py=c4117922eb79d50153b038589f1404b8b52e172c7e165499ea27eaa2d6cb669c -->
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -453,6 +453,7 @@ body{padding:0}
 <symbol id="i-adjustments" viewBox="0 0 24 24"><path d="M4 10a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M6 4v4 M6 12v8 M10 16a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M12 4v10 M12 18v2 M16 7a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M18 4v1 M18 9v11"/></symbol>
 <symbol id="i-alert-circle" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M12 8v4 M12 16h.01"/></symbol>
 <symbol id="i-alert-triangle" viewBox="0 0 24 24"><path d="M12 4.5l8.5 15.5h-17z M12 10.5v4 M12 17.2h.01"/></symbol>
+<symbol id="i-arrow-back-up" viewBox="0 0 24 24"><path d="M9 14l-4 -4l4 -4 M5 10h11a4 4 0 1 1 0 8h-1"/></symbol>
 <symbol id="i-arrow-down-left" viewBox="0 0 24 24"><path d="M17 7l-10 10 M16 17h-9v-9"/></symbol>
 <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M17 7l-10 10 M8 7h9v9"/></symbol>
 <symbol id="i-baby-carriage" viewBox="0 0 24 24"><path d="M6 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M16 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M2 5h2.5l1.632 4.897a6 6 0 0 0 5.693 4.103h2.675a5.5 5.5 0 0 0 0 -11h-.5v6 M6 9h14 M9 17l1 -3 M16 14l1 3"/></symbol>
@@ -647,7 +648,7 @@ body{padding:0}
       <div class="row"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Счёт по умолчанию</div><div class="s">Карта основная</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-lock"/></svg><div class="g"><div class="t">Защита входа</div><div class="s">Включена</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-database"/></svg><div class="g"><div class="t">Данные</div><div class="s">Сохранить в файл или восстановить</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
-      <div class="row"><svg class="ic"><use href="#i-info-circle"/></svg><div class="g"><div class="t">О программе</div><div class="s">Версия 1.0, схема 5</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><svg class="ic"><use href="#i-info-circle"/></svg><div class="g"><div class="t">О программе</div><div class="s">Версия 1.0.21, схема 7</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     </div>
   </div>
   <nav class="nav">
@@ -839,6 +840,39 @@ body{padding:0}
 </div>
 </div>
 
+<div class="scr right" data-screen="B-08" title="B-08 · Выбрать категорию дохода">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Категория дохода</h2></div>
+  <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span>Поиск по названию</span></div>
+  <div class="lbl" style="padding:8px 11px 6px;margin:0"><span>Частые</span></div>
+  <div class="chiprow"><b class="chip"><svg class="ic"><use href="#i-cash"/></svg>Зарплата</b><b class="chip"><svg class="ic"><use href="#i-arrow-back-up"/></svg>Возвраты и вычеты</b><b class="chip"><svg class="ic"><use href="#i-trending-up"/></svg>Проценты и дивиденды</b></div>
+  <div class="list" style="padding-top:6px">
+    <div class="row"><svg class="ic"><use href="#i-question-mark"/></svg><div class="g"><div class="t">Без категории</div></div></div>
+    <div class="row"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div class="t">Доход</div></div><span class="badge">8</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="lbl" style="padding:12px 11px 6px;margin:0;border-top:1px solid var(--line)"><span>Возврат в расходы</span></div>
+    <div class="row"><svg class="ic"><use href="#i-steering-wheel"/></svg><div class="g"><div class="t">Автомобиль</div></div><span class="badge">5</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="row"><svg class="ic"><use href="#i-baby-carriage"/></svg><div class="g"><div class="t">Дети</div></div><span class="badge">6</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="row"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Еда</div></div><span class="badge">6</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="row"><svg class="ic"><use href="#i-home"/></svg><div class="g"><div class="t">Жильё</div></div><span class="badge">4</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="row"><svg class="ic"><use href="#i-stethoscope"/></svg><div class="g"><div class="t">Здоровье</div></div><span class="badge">8</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="row"><svg class="ic"><use href="#i-mood-happy"/></svg><div class="g"><div class="t">Отдых</div></div><span class="badge">5</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+  </div>
+</div>
+</div>
+
+<div class="scr right" data-screen="B-09" title="B-09 · Найти подкатегорию по буквам">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Категория расхода</h2></div>
+  <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span class="typed">дост</span></div>
+  <div class="list" style="padding-top:6px">
+    <div class="row"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Еда</div></div><span class="badge">6</span><svg class="ic mut"><use href="#i-chevron-down"/></svg></div>
+    <div class="row child"><svg class="ic"><use href="#i-truck-delivery"/></svg><div class="g"><div class="t">Доставка еды</div></div></div>
+    <div class="row"><svg class="ic"><use href="#i-coins"/></svg><div class="g"><div class="t">Финансы</div></div><span class="badge">9</span><svg class="ic mut"><use href="#i-chevron-down"/></svg></div>
+    <div class="row child"><svg class="ic"><use href="#i-truck-delivery"/></svg><div class="g"><div class="t">Почта, доставка</div></div></div>
+  </div>
+</div>
+</div>
+
 <div class="scr right" data-screen="C-01" title="C-01 · Сохранить без категории">
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Новая операция</h2><b class="save">Сохранить</b></div>
@@ -926,7 +960,7 @@ body{padding:0}
 
 <div class="scr right" data-screen="C-04" title="C-04 · Выгрузить историю при первом обмене">
 <div class="phone">
-  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Синхронизация</h2></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Обмен</h2></div>
   <div class="body">
     <div class="lbl"><span>Отправка</span><span>1 240 / 2 018</span></div>
     <div class="progress"><i></i></div>
@@ -936,21 +970,20 @@ body{padding:0}
       <div class="row"><svg class="ic" style="color:var(--pos)"><use href="#i-check"/></svg><div class="g"><div class="t">Категории</div></div><span class="num dim">85</span></div>
       <div class="row"><svg class="ic acc"><use href="#h-sync"/></svg><div class="g"><div class="t">Операции</div></div><span class="num dim">1 176 / 1 954</span></div>
     </div>
-    <div class="note">Порядок отправки задан ссылками: счета и категории уходят раньше операций</div>
     <div class="btn" style="background:transparent;color:var(--acc);border:1px solid var(--line2)">Прервать</div>
   </div>
 </div>
 </div>
 
-<div class="scr right" data-screen="C-05" title="C-05 · Синхронизировать">
+<div class="scr right" data-screen="C-05" title="C-05 · Обменяться с сервером">
 <div class="phone">
-  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Синхронизация</h2></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Обмен</h2></div>
   <div class="body">
     <div class="stat">
       <div class="b"><div class="k">Не отправлено</div><div class="v">14</div></div>
       <div class="b"><div class="k">Последний обмен</div><div class="v" style="font-size:13px">вчера 21:40</div></div>
     </div>
-    <div class="btn">Синхронизировать</div>
+    <div class="btn">Обменяться</div>
     <div class="card" style="background:var(--negbg);border-color:var(--neg)">
       <div class="row" style="align-items:flex-start"><svg class="ic" style="color:var(--neg)"><use href="#h-alert"/></svg><div class="g"><div class="t neg">Сервер не отвечает</div><div class="s" style="white-space:normal">Изменения останутся на устройстве до следующей попытки</div></div></div>
     </div>
@@ -960,7 +993,6 @@ body{padding:0}
       <div class="dv"></div>
       <div class="fld"><span class="k">Токен</span><span class="v">••••••••</span></div>
     </div>
-    <div class="note">Синхронизация не влияет на работу приложения: запись операций доступна всегда</div>
   </div>
 </div>
 </div>
@@ -1135,6 +1167,232 @@ body{padding:0}
 </div>
 </div>
 
+<div class="scr right" data-screen="C-13" title="C-13 · Уйти, не сохранив">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Операция</h2><b class="del">Удалить</b><b class="save">Сохранить</b></div>
+  <div class="body">
+    <div class="card">
+      <div class="kinds"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расход</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доход</b><b class="trf"><svg class="ic sm"><use href="#i-swap"/></svg>Перевод</b></div>
+      <div class="amt"><span class="expr"></span><span class="v exp">-1 520 ₽</span></div>
+      <div class="cells">
+        <div class="fld"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Счёт</span><span class="v">Карта основная</span></span></div>
+        <div class="fld"><span class="ico exp"><svg class="ic"><use href="#i-shopping-cart"/></svg></span><span><span class="k">Категория</span><span class="v">Продукты</span></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="veil">
+    <div class="dlg">
+      <h4>Выйти без сохранения?</h4>
+      <p>Данные не сохранятся.</p>
+      <div class="acts"><b class="no">Остаться</b><b class="yes">Выйти</b></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="scr right" data-screen="C-14" title="C-14 · Узнать, что база не обновилась">
+<div class="phone">
+  <div class="hd"><h2>Балансы</h2></div>
+  <nav class="nav">
+    <a class="on"><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+  <div class="veil">
+    <div class="dlg">
+      <h4>База не обновилась</h4>
+      <p>Не удалось обновить схему базы. База возвращена из резервной копии; верните предыдущую версию приложения — данные целы.</p>
+      <div class="acts"><b class="yes">Закрыть</b></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="scr right" data-screen="C-15" title="C-15 · Перезапустить после восстановления">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Данные</h2></div>
+  <div class="body">
+    <div class="lbl"><span>Восстановить из файла</span></div>
+    <div class="card">
+      <div class="row"><svg class="ic"><use href="#i-upload"/></svg><div class="g"><div class="t">Выбрать файл</div><div class="s">Текущие данные заменятся данными файла</div></div></div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+  <div class="veil">
+    <div class="dlg">
+      <h4>Данные восстановлены</h4>
+      <p>Приложение перезапустится.</p>
+      <div class="acts"><b class="yes">Перезапустить</b></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="scr right" data-screen="C-16" title="C-16 · Выбрать не тот файл">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Данные</h2></div>
+  <div class="body">
+    <div class="lbl"><span>Восстановить из файла</span></div>
+    <div class="card">
+      <div class="row"><svg class="ic"><use href="#i-upload"/></svg><div class="g"><div class="t">Выбрать файл</div><div class="s">Текущие данные заменятся данными файла</div></div></div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+  <div class="veil">
+    <div class="dlg">
+      <h4>В этом файле нет данных трекера</h4>
+      <div class="acts"><b class="yes">Закрыть</b></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="scr right" data-screen="C-17" title="C-17 · Открыть пустой справочник мест">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Места</h2></div>
+  <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span>Поиск по названию</span></div>
+  <div class="empty" style="padding-top:140px">
+    <p>Мест пока нет. Они появятся, когда вы укажете место в операции.</p>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</div>
+
+<div class="scr right" data-screen="C-18" title="C-18 · Открыть пустые отчёты о сбоях">
+<div class="phone">
+  <div class="atmo" style="top:46px"></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Отчёты о сбоях</h2></div>
+  <div class="body">
+    <div class="card gl" style="padding:18px 14px;text-align:center">
+      <div style="font-size:15px;font-weight:600">Отчётов нет</div>
+      <div class="s" style="white-space:normal;margin-top:6px">Они появятся, если приложение закроется с ошибкой.</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</div>
+
+<div class="scr right" data-screen="C-19" title="C-19 · Указать первое место">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Место</h2></div>
+  <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span>Поиск по названию</span></div>
+  <div class="empty" style="padding-top:120px">
+    <p>Мест пока нет. Наберите название — оно создастся вместе с операцией.</p>
+  </div>
+</div>
+</div>
+
+<div class="scr right" data-screen="C-20" title="C-20 · Заблокировать счёт с деньгами">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт</h2><b class="del">Удалить</b><b class="save">Сохранить</b></div>
+  <div class="body">
+    <div class="card form">
+      <div class="preview"><span class="tile lg ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><div class="g"><div class="t">Карта евро</div><div class="s">Карта · EUR</div></div></div>
+      <div class="dv"></div>
+      <div class="fld"><span class="k">Название</span><span class="v">Карта евро</span></div>
+    </div>
+    <div class="card form">
+      <div class="swrow"><span>Скрытый</span><span class="sw2"><i></i></span></div>
+      <div class="dv"></div>
+      <div class="swrow"><span>Заблокированный</span><span class="sw2 on"><i></i></span></div>
+    </div>
+  </div>
+  <div class="veil">
+    <div class="dlg">
+      <h4>Заблокировать счёт?</h4>
+      <p>Внимание: на счёте ещё 1 240,00 €.<br>Счётом по умолчанию станет «Наличные».</p>
+      <div class="acts"><b class="no">Отмена</b><b class="yes">Заблокировать</b></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="scr right" data-screen="C-21" title="C-21 · Выбрать счёт по умолчанию без счетов">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт по умолчанию</h2></div>
+  <div class="empty" style="padding-top:170px">
+    <h3>Нет незаблокированных счетов</h3>
+    <p>Новый счёт сам станет счётом по умолчанию.</p>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</div>
+
+<div class="scr right" data-screen="C-22" title="C-22 · Включить защиту входа">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Защита входа</h2></div>
+  <div class="body">
+    <div class="card">
+      <div class="row"><svg class="ic"><use href="#i-lock"/></svg><div class="g"><div class="t">Защита входа</div></div><span class="dim">Выключена</span></div>
+    </div>
+    <div class="note dim" style="margin:-4px 3px 6px">ПИН-код при запуске и после 5 минут в фоне</div>
+    <div class="card">
+      <div class="row"><div class="g"><div class="t accent">Задать ПИН-код</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</div>
+
+<div class="scr right" data-screen="C-23" title="C-23 · Записать операцию без счёта">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Новая операция</h2><b class="save">Сохранить</b></div>
+  <div class="body">
+    <div class="card">
+      <div class="kinds"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расход</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доход</b><b class="trf"><svg class="ic sm"><use href="#i-swap"/></svg>Перевод</b></div>
+      <div class="amt"><span class="expr"></span><span class="v exp">-1 590</span></div>
+      <div class="cells">
+        <div class="fld req"><span class="ico"><svg class="ic"><use href="#i-wallet"/></svg></span><span><span class="k">Счёт</span><span class="v ask">Добавить</span></span></div>
+        <div class="fld req"><span class="ico"><svg class="ic"><use href="#i-tag"/></svg></span><span><span class="k">Категория</span><span class="v ask">Выбрать</span></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="toast">Сначала добавьте счёт</div>
+  <div class="kp">
+    <div class="nums">
+      <b>7</b><b>8</b><b>9</b>
+      <b>4</b><b>5</b><b>6</b>
+      <b>1</b><b>2</b><b>3</b>
+      <b>,</b><b>0</b><b><svg class="ic"><use href="#i-backspace"/></svg></b>
+    </div>
+    <div class="ops">
+      <b>÷</b><b>×</b><b>−</b><b>+</b><b>=</b>
+    </div>
+  </div>
+</div>
+</div>
+
 <div class="scr right" data-screen="D-01" title="D-01 · Упорядочить счета">
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счета</h2><span class="tool">+</span></div>
@@ -1176,12 +1434,12 @@ body{padding:0}
       <div class="fld"><span class="k">Цвет и значок</span><div class="signrow"><span class="tile ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><span class="v">Голубой · процент</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div></div>
       <div class="fld"><span class="k">Тип</span><span class="v">Карта</span></div>
       <div class="fld"><span class="k">Валюта</span><span class="v lock">Рубль ₽</span></div>
-      <div class="fld"><span class="k">Начальный остаток</span><span class="v neg" style="border-bottom:2px solid var(--acc)">-15 000 ₽</span></div>
+      <div class="fld"><span class="k">Начальный остаток</span><span class="v neg" style="border-bottom:2px solid var(--acc)">-15000</span></div>
       <div class="fld"><span class="k">Дата открытия</span><span class="v">01.01.2026</span></div>
     </div>
     <div class="card form">
       <div class="swrow"><span>Скрытый</span><span class="sw2"><i></i></span></div>
-      <div class="note">Счёт не входит в итоги и отчёт</div>
+      <div class="note">Счёт не входит в итоги и в отчёт по умолчанию</div>
       <div class="dv d2-closing"></div>
       <div class="swrow d2-closing"><span>Заблокированный</span><span class="sw2" id="d2close"><i></i></span></div>
       <div class="note d2-closing">Заблокированный счёт не показывается на главном экране и не предлагается в выборе</div>
@@ -1400,9 +1658,9 @@ body{padding:0}
     </svg>
     <div class="t" style="font-size:15px;font-weight:600;text-align:center;margin-top:-6px">Личный трекер финансов</div>
     <div class="card">
-      <div class="row"><div class="g"><div class="t">Версия</div></div><span class="s">1.0</span></div>
-      <div class="row"><div class="g"><div class="t">Схема базы</div></div><span class="s">5</span></div>
-      <div class="row"><div class="g"><div class="t">Отчёты о сбоях</div></div><span class="s">3</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><div class="g"><div class="t">Версия</div></div><span class="s">1.0.21</span></div>
+      <div class="row"><div class="g"><div class="t">Схема базы</div></div><span class="s">7</span></div>
+      <div class="row"><div class="g"><div class="t">Отчёты о сбоях</div></div><span class="s">6</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><div class="g"><div class="note dim">Данные хранятся на этом устройстве и никуда не передаются.</div><div class="note dim">Значки — Tabler Icons, лицензия MIT.</div></div></div>
     </div>
   </div>
@@ -1564,16 +1822,17 @@ body{padding:0}
       <div class="note" style="font-weight:600">Последний сбой</div>
       <div style="font-size:14px;font-weight:600;margin-top:1px">Приложение закрылось</div>
       <div class="s">Сегодня, 09:57 · экран «О программе»</div>
-      <div class="cstat"><b>2<i>закрылось</i></b><b>1<i>зависло</i></b><b>2<i>прочее</i></b></div>
+      <div class="cstat"><b>2<i>закрылось</i></b><b>1<i>зависло</i></b><b>3<i>прочее</i></b></div>
       <div class="btn">Поделиться отчётами</div>
     </div>
-    <div class="note" style="font-weight:600;margin:2px 0 -5px 3px">Все отчёты · 5</div>
+    <div class="note" style="font-weight:600;margin:2px 0 -5px 3px">Все отчёты · 6</div>
     <div class="card gl">
       <div class="row"><span class="cb closed"><svg class="ic"><use href="#i-bolt"/></svg></span><div class="g"><div class="t" style="font-weight:600">Приложение закрылось</div><div class="s">Сегодня, 09:57 · CrashedByAdbException</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><span class="cb caught"><svg class="ic"><use href="#i-alert-circle"/></svg></span><div class="g"><div class="t" style="font-weight:600">Действие не удалось</div><div class="s">Сегодня, 09:41 · TimeoutException</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><span class="cb system"><svg class="ic"><use href="#i-cpu"/></svg></span><div class="g"><div class="t" style="font-weight:600">Падение в системе Android</div><div class="s">Вчера, 22:39 · SIGSEGV</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><span class="cb froze"><svg class="ic"><use href="#i-hourglass"/></svg></span><div class="g"><div class="t" style="font-weight:600">Приложение зависло</div><div class="s">Вчера, 21:12</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><span class="cb killed"><svg class="ic"><use href="#i-moon"/></svg></span><div class="g"><div class="t" style="font-weight:600">Закрыто системой</div><div class="s">5 октября, 20:47 · мало памяти</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><span class="cb warning"><svg class="ic"><use href="#i-alert-triangle"/></svg></span><div class="g"><div class="t" style="font-weight:600">Предупреждение</div><div class="s">4 октября, 18:02 · TaskCanceledException</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
     </div>
     <div class="btn" style="background:transparent;color:var(--neg)">Очистить отчёты</div>
   </div>
@@ -1593,7 +1852,7 @@ body{padding:0}
   <div class="body">
     <div class="card gl" style="padding:10px 11px 9px">
       <div style="display:flex;gap:9px;align-items:center"><span class="cb closed lg"><svg class="ic"><use href="#i-bolt"/></svg></span><div style="min-width:0"><div style="font-size:13.5px;font-weight:600">Приложение закрылось</div><div class="s">Сегодня, 09:57 · экран «О программе»</div></div></div>
-      <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin-top:8px;font-size:11.5px"><span class="dim">Версия</span><b style="text-align:right">1.0.5 (10005)</b><span class="dim">Телефон</span><b style="text-align:right">samsung SM-S938B</b><span class="dim">Android</span><b style="text-align:right">16</b></div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin-top:8px;font-size:11.5px"><span class="dim">Версия</span><b style="text-align:right">1.0.21 (10021)</b><span class="dim">Телефон</span><b style="text-align:right">samsung SM-S938B</b><span class="dim">Android</span><b style="text-align:right">16</b></div>
     </div>
     <div class="note" style="font-weight:600;margin:2px 0 -5px 3px">Причина</div>
     <div class="card gl">
@@ -1737,11 +1996,49 @@ body{padding:0}
   </div>
 </div>
 </div>
+
+<div class="scr right" data-screen="E-06" title="E-06 · Вернуться из опустевшей группы">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Дети</h2></div>
+  <div class="body" style="gap:4px">
+    <div class="note dim" style="font-size:12px">август 2026</div>
+  </div>
+  <div class="empty" style="padding-top:150px">
+    <h3>Операций больше нет</h3>
+    <p>Вернитесь к отчёту.</p>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</div>
+
+<div class="scr right" data-screen="E-07" title="E-07 · Вернуться из опустевшей подкатегории">
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Кофе</h2></div>
+  <div class="body" style="gap:4px">
+    <div class="note dim" style="font-size:12px">август 2026</div>
+  </div>
+  <div class="empty" style="padding-top:150px">
+    <h3>В этом месяце операций нет</h3>
+    <p>Вернитесь к отчёту.</p>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</div>
 <div class="rip" id="rip"></div>
 </div>
 </div></div></div>
 
-<p class="legend">Зелёный круг — касание. Счётчик считает касания по интерфейсу отдельно от набора цифр: первое зависит от раскладки экранов, второе — от суммы. С клавиатуры: <code>пробел</code> — пауза, <code>←</code> и <code>→</code> — шаг, цифры — первые десять сценариев. Клик по кадру ставит на паузу. Экранов в прототипе столько же, сколько в макетах: 45.</p>
+<p class="legend">Зелёный круг — касание. Счётчик считает касания по интерфейсу отдельно от набора цифр: первое зависит от раскладки экранов, второе — от суммы. С клавиатуры: <code>пробел</code> — пауза, <code>←</code> и <code>→</code> — шаг, цифры — первые десять сценариев. Клик по кадру ставит на паузу. Экранов в прототипе столько же, сколько в макетах: 60.</p>
 </div>
 
 <script>

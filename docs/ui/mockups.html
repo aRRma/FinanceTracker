@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Личный трекер финансов — макеты, итерация 5</title>
+<title>Личный трекер финансов — макеты</title>
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -412,6 +412,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <symbol id="i-adjustments" viewBox="0 0 24 24"><path d="M4 10a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M6 4v4 M6 12v8 M10 16a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M12 4v10 M12 18v2 M16 7a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M18 4v1 M18 9v11"/></symbol>
 <symbol id="i-alert-circle" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M12 8v4 M12 16h.01"/></symbol>
 <symbol id="i-alert-triangle" viewBox="0 0 24 24"><path d="M12 4.5l8.5 15.5h-17z M12 10.5v4 M12 17.2h.01"/></symbol>
+<symbol id="i-arrow-back-up" viewBox="0 0 24 24"><path d="M9 14l-4 -4l4 -4 M5 10h11a4 4 0 1 1 0 8h-1"/></symbol>
 <symbol id="i-arrow-down-left" viewBox="0 0 24 24"><path d="M17 7l-10 10 M16 17h-9v-9"/></symbol>
 <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M17 7l-10 10 M8 7h9v9"/></symbol>
 <symbol id="i-baby-carriage" viewBox="0 0 24 24"><path d="M6 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M16 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M2 5h2.5l1.632 4.897a6 6 0 0 0 5.693 4.103h2.675a5.5 5.5 0 0 0 0 -11h-.5v6 M6 9h14 M9 17l1 -3 M16 14l1 3"/></symbol>
@@ -483,7 +484,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="wrap">
 <header class="masthead">
 <h1>Макеты экранов</h1>
-<p>45 экранов: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
+<p>60 экранов: каркас, ввод, состояния и ошибки, справочники, отчёт. Заголовок каждого экрана — действие пользователя, рядом номера сценариев из docs/use-cases.md.</p>
 <p>Все экраны одного размера — 330 × 690: экран Samsung Galaxy S25 Ultra (480 × 1040 логических пикселей) под строкой состояния, уменьшенный в 480/330 раза. Нижняя панель и клавиатура прижаты к низу, содержимое длиннее экрана обрезается, как на устройстве.</p>
 <p>Правдой считается приложение: макет сверяется с ним и правится в той же задаче, что и экран. Значки — контуры Tabler из набора приложения, названия категорий — из стартового набора.</p>
 <p style="margin-top:12px"><button onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark'" style="border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit">Переключить тему</button></p>
@@ -582,7 +583,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">A-04</span><b>Открыть справочники и настройки</b><span class="uc">UC-11 UC-13 UC-18 UC-20 UC-25</span><em>Всё, что открывается реже раза в неделю, двумя карточками: справочники и настройки. Под каждой строкой — её состояние: сколько записей, какая тема, какой пояс, какой счёт по умолчанию, включена ли защита входа [D-14]; у «Данных» — что там можно сделать.</em></figcaption>
+<figcaption class="cap"><span class="sid">A-04</span><b>Открыть справочники и настройки</b><span class="uc">UC-11 UC-13 UC-18 UC-25 UC-26 UC-27 UC-28</span><em>Всё, что открывается реже раза в неделю, двумя карточками: справочники и настройки. Под каждой строкой — её состояние: сколько записей, какая тема, какой пояс, какой счёт по умолчанию, включена ли защита входа [D-14]; у «Данных» — что там можно сделать.</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Ещё</h2></div>
   <div class="body">
@@ -599,7 +600,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="row"><svg class="ic"><use href="#i-credit-card"/></svg><div class="g"><div class="t">Счёт по умолчанию</div><div class="s">Карта основная</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-lock"/></svg><div class="g"><div class="t">Защита входа</div><div class="s">Включена</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><svg class="ic"><use href="#i-database"/></svg><div class="g"><div class="t">Данные</div><div class="s">Сохранить в файл или восстановить</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
-      <div class="row"><svg class="ic"><use href="#i-info-circle"/></svg><div class="g"><div class="t">О программе</div><div class="s">Версия 1.0, схема 5</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><svg class="ic"><use href="#i-info-circle"/></svg><div class="g"><div class="t">О программе</div><div class="s">Версия 1.0.21, схема 7</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
     </div>
   </div>
   <nav class="nav">
@@ -617,7 +618,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-01</span><b>Ввести сумму</b><span class="uc">UC-01</span><em>Две карточки: в первой обязательное — вид, сумма, счёт и категория, во второй то, что можно не заполнять. Клавиатура открыта сразу — сумму меняют всегда. Итог со знаком и цветом вида; арифметика прямо в поле: пока действие не закрыто клавишей «=», вместо итога подсказка. Панели вкладок на форме нет, сохранение — в шапке. В поле счёта — его плашка вместо серого кружка: перепутанный счёт видно до сохранения. Счёт подставлен — счёт по умолчанию [D-13], а из ленты незаблокированного счёта — этот счёт. Незаполненное обязательное поле отмечено тихо — кольцом у значка и точкой у подписи: категория пуста на каждой новой операции, и громкая подсветка встречала бы каждый раз. Подставить счёт нечего — сумма видна без знака валюты, поле счёта отмечено так же и подписано «Добавить»: касание открывает карточку нового счёта, «Сохранить» без счёта отвечает всплывающим сообщением.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-01</span><b>Ввести сумму</b><span class="uc">UC-01</span><em>Обязательное — в первой карточке, необязательное — во второй. Клавиатура открыта сразу — сумму меняют всегда; пока действие не закрыто клавишей «=», вместо итога подсказка. Панели вкладок на форме нет, сохранение — в шапке. В поле счёта — его плашка: перепутанный счёт видно до сохранения. Незаполненное обязательное поле отмечено тихо — кольцом у значка и точкой у подписи: категория пуста на каждой новой операции. Счёта ещё нет — [C-23].</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Новая операция</h2><b class="save">Сохранить</b></div>
   <div class="body">
@@ -669,7 +670,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-03</span><b>Выбрать подкатегорию</b><span class="uc">UC-01</span><em>Группы свёрнуты, открыта та, где стоит нынешний выбор: иначе его пришлось бы искать вслепую. Шапка группы разворачивает её, и первой строкой стоит «Прочее» — для тех, кому подробности не нужны. В поле формы и на панели частых оно подписано с группой — «Еда · Прочее»: «Прочее» есть в каждой группе, и одно слово не сказало бы, чьё оно. Группа из одной подкатегории — «Без категории», «Служебное» — не разворачивается: у неё нет ни числа, ни стрелки, касание выбирает её подкатегорию. Сама группа в операцию не попадает никогда — инвариант не нуждается в проверке. Над списком — частые подкатегории за последние три месяца: до привычной иначе разворот группы и прокрутка. С первой буквой поиска панель уходит. У дохода сначала доходные группы, ниже под линией и подписью «Возврат в расходы» — расходные группы, принимающие доход как возврат, в том же алфавитном порядке; у расхода так же, под подписью «Вычет из доходов», — доходные группы, принимающие расход.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-03</span><b>Выбрать подкатегорию</b><span class="uc">UC-01</span><em>Группы свёрнуты, открыта та, где стоит нынешний выбор. Шапка разворачивает группу, первой строкой — «Прочее»; в поле формы и на панели частых оно подписано с группой — «Еда · Прочее». Группа из одной подкатегории — «Без категории», «Служебное» — не разворачивается: касание выбирает её подкатегорию. Над списком — частые подкатегории. Доход — [B-08], поиск — [B-09].</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Категория расхода</h2></div>
   <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span>Поиск по названию</span></div>
@@ -790,7 +791,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">B-07</span><b>Указать место</b><span class="uc">UC-01 UC-24</span><em>Отбор по набранным буквам, частые выше. Если совпадения нет, место создаётся прямо отсюда — без похода в справочник. «Без места» снимает поставленное по ошибке — строка видна, когда место уже выбрано.</em></figcaption>
+<figcaption class="cap"><span class="sid">B-07</span><b>Указать место</b><span class="uc">UC-01 UC-24</span><em>Отбор по набранным буквам, частые выше. Совпадения нет — набранное название встаёт в форму, а место заведётся вместе с операцией, без похода в справочник. «Без места» снимает поставленное по ошибке — строка видна, когда место уже выбрано. Мест ещё нет — [C-19].</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Место</h2></div>
   <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span class="typed">пят</span></div>
@@ -803,13 +804,48 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </div>
 </figure>
 
+<figure class="unit">
+<figcaption class="cap"><span class="sid">B-08</span><b>Выбрать категорию дохода</b><span class="uc">UC-03 UC-22</span><em>Сначала доходные группы. Ниже под подписью «Возврат в расходы» — расходные группы, принимающие доход как возврат: он вычтется из расхода группы. У расхода так же, под подписью «Вычет из доходов», — доходные универсальные группы.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Категория дохода</h2></div>
+  <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span>Поиск по названию</span></div>
+  <div class="lbl" style="padding:8px 11px 6px;margin:0"><span>Частые</span></div>
+  <div class="chiprow"><b class="chip"><svg class="ic"><use href="#i-cash"/></svg>Зарплата</b><b class="chip"><svg class="ic"><use href="#i-arrow-back-up"/></svg>Возвраты и вычеты</b><b class="chip"><svg class="ic"><use href="#i-trending-up"/></svg>Проценты и дивиденды</b></div>
+  <div class="list" style="padding-top:6px">
+    <div class="row"><svg class="ic"><use href="#i-question-mark"/></svg><div class="g"><div class="t">Без категории</div></div></div>
+    <div class="row"><svg class="ic"><use href="#i-cash"/></svg><div class="g"><div class="t">Доход</div></div><span class="badge">8</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="lbl" style="padding:12px 11px 6px;margin:0;border-top:1px solid var(--line)"><span>Возврат в расходы</span></div>
+    <div class="row"><svg class="ic"><use href="#i-steering-wheel"/></svg><div class="g"><div class="t">Автомобиль</div></div><span class="badge">5</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="row"><svg class="ic"><use href="#i-baby-carriage"/></svg><div class="g"><div class="t">Дети</div></div><span class="badge">6</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="row"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Еда</div></div><span class="badge">6</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="row"><svg class="ic"><use href="#i-home"/></svg><div class="g"><div class="t">Жильё</div></div><span class="badge">4</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="row"><svg class="ic"><use href="#i-stethoscope"/></svg><div class="g"><div class="t">Здоровье</div></div><span class="badge">8</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    <div class="row"><svg class="ic"><use href="#i-mood-happy"/></svg><div class="g"><div class="t">Отдых</div></div><span class="badge">5</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+  </div>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">B-09</span><b>Найти подкатегорию по буквам</b><span class="uc">UC-01</span><em>С первой буквой панель частых уходит. Найденные подкатегории видны раскрытыми под своими группами; совпало название группы — видна вся группа. Ничего не нашлось — так и написано.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Категория расхода</h2></div>
+  <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span class="typed">дост</span></div>
+  <div class="list" style="padding-top:6px">
+    <div class="row"><svg class="ic"><use href="#i-tools-kitchen-2"/></svg><div class="g"><div class="t">Еда</div></div><span class="badge">6</span><svg class="ic mut"><use href="#i-chevron-down"/></svg></div>
+    <div class="row child"><svg class="ic"><use href="#i-truck-delivery"/></svg><div class="g"><div class="t">Доставка еды</div></div></div>
+    <div class="row"><svg class="ic"><use href="#i-coins"/></svg><div class="g"><div class="t">Финансы</div></div><span class="badge">9</span><svg class="ic mut"><use href="#i-chevron-down"/></svg></div>
+    <div class="row child"><svg class="ic"><use href="#i-truck-delivery"/></svg><div class="g"><div class="t">Почта, доставка</div></div></div>
+  </div>
+</div>
+</figure>
+
 </div>
 
 <div class="band"><h2>C · Состояния и ошибки</h2><span>То, что обычно проектируют последним и потом переделывают</span></div>
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-01</span><b>Сохранить без категории</b><span class="uc">UC-01</span><em>Сохранение не гаснет, пока нет категории или счёта: по касанию всплывающее сообщение внизу называет, чего не хватает, и исчезает само — отвечать на него нечего. Нарушенное правило домена показывается карточкой над клавиатурой. Дата раньше открытия счёта сюда не доходит: календарь её не предлагает, а при смене счёта форма сама сдвигает дату на день открытия и говорит об этом всплывающим сообщением.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-01</span><b>Сохранить без категории</b><span class="uc">UC-01</span><em>Сохранение не гаснет, пока нет категории или счёта: всплывающее сообщение называет, чего не хватает, и исчезает само. Нарушенное правило домена показывается карточкой над клавиатурой.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Новая операция</h2><b class="save">Сохранить</b></div>
   <div class="body">
@@ -897,9 +933,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-04</span><b>Выгрузить историю при первом обмене</b><span class="uc">UC-16</span><em>Отложено вместе с обменом, экран сохранён для будущего этапа и в приложении не реализован. Единственный случай, когда обмен занимает заметное время. Показан прогресс по строкам, а не бесконечный индикатор.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-04</span><b>Выгрузить историю при первом обмене</b><span class="uc">UC-16</span><em>Отложено вместе с обменом, в приложении нет. Первый обмен — единственный долгий: прогресс по строкам, а не бесконечный индикатор.</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Синхронизация</h2></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Обмен</h2></div>
   <div class="body">
     <div class="lbl"><span>Отправка</span><span>1 240 / 2 018</span></div>
     <div class="progress"><i></i></div>
@@ -909,22 +945,21 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="row"><svg class="ic" style="color:var(--pos)"><use href="#i-check"/></svg><div class="g"><div class="t">Категории</div></div><span class="num dim">85</span></div>
       <div class="row"><svg class="ic acc"><use href="#h-sync"/></svg><div class="g"><div class="t">Операции</div></div><span class="num dim">1 176 / 1 954</span></div>
     </div>
-    <div class="note">Порядок отправки задан ссылками: счета и категории уходят раньше операций</div>
     <div class="btn" style="background:transparent;color:var(--acc);border:1px solid var(--line2)">Прервать</div>
   </div>
 </div>
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-05</span><b>Синхронизировать</b><span class="uc">UC-16 UC-17</span><em>Отложено вместе с обменом, экран сохранён для будущего этапа и в приложении не реализован. Ошибка сформулирована как факт с последствием. Приложение не заблокировано, данные не потеряны, и это сказано прямо.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-05</span><b>Обменяться с сервером</b><span class="uc">UC-16 UC-17</span><em>Отложено вместе с обменом, в приложении нет. Ошибка — фактом с последствием: данные не потеряны, и это сказано прямо.</em></figcaption>
 <div class="phone">
-  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Синхронизация</h2></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Обмен</h2></div>
   <div class="body">
     <div class="stat">
       <div class="b"><div class="k">Не отправлено</div><div class="v">14</div></div>
       <div class="b"><div class="k">Последний обмен</div><div class="v" style="font-size:13px">вчера 21:40</div></div>
     </div>
-    <div class="btn">Синхронизировать</div>
+    <div class="btn">Обменяться</div>
     <div class="card" style="background:var(--negbg);border-color:var(--neg)">
       <div class="row" style="align-items:flex-start"><svg class="ic" style="color:var(--neg)"><use href="#h-alert"/></svg><div class="g"><div class="t neg">Сервер не отвечает</div><div class="s" style="white-space:normal">Изменения останутся на устройстве до следующей попытки</div></div></div>
     </div>
@@ -934,7 +969,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="dv"></div>
       <div class="fld"><span class="k">Токен</span><span class="v">••••••••</span></div>
     </div>
-    <div class="note">Синхронизация не влияет на работу приложения: запись операций доступна всегда</div>
   </div>
 </div>
 </figure>
@@ -1027,7 +1061,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-09</span><b>Удалить несколько операций</b><span class="uc">UC-08</span><em>Долгое нажатие на строке ленты включает выделение: строка отмечена знаком на месте значка и бледным фоном, касание отмечает остальные, а не открывает их. Шапку на это время занимает число выделенных и «Удалить» — на её месте, а не полосой над лентой: полоса сдвигала строки под пальцем, и следующее касание попадало в соседнюю. Жетоны счетов в подписи остаются: галочка занимает место значка категории, а не знака счёта. Крестик и «назад» снимают выделение, стрелка «назад» в ленте счёта спрятана, кнопка «+» тоже. Подтверждение называет число операций и балансы затронутых счетов, кроме тех, чей баланс не меняется.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-09</span><b>Удалить несколько операций</b><span class="uc">UC-08</span><em>Долгое нажатие включает выделение: строка отмечена знаком на месте значка, касание отмечает остальные, а не открывает их. Число выделенных и «Удалить» занимают шапку, а не полосу над лентой: полоса сдвигала строки под пальцем. Крестик и «назад» снимают выделение, кнопка «+» спрятана. Подтверждение называет число операций и балансы счетов, которые изменятся.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg"><use href="#i-x"/></svg><h2>Выбрано: 2</h2><b class="del">Удалить</b></div>
   <div class="date"><span>25 августа</span><span>-6 250,00 ₽</span></div>
@@ -1054,7 +1088,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">C-10</span><b>Войти по ПИН-коду</b><span class="uc">UC-26</span><em>Заслонка — при запуске и после пяти минут в фоне. Своё окно поверх всего приложения, включая открытый вопрос: ни шапки, ни вкладок, ни сумм. Оформление — стиль «Изумруд» (docs/ui/style.md): атмосфера от края до края, клавиши — приподнятые круги посередине экрана, как у набора кода телефона, отклик и движение на каждое событие. Код — четыре цифры. Нажатая клавиша заливается цветом действия («5» на макете) — цифра принята раньше, чем закрасится точка. Код проверяется по набору последней цифры, кнопки «Готово» нет: точки сначала пробегают волной, и только потом приходит ответ. Неверный — точки краснеют, качаются и стираются, «Неверный ПИН-код» на плашке; когда до паузы остаётся две попытки и меньше — «Неверный ПИН-код. Осталось 2 попытки». Верный — замок открывается, и заслонка растворяется над экраном приложения. «Назад» сворачивает приложение. После входа — тот же экран, что был, вместе с недописанной операцией. «Забыли ПИН-код?» нет: сбросить код нечем.</em></figcaption>
+<figcaption class="cap"><span class="sid">C-10</span><b>Войти по ПИН-коду</b><span class="uc">UC-26</span><em>Своё окно поверх всего приложения, включая открытый вопрос: ни шапки, ни вкладок, ни сумм. Оформление — стиль «Изумруд»: атмосфера от края до края, клавиши — приподнятые круги, как у набора кода телефона. Нажатая клавиша заливается цветом действия («5»); на макете рядом — ответ на прошлую попытку. Код проверяется по набору последней цифры, без «Готово». Неверный — точки краснеют, качаются и стираются; за две попытки до паузы — их число. Верный — заслонка растворяется над экраном приложения. «Забыли ПИН-код?» нет: сбросить код нечем.</em></figcaption>
 <div class="phone">
   <div class="atmo"></div>
   <div class="pin" style="top:140px">
@@ -1116,13 +1150,250 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </div>
 </figure>
 
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-13</span><b>Уйти, не сохранив</b><span class="uc">UC-07</span><em>«Назад» с изменённой формы — операции, счёта, группы, подкатегории, места — спрашивает, а не теряет набранное молча. Неизменённая форма закрывается без вопроса: вопрос на каждом выходе перестали бы читать.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Операция</h2><b class="del">Удалить</b><b class="save">Сохранить</b></div>
+  <div class="body">
+    <div class="card">
+      <div class="kinds"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расход</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доход</b><b class="trf"><svg class="ic sm"><use href="#i-swap"/></svg>Перевод</b></div>
+      <div class="amt"><span class="expr"></span><span class="v exp">-1 520 ₽</span></div>
+      <div class="cells">
+        <div class="fld"><span class="tile ac-orange"><svg class="ic"><use href="#i-credit-card"/></svg></span><span><span class="k">Счёт</span><span class="v">Карта основная</span></span></div>
+        <div class="fld"><span class="ico exp"><svg class="ic"><use href="#i-shopping-cart"/></svg></span><span><span class="k">Категория</span><span class="v">Продукты</span></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="veil">
+    <div class="dlg">
+      <h4>Выйти без сохранения?</h4>
+      <p>Данные не сохранятся.</p>
+      <div class="acts"><b class="no">Остаться</b><b class="yes">Выйти</b></div>
+    </div>
+  </div>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-14</span><b>Узнать, что база не обновилась</b><span class="uc">UC-20</span><em>Обновление приложения не смогло обновить схему базы. База возвращена из резервной копии, данные целы, но новый код со старой схемой работать не может — нужна прежняя версия приложения. Не удалась сама копия — текст другой: схема не тронута. Отчёт о сбое записан.</em></figcaption>
+<div class="phone">
+  <div class="hd"><h2>Балансы</h2></div>
+  <nav class="nav">
+    <a class="on"><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+  <div class="veil">
+    <div class="dlg">
+      <h4>База не обновилась</h4>
+      <p>Не удалось обновить схему базы. База возвращена из резервной копии; верните предыдущую версию приложения — данные целы.</p>
+      <div class="acts"><b class="yes">Закрыть</b></div>
+    </div>
+  </div>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-15</span><b>Перезапустить после восстановления</b><span class="uc">UC-25</span><em>Данные заменены. Открытые экраны и запомненные при запуске пояс и тема описывают прежние данные, поэтому дальше — только с чистого запуска. Кнопка одна.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Данные</h2></div>
+  <div class="body">
+    <div class="lbl"><span>Восстановить из файла</span></div>
+    <div class="card">
+      <div class="row"><svg class="ic"><use href="#i-upload"/></svg><div class="g"><div class="t">Выбрать файл</div><div class="s">Текущие данные заменятся данными файла</div></div></div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+  <div class="veil">
+    <div class="dlg">
+      <h4>Данные восстановлены</h4>
+      <p>Приложение перезапустится.</p>
+      <div class="acts"><b class="yes">Перезапустить</b></div>
+    </div>
+  </div>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-16</span><b>Выбрать не тот файл</b><span class="uc">UC-25</span><em>Файл проверяется до замены, данные не тронуты. Причина — одной фразой: не тот файл, повреждён при пересылке или сохранён более новой версией приложения — тогда просьба сначала обновиться.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Данные</h2></div>
+  <div class="body">
+    <div class="lbl"><span>Восстановить из файла</span></div>
+    <div class="card">
+      <div class="row"><svg class="ic"><use href="#i-upload"/></svg><div class="g"><div class="t">Выбрать файл</div><div class="s">Текущие данные заменятся данными файла</div></div></div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+  <div class="veil">
+    <div class="dlg">
+      <h4>В этом файле нет данных трекера</h4>
+      <div class="acts"><b class="yes">Закрыть</b></div>
+    </div>
+  </div>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-17</span><b>Открыть пустой справочник мест</b><span class="uc">UC-18</span><em>При первом запуске мест нет: заводить их здесь нельзя, они появляются из формы операции. Экран так и говорит.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Места</h2></div>
+  <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span>Поиск по названию</span></div>
+  <div class="empty" style="padding-top:140px">
+    <p>Мест пока нет. Они появятся, когда вы укажете место в операции.</p>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-18</span><b>Открыть пустые отчёты о сбоях</b><span class="uc">UC-27</span><em>Сбоев не было: вместо списка — откуда отчёты берутся. Кнопок «Поделиться» и «Очистить» нет — делиться нечем.</em></figcaption>
+<div class="phone">
+  <div class="atmo" style="top:46px"></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Отчёты о сбоях</h2></div>
+  <div class="body">
+    <div class="card gl" style="padding:18px 14px;text-align:center">
+      <div style="font-size:15px;font-weight:600">Отчётов нет</div>
+      <div class="s" style="white-space:normal;margin-top:6px">Они появятся, если приложение закроется с ошибкой.</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-19</span><b>Указать первое место</b><span class="uc">UC-01</span><em>Подсказок ещё нет: экран объясняет, что набранное название станет местом вместе с операцией.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Место</h2></div>
+  <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span>Поиск по названию</span></div>
+  <div class="empty" style="padding-top:120px">
+    <p>Мест пока нет. Наберите название — оно создастся вместе с операцией.</p>
+  </div>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-20</span><b>Заблокировать счёт с деньгами</b><span class="uc">UC-21</span><em>Блокировку с деньгами на счёте или блокировку счёта по умолчанию подтверждают одним вопросом: каждое последствие — своей строкой. Домен блокировке не мешает — куда делись деньги, решает пользователь. Удаление счёта по умолчанию так же называет преемника или говорит, что счёта по умолчанию не останется.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт</h2><b class="del">Удалить</b><b class="save">Сохранить</b></div>
+  <div class="body">
+    <div class="card form">
+      <div class="preview"><span class="tile lg ac-green"><svg class="ic"><use href="#i-plane"/></svg></span><div class="g"><div class="t">Карта евро</div><div class="s">Карта · EUR</div></div></div>
+      <div class="dv"></div>
+      <div class="fld"><span class="k">Название</span><span class="v">Карта евро</span></div>
+    </div>
+    <div class="card form">
+      <div class="swrow"><span>Скрытый</span><span class="sw2"><i></i></span></div>
+      <div class="dv"></div>
+      <div class="swrow"><span>Заблокированный</span><span class="sw2 on"><i></i></span></div>
+    </div>
+  </div>
+  <div class="veil">
+    <div class="dlg">
+      <h4>Заблокировать счёт?</h4>
+      <p>Внимание: на счёте ещё 1 240,00 €.<br>Счётом по умолчанию станет «Наличные».</p>
+      <div class="acts"><b class="no">Отмена</b><b class="yes">Заблокировать</b></div>
+    </div>
+  </div>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-21</span><b>Выбрать счёт по умолчанию без счетов</b><span class="uc">UC-28</span><em>Незаблокированных счетов нет — выбирать не из чего. Тем же текстом подписана строка в «Ещё».</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт по умолчанию</h2></div>
+  <div class="empty" style="padding-top:170px">
+    <h3>Нет незаблокированных счетов</h3>
+    <p>Новый счёт сам станет счётом по умолчанию.</p>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-22</span><b>Включить защиту входа</b><span class="uc">UC-26</span><em>Защита выключена — одна строка «Задать ПИН-код», она ведёт к набору нового кода [D-15].</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Защита входа</h2></div>
+  <div class="body">
+    <div class="card">
+      <div class="row"><svg class="ic"><use href="#i-lock"/></svg><div class="g"><div class="t">Защита входа</div></div><span class="dim">Выключена</span></div>
+    </div>
+    <div class="note dim" style="margin:-4px 3px 6px">ПИН-код при запуске и после 5 минут в фоне</div>
+    <div class="card">
+      <div class="row"><div class="g"><div class="t accent">Задать ПИН-код</div></div><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">C-23</span><b>Записать операцию без счёта</b><span class="uc">UC-01</span><em>Подставить счёт нечего — незаблокированных счетов нет. Сумма видна без знака валюты, поле счёта отмечено как обязательное и подписано «Добавить»: касание открывает карточку нового счёта, заведённый счёт встаёт в форму с набранным. «Сохранить» без счёта отвечает всплывающим «Сначала добавьте счёт».</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Новая операция</h2><b class="save">Сохранить</b></div>
+  <div class="body">
+    <div class="card">
+      <div class="kinds"><b class="exp on"><svg class="ic sm"><use href="#i-arrow-down-left"/></svg>Расход</b><b class="inc"><svg class="ic sm"><use href="#i-arrow-up-right"/></svg>Доход</b><b class="trf"><svg class="ic sm"><use href="#i-swap"/></svg>Перевод</b></div>
+      <div class="amt"><span class="expr"></span><span class="v exp">-1 590</span></div>
+      <div class="cells">
+        <div class="fld req"><span class="ico"><svg class="ic"><use href="#i-wallet"/></svg></span><span><span class="k">Счёт</span><span class="v ask">Добавить</span></span></div>
+        <div class="fld req"><span class="ico"><svg class="ic"><use href="#i-tag"/></svg></span><span><span class="k">Категория</span><span class="v ask">Выбрать</span></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="toast">Сначала добавьте счёт</div>
+  <div class="kp">
+    <div class="nums">
+      <b>7</b><b>8</b><b>9</b>
+      <b>4</b><b>5</b><b>6</b>
+      <b>1</b><b>2</b><b>3</b>
+      <b>,</b><b>0</b><b><svg class="ic"><use href="#i-backspace"/></svg></b>
+    </div>
+    <div class="ops">
+      <b>÷</b><b>×</b><b>−</b><b>+</b><b>=</b>
+    </div>
+  </div>
+</div>
+</figure>
+
 </div>
 
 <div class="band"><h2>D · Справочники</h2><span>Счета и категории — редкое редактирование, но плотные правила</span></div>
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-01</span><b>Упорядочить счета</b><span class="uc">UC-15 UC-13 UC-21</span><em>Порядок задаётся перетаскиванием за всю строку, ручка слева только говорит об этом. Раздел накоплений появляется от признака счёта, а не от его типа; пустые разделы не показываются. Заблокированный счёт вместо ручки помечен замком — его не переставляют; плашка у него вполсилы, а цвет считается свободным для новых счетов.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-01</span><b>Упорядочить счета</b><span class="uc">UC-15 UC-13 UC-21</span><em>Порядок задаётся перетаскиванием за всю строку, ручка слева только говорит об этом. Перетаскивают внутри раздела. Раздел накоплений появляется от признака счёта, а не от его типа; пустые разделы накоплений и заблокированных не показываются. Заблокированный счёт вместо ручки помечен замком — его не переставляют; плашка у него вполсилы, а цвет считается свободным для новых счетов.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счета</h2><span class="tool">+</span></div>
   <div class="body">
@@ -1153,7 +1424,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-02</span><b>Изменить счёт</b><span class="uc">UC-14 UC-13 UC-21</span><em>Шапка карточки показывает знак счёта, название и подпись «Карта · RUB»; под названием строка «Цвет и значок» — плашка, «цвет · значок», шеврон — открывает отдельный экран [D-12], а не две длинные сетки в карточке. Валюта заперта: по счёту есть операции — касание поля объясняет это всплывающим сообщением; календарь даты открытия так же называет крайний день — день первой операции. Ограничения объясняются в момент касания, а не отказом при сохранении. Блокировка счёта с деньгами подтверждается отдельным вопросом с суммой остатка, а блокировка и удаление счёта по умолчанию называют в вопросе счёт, который займёт его место [D-13]; у нового счёта переключателя блокировки нет — заводить сразу заблокированный незачем. Остаток набирается клавиатурой суммы — она появляется по касанию поля и уходит при наборе названия; долг — минусом первой клавишей, красным. Сохранение и удаление — в шапке, как в форме операции: клавиатура их не закрывает. Панели вкладок нет, тоже как в форме операции: с ней и клавиатурой поле остатка уходило под клавиши. Пока клавиатура на виду, остаток показан как набран — с запятой, без валюты; «назад» сначала убирает клавиатуру. Счёт с операциями не удаляется — «Удалить» отвечает всплывающим сообщением, что его можно заблокировать; пустой удаляется после подтверждения.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-02</span><b>Изменить счёт</b><span class="uc">UC-14 UC-13 UC-21</span><em>Шапка — знак счёта и подпись «Карта · RUB»; «Цвет и значок» открывает свой экран [D-12]. Валюта заперта, если по счёту есть операции: касание объясняет причину всплывающим сообщением, календарь даты открытия так же называет крайний день. Ограничения объясняются в момент касания, а не отказом при сохранении. Остаток набирается клавиатурой суммы — пока она на виду, остаток показан как набран, без валюты; «назад» сначала убирает клавиатуру. Сохранение и удаление — в шапке, панели вкладок нет: с ней поле остатка уходило под клавиши. У нового счёта переключателя блокировки нет. Блокировка — [C-20].</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт</h2><b class="del">Удалить</b><b class="save">Сохранить</b></div>
   <div class="body">
@@ -1164,12 +1435,12 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="fld"><span class="k">Цвет и значок</span><div class="signrow"><span class="tile ac-sky"><svg class="ic"><use href="#i-percentage"/></svg></span><span class="v">Голубой · процент</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div></div>
       <div class="fld"><span class="k">Тип</span><span class="v">Карта</span></div>
       <div class="fld"><span class="k">Валюта</span><span class="v lock">Рубль ₽</span></div>
-      <div class="fld"><span class="k">Начальный остаток</span><span class="v neg" style="border-bottom:2px solid var(--acc)">-15 000 ₽</span></div>
+      <div class="fld"><span class="k">Начальный остаток</span><span class="v neg" style="border-bottom:2px solid var(--acc)">-15000</span></div>
       <div class="fld"><span class="k">Дата открытия</span><span class="v">01.01.2026</span></div>
     </div>
     <div class="card form">
       <div class="swrow"><span>Скрытый</span><span class="sw2"><i></i></span></div>
-      <div class="note">Счёт не входит в итоги и отчёт</div>
+      <div class="note">Счёт не входит в итоги и в отчёт по умолчанию</div>
       <div class="dv d2-closing"></div>
       <div class="swrow d2-closing"><span>Заблокированный</span><span class="sw2" id="d2close"><i></i></span></div>
       <div class="note d2-closing">Заблокированный счёт не показывается на главном экране и не предлагается в выборе</div>
@@ -1227,7 +1498,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-04</span><b>Завести группу</b><span class="uc">UC-11</span><em>Вид задаётся здесь и наследуется всеми подкатегориями; рядом — универсальность: включённая, она кладёт возврат туда же, где лежит покупка. «Прочее» создаётся автоматически — об этом сказано до нажатия, а не после. Значок выбирается сеткой прямо под полем.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-04</span><b>Завести группу</b><span class="uc">UC-11</span><em>Вид задаётся здесь и наследуется всеми подкатегориями; рядом — универсальность: включённая, она кладёт возврат туда же, где лежит покупка. «Прочее» создаётся автоматически — об этом сказано до нажатия, а не после. Касание значка раскрывает под полем сетку набора.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Новая группа</h2></div>
   <div class="body">
@@ -1260,7 +1531,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-05</span><b>Привести в порядок справочник мест</b><span class="uc">UC-18</span><em>Пуст при первом запуске, наполняется сам; создавать места здесь нельзя — они заводятся из формы операции. Порядок — по частоте, подпись — категория, в которой место встречается чаще всего. Переименование правит все операции разом — ради этого справочник и нужен вместо свободной строки.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-05</span><b>Привести в порядок справочник мест</b><span class="uc">UC-18</span><em>Наполняется сам, пустой — [C-17]; создавать места здесь нельзя — они заводятся из формы операции. Порядок — по частоте, подпись — категория, в которой место встречается чаще всего. Переименование правит все операции разом — ради этого справочник и нужен вместо свободной строки.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Места</h2></div>
   <div class="search"><svg class="ic sm"><use href="#h-search"/></svg><span>Поиск по названию</span></div>
@@ -1283,7 +1554,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-06</span><b>Выбрать тему оформления</b><span class="uc">UC-20</span><em>Три состояния, а не переключатель: вернуться к системной теме после ручного выбора иначе невозможно. Выбранная строка — плашкой и галочкой.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-06</span><b>Выбрать тему оформления</b><span class="uc">UC-28</span><em>Три состояния, а не переключатель: вернуться к системной теме после ручного выбора иначе невозможно. Выбранная строка — плашкой и галочкой.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Оформление</h2></div>
   <div class="body">
@@ -1339,7 +1610,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-08</span><b>Выбрать часовой пояс</b><span class="uc">UC-20</span><em>Зона, а не смещение: смещение перестаёт соответствовать зоне на переходе на летнее время, и «сегодня» уезжает на сутки. Первой строкой — возврат к системному поясу, иначе после ручного выбора вернуться к нему нечем. По строке на смещение на сегодня, подписанной городами: сотни зон системы — в основном дубли и служебные. Строка ставит зону первого города; у кого летнее время идёт иначе, после перехода выбирает заново.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-08</span><b>Выбрать часовой пояс</b><span class="uc">UC-28</span><em>Список короткий — строка на смещение на сегодня, подписанная городами: сотни зон системы — в основном дубли и служебные. Хранится не смещение, а зона первого города строки; у кого летнее время идёт иначе, после перехода выбирает заново. Первой строкой — возврат к системному поясу.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Часовой пояс</h2></div>
   <div class="list">
@@ -1364,7 +1635,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-09</span><b>Посмотреть версию</b><span class="uc">UC-20</span><em>Номер схемы нужен не из любопытства: по нему видно, накатилась ли миграция после обновления приложения. Оформление — стиль «Изумруд»: атмосфера экрана ПИН-кода под всем экраном и знак приложения без плитки. В тёмной теме знак неоновый, в светлой — дневной: светлое стекло с кромкой цветом действия, потому что неон на светлом гаснет. Пояснения — в карточке, а не на атмосфере: пятна плывут, и мелкий текст попадал бы на разные участки. Строка «Отчёты о сбоях» ведёт на их список [D-16], справа — сколько их.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-09</span><b>Посмотреть версию</b><span class="uc">UC-27</span><em>Номер схемы нужен не из любопытства: по нему видно, накатилась ли миграция после обновления приложения. Оформление — стиль «Изумруд»: атмосфера экрана ПИН-кода под всем экраном и знак приложения без плитки. В тёмной теме знак неоновый, в светлой — дневной: светлое стекло с кромкой цветом действия, потому что неон на светлом гаснет. Пояснения — в карточке, а не на атмосфере: пятна плывут, и мелкий текст попадал бы на разные участки. Строка «Отчёты о сбоях» ведёт на их список [D-16], справа — сколько их.</em></figcaption>
 <div class="phone">
   <div class="atmo" style="top:46px"></div>
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>О программе</h2></div>
@@ -1395,9 +1666,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     </svg>
     <div class="t" style="font-size:15px;font-weight:600;text-align:center;margin-top:-6px">Личный трекер финансов</div>
     <div class="card">
-      <div class="row"><div class="g"><div class="t">Версия</div></div><span class="s">1.0</span></div>
-      <div class="row"><div class="g"><div class="t">Схема базы</div></div><span class="s">5</span></div>
-      <div class="row"><div class="g"><div class="t">Отчёты о сбоях</div></div><span class="s">3</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><div class="g"><div class="t">Версия</div></div><span class="s">1.0.21</span></div>
+      <div class="row"><div class="g"><div class="t">Схема базы</div></div><span class="s">7</span></div>
+      <div class="row"><div class="g"><div class="t">Отчёты о сбоях</div></div><span class="s">6</span><svg class="ic mut"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><div class="g"><div class="note dim">Данные хранятся на этом устройстве и никуда не передаются.</div><div class="note dim">Значки — Tabler Icons, лицензия MIT.</div></div></div>
     </div>
   </div>
@@ -1411,7 +1682,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-10</span><b>Перенести данные на другой телефон</b><span class="uc">UC-25</span><em>Сохранить всю базу файлом — двумя путями рядом: в папку на самом телефоне (системное окно выбора места, например «Загрузки») или через «Поделиться» — Telegram, Google Диск, почта. В окне «Поделиться» пункта «положить в папку» нет, поэтому одного его не хватало. Восстановить — выбрать файл. Чужой, повреждённый и файл из более новой версии отвергаются с причиной, данные при этом не трогаются. На пустую базу — после переустановки — файл восстанавливается сразу, без вопросов; если в базе уже есть счета или операции, сначала предупреждение [D-11]. После замены приложение перезапускается.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-10</span><b>Перенести данные на другой телефон</b><span class="uc">UC-25</span><em>Сохранить всю базу файлом — двумя путями: в папку на телефоне или через «Поделиться»; в окне «Поделиться» пункта «положить в папку» нет. Восстановить — выбрать файл. Неподходящий файл отвергается с причиной [C-16]. На пустую базу файл восстанавливается сразу, иначе сначала предупреждение [D-11]; после замены — перезапуск [C-15].</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Данные</h2></div>
   <div class="body">
@@ -1435,7 +1706,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-11</span><b>Заменить данные на телефоне</b><span class="uc">UC-25</span><em>Восстановление поверх счетов и операций стирает их без возврата, поэтому вместо обычного диалога — красная карточка на месте строк, а кнопка оживает только через пять секунд: подпись считает их вниз, «Удалить и восстановить (5)». Так устроены необратимые действия в настройках телефонов — подтверждение по привычке не проскочит. Что именно пропадёт, сказано счётом — сколько счетов, операций, своих категорий и мест, — а не одними словами «все данные»; строки с нулём нет. Предупреждение встаёт, даже если заведены одни свои категории или места. «Отмена» и «назад» закрывают предупреждение, данные не тронуты.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-11</span><b>Заменить данные на телефоне</b><span class="uc">UC-25</span><em>Замена стирает данные без возврата, поэтому вместо обычного диалога — красная карточка на месте строк, а кнопка оживает только через пять секунд: подтверждение по привычке не проскочит. Что пропадёт, сказано счётом, а не словами «все данные». «Отмена» и «назад» закрывают предупреждение, данные не тронуты.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Данные</h2></div>
   <div class="body">
@@ -1463,7 +1734,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-12</span><b>Выбрать цвет и значок счёта</b><span class="uc">UC-13 UC-14</span><em>Экран открывает строка «Цвет и значок» в карточке счёта [D-02]. Сверху — предпросмотр: строка балансов и строка ленты с жетоном; обе перекрашиваются по каждому касанию, и знак виден там, где его будут узнавать. Ниже восемь цветов в два ряда по четыре, выбранный — с галочкой, и восемнадцать значков по шесть в ряд; выбранный залит цветом счёта, значок на нём белый или тёмный, как будет на балансах. Над сеткой — подсказка по названию: до трёх подходящих значков, сам значок от названия не меняется. «Назад» возвращает выбор в карточку, в базу он уходит по «Сохранить» там; панели вкладок нет, как у остальных экранов выбора.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-12</span><b>Выбрать цвет и значок счёта</b><span class="uc">UC-13 UC-14</span><em>Сверху — предпросмотр строки балансов и строки ленты: обе перекрашиваются по каждому касанию, и знак виден там, где его будут узнавать. Ниже — восемь цветов и восемнадцать значков; над значками — подсказка по названию, сам значок от названия не меняется. «Назад» возвращает выбор в карточку [D-02], в базу он уходит по её «Сохранить».</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Цвет и значок</h2></div>
   <div class="body">
@@ -1492,7 +1763,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-13</span><b>Выбрать счёт по умолчанию</b><span class="uc">UC-20</span><em>Счёт, который форма подставляет в новую операцию, открытую не из ленты счёта. Выбор — касанием строки, галочка и фон переезжают сразу. В списке только незаблокированные счета, в порядке справочника. Пока выбора нет, счёт по умолчанию — верхний в списке: на чистой установке это первый заведённый счёт. Блокировка и удаление счёта по умолчанию называют в подтверждении, какой счёт займёт его место: «Счётом по умолчанию станет «Наличные».» Незаблокированных счетов нет — вместо списка «Нет незаблокированных счетов» и «Новый счёт сам станет счётом по умолчанию.», тем же текстом подписана и строка в «Ещё».</em></figcaption>
+<figcaption class="cap"><span class="sid">D-13</span><b>Выбрать счёт по умолчанию</b><span class="uc">UC-28</span><em>Выбор — касанием строки, галочка переезжает сразу. В списке незаблокированные счета в порядке справочника; пока выбора нет, счёт по умолчанию — первый из них. Блокировка и удаление счёта по умолчанию называют преемника [C-20]. Незаблокированных счетов нет — [C-21].</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счёт по умолчанию</h2></div>
   <div class="list">
@@ -1514,7 +1785,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-14</span><b>Защитить вход ПИН-кодом</b><span class="uc">UC-26</span><em>Защита включена: строки «Сменить ПИН-код» и «Выключить защиту» — обе начинаются с текущего кода [D-15], неверный засчитывается попыткой, как на заслонке. Выключенная — одна строка «Задать ПИН-код». Строки, а не переключатель: каждое действие уводит на экран кода, и переключатель стоял бы в новом положении раньше, чем дело сделано. Выбора времени нет — вход спрашивается после пяти минут в фоне. Защита живёт на телефоне и с выгрузкой не переезжает.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-14</span><b>Защитить вход ПИН-кодом</b><span class="uc">UC-26</span><em>Защита включена: «Сменить ПИН-код» и «Выключить защиту» начинаются с текущего кода [D-15], неверный засчитывается попыткой. Выключенная — [C-22]. Строки, а не переключатель: каждое действие уводит на экран кода, и переключатель стоял бы в новом положении раньше, чем дело сделано.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Защита входа</h2></div>
   <div class="body">
@@ -1557,7 +1828,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-16</span><b>Отправить отчёт о сбое</b><span class="uc">UC-20</span><em>Открывается строкой «Отчёты о сбоях» в «О программе» [D-09]. Сверху последний сбой — что и на каком экране случилось — и счётчики: сколько раз приложение закрылось (на исключении или в системе Android), сколько зависло, прочее; «Поделиться отчётами» отдаёт файл всех отчётов — в Telegram или почту. Ниже — все отчёты от новых к старым: знак и заголовок вида, когда и короткая причина; касание строки или последнего сбоя открывает отчёт [D-17]. Виды: приложение закрылось, падение в системе Android, зависло, закрыто системой (чаще в фоне — нехватка памяти, заморозка), действие не удалось, предупреждение. Сумм, имён и заметок в отчётах нет. «Очистить отчёты» — тихой подписью в конце, удаляет все после вопроса. Сам экран о падении не напоминает: после сбоя приложение запускается как обычно. Пусто — «Отчётов нет» и откуда они берутся. Отчёты читаются из своего файла, а не из базы: экран открывается и тогда, когда база не поднялась. Оформление — «Изумруд», в светлой теме карточки — светлое стекло.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-16</span><b>Отправить отчёт о сбое</b><span class="uc">UC-27</span><em>Открывается из «О программе» [D-09]. Сверху последний сбой — что и на каком экране — со счётчиками и «Поделиться отчётами»: файл всех отчётов. Ниже — все отчёты от новых к старым, знак и заголовок вида; касание открывает отчёт [D-17]. «Очистить отчёты» — тихой подписью в конце. Экран открывается и тогда, когда база не поднялась. Пусто — [C-18]. Оформление — «Изумруд», в светлой теме карточки — светлое стекло.</em></figcaption>
 <div class="phone">
   <div class="atmo" style="top:46px"></div>
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Отчёты о сбоях</h2></div>
@@ -1566,16 +1837,17 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
       <div class="note" style="font-weight:600">Последний сбой</div>
       <div style="font-size:14px;font-weight:600;margin-top:1px">Приложение закрылось</div>
       <div class="s">Сегодня, 09:57 · экран «О программе»</div>
-      <div class="cstat"><b>2<i>закрылось</i></b><b>1<i>зависло</i></b><b>2<i>прочее</i></b></div>
+      <div class="cstat"><b>2<i>закрылось</i></b><b>1<i>зависло</i></b><b>3<i>прочее</i></b></div>
       <div class="btn">Поделиться отчётами</div>
     </div>
-    <div class="note" style="font-weight:600;margin:2px 0 -5px 3px">Все отчёты · 5</div>
+    <div class="note" style="font-weight:600;margin:2px 0 -5px 3px">Все отчёты · 6</div>
     <div class="card gl">
       <div class="row"><span class="cb closed"><svg class="ic"><use href="#i-bolt"/></svg></span><div class="g"><div class="t" style="font-weight:600">Приложение закрылось</div><div class="s">Сегодня, 09:57 · CrashedByAdbException</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><span class="cb caught"><svg class="ic"><use href="#i-alert-circle"/></svg></span><div class="g"><div class="t" style="font-weight:600">Действие не удалось</div><div class="s">Сегодня, 09:41 · TimeoutException</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><span class="cb system"><svg class="ic"><use href="#i-cpu"/></svg></span><div class="g"><div class="t" style="font-weight:600">Падение в системе Android</div><div class="s">Вчера, 22:39 · SIGSEGV</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><span class="cb froze"><svg class="ic"><use href="#i-hourglass"/></svg></span><div class="g"><div class="t" style="font-weight:600">Приложение зависло</div><div class="s">Вчера, 21:12</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
       <div class="row"><span class="cb killed"><svg class="ic"><use href="#i-moon"/></svg></span><div class="g"><div class="t" style="font-weight:600">Закрыто системой</div><div class="s">5 октября, 20:47 · мало памяти</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><span class="cb warning"><svg class="ic"><use href="#i-alert-triangle"/></svg></span><div class="g"><div class="t" style="font-weight:600">Предупреждение</div><div class="s">4 октября, 18:02 · TaskCanceledException</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
     </div>
     <div class="btn" style="background:transparent;color:var(--neg)">Очистить отчёты</div>
   </div>
@@ -1589,14 +1861,14 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">D-17</span><b>Прочитать отчёт о сбое</b><span class="uc">UC-20</span><em>Открывается касанием строки в «Отчётах о сбоях» [D-16]. Шапка — знак вида, что и где случилось, версия, телефон и Android. «Причина» — короткий тип исключения или сигнал и стек, свёрнутый до пяти строк; «Весь стек» раскрывает его целиком. «Перед сбоем» — переходы, нажатия, уход в фон и возврат во времени пользователя, последней строкой — сам сбой; у прошлого завершения этого блока нет — тот процесс уже мёртв. «Поделиться отчётом» отдаёт только этот отчёт.</em></figcaption>
+<figcaption class="cap"><span class="sid">D-17</span><b>Прочитать отчёт о сбое</b><span class="uc">UC-27</span><em>Открывается касанием строки в «Отчётах о сбоях» [D-16]. Шапка — знак вида, что и где случилось, версия, телефон и Android. «Причина» — короткий тип исключения или сигнал и стек, свёрнутый до пяти строк; «Весь стек» раскрывает его целиком. «Перед сбоем» — переходы, нажатия, уход в фон и возврат во времени пользователя, последней строкой — сам сбой; у прошлого завершения этого блока нет — тот процесс уже мёртв. «Поделиться отчётом» отдаёт только этот отчёт.</em></figcaption>
 <div class="phone">
   <div class="atmo" style="top:46px"></div>
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Отчёт о сбое</h2></div>
   <div class="body">
     <div class="card gl" style="padding:10px 11px 9px">
       <div style="display:flex;gap:9px;align-items:center"><span class="cb closed lg"><svg class="ic"><use href="#i-bolt"/></svg></span><div style="min-width:0"><div style="font-size:13.5px;font-weight:600">Приложение закрылось</div><div class="s">Сегодня, 09:57 · экран «О программе»</div></div></div>
-      <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin-top:8px;font-size:11.5px"><span class="dim">Версия</span><b style="text-align:right">1.0.5 (10005)</b><span class="dim">Телефон</span><b style="text-align:right">samsung SM-S938B</b><span class="dim">Android</span><b style="text-align:right">16</b></div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin-top:8px;font-size:11.5px"><span class="dim">Версия</span><b style="text-align:right">1.0.21 (10021)</b><span class="dim">Телефон</span><b style="text-align:right">samsung SM-S938B</b><span class="dim">Android</span><b style="text-align:right">16</b></div>
     </div>
     <div class="note" style="font-weight:600;margin:2px 0 -5px 3px">Причина</div>
     <div class="card gl">
@@ -1631,7 +1903,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 <div class="sheet">
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">E-01</span><b>Разобраться, куда ушли деньги</b><span class="uc">UC-19</span><em>Первый уровень отвечает на вопрос «куда ушли деньги». Переключатель видов — своим цветом и знаком, как в форме операции. Полоса под строкой даёт сравнение глазом, без чтения процентов; стрелка «вперёд» гаснет на текущем месяце. Под месяцем — строка счетов отчёта: подпись набора и знаки его счетов их цветами, касание открывает выбор [E-05]. Обычный отчёт — «Активные счета · ₽», тихо, знак заблокированного счёта вполсилы. Свой набор подсвечен и называется «Активные счета · €», именем единственного счёта или числом — «5 счетов»; знаков не больше пяти, а если счетов больше — четыре знака и «+N». Свой набор виден и глубже: его знаки стоят в подписи второго и третьего уровня. Выбор живёт до перезапуска приложения.</em></figcaption>
+<figcaption class="cap"><span class="sid">E-01</span><b>Разобраться, куда ушли деньги</b><span class="uc">UC-19</span><em>Первый уровень отвечает на вопрос «куда ушли деньги». Полоса под строкой даёт сравнение глазом, без чтения процентов; стрелка «вперёд» гаснет на текущем месяце. Под месяцем — строка счетов отчёта со знаками набора, касание открывает выбор [E-05]. Обычный отчёт — «Активные счета · ₽», тихо; свой набор подсвечен, и его знаки видны и глубже. Знаков не больше пяти; если счетов больше, на месте пятого — «+N».</em></figcaption>
 <div class="phone">
   <div class="hd"><h2>Отчёт</h2></div>
   <div class="body" style="gap:8px">
@@ -1733,7 +2005,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 </figure>
 
 <figure class="unit">
-<figcaption class="cap"><span class="sid">E-05</span><b>Выбрать счета отчёта</b><span class="uc">UC-19</span><em>Разделы — валюты, как при выборе счёта в форме операции: отчёт считается в одной валюте, и границу видно до касания. В разделе все неудалённые счета: сначала обычные, затем накопления, затем заблокированные — с подписью. Касание строки ставит или снимает отметку, выбор применяется сразу, кнопки «Готово» нет. Счёт другой валюты, чем уже отмеченные, не отмечается: всплывает «Допускаются счета только с одинаковой валютой». «Все активные» у раздела заменяет выбор активными счетами этой валюты — так отчёт переходит на евро одним касанием, а у рублей та же кнопка возвращает обычный отчёт; отдельной «Сбросить» нет. Отмечены ровно активные — вместо кнопки тихое «Выбраны»; у валюты одних накоплений кнопки нет. Пустой выбор — обычный отчёт. Панели вкладок нет, как на других экранах выбора.</em></figcaption>
+<figcaption class="cap"><span class="sid">E-05</span><b>Выбрать счета отчёта</b><span class="uc">UC-19</span><em>Разделы — валюты: отчёт считается в одной валюте, и границу видно до касания. В разделе сначала обычные счета, затем накопления, затем заблокированные. Касание ставит или снимает отметку, выбор применяется сразу. Счёт другой валюты не отмечается — «Допускаются счета только с одинаковой валютой». «Все активные» переводит отчёт на валюту раздела одним касанием, у рублей — возвращает обычный отчёт; отмечены ровно активные — вместо кнопки тихое «Выбраны»; у валюты одних накоплений кнопки нет.</em></figcaption>
 <div class="phone">
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Счета отчёта</h2></div>
   <div class="list">
@@ -1748,6 +2020,46 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
     <div class="sec"><span>Доллары</span></div>
     <div class="row"><span class="tile ac-magenta"><svg class="ic"><use href="#i-home"/></svg></span><div class="g"><div class="t">Доллары дома</div><div class="s">Накопления</div></div><span class="chk"></span></div>
   </div>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">E-06</span><b>Вернуться из опустевшей группы</b><span class="uc">UC-19</span><em>Последнюю операцию группы удалили или перенесли из карточки, открытой с третьего уровня. Список пуст, и экран говорит, что делать дальше, а не показывает нулевую сумму.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Дети</h2></div>
+  <div class="body" style="gap:4px">
+    <div class="note dim" style="font-size:12px">август 2026</div>
+  </div>
+  <div class="empty" style="padding-top:150px">
+    <h3>Операций больше нет</h3>
+    <p>Вернитесь к отчёту.</p>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</figure>
+
+<figure class="unit">
+<figcaption class="cap"><span class="sid">E-07</span><b>Вернуться из опустевшей подкатегории</b><span class="uc">UC-19</span><em>То же на третьем уровне: единственную операцию подкатегории перенесли в другую категорию.</em></figcaption>
+<div class="phone">
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Кофе</h2></div>
+  <div class="body" style="gap:4px">
+    <div class="note dim" style="font-size:12px">август 2026</div>
+  </div>
+  <div class="empty" style="padding-top:150px">
+    <h3>В этом месяце операций нет</h3>
+    <p>Вернитесь к отчёту.</p>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
 </div>
 </figure>
 
