@@ -84,17 +84,9 @@ public sealed partial class DefaultAccountViewModel : ScreenViewModel
             return;
         }
 
-        List<AccountListItem> open = [];
-        List<OpenAccount> candidates = [];
-
-        foreach (AccountListItem account in await accountsTask)
-        {
-            if (!account.IsClosed)
-            {
-                open.Add(account);
-                candidates.Add(new OpenAccount(account.Key, account.Name));
-            }
-        }
+        // Список — в порядке экрана «Счета», как и подстановка: верхний в нём и есть счёт по умолчанию
+        List<AccountListItem> open = [.. DefaultAccount.InScreenOrder(await accountsTask)];
+        List<OpenAccount> candidates = DefaultAccount.Candidates(open);
 
         _open = open;
         _selected = DefaultAccount.Resolve(candidates, DefaultAccount.Parse(await choiceTask))?.Key;

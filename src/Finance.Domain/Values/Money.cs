@@ -22,8 +22,8 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
     private const int MaxScale = 2;
 
     /// <summary>
-    /// Предел суммы по модулю. Ровно столько помещается в колонку
-    /// <c>numeric(19,2)</c> с запасом, и на столько же рассчитана клавиатура ввода.
+    /// Предел суммы по модулю. Копейки такой суммы с большим запасом помещаются
+    /// в <c>INTEGER</c> SQLite, и на столько же рассчитана клавиатура ввода.
     /// </summary>
     public const decimal Limit = 999_999_999_999.99m;
 
@@ -87,7 +87,7 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
     /// <summary>
     /// Проверяет предел суммы. Живёт здесь, а не у каждого поля: предел один,
     /// и записанный в трёх местах он разойдётся при первой же правке.
-    /// Баланс через эту проверку не проходит — предел задан сумме операции.
+    /// Предел задан сумме операции и начальному остатку; бегущий баланс не проверяется.
     /// </summary>
     /// <param name="what">Что проверяется — попадёт в текст ошибки.</param>
     public void EnsureWithinLimit(RuleText what) =>
@@ -174,7 +174,8 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
     public override int GetHashCode() => HashCode.Combine(Amount, Currency);
 
     /// <summary>
-    /// Представление для журналов и сообщений об ошибках, не для интерфейса.
+    /// Инвариантная запись для журналов и текстов нарушений; на экране сумму
+    /// форматирует прикладной слой.
     /// </summary>
     public override string ToString() =>
         string.Create(CultureInfo.InvariantCulture, $"{Amount:0.00} {Currency}");

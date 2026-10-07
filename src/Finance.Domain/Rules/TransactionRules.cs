@@ -108,7 +108,8 @@ public static class TransactionRules
     }
 
     /// <summary>
-    /// Категория второго уровня и того же вида, что операция.
+    /// Категория второго уровня, а её группа принимает вид операции: свой или любой,
+    /// если группа универсальная.
     /// </summary>
     private static void EnsureCategoryFits(Transaction transaction, Category? category, Category? categoryGroup)
     {

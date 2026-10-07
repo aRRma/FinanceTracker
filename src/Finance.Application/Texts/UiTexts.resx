@@ -217,7 +217,7 @@
     <value>Скрытый</value>
   </data>
   <data name="AccountExcludeHint" xml:space="preserve">
-    <value>Счёт не входит в итоги и отчёт</value>
+    <value>Счёт не входит в итоги и в отчёт по умолчанию</value>
   </data>
   <data name="AccountClosedLabel" xml:space="preserve">
     <value>Заблокированный</value>

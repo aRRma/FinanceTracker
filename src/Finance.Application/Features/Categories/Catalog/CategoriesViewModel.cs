@@ -49,7 +49,8 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
 
     /// <summary>
     /// Набранное в поиске. Пока поле пусто, группы стоят как их оставили;
-    /// с первой же буквой показываются подходящие подкатегории всех групп.
+    /// с первой же буквой показываются подходящие подкатегории групп выбранного вида,
+    /// а если совпало название группы — вся группа.
     /// </summary>
     [ObservableProperty]
     public partial string Filter { get; set; } = string.Empty;
@@ -64,7 +65,7 @@ public sealed partial class CategoriesViewModel : ScreenViewModel
     public partial bool IsLoaded { get; private set; }
 
     /// <summary>
-    /// Групп этого вида нет — показывается пустое состояние.
+    /// Показывать нечего — групп этого вида нет или поиск ничего не нашёл: показывается пустое состояние.
     /// </summary>
     public bool IsEmpty => IsLoaded && Lines.Count is 0;
 

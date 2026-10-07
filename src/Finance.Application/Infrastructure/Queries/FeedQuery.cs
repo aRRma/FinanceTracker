@@ -69,7 +69,7 @@ public sealed class FeedQuery : IFeedQuery
 
         Dictionary<DateOnly, Money> totals = accountKey is { } viewed
             ? await AccountDayTotalsAsync(context, viewed, earliest, latest, cancellationToken).ConfigureAwait(false)
-            : await LedgerDayTotalsAsync(context, earliest, latest, cancellationToken).ConfigureAwait(false);
+            : await FeedDayTotalsAsync(context, earliest, latest, cancellationToken).ConfigureAwait(false);
 
         List<FeedItem> items = new(rows.Count);
 
@@ -170,7 +170,7 @@ public sealed class FeedQuery : IFeedQuery
     /// Перевод между двумя учитываемыми счетами итог не меняет: деньги остались
     /// в тех же суммах, просто на другом счёте.
     /// </summary>
-    private static async Task<Dictionary<DateOnly, Money>> LedgerDayTotalsAsync(
+    private static async Task<Dictionary<DateOnly, Money>> FeedDayTotalsAsync(
         FinanceDbContext context,
         DateOnly earliest,
         DateOnly latest,

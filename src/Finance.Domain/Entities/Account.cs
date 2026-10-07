@@ -61,7 +61,7 @@ public sealed class Account : Entity
 
     /// <summary>
     /// Значок по назначению, выбранный руками. <see langword="null"/> — значок по типу:
-    /// он следует за сменой типа, пока значок не выбран.
+    /// он следует за сменой типа и за признаком «скрытый», пока значок не выбран.
     /// </summary>
     public string? Icon { get; private set; }
 
@@ -81,7 +81,8 @@ public sealed class Account : Entity
     public DateOnly OpenedOn { get; private set; }
 
     /// <summary>
-    /// «Скрытый»: счёт не входит ни в «доступно к тратам», ни в итог дня, ни в отчёт.
+    /// «Скрытый»: счёт не входит ни в «доступно к тратам», ни в итог дня, ни в отчёт
+    /// по всем активным счетам; в отчёт его можно добавить руками.
     /// </summary>
     public bool ExcludedFromTotals { get; private set; }
 
@@ -92,7 +93,8 @@ public sealed class Account : Entity
     public bool IsClosed { get; private set; }
 
     /// <summary>
-    /// Порядок на главном экране, задаётся перетаскиванием.
+    /// Порядок счетов во всех списках; задаётся перетаскиванием внутри раздела
+    /// экрана «Счета».
     /// </summary>
     public int SortOrder { get; private set; }
 
@@ -261,7 +263,7 @@ public sealed class Account : Entity
     public void Reopen() => IsClosed = false;
 
     /// <summary>
-    /// Задаёт место счёта на главном экране.
+    /// Задаёт место счёта в общем порядке.
     /// </summary>
     public void SetSortOrder(int sortOrder) => SortOrder = sortOrder;
 

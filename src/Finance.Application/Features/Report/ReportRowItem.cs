@@ -11,7 +11,7 @@ namespace Finance.Application.Features.Report;
 /// <param name="Name">Название.</param>
 /// <param name="Icon">Ключ значка.</param>
 /// <param name="Amount">Сумма со знаком: расход минусом, доход плюсом.</param>
-/// <param name="Share">Доля в процентах, целыми: «37%». Пустая у строки, где возвратов больше, чем трат.</param>
+/// <param name="Share">Доля в процентах, целыми: «37%». Пустая у строки, где возвратов не меньше, чем трат.</param>
 /// <param name="Fraction">Та же доля долей единицы — ширина полосы.</param>
 /// <param name="IsExpense">Сумма со знаком отрицательна — красится цветом расхода, иначе цветом дохода.</param>
 public sealed record ReportRowItem(
@@ -88,9 +88,9 @@ public sealed record ReportRowItem(
     }
 
     /// <summary>
-    /// Расход показывается минусом: в базе суммы всегда положительны, знак задаёт вид.
+    /// Расход показывается минусом: сумма строки хранится без знака вида, знак задаёт вид.
     /// </summary>
-    /// <param name="total">Положительная сумма.</param>
+    /// <param name="total">Сумма строки в единицах её вида.</param>
     /// <param name="kind">Вид строки.</param>
     public static Money Signed(Money total, CategoryKind kind) =>
         kind is CategoryKind.Expense ? -total : total;

@@ -27,7 +27,8 @@ internal sealed class DevicePinStore : IPinStore
         }
         catch (Exception error) when (error is not OperationCanceledException)
         {
-            // Тот же тег, что у Guarded: crash помощника эмулятора читает журнал по нему
+            // Тот же тег, что у Guarded, но уровень Warn: crash помощника эмулятора берёт только
+            // уровень Error этого тега и такой случай не покажет — это не падение, вход продолжается
             Android.Util.Log.Warn("Finance", error.ToString());
             CrashCatcher.Warn(error);
 

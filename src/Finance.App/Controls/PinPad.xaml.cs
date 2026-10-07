@@ -254,8 +254,9 @@ public sealed partial class PinPad : ContentView
     /// </summary>
     private void OnKeyDown(object? sender, EventArgs e)
     {
-        // Во время волны цифра не принимается: проседание и кольцо обещали бы обратное
-        if (!_waving && sender is VisualElement key && Attached(key))
+        // Во время волны цифра не принимается: проседание и кольцо обещали бы обратное.
+        // С выключенными в системе анимациями клавиша не проседает — нажатие видно заливкой
+        if (!_waving && Motion.IsOn && sender is VisualElement key && Attached(key))
         {
             Guarded.Run(() => key.ScaleToAsync(0.9, 70, Easing.CubicOut));
             Ripple(key);
@@ -267,9 +268,20 @@ public sealed partial class PinPad : ContentView
     /// </summary>
     private void OnKeyUp(object? sender, EventArgs e)
     {
-        if (sender is VisualElement key && Attached(key))
+        if (sender is not VisualElement key || !Attached(key))
+        {
+            return;
+        }
+
+        // Анимации могли выключить, пока палец лежал на осевшей клавише: тогда она
+        // встаёт на место сразу, иначе осталась бы уменьшенной до следующего входа
+        if (Motion.IsOn)
         {
             Guarded.Run(() => key.ScaleToAsync(1, 320, Easing.SpringOut));
+        }
+        else
+        {
+            key.Scale = 1;
         }
     }
 
@@ -318,7 +330,7 @@ public sealed partial class PinPad : ContentView
 
         // Касание стирания приходит целиком, без отдельного «палец лёг»: кольцо и
         // короткое проседание вместе
-        if (sender is VisualElement key && Attached(key))
+        if (Motion.IsOn && sender is VisualElement key && Attached(key))
         {
             Ripple(key);
             Guarded.Run(async () =>

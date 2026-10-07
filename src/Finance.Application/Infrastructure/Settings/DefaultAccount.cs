@@ -1,3 +1,4 @@
+using Finance.Application.Infrastructure.Queries;
 using Finance.Application.Infrastructure.Storage;
 using Finance.Application.Infrastructure.Storage.Rows;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ public static class DefaultAccount
     /// Счёт по умолчанию: выбранный, пока он не заблокирован и не удалён, иначе верхний незаблокированный.
     /// Так первый заведённый счёт сам становится счётом по умолчанию, а заблокированный уступает место следующему.
     /// </summary>
-    /// <param name="open">Незаблокированные счета в порядке списка «Счета».</param>
+    /// <param name="open">Незаблокированные счета в порядке экрана «Счета» (<see cref="InScreenOrder"/>).</param>
     /// <param name="choice">Явный выбор пользователя; пусто — выбора не было.</param>
     /// <returns>Счёт по умолчанию; пусто — незаблокированных счетов нет.</returns>
     public static OpenAccount? Resolve(IReadOnlyList<OpenAccount> open, Guid? choice)
@@ -33,6 +34,27 @@ public static class DefaultAccount
     }
 
     /// <summary>
+    /// Незаблокированные счета в порядке экрана «Счета»: доступные к тратам раньше накоплений,
+    /// внутри раздела — порядок списка. По общему порядку первым оказался бы скрытый счёт,
+    /// заведённый раньше остальных, хотя на экране он ниже.
+    /// </summary>
+    /// <param name="accounts">Счета в порядке <see cref="IAccountsQuery"/>.</param>
+    /// <returns>Кандидаты в счета по умолчанию, верхний — первым.</returns>
+    public static IEnumerable<AccountListItem> InScreenOrder(IEnumerable<AccountListItem> accounts) =>
+        accounts
+            .Where(static account => !account.IsClosed)
+            .OrderBy(static account => account.ExcludedFromTotals);
+
+    /// <summary>
+    /// Кандидаты в счета по умолчанию для <see cref="Resolve"/> — в порядке <see cref="InScreenOrder"/>.
+    /// Один путь на всех потребителей: свой список без этого порядка назвал бы не тот счёт.
+    /// </summary>
+    /// <param name="accounts">Счета в порядке <see cref="IAccountsQuery"/>.</param>
+    /// <returns>Незаблокированные счета, верхний — первым.</returns>
+    public static List<OpenAccount> Candidates(IEnumerable<AccountListItem> accounts) =>
+        [.. InScreenOrder(accounts).Select(static account => new OpenAccount(account.Key, account.Name))];
+
+    /// <summary>
     /// Разбирает значение настройки. Испорченное значение равно отсутствию выбора:
     /// подставится верхний счёт, а не ошибка на каждом открытии формы.
     /// </summary>
@@ -40,15 +62,16 @@ public static class DefaultAccount
     /// <returns>Ключ выбранного счёта или <c>null</c>.</returns>
     public static Guid? Parse(string? value) => Guid.TryParse(value, out Guid key) ? key : null;
 
-    // Порядок — тот же, что у AccountsQuery: иначе подтверждение и раздел «Ещё»
-    // назвали бы не тот счёт, что подставит форма
+    // Порядок — тот же, что у InScreenOrder поверх AccountsQuery: иначе подтверждение
+    // и раздел «Ещё» назвали бы не тот счёт, что подставит форма
     private static async Task<IReadOnlyList<OpenAccount>> ReadOpenAsync(
         FinanceDbContext context,
         CancellationToken cancellationToken) =>
         await context.Accounts
             .AsNoTracking()
             .Where(static row => !row.IsClosed)
-            .OrderBy(static row => row.SortOrder)
+            .OrderBy(static row => row.ExcludedFromTotals)
+            .ThenBy(static row => row.SortOrder)
             .ThenBy(static row => row.Name)
             .Select(static row => new OpenAccount(row.Key, row.Name))
             .ToListAsync(cancellationToken)

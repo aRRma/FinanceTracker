@@ -130,8 +130,8 @@ public sealed partial class TransactionViewModel : FormViewModel
     public string SourceLabel => IsTransfer ? UiTexts.TransactionSourceTransfer : UiTexts.TransactionSourceSimple;
 
     /// <summary>
-    /// Вид категорий, подходящих операции: расходной — расходные. Тем же видом
-    /// открывается экран выбора подкатегории.
+    /// Вид категорий, подходящих операции: расходной — расходные, а универсальные группы
+    /// подходят любому виду. Тем же видом открывается экран выбора подкатегории.
     /// </summary>
     public CategoryKind CategoryKind => Kind is TransactionKind.Income ? CategoryKind.Income : CategoryKind.Expense;
 

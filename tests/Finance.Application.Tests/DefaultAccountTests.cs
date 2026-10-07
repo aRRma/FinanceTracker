@@ -173,6 +173,37 @@ public sealed class DefaultAccountTests
     }
 
     /// <summary>
+    /// Верхний — как на экране «Счета»: доступные к тратам раньше накоплений, даже если
+    /// скрытый счёт заведён первым. Иначе форма подставляла бы вклад, который на экране ниже.
+    /// </summary>
+    [Fact]
+    public async Task Без_выбора_накопления_уступают_доступным_к_тратам()
+    {
+        await using TransactionFixture given = await TransactionFixture.CreateAsync();
+
+        Guid savings = await given.AccountAsync("Вклад", excluded: true);
+        Guid card = await given.AccountAsync("Карта");
+
+        Assert.Equal(card, (await NewFormAsync(given)).SourceAccount?.Key);
+
+        DefaultAccountViewModel screen = given.Database.Resolve<DefaultAccountViewModel>();
+        await screen.LoadAsync();
+
+        Assert.Equal([card, savings], screen.Accounts.Select(static option => option.Key));
+        Assert.Equal(card, Assert.Single(screen.Accounts, static option => option.IsSelected).Key);
+
+        MoreViewModel more = given.Database.Resolve<MoreViewModel>();
+        await more.LoadAsync();
+
+        Assert.Equal("Карта", more.DefaultAccountCaption);
+
+        AccountViewModel model = await CardAsync(given, card);
+        model.IsClosed = true;
+
+        Assert.Equal(Moves("Вклад"), model.ClosingWarning);
+    }
+
+    /// <summary>
     /// Испорченное значение настройки равно отсутствию выбора, а не ошибке на каждом открытии формы.
     /// </summary>
     [Fact]

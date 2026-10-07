@@ -37,7 +37,8 @@ public sealed class MainActivity : MauiAppCompatActivity
     private LockCover? _cover;
 
     /// <summary>
-    /// Холодный старт: приложения не было, ярлык поднял его с нуля.
+    /// Любой холодный старт, не только по ярлыку, и пересоздание активности в живом
+    /// процессе. Здесь же поднимается заслонка входа.
     /// </summary>
     /// <param name="savedInstanceState">Состояние, сохранённое платформой.</param>
     protected override void OnCreate(Bundle? savedInstanceState)

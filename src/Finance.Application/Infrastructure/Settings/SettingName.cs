@@ -22,7 +22,8 @@ public static class SettingName
     public const string Theme = "theme";
 
     /// <summary>
-    /// Ключ счёта, явно выбранного счётом по умолчанию. Нет строки — счёт по умолчанию верхний в списке.
+    /// Ключ счёта, явно выбранного счётом по умолчанию. Нет строки или выбранный
+    /// заблокирован либо удалён — счёт по умолчанию верхний незаблокированный в порядке экрана «Счета».
     /// </summary>
     public const string DefaultAccountKey = "transactions.default_account_key";
 }

@@ -44,7 +44,7 @@ public enum Invariant
     AmountInWholeKopecks = 4,
 
     /// <summary>
-    /// Суммы в разных валютах не складываются, не вычитаются и не сравниваются.
+    /// Суммы в разных валютах не складываются, не вычитаются и не упорядочиваются.
     /// </summary>
     CurrenciesNeverMixed = 5,
 

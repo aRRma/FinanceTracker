@@ -186,8 +186,9 @@ public sealed class Backdrop : Microsoft.Maui.Controls.AbsoluteLayout
 
         foreach ((Ellipse shape, _) in _blobs)
         {
-            // Признак приходит привязкой и до показа — тогда без анимации
-            if (shape.Handler is null)
+            // Признак приходит привязкой и до показа — тогда без анимации; без неё
+            // и при выключенных в системе анимациях
+            if (shape.Handler is null || !Motion.IsOn)
             {
                 shape.Opacity = opacity;
             }

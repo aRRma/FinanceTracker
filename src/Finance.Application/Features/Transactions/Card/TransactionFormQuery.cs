@@ -64,15 +64,10 @@ public sealed class TransactionFormQuery : ITransactionFormQuery
             .ConfigureAwait(false);
 
         List<AccountOption> options = new(accounts.Count);
-        List<OpenAccount> open = new(accounts.Count);
+        List<OpenAccount> open = DefaultAccount.Candidates(accounts);
 
         foreach (AccountListItem account in accounts)
         {
-            if (!account.IsClosed)
-            {
-                open.Add(new OpenAccount(account.Key, account.Name));
-            }
-
             options.Add(new AccountOption(
                 account.Key,
                 account.Icon,

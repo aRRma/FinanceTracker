@@ -241,7 +241,8 @@ public sealed partial class SubcategoryViewModel : FormViewModel
         Key is { } key && await WriteAsync(token => _delete.HandleAsync(key, token), cancellationToken);
 
     /// <summary>
-    /// Переносить можно только в группы того же вида и не в служебные.
+    /// В списке группы того же вида и не служебные; текущая служебная остаётся. Остальное
+    /// про перенос, включая универсальность, проверяет домен при сохранении.
     /// </summary>
     private void FillGroups(IReadOnlyList<CategoryListItem> categories, CategoryListItem parent)
     {

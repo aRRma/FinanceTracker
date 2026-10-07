@@ -14,6 +14,7 @@ public sealed class MainApplication : MauiApplication
 
 	/// <summary>
 	/// Перехват сбоев — до сборки приложения: сбой в ней самой иначе не попал бы в отчёты.
+	/// После сборки служб разбираются записи системы о прошлых завершениях процесса.
 	/// </summary>
 	public override void OnCreate()
 	{

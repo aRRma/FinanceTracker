@@ -36,7 +36,8 @@ public static class MauiProgram
             // Фигуру своего типа MAUI не находит: обработчики фигур записаны
             // поимённо, и без этой строки любой экран со значком падает при открытии
             .ConfigureMauiHandlers(handlers => handlers.AddHandler<Icon, ShapeViewHandler>())
-            // Свой обработчик вкладок: без него каждый переход красит шапку чёрным
+            // Свой обработчик вкладок: без него каждый переход заливает область страниц чёрным,
+            // и оно просвечивает сквозь прозрачную шапку
             .ConfigureMauiHandlers(handlers => handlers.AddHandler<Shell, FinanceShellRenderer>())
             // Ответ системного окна выбора места для выгрузки: своя переопределённая
             // OnActivityResult в активности переопределяла бы устаревший член AndroidX

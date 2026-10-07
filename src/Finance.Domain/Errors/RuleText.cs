@@ -123,7 +123,7 @@ public enum RuleText
     ReceiverIsNotGroup = 21,
 
     /// <summary>
-    /// Удаляют приёмник группы или служебную подкатегорию.
+    /// Удаляют приёмник группы или служебную категорию, подкатегорию или группу.
     /// </summary>
     ProtectedCategoryNotDeleted = 22,
 

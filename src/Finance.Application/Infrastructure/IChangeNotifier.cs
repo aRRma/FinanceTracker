@@ -21,7 +21,8 @@ public interface IChangeNotifier
     long VersionOf(DataChange kinds);
 
     /// <summary>
-    /// Сообщает об изменении. Вызывается единой точкой выполнения команд.
+    /// Сообщает об изменении. Зовёт <c>UnitOfWork</c> после фиксации команды; мимо него
+    /// зовут только смена темы, смена пояса и возврат из фона, где транзакции нет.
     /// </summary>
     /// <param name="change">Что именно изменилось.</param>
     void Publish(DataChange change);

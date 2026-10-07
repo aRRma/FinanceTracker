@@ -6,7 +6,8 @@ namespace Finance.Application.Features.Export;
 public sealed record RecoveryLine
 {
     /// <summary>
-    /// Ключ значка — тот же, что у раздела этих данных на экране «Ещё».
+    /// Ключ значка: у счетов, категорий и мест — тот же, что у раздела на экране «Ещё»;
+    /// у операций свой, раздела операций там нет.
     /// </summary>
     public required string Icon { get; init; }
 

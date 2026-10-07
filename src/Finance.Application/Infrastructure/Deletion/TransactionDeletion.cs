@@ -14,8 +14,8 @@ public sealed record TransactionDeletion
     public required int Count { get; init; }
 
     /// <summary>
-    /// Балансы счетов после удаления — в порядке, в каком счета встречаются в ленте
-    /// сверху вниз; у перевода сначала счёт списания, потом зачисления.
+    /// Балансы после удаления у счетов, где баланс изменится, — в порядке, в каком счета
+    /// встречаются в ленте сверху вниз; у перевода сначала счёт списания, потом зачисления.
     /// </summary>
     public required IReadOnlyList<BalanceAfterDeletion> Balances { get; init; }
 
@@ -32,7 +32,7 @@ public sealed record TransactionDeletion
             Plural.Of(Count, UiTexts.TransactionsCountOne, UiTexts.TransactionsCountFew, UiTexts.TransactionsCountMany));
 
     /// <summary>
-    /// Текст диалога: каким станет баланс каждого счёта и что отменить будет нельзя.
+    /// Текст диалога: каким станет баланс у счетов, где он изменится, и что отменить будет нельзя.
     /// Без последствия пользователь подтверждает вслепую и проверяет результат потом.
     /// </summary>
     public string Message

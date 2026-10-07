@@ -78,7 +78,7 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
 
     /// <summary>
     /// Набранное в поиске. Пока поле пусто, группы стоят как их оставили;
-    /// с первой же буквой показываются подходящие подкатегории всех групп.
+    /// с первой же буквой показываются подходящие подкатегории групп, принимающих вид операции.
     /// </summary>
     [ObservableProperty]
     public partial string Filter { get; set; } = string.Empty;
@@ -105,7 +105,8 @@ public sealed partial class CategoryPickerViewModel : ObservableObject
     public bool IsFrequentVisible => Frequent.Count > 0 && Filter.AsSpan().Trim().Length is 0;
 
     /// <summary>
-    /// Читает категории выбранного вида.
+    /// Читает группы, принимающие вид операции: группы этого вида и универсальные
+    /// группы другого вида отдельным разделом.
     /// </summary>
     /// <param name="kind">Вид: расход или доход — он задан видом операции.</param>
     /// <param name="selected">Подкатегория, стоящая в форме сейчас.</param>
