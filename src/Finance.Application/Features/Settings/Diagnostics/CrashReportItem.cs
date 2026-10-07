@@ -1,30 +1,34 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+using Finance.Application.Infrastructure.Diagnostics;
 
 namespace Finance.Application.Features.Settings.Diagnostics;
 
 /// <summary>
-/// Строка списка отчётов о сбоях: вид, когда, первая строка — и весь отчёт, который раскрывается касанием.
+/// Строка списка отчётов о сбоях: вид, заголовок и подпись «когда · причина»; касание открывает отчёт.
 /// </summary>
-public sealed partial class CrashReportItem : ObservableObject
+public sealed class CrashReportItem
 {
     /// <summary>
-    /// Вид сбоя словом.
+    /// Вид сбоя — по нему выбирается значок.
     /// </summary>
-    public required string Kind { get; init; }
+    public required CrashCategory Category { get; init; }
 
     /// <summary>
-    /// Когда, в зоне пользователя, и первая строка отчёта.
+    /// Что случилось словами: «Приложение закрылось».
+    /// </summary>
+    public required string Title { get; init; }
+
+    /// <summary>
+    /// Когда, в зоне пользователя, и короткая причина.
     /// </summary>
     public required string Caption { get; init; }
 
     /// <summary>
-    /// Отчёт целиком.
+    /// Над строкой линия: строки стоят в одной карточке, и первой линия не нужна.
     /// </summary>
-    public required string Text { get; init; }
+    public bool HasDivider { get; init; }
 
     /// <summary>
-    /// Отчёт раскрыт.
+    /// Отчёт — для экрана отчёта.
     /// </summary>
-    [ObservableProperty]
-    public partial bool IsExpanded { get; set; }
+    public required CrashReport Report { get; init; }
 }

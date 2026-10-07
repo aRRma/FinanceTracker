@@ -173,7 +173,8 @@ public sealed class CrashReportsTests : IDisposable
 
     /// <summary>
     /// Падение внутри Java пишется по стеку Java: вызовы остаются, сообщения — нет, в том числе у вложенных
-    /// и многострочные. В сообщении обёртки над исключением .NET лежит его текст.
+    /// и многострочные, даже когда строка продолжения начинается как вызов. В сообщении обёртки над
+    /// исключением .NET лежит его текст.
     /// </summary>
     [Fact]
     public async Task Стек_Java_пишется_без_сообщений()
@@ -182,6 +183,7 @@ public sealed class CrashReportsTests : IDisposable
         const string stack = """
             java.lang.RuntimeException: Unable to start activity: 1 234,56 Пятёрочка
             вторая строка сообщения
+            at least one: Пятёрочка
             	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:4280)
             	at android.os.Looper.loop(Looper.java:338)
             Caused by: android.runtime.JavaProxyThrowable: [System.FormatException]: Пятёрочка
@@ -203,6 +205,42 @@ public sealed class CrashReportsTests : IDisposable
         Assert.DoesNotContain("Пятёрочка", report.Text, StringComparison.Ordinal);
         Assert.DoesNotContain("1 234,56", report.Text, StringComparison.Ordinal);
         Assert.DoesNotContain("вторая строка", report.Text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Исключение Java, всплывшее в .NET, пишется без сообщений: стек его обёртки кончается стеком Java,
+    /// а там сообщение есть у каждого исключения цепочки.
+    /// </summary>
+    [Fact]
+    public async Task Стек_Java_в_обёртке_NET_пишется_без_сообщений()
+    {
+        CrashReports reports = Create();
+
+        reports.Write(CrashKind.Caught, new JavaWrapperException());
+
+        CrashReport report = Assert.Single(await reports.ReadAsync(CancellationToken.None));
+        Assert.Contains("at Finance.App.Pages.CrashReportsPage.ShareAsync()", report.Text, StringComparison.Ordinal);
+        Assert.Contains("java.lang.IllegalStateException\n", report.Text, StringComparison.Ordinal);
+        Assert.Contains("\tat android.content.Intent.resolve(Intent.java:42)", report.Text, StringComparison.Ordinal);
+        Assert.Contains("Caused by: java.io.IOException\n", report.Text, StringComparison.Ordinal);
+        Assert.DoesNotContain("Пятёрочка", report.Text, StringComparison.Ordinal);
+        Assert.DoesNotContain("1 234,56", report.Text, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Огромное описание режется: отчёт больше файла сменой файла вытеснил бы все прежние отчёты.
+    /// </summary>
+    [Fact]
+    public async Task Огромный_отчёт_не_вытесняет_прежние()
+    {
+        CrashReports reports = Create();
+        reports.Write(CrashKind.Caught, new TimeoutException());
+        reports.Write(CrashKind.Warning, new AggregateException(Enumerable.Range(0, 20_000).Select(static _ => new TimeoutException())));
+        reports.Write(CrashKind.Caught, new TimeoutException());
+
+        IReadOnlyList<CrashReport> read = await reports.ReadAsync(CancellationToken.None);
+        Assert.Equal([CrashKind.Caught, CrashKind.Warning, CrashKind.Caught], read.Select(static report => report.Kind));
+        Assert.EndsWith("\n...", read[1].Text, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -448,6 +486,22 @@ public sealed class CrashReportsTests : IDisposable
         public override string Message => throw new InvalidOperationException("message");
 
         public override string StackTrace => throw new InvalidOperationException("stack");
+    }
+
+    /// <summary>
+    /// Исключение Java, всплывшее в .NET: стек его обёртки устроен так же, как у <c>Java.Lang.Throwable</c> —
+    /// управляемая часть, разделитель и стек Java, напечатанный самой Java.
+    /// </summary>
+    private sealed class JavaWrapperException : Exception
+    {
+        public override string StackTrace => """
+               at Finance.App.Pages.CrashReportsPage.ShareAsync()
+              --- End of managed Java.Lang.IllegalStateException stack trace ---
+            java.lang.IllegalStateException: Пятёрочка
+            	at android.content.Intent.resolve(Intent.java:42)
+            Caused by: java.io.IOException: 1 234,56
+            	... 3 more
+            """;
     }
 
     private static int CountEnds(CrashReports reports) =>

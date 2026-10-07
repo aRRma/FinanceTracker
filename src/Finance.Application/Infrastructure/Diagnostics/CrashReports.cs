@@ -28,7 +28,7 @@ public sealed class CrashReports
     private readonly TimeProvider _time;
     private readonly DeviceInfo _device;
     private readonly int _fileLimit;
-    private int _fatalWritten;
+    private bool _fatalWritten;
 
     /// <summary>
     /// Отчёты в папке данных приложения.
@@ -85,7 +85,7 @@ public sealed class CrashReports
     /// <returns><c>true</c>, если отчёт записан.</returns>
     /// <remarks>
     /// Синхронно: при падении процесс умирает сразу за обработчиком, и асинхронная запись не успела бы.
-    /// Ничего не бросает — сбой записи потерял бы исходный сбой, ради которого она шла.
+    /// Сбой записи наружу не бросает — он потерял бы исходный сбой, ради которого она шла.
     /// </remarks>
     public bool Write(CrashKind kind, Exception error)
     {
@@ -164,7 +164,8 @@ public sealed class CrashReports
     /// </summary>
     /// <param name="path">Куда положить сведённый файл.</param>
     /// <remarks>
-    /// Под той же блокировкой, что запись: смена файла посреди копирования потеряла бы отчёты.
+    /// Под той же блокировкой, что запись: смена файла посреди копирования потеряла бы отчёты. Предыдущий
+    /// файл может кончаться оборванной записью — без перевода строки первый отчёт текущего склеился бы с ней.
     /// </remarks>
     public void CopyTo(string path)
     {
@@ -172,8 +173,24 @@ public sealed class CrashReports
 
         lock (_gate)
         {
-            File.WriteAllText(path, ReadText(PreviousPath) + ReadText(CurrentPath), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            string previous = ReadText(PreviousPath);
+            string joint = previous.Length is 0 || previous.EndsWith('\n') ? "" : "\n";
+
+            File.WriteAllText(path, previous + joint + ReadText(CurrentPath), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
         }
+    }
+
+    /// <summary>
+    /// Кладёт один отчёт в отдельный файл — для «Поделиться» с экрана отчёта.
+    /// </summary>
+    /// <param name="report">Отчёт.</param>
+    /// <param name="path">Куда положить файл.</param>
+    public static void CopyTo(CrashReport report, string path)
+    {
+        ArgumentNullException.ThrowIfNull(report);
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+
+        File.WriteAllText(path, CrashReportFile.Format(report), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
     }
 
     /// <summary>
@@ -190,20 +207,20 @@ public sealed class CrashReports
 
     private bool Fatal(CrashKind kind, Func<string> describe)
     {
-        if (Interlocked.Exchange(ref _fatalWritten, 1) is not 0)
+        // Под блокировкой записи: обработчик того же падения в другом потоке ждёт, пока первый допишет, —
+        // иначе он отдал бы падение дальше, и процесс умер бы посреди отчёта. Признак ставится только
+        // удачной записью: неудачная не глушит следующий обработчик
+        lock (_gate)
         {
-            return false;
+            if (_fatalWritten)
+            {
+                return false;
+            }
+
+            _fatalWritten = Record(kind, describe);
+
+            return _fatalWritten;
         }
-
-        if (Record(kind, describe))
-        {
-            return true;
-        }
-
-        // Признак снимается: иначе неудачная запись первого обработчика заглушила бы остальных
-        Volatile.Write(ref _fatalWritten, 0);
-
-        return false;
     }
 
     private bool Record(CrashKind kind, Func<string> describe) =>

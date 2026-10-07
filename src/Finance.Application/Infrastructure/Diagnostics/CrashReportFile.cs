@@ -24,6 +24,12 @@ internal static class CrashReportFile
     internal const string TrailHeader = "--- trail (UTC)";
 
     /// <summary>
+    /// Предел описания сбоя в символах. Составное исключение из тысячи задач дало бы отчёт больше самого файла,
+    /// и смена файла вытеснила бы им все прежние отчёты; причина же видна в начале.
+    /// </summary>
+    internal const int DescriptionLimit = 64 * 1024;
+
+    /// <summary>
     /// Собирает отчёт в текст для дозаписи в файл.
     /// </summary>
     /// <param name="atUtc">Момент сбоя.</param>
@@ -37,7 +43,7 @@ internal static class CrashReportFile
         text.Append(CultureInfo.InvariantCulture, $"{Marker} {atUtc.ToUniversalTime():O} {kind}\n");
         text.Append(CultureInfo.InvariantCulture, $"app {device.AppVersion} ({device.AppBuild}), android {device.Android}, {device.Model}\n");
 
-        AppendLines(text, description);
+        AppendLines(text, description.Length <= DescriptionLimit ? description : string.Concat(description.AsSpan(0, DescriptionLimit), "\n..."));
 
         if (trail.Count > 0)
         {
@@ -66,6 +72,13 @@ internal static class CrashReportFile
     }
 
     /// <summary>
+    /// Собирает прочитанный отчёт обратно в текст файла — для отправки одного отчёта.
+    /// </summary>
+    /// <param name="report">Отчёт.</param>
+    internal static string Format(CrashReport report) =>
+        string.Create(CultureInfo.InvariantCulture, $"{Marker} {report.AtUtc.ToUniversalTime():O} {report.Kind}\n{report.Text}\n{End}\n");
+
+    /// <summary>
     /// Разбирает файл в отчёты в порядке записи.
     /// </summary>
     /// <param name="text">Содержимое файла.</param>
@@ -80,12 +93,19 @@ internal static class CrashReportFile
             {
                 if (open is { } header && body.Count > 0)
                 {
+                    // Первая строка тела — сборка и устройство, затем сбой, затем след после своего заголовка
+                    int trail = body.IndexOf(TrailHeader);
+                    string[] description = [.. body[1..(trail < 0 ? body.Count : trail)]];
+
                     yield return new CrashReport
                     {
                         AtUtc = header.AtUtc,
                         Kind = header.Kind,
-                        Headline = body.Count > 1 ? body[1] : "",
+                        Headline = description.Length > 0 ? description[0] : "",
                         Text = string.Join('\n', body),
+                        Device = body[0],
+                        Description = description,
+                        Trail = trail < 0 ? [] : [.. body[(trail + 1)..]],
                     };
                 }
 

@@ -6,7 +6,7 @@ namespace Finance.Application.Infrastructure.Diagnostics;
 public sealed class DeviceInfo
 {
     /// <summary>
-    /// Сведения не переданы — так бывает только вне устройства, в тестах.
+    /// Сведения не переданы или платформа их не прочитала: отчёт без версии лучше, чем никакого.
     /// </summary>
     public static DeviceInfo Unknown { get; } = new() { AppVersion = "?", AppBuild = "?", Android = "?", Model = "?" };
 

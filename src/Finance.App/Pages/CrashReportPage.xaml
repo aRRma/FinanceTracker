@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Экран D-17: отчёт о сбое. Шапка-карточка — крупный знак вида, что и где случилось,
+    версия и телефон; «Причина» — короткий тип и стек, свёрнутый до верхних строк;
+    «Перед сбоем» — шкала действий во времени пользователя, последней строкой сам сбой.
+    «Поделиться отчётом» отдаёт только этот отчёт.
+-->
+<pages:DataPage
+    x:Class="Finance.App.Pages.CrashReportPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
+    xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
+    xmlns:diagnostics="clr-namespace:Finance.Application.Features.Settings.Diagnostics;assembly=Finance.Application"
+    x:DataType="diagnostics:CrashReportViewModel"
+    Title="{x:Static texts:UiTexts.CrashReportTitle}">
+
+    <Grid SafeAreaEdges="None">
+        <controls:Backdrop />
+
+        <ScrollView SafeAreaEdges="Container">
+            <VerticalStackLayout Padding="16,12,16,24" Spacing="12">
+
+                <Border Style="{StaticResource GlassSurface}">
+                    <VerticalStackLayout Padding="14,14,14,10" Spacing="10">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <controls:CrashBadge Grid.Column="0" Category="{Binding Category}" IsLarge="True" />
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="{Binding Title}" FontFamily="OpenSansSemibold" FontSize="17" />
+                                <Label Text="{Binding Caption}" Style="{StaticResource SecondaryLabel}" FontSize="13" />
+                            </VerticalStackLayout>
+                        </Grid>
+                        <!-- Значение — в резиновой колонке с обрезкой: длинная модель телефона
+                             не переносится и не толкает подпись -->
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="4">
+                            <Label Grid.Row="0" Grid.Column="0" Text="{x:Static texts:UiTexts.AboutVersion}" Style="{StaticResource SecondaryLabel}" />
+                            <Label Grid.Row="0" Grid.Column="1" Text="{Binding Version}" FontFamily="OpenSansSemibold"
+                                   HorizontalTextAlignment="End" LineBreakMode="TailTruncation" />
+                            <Label Grid.Row="1" Grid.Column="0" Text="{x:Static texts:UiTexts.CrashReportPhone}" Style="{StaticResource SecondaryLabel}" />
+                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding Phone}" FontFamily="OpenSansSemibold"
+                                   HorizontalTextAlignment="End" LineBreakMode="TailTruncation" />
+                            <Label Grid.Row="2" Grid.Column="0" Text="{x:Static texts:UiTexts.CrashReportAndroid}" Style="{StaticResource SecondaryLabel}" />
+                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding Android}" FontFamily="OpenSansSemibold"
+                                   HorizontalTextAlignment="End" LineBreakMode="TailTruncation" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="{x:Static texts:UiTexts.CrashReportCause}" Style="{StaticResource SectionLabel}" Margin="4,4,0,0" />
+                <Border Style="{StaticResource GlassSurface}">
+                    <VerticalStackLayout>
+                        <VerticalStackLayout Padding="14,12,14,10" Spacing="4">
+                            <Label Text="{Binding Cause}" FontFamily="OpenSansSemibold" />
+                            <!-- Моноширинный и с переносом по знакам: строки стека длиннее экрана,
+                                 а перенос по словам оставлял одинокие «at» на своих строках -->
+                            <Label Text="{Binding Stack}" FontFamily="monospace" FontSize="10.5"
+                                   LineBreakMode="CharacterWrap" Style="{StaticResource SecondaryLabel}" />
+                        </VerticalStackLayout>
+                        <BoxView Style="{StaticResource Divider}" IsVisible="{Binding CanExpandStack}" />
+                        <Grid Padding="14,10" ColumnDefinitions="*,Auto" IsVisible="{Binding CanExpandStack}"
+                              MinimumHeightRequest="{StaticResource TouchTarget}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnStackTapped" />
+                            </Grid.GestureRecognizers>
+                            <Label Grid.Column="0" Text="{Binding StackToggle}" FontFamily="OpenSansSemibold" VerticalOptions="Center"
+                                   TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                            <controls:Icon Grid.Column="1" Key="chevron-down" VerticalOptions="Center" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="{x:Static texts:UiTexts.CrashReportBefore}" Style="{StaticResource SectionLabel}" Margin="4,4,0,0"
+                       IsVisible="{Binding HasTrail}" />
+                <Border Style="{StaticResource GlassSurface}" IsVisible="{Binding HasTrail}">
+                    <VerticalStackLayout Padding="14,10" Spacing="6" BindableLayout.ItemsSource="{Binding Trail}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="diagnostics:CrashTrailEntry">
+                                <Grid ColumnDefinitions="64,*" ColumnSpacing="10">
+                                    <Label Grid.Column="0" Text="{Binding Time}" FontFamily="monospace" FontSize="11"
+                                           Style="{StaticResource CaptionLabel}" VerticalOptions="Center" />
+                                    <Label Grid.Column="1" Text="{Binding Text}" FontSize="13" VerticalOptions="Center"
+                                           LineBreakMode="TailTruncation">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsCode}" Value="True">
+                                                <Setter Property="FontFamily" Value="monospace" />
+                                                <Setter Property="FontSize" Value="11" />
+                                                <Setter Property="TextColor"
+                                                        Value="{AppThemeBinding Light={StaticResource Ink2Light}, Dark={StaticResource Ink2Dark}}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsCrash}" Value="True">
+                                                <Setter Property="FontFamily" Value="OpenSansSemibold" />
+                                                <Setter Property="TextColor"
+                                                        Value="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button Text="{x:Static texts:UiTexts.CrashReportShare}" AutomationId="ShareCrashReport"
+                        Clicked="OnShareClicked" Margin="0,4,0,0" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</pages:DataPage>

@@ -137,6 +137,7 @@ public static class MauiProgram
         services.AddTransient<DefaultAccountPage>();
         services.AddTransient<AboutPage>();
         services.AddTransient<CrashReportsPage>();
+        services.AddTransient<CrashReportPage>();
         services.AddTransient<ExportPage>();
         services.AddTransient<AppLockPage>();
         services.AddTransient<PinPage>();

@@ -120,9 +120,29 @@ public sealed class PastExitsTests : IDisposable
         _reports.WriteFatal(CrashKind.Unhandled, new TimeoutException());
         DateTimeOffset crashed = (await _reports.ReadAsync(CancellationToken.None))[0].AtUtc;
 
-        FakeHistory history = new(new PastExit { AtUtc = crashed.AddSeconds(2), Reason = ExitReason.CrashNative, Status = 6, Trace = Tombstone() });
+        FakeHistory history = new(new PastExit { AtUtc = crashed.AddSeconds(2), Reason = ExitReason.CrashNative, Status = 6, Trace = NativeSample() });
 
         Assert.Equal(0, await new PastExits(_reports, history, _device).RecordAsync(CancellationToken.None));
+    }
+
+    /// <summary>
+    /// Отчёт обработчика сводится с одной записью системы: падение следующего запуска через пять секунд —
+    /// уже другая смерть, и о ней отчёт пишется.
+    /// </summary>
+    [Fact]
+    public async Task Отчёт_обработчика_гасит_только_одну_запись()
+    {
+        _reports.WriteFatal(CrashKind.Unhandled, new TimeoutException());
+        DateTimeOffset crashed = (await _reports.ReadAsync(CancellationToken.None))[0].AtUtc;
+
+        FakeHistory history = new(
+            new PastExit { AtUtc = crashed.AddSeconds(1), Reason = ExitReason.Crash, Status = 0 },
+            new PastExit { AtUtc = crashed.AddSeconds(5), Reason = ExitReason.CrashNative, Status = 11 });
+
+        Assert.Equal(1, await new PastExits(_reports, history, _device).RecordAsync(CancellationToken.None));
+
+        CrashReport report = (await _reports.ReadAsync(CancellationToken.None)).Single(static report => report.Kind is CrashKind.ExitReason);
+        Assert.Equal("exit CrashNative status 11", report.Headline);
     }
 
     /// <summary>
@@ -147,7 +167,7 @@ public sealed class PastExitsTests : IDisposable
     [Fact]
     public async Task Порча_нативной_трассы_не_стирает_сигнал()
     {
-        byte[] trace = [.. Tombstone()[..^4], 0xFF];
+        byte[] trace = [.. NativeSample()[..^4], 0xFF];
 
         FakeHistory history = new(new PastExit { AtUtc = Moment, Reason = ExitReason.CrashNative, Status = 11, Trace = trace });
 
@@ -221,7 +241,7 @@ public sealed class PastExitsTests : IDisposable
     [Fact]
     public async Task Из_нативной_трассы_берутся_сигнал_и_стек_упавшего_потока()
     {
-        FakeHistory history = new(new PastExit { AtUtc = Moment, Reason = ExitReason.CrashNative, Status = 11, Trace = Tombstone() });
+        FakeHistory history = new(new PastExit { AtUtc = Moment, Reason = ExitReason.CrashNative, Status = 11, Trace = NativeSample() });
 
         await new PastExits(_reports, history, _device).RecordAsync(CancellationToken.None);
 
@@ -329,7 +349,7 @@ public sealed class PastExitsTests : IDisposable
     /// <summary>
     /// Образец трассы нативного падения: упавший поток, соседний поток и всё, чего в отчёте быть не должно.
     /// </summary>
-    private static byte[] Tombstone()
+    private static byte[] NativeSample()
     {
         byte[] frame(ulong pc, string file, string function, ulong offset) => Proto.Message(
             4,

@@ -29,7 +29,8 @@ internal sealed class DeviceExitHistory : IExitHistory
                 continue;
             }
 
-            ExitReason reason = Enum.IsDefined((ExitReason)(int)info.Reason) ? (ExitReason)(int)info.Reason : ExitReason.Unknown;
+            ExitReason reason = (ExitReason)(int)info.Reason;
+            reason = Enum.IsDefined(reason) ? reason : ExitReason.Unknown;
 
             exits.Add(new PastExit
             {
@@ -39,7 +40,7 @@ internal sealed class DeviceExitHistory : IExitHistory
                 Description = info.Description,
                 Summary = info.GetProcessStateSummary(),
 
-                // Трасса есть только у нативного падения и зависания и весит сотни килобайт: у остальных не читается
+                // Трасса есть только у нативного падения и зависания и весит десятки и сотни килобайт: у остальных не читается
                 Trace = reason is ExitReason.CrashNative or ExitReason.Anr ? ReadTrace(info) : null,
             });
         }

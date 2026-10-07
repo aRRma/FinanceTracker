@@ -17,9 +17,15 @@ internal sealed class JavaCrashHandler(Java.Lang.Thread.IUncaughtExceptionHandle
         // Обёртка .NET знает только управляемую часть стека, а у падения внутри Java она пуста.
         // Исключение .NET, ушедшее в Java, к этому моменту уже записано, и вызов промолчит
         // Стек Android отдаёт пустым, если в цепочке есть UnknownHostException, — тогда остаётся хотя бы класс
-        string? stack = Android.Util.Log.GetStackTraceString(e);
-        CrashCatcher.Reports?.WriteFatalJava(string.IsNullOrEmpty(stack) ? e.Class?.Name ?? nameof(Java.Lang.Throwable) : stack);
-
-        previous?.UncaughtException(t, e);
+        // Дальше падение уходит в любом случае: бросок отсюда система проглотит, и процесс повис бы
+        try
+        {
+            string? stack = Android.Util.Log.GetStackTraceString(e);
+            CrashCatcher.Reports?.WriteFatalJava(string.IsNullOrEmpty(stack) ? e.Class?.Name ?? nameof(Java.Lang.Throwable) : stack);
+        }
+        finally
+        {
+            previous?.UncaughtException(t, e);
+        }
     }
 }

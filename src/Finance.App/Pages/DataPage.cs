@@ -46,6 +46,12 @@ public abstract class DataPage : ContentPage
     /// </summary>
     protected virtual bool ReloadsOnAppearing => true;
 
+    /// <summary>
+    /// Ждать ли подготовки базы перед чтением. Экран, читающий не базу, а свой файл, не ждёт:
+    /// при сорванной миграции он остался бы пустым, хотя прочитать есть что.
+    /// </summary>
+    protected virtual bool ReadsDatabase => true;
+
     /// <inheritdoc />
     protected override void OnAppearing()
     {
@@ -61,7 +67,8 @@ public abstract class DataPage : ContentPage
 
             if (BindingContext is IFormModel)
             {
-                _back.Command = new Command(() => Guarded.Run(LeaveAsync));
+                // Имя — для следа действий: иначе стрелка записалась бы появлением экрана, где её завели
+                _back.Command = new Command(() => Guarded.Run(LeaveAsync, member: nameof(LeaveAsync)));
             }
 
             Shell.SetBackButtonBehavior(this, _back);
@@ -133,7 +140,11 @@ public abstract class DataPage : ContentPage
         {
             // ConfigureAwait здесь не ставится намеренно: продолжение обязано
             // вернуться в поток интерфейса — оно наполняет привязанные коллекции
-            await _startup.PrepareAsync();
+            if (ReadsDatabase)
+            {
+                await _startup.PrepareAsync();
+            }
+
             await LoadAsync();
         }
         catch (DatabaseMigrationException error)

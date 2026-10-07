@@ -37,6 +37,12 @@ internal static class CrashDescription
     private static readonly string[] NestedPrefixes = ["Caused by: ", "Suppressed: "];
 
     /// <summary>
+    /// Начало строки, за которой обёртка .NET над исключением Java дописывает к своему стеку стек Java —
+    /// целиком, как его печатает Java, с сообщениями.
+    /// </summary>
+    private const string JavaStackSeparator = "--- End of managed ";
+
+    /// <summary>
     /// Описывает сбой со всеми вложенными исключениями.
     /// </summary>
     /// <param name="error">Сбой.</param>
@@ -71,7 +77,7 @@ internal static class CrashDescription
                 text.Append(TypeOf(trimmed)).Append('\n');
                 first = false;
             }
-            else if (trimmed.StartsWith("at ", StringComparison.Ordinal) || trimmed.StartsWith("... ", StringComparison.Ordinal))
+            else if (IsFrame(trimmed))
             {
                 text.Append(line).Append('\n');
             }
@@ -83,6 +89,14 @@ internal static class CrashDescription
 
         return text.ToString();
     }
+
+    /// <summary>
+    /// Строка вызова — <c>at Класс.метод(Файл.java:12)</c> — или свёрнутый хвост — <c>... 12 more</c>. Начала строки
+    /// мало: продолжение многострочного сообщения тоже бывает «at …», а скобка в конце у него — редкость.
+    /// </summary>
+    private static bool IsFrame(string line) =>
+        (line.StartsWith("at ", StringComparison.Ordinal) && line.EndsWith(')'))
+        || (line.StartsWith("... ", StringComparison.Ordinal) && line.EndsWith(" more", StringComparison.Ordinal));
 
     /// <summary>
     /// Начало строки, которым Java открывает вложенное исключение; пусто — строка не такая.
@@ -105,6 +119,18 @@ internal static class CrashDescription
     /// </summary>
     private static string TypeOf(string line) => line.Split(':', 2)[0].Trim();
 
+    /// <summary>
+    /// Стек исключения со стеком Java, сведённым к типам и вызовам. Исключение Java, всплывшее в .NET, — обёртка,
+    /// и её стек кончается стеком Java с сообщениями: текст исключения ушёл бы в отчёт мимо белого списка.
+    /// </summary>
+    private static string WithoutJavaMessages(string stack)
+    {
+        int separator = stack.IndexOf(JavaStackSeparator, StringComparison.Ordinal);
+        int java = separator < 0 ? -1 : stack.IndexOf('\n', separator);
+
+        return java < 0 ? stack : string.Concat(stack.AsSpan(0, java + 1), DescribeJava(stack[(java + 1)..]).TrimEnd('\n'));
+    }
+
     private static void Append(StringBuilder text, Exception error, int depth)
     {
         text.Append(error.GetType().FullName);
@@ -118,7 +144,7 @@ internal static class CrashDescription
 
         if (error.StackTrace is { } stack)
         {
-            text.Append(stack).Append('\n');
+            text.Append(WithoutJavaMessages(stack)).Append('\n');
         }
 
         if (depth >= MaxDepth)

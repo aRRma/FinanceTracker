@@ -129,6 +129,11 @@ public static class Routes
     public const string CrashReports = "settings/crash-reports";
 
     /// <summary>
+    /// Один отчёт о сбое — с его строки в списке отчётов.
+    /// </summary>
+    public const string CrashReport = "settings/crash-report";
+
+    /// <summary>
     /// Выгрузка в файл и восстановление из него.
     /// </summary>
     public const string Export = "settings/data";
@@ -169,6 +174,7 @@ public static class Routes
         Routing.RegisterRoute(DefaultAccount, typeof(DefaultAccountPage));
         Routing.RegisterRoute(About, typeof(AboutPage));
         Routing.RegisterRoute(CrashReports, typeof(CrashReportsPage));
+        Routing.RegisterRoute(CrashReport, typeof(CrashReportPage));
         Routing.RegisterRoute(Export, typeof(ExportPage));
         Routing.RegisterRoute(AppLock, typeof(AppLockPage));
         Routing.RegisterRoute(Pin, typeof(PinPage));

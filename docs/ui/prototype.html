@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Личный трекер финансов — прототип</title>
 <!-- СГЕНЕРИРОВАНО из mockups.html скриптом tools/build_prototype.py. Руками не править. -->
-<!-- отпечатки источников: mockups.html=a5240e3d1ca3565b063d8d267c594ef0d583a86e3a2984574ff153a44aa36b13 build_prototype.py=c4117922eb79d50153b038589f1404b8b52e172c7e165499ea27eaa2d6cb669c -->
+<!-- отпечатки источников: mockups.html=ea1360b0319ae05b94af5c79c1c342cb76862982f053048c1a40f75875c35831 build_prototype.py=c4117922eb79d50153b038589f1404b8b52e172c7e165499ea27eaa2d6cb669c -->
 <style>
 :root{
   --paper:#EDEFF1; --card:#FFFFFF; --sunk:#F4F6F7;
@@ -30,6 +30,12 @@
   --mark-day-glass-a:#E9FFF6; --mark-day-glass-b:#9FE3C8; --mark-day-tube:#0F5C4C; --mark-day-core:#2DBC55;
   --mark-neon-glass-a:#1D6B55; --mark-neon-glass-b:#0A3328; --mark-neon-tube:#3CFFB0; --mark-neon-core:#E6FFF5; --mark-neon-glow:#2CFFA8;
   --mark-shine:#FFFFFF;
+  /* Отчёты о сбоях [D-16, D-17]: светлое стекло на атмосфере и знак вида — значок цветом вида на
+     подложке того же цвета; значения — из Colors.xaml (GlassLight, Crash*) */
+  --glass-l:rgba(255,255,255,.74); --glass-l-line:rgba(15,92,76,.13); --lift-l:0 8px 20px -12px rgba(15,92,76,.5);
+  --cr-closed:#C9302C; --cr-closed-t:#F6DEDD; --cr-system:#7650BE; --cr-system-t:#E9E3F5;
+  --cr-froze:#2259D6; --cr-froze-t:#DCE4F8; --cr-killed:#3F7F8F; --cr-killed-t:#E0EBED;
+  --cr-caught:#676D74; --cr-caught-t:#E7E8E9; --cr-warning:#B8681F; --cr-warning-t:#F4E7DB;
 }
 [data-theme="dark"]{
   --paper:#101315;--card:#1C2124;--sunk:#252B2F;
@@ -42,6 +48,10 @@
   --acc-violet:#9E59F6; --acc-magenta:#EC2DE4; --acc-red:#F72C2E; --acc-pink:#F62B97;
   --bd-top:#0D2A22; --bd-mid:#0E1B18; --bd-bot:#0E1214; --spot-sky:32%; --spot-green:26%; --spot-acc:18%;
   --glass:rgba(72,167,142,.15); --glass-line:rgba(72,167,142,.38); --lift:none; --ripple:rgba(72,167,142,.45); --pill:rgba(0,0,0,.35);
+  --glass-l:rgba(72,167,142,.15); --glass-l-line:rgba(72,167,142,.38); --lift-l:none;
+  --cr-closed:#FF8A80; --cr-closed-t:#45423B; --cr-system:#B79BEF; --cr-system-t:#374551;
+  --cr-froze:#8AB1FF; --cr-froze-t:#2E4A55; --cr-killed:#7FC1CF; --cr-killed-t:#2C4D4B;
+  --cr-caught:#8A9299; --cr-caught-t:#2E4440; --cr-warning:#F0A766; --cr-warning-t:#424836;
 }
 /* В тёмной теме плавающая кнопка цветом карточки с акцентной обводкой, как в приложении */
 [data-theme="dark"] .fab{background:var(--card);color:var(--acc);border:1px solid var(--acc)}
@@ -223,6 +233,26 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);f
 [data-theme="dark"] .pinpad b.on{color:var(--onacc)}
 [data-theme="dark"] .pinpad .ic{color:var(--ink2)}
 .pinpad.off{opacity:.4}
+/* Отчёты о сбоях [D-16, D-17]: карточки — светлое стекло, знак вида 30 dp — 21 (крупный 46 — 32),
+   плитки счётчиков, шкала «Перед сбоем» */
+.card.gl{background:var(--glass-l);border-color:var(--glass-l-line);box-shadow:var(--lift-l);border-radius:12px}
+.cb{width:21px;height:21px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex:none;color:var(--c);background:var(--t);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 28%,transparent)}
+.cb .ic{width:11px;height:11px;color:var(--c);stroke-width:1.9}
+.cb.lg{width:32px;height:32px;border-radius:10px}
+.cb.lg .ic{width:17px;height:17px;stroke-width:1.7}
+.cb.closed{--c:var(--cr-closed);--t:var(--cr-closed-t)}
+.cb.system{--c:var(--cr-system);--t:var(--cr-system-t)}
+.cb.froze{--c:var(--cr-froze);--t:var(--cr-froze-t)}
+.cb.killed{--c:var(--cr-killed);--t:var(--cr-killed-t)}
+.cb.caught{--c:var(--cr-caught);--t:var(--cr-caught-t)}
+.cb.warning{--c:var(--cr-warning);--t:var(--cr-warning-t)}
+.cstat{display:flex;gap:6px;margin:9px 0 10px}
+.cstat b{flex:1;text-align:center;background:var(--accbg);border-radius:7px;padding:4px 0;font-size:13px}
+.cstat i{display:block;font-style:normal;font-weight:400;font-size:10px;color:var(--ink3)}
+.tline{display:flex;gap:9px;font-size:11.5px;padding:2px 0}
+.tline time{font-family:var(--mono);font-size:10px;color:var(--ink3);width:44px;flex:none;padding-top:1px}
+.tline code{font-family:var(--mono);font-size:10px;color:var(--ink2)}
+.tline .bad{color:var(--neg);font-weight:600}
 .pin{position:absolute;left:0;right:0;text-align:center}
 .pin .lock{width:44px;height:44px;margin:0 auto 11px;border-radius:50%;background:var(--glass);border:1px solid var(--glass-line);box-shadow:var(--lift);display:flex;align-items:center;justify-content:center}
 .pin .lock .ic{color:var(--acc);width:21px;height:21px}
@@ -421,12 +451,14 @@ body{padding:0}
 <symbol id="h-sync" viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3.5v5h-5"/></symbol>
 <symbol id="h-alert" viewBox="0 0 24 24"><path d="M12 4.5l8.5 15.5h-17z"/><path d="M12 10.5v4M12 17.2h.01"/></symbol>
 <symbol id="i-adjustments" viewBox="0 0 24 24"><path d="M4 10a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M6 4v4 M6 12v8 M10 16a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M12 4v10 M12 18v2 M16 7a2 2 0 1 0 4 0a2 2 0 0 0 -4 0 M18 4v1 M18 9v11"/></symbol>
+<symbol id="i-alert-circle" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M12 8v4 M12 16h.01"/></symbol>
 <symbol id="i-alert-triangle" viewBox="0 0 24 24"><path d="M12 4.5l8.5 15.5h-17z M12 10.5v4 M12 17.2h.01"/></symbol>
 <symbol id="i-arrow-down-left" viewBox="0 0 24 24"><path d="M17 7l-10 10 M16 17h-9v-9"/></symbol>
 <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M17 7l-10 10 M8 7h9v9"/></symbol>
 <symbol id="i-baby-carriage" viewBox="0 0 24 24"><path d="M6 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M16 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M2 5h2.5l1.632 4.897a6 6 0 0 0 5.693 4.103h2.675a5.5 5.5 0 0 0 0 -11h-.5v6 M6 9h14 M9 17l1 -3 M16 14l1 3"/></symbol>
 <symbol id="i-backspace" viewBox="0 0 24 24"><path d="M20 6a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-11l-5 -5a1.5 1.5 0 0 1 0 -2l5 -5z M12 10l4 4 M16 10l-4 4"/></symbol>
 <symbol id="i-beach" viewBox="0 0 24 24"><path d="M17.553 16.75a7.5 7.5 0 0 0 -10.606 0 M18 3.804a6 6 0 0 0 -8.196 2.196l10.392 6a6 6 0 0 0 -2.196 -8.196 M16.732 10c1.658 -2.87 2.225 -5.644 1.268 -6.196c-.957 -.552 -3.075 1.326 -4.732 4.196 M15 9l-3 5.196 M3 19.25a2.4 2.4 0 0 1 1 -.25a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 1 .25"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/></symbol>
 <symbol id="i-building-bank" viewBox="0 0 24 24"><path d="M3 21l18 0 M3 10l18 0 M5 6l7 -3l7 3 M4 10l0 11 M20 10l0 11 M8 14l0 3 M12 14l0 3 M16 14l0 3"/></symbol>
 <symbol id="i-bus" viewBox="0 0 24 24"><path d="M4 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M16 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0 M4 17h-2v-11a1 1 0 0 1 1 -1h14a5 7 0 0 1 5 7v5h-2m-4 0h-8 M16 5l1.5 7l4.5 0 M2 10l15 0 M7 5l0 5 M12 5l0 5"/></symbol>
 <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z M16 3v4 M8 3v4 M4 11h16 M11 15h1 M12 15v3"/></symbol>
@@ -438,6 +470,7 @@ body{padding:0}
 <symbol id="i-circle-check" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M9 12l2 2 M11 14l4 -4"/></symbol>
 <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M3 14c.83 .642 2.077 1.017 3.5 1c1.423 .017 2.67 -.358 3.5 -1c.83 -.642 2.077 -1.017 3.5 -1c1.423 -.017 2.67 .358 3.5 1 M8 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2 M12 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2 M3 10h14v5a6 6 0 0 1 -6 6h-2a6 6 0 0 1 -6 -6v-5 M16.746 16.726a3 3 0 1 0 .252 -5.555"/></symbol>
 <symbol id="i-coins" viewBox="0 0 24 24"><path d="M9 14c0 1.657 2.686 3 6 3s6 -1.343 6 -3s-2.686 -3 -6 -3s-6 1.343 -6 3 M9 14v4c0 1.656 2.686 3 6 3s6 -1.344 6 -3v-4 M3 6c0 1.072 1.144 2.062 3 2.598s4.144 .536 6 0c1.856 -.536 3 -1.526 3 -2.598c0 -1.072 -1.144 -2.062 -3 -2.598s-4.144 -.536 -6 0c-1.856 .536 -3 1.526 -3 2.598 M3 6v10c0 .888 .772 1.45 2 2 M3 11c0 .888 .772 1.45 2 2"/></symbol>
+<symbol id="i-cpu" viewBox="0 0 24 24"><path d="M6 5h12 M18 5a1 1 0 0 1 1 1 M19 6v12 M19 18a1 1 0 0 1 -1 1 M18 19h-12 M6 19a1 1 0 0 1 -1 -1 M5 18v-12 M5 6a1 1 0 0 1 1 -1 M9 9h6 M15 9v6 M15 15h-6 M9 15v-6 M3 10h2 M3 14h2 M10 3v2 M14 3v2 M21 10h-2 M21 14h-2 M14 21v-2 M10 21v-2"/></symbol>
 <symbol id="i-credit-card" viewBox="0 0 24 24"><path d="M3 8a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-8 M3 10h18 M7 15h.01 M11 15h2"/></symbol>
 <symbol id="i-database" viewBox="0 0 24 24"><path d="M4 6a8 3 0 1 0 16 0a8 3 0 1 0 -16 0 M4 6v12 M20 6v12 M4 12a8 3 0 0 0 16 0 M4 18a8 3 0 0 0 16 0"/></symbol>
 <symbol id="i-device-mobile" viewBox="0 0 24 24"><path d="M6 5a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-14 M11 4h2 M12 17v.01"/></symbol>
@@ -448,6 +481,7 @@ body{padding:0}
 <symbol id="i-grip-vertical" viewBox="0 0 24 24"><path d="M8 5a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M8 12a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M8 19a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M14 5a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M14 12a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M14 19a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"/></symbol>
 <symbol id="i-heart-handshake" viewBox="0 0 24 24"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572 M12 6l-3.293 3.293a1 1 0 0 0 0 1.414l.543 .543c.69 .69 1.81 .69 2.5 0l1 -1a3.182 3.182 0 0 1 4.5 0l2.25 2.25 M12.5 15.5l2 2 M15 13l2 2"/></symbol>
 <symbol id="i-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0 M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7 M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></symbol>
+<symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M6.5 7h11 M6.5 17h11 M6 20v-2 M6 18a6 6 0 1 1 12 0 M18 18v2 M18 20a1 1 0 0 1 -1 1 M17 21h-10 M7 21a1 1 0 0 1 -1 -1 M6 4v2 M6 6a6 6 0 1 0 12 0 M18 6v-2 M18 4a1 1 0 0 0 -1 -1 M17 3h-10 M7 3a1 1 0 0 0 -1 1"/></symbol>
 <symbol id="i-info-circle" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M12 9h.01 M11 12h1v4h1"/></symbol>
 <symbol id="i-key" viewBox="0 0 24 24"><path d="M16.555 3.843l3.602 3.602a2.877 2.877 0 0 1 0 4.069l-2.643 2.643a2.877 2.877 0 0 1 -4.069 0l-.301 -.301l-6.558 6.558a2 2 0 0 1 -1.239 .578l-.175 .008h-1.172a1 1 0 0 1 -.993 -.883l-.007 -.117v-1.172a2 2 0 0 1 .467 -1.284l.119 -.13l.414 -.414h2v-2h2v-2l2.144 -2.144l-.301 -.301a2.877 2.877 0 0 1 0 -4.069l2.643 -2.643a2.877 2.877 0 0 1 4.069 0 M15 9h.01"/></symbol>
 <symbol id="i-lock" viewBox="0 0 24 24"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6 M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0 M8 11v-4a4 4 0 1 1 8 0v4"/></symbol>
@@ -1523,20 +1557,61 @@ body{padding:0}
 
 <div class="scr right" data-screen="D-16" title="D-16 · Отправить отчёт о сбое">
 <div class="phone">
+  <div class="atmo" style="top:46px"></div>
   <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Отчёты о сбоях</h2></div>
   <div class="body">
-    <div class="card">
-      <div class="row"><div class="g"><div class="t">Падение</div><div class="s">6 октября, 22:41 · System.InvalidOperationException</div><div class="note dim" style="font-family:ui-monospace,monospace;font-size:9.5px;white-space:pre-wrap;margin-top:6px">app 1.0.5 (10005), android 16, samsung SM-S938B
-System.InvalidOperationException
-   at Finance.App.Pages.FeedPage.OnRefreshing()
---- trail (UTC)
-19:40:58 nav //feed
-19:41:02 run FeedPage.OnRefreshing</div></div></div>
-      <div class="row"><div class="g"><div class="t">Прошлое завершение</div><div class="s">6 октября, 22:39 · exit CrashNative status 11</div></div></div>
-      <div class="row"><div class="g"><div class="t">Ошибка</div><div class="s">6 октября, 21:51 · System.TimeoutException</div></div></div>
+    <div class="card gl" style="padding:10px 11px 11px">
+      <div class="note" style="font-weight:600">Последний сбой</div>
+      <div style="font-size:14px;font-weight:600;margin-top:1px">Приложение закрылось</div>
+      <div class="s">Сегодня, 09:57 · экран «О программе»</div>
+      <div class="cstat"><b>2<i>закрылось</i></b><b>1<i>зависло</i></b><b>2<i>прочее</i></b></div>
+      <div class="btn">Поделиться отчётами</div>
     </div>
-    <div class="btn" style="margin-top:12px">Поделиться</div>
-    <div class="btn danger" style="margin-top:8px">Очистить</div>
+    <div class="note" style="font-weight:600;margin:2px 0 -5px 3px">Все отчёты · 5</div>
+    <div class="card gl">
+      <div class="row"><span class="cb closed"><svg class="ic"><use href="#i-bolt"/></svg></span><div class="g"><div class="t" style="font-weight:600">Приложение закрылось</div><div class="s">Сегодня, 09:57 · CrashedByAdbException</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><span class="cb caught"><svg class="ic"><use href="#i-alert-circle"/></svg></span><div class="g"><div class="t" style="font-weight:600">Действие не удалось</div><div class="s">Сегодня, 09:41 · TimeoutException</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><span class="cb system"><svg class="ic"><use href="#i-cpu"/></svg></span><div class="g"><div class="t" style="font-weight:600">Падение в системе Android</div><div class="s">Вчера, 22:39 · SIGSEGV</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><span class="cb froze"><svg class="ic"><use href="#i-hourglass"/></svg></span><div class="g"><div class="t" style="font-weight:600">Приложение зависло</div><div class="s">Вчера, 21:12</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
+      <div class="row"><span class="cb killed"><svg class="ic"><use href="#i-moon"/></svg></span><div class="g"><div class="t" style="font-weight:600">Закрыто системой</div><div class="s">5 октября, 20:47 · мало памяти</div></div><svg class="ic mut sm"><use href="#i-chevron-right"/></svg></div>
+    </div>
+    <div class="btn" style="background:transparent;color:var(--neg)">Очистить отчёты</div>
+  </div>
+  <nav class="nav">
+    <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
+    <a><svg class="ic"><use href="#h-tab-feed"/></svg><span>Операции</span></a>
+    <a><svg class="ic"><use href="#h-tab-report"/></svg><span>Отчёт</span></a>
+    <a class="on"><svg class="ic"><use href="#h-tab-more"/></svg><span>Ещё</span></a>
+  </nav>
+</div>
+</div>
+
+<div class="scr right" data-screen="D-17" title="D-17 · Прочитать отчёт о сбое">
+<div class="phone">
+  <div class="atmo" style="top:46px"></div>
+  <div class="hd"><svg class="ic lg act"><use href="#h-back"/></svg><h2>Отчёт о сбое</h2></div>
+  <div class="body">
+    <div class="card gl" style="padding:10px 11px 9px">
+      <div style="display:flex;gap:9px;align-items:center"><span class="cb closed lg"><svg class="ic"><use href="#i-bolt"/></svg></span><div style="min-width:0"><div style="font-size:13.5px;font-weight:600">Приложение закрылось</div><div class="s">Сегодня, 09:57 · экран «О программе»</div></div></div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin-top:8px;font-size:11.5px"><span class="dim">Версия</span><b style="text-align:right">1.0.5 (10005)</b><span class="dim">Телефон</span><b style="text-align:right">samsung SM-S938B</b><span class="dim">Android</span><b style="text-align:right">16</b></div>
+    </div>
+    <div class="note" style="font-weight:600;margin:2px 0 -5px 3px">Причина</div>
+    <div class="card gl">
+      <div style="padding:8px 11px 7px"><div style="font-weight:600">CrashedByAdbException</div><div class="note dim" style="font-family:ui-monospace,monospace;font-size:9px;white-space:pre-wrap;word-break:break-all">android.app.RemoteServiceException$CrashedByAdbException
+  at android.app.ActivityThread.throwRemoteServiceException(ActivityThread.java:2377)
+  at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2741)
+  at android.os.Handler.dispatchMessage(Handler.java:110)
+  at android.os.Looper.loopOnce(Looper.java:248)</div></div>
+      <div class="row" style="border-top:1px solid var(--line)"><div class="g" style="color:var(--acc);font-weight:600">Весь стек — 11 строк</div><svg class="ic mut sm"><use href="#i-chevron-down"/></svg></div>
+    </div>
+    <div class="note" style="font-weight:600;margin:2px 0 -5px 3px">Перед сбоем</div>
+    <div class="card gl" style="padding:6px 11px">
+      <div class="tline"><time>09:55:18</time><span>экран «Ещё»</span></div>
+      <div class="tline"><time>09:55:23</time><code>MorePage.OnAbout</code></div>
+      <div class="tline"><time>09:55:24</time><span>экран «О программе»</span></div>
+      <div class="tline"><time>09:57:02</time><span class="bad">сбой</span></div>
+    </div>
+    <div class="btn">Поделиться отчётом</div>
   </div>
   <nav class="nav">
     <a><svg class="ic"><use href="#h-tab-balances"/></svg><span>Балансы</span></a>
@@ -1666,7 +1741,7 @@ System.InvalidOperationException
 </div>
 </div></div></div>
 
-<p class="legend">Зелёный круг — касание. Счётчик считает касания по интерфейсу отдельно от набора цифр: первое зависит от раскладки экранов, второе — от суммы. С клавиатуры: <code>пробел</code> — пауза, <code>←</code> и <code>→</code> — шаг, цифры — первые десять сценариев. Клик по кадру ставит на паузу. Экранов в прототипе столько же, сколько в макетах: 44.</p>
+<p class="legend">Зелёный круг — касание. Счётчик считает касания по интерфейсу отдельно от набора цифр: первое зависит от раскладки экранов, второе — от суммы. С клавиатуры: <code>пробел</code> — пауза, <code>←</code> и <code>→</code> — шаг, цифры — первые десять сценариев. Клик по кадру ставит на паузу. Экранов в прототипе столько же, сколько в макетах: 45.</p>
 </div>
 
 <script>

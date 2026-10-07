@@ -436,6 +436,24 @@
         </Setter>
     </Style>
 
+    <!-- Поверхность экрана отчётов о сбоях: в светлой теме — светлое стекло с кромкой
+         цветом действия и мягкой зелёной тенью, в тёмной — то же стекло, что у PinSurface -->
+    <Style x:Key="GlassSurface" TargetType="Border">
+        <Setter Property="BackgroundColor"
+                Value="{AppThemeBinding Light={StaticResource GlassLight}, Dark={StaticResource GlassDark}}" />
+        <Setter Property="Stroke"
+                Value="{AppThemeBinding Light={StaticResource GlassLineLight}, Dark={StaticResource GlassLineDark}}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 16" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="{StaticResource LiftShadowLight}" Offset="0,8" Radius="20"
+                        Opacity="{AppThemeBinding Light=0.3, Dark=0}" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Точка набора ПИН-кода: размер один на точки, красный и зелёный ряды ответа.
          Шаг между центрами (точка и промежуток 20) записан и в PinPad.DotPitch -->
     <Style x:Key="PinDot" TargetType="Ellipse">

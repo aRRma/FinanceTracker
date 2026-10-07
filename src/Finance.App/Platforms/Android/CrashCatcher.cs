@@ -25,8 +25,10 @@ internal static class CrashCatcher
     /// </summary>
     private static int _summaryQueued;
 
+    private static readonly Lock SummaryGate = new();
+
     /// <summary>
-    /// Отчёты о сбоях. Пусто только до подключения перехвата.
+    /// Отчёты о сбоях. Пусто до подключения перехвата и если у приложения нет папки данных.
     /// </summary>
     internal static CrashReports? Reports { get; private set; }
 
@@ -119,7 +121,7 @@ internal static class CrashCatcher
     internal static void Warn(Exception error) => Reports?.Write(CrashKind.Warning, error);
 
     /// <summary>
-    /// След действий. Пусто только до подключения перехвата.
+    /// След действий. Пусто, когда пусты отчёты.
     /// </summary>
     internal static ActionTrail? Trail => Reports?.Trail;
 
@@ -141,7 +143,12 @@ internal static class CrashCatcher
 
             try
             {
-                activities.SetProcessStateSummary(trail.Summary());
+                // Чтение и отправка — под одним замком: иначе отправка, начатая раньше, могла бы
+                // закончиться позже и оставить системе устаревшую сводку
+                lock (SummaryGate)
+                {
+                    activities.SetProcessStateSummary(trail.Summary());
+                }
             }
             // Поток пула: исключение отсюда уронило бы процесс, а сводка того не стоит
             catch (Exception failure) when (failure is not OutOfMemoryException)

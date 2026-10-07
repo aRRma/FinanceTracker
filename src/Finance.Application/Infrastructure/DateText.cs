@@ -1,4 +1,5 @@
 using System.Globalization;
+using Finance.Application.Texts;
 
 namespace Finance.Application.Infrastructure;
 
@@ -35,7 +36,7 @@ public static class DateText
         date.Year == today.Year ? Day(date) : DayWithYear(date);
 
     /// <summary>
-    /// Момент в зоне пользователя: «6 октября, 22:41», год — только чужой.
+    /// Момент в зоне пользователя: «Сегодня, 09:57», «Вчера, 21:12», «6 октября, 22:41», год — только чужой.
     /// </summary>
     /// <param name="moment">Момент.</param>
     /// <param name="zone">Часовой пояс пользователя.</param>
@@ -45,9 +46,13 @@ public static class DateText
         ArgumentNullException.ThrowIfNull(zone);
 
         DateTimeOffset local = TimeZoneInfo.ConvertTime(moment, zone);
+        DateOnly date = DateOnly.FromDateTime(local.DateTime);
         CultureInfo culture = UiCulture.Current;
+        string day = date == today ? UiTexts.TransactionToday
+            : date == today.AddDays(-1) ? UiTexts.TransactionYesterday
+            : DayWithYearIfOther(date, today);
 
-        return string.Create(culture, $"{DayWithYearIfOther(DateOnly.FromDateTime(local.DateTime), today)}, {local.ToString("HH:mm", culture)}");
+        return string.Create(culture, $"{day}, {local.ToString("HH:mm", culture)}");
     }
 
     /// <summary>

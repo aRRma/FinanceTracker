@@ -55,8 +55,11 @@ public sealed partial class AppShell : Shell
 
         ArgumentNullException.ThrowIfNull(args);
 
-        // Одно место на все переходы, включая «назад» и смену вкладки
-        CrashCatcher.Trail?.Navigated(args.Current?.Location?.OriginalString ?? "");
+        // Одно место на все переходы, включая «назад» и смену вкладки. Без адреса экран в следе не меняется
+        if (args.Current?.Location?.OriginalString is { Length: > 0 } location)
+        {
+            CrashCatcher.Trail?.Navigated(location);
+        }
 
         // Ярлык на значке поднимает приложение раньше, чем появляется каркас,
         // и запрос ждёт здесь — первой навигации, после которой есть куда идти

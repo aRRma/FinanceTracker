@@ -106,7 +106,6 @@ public static class FinanceServices
                 DeviceInfo.Unknown));
         }
 
-        services.AddSingleton(static provider => provider.GetRequiredService<CrashReports>().Trail);
         services.AddSingleton<PastExits>();
 
         services.AddDbContextFactory<FinanceDbContext>(options => options.UseSqlite(location.ConnectionString));
@@ -196,6 +195,8 @@ public static class FinanceServices
         services.AddTransient<DefaultAccountViewModel>();
         services.AddTransient<AboutViewModel>();
         services.AddTransient<CrashReportsViewModel>();
+        services.AddTransient<CrashReportViewModel>();
+        services.AddSingleton<CrashReportChoice>();
         services.AddTransient<ExportViewModel>();
         services.AddTransient<AppLockViewModel>();
         services.AddTransient<PinViewModel>();

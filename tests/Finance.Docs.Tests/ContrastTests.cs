@@ -130,6 +130,32 @@ public sealed partial class ContrastTests
     }
 
     /// <summary>
+    /// Значок вида сбоя на своей подложке различим как знак — тот же порог 3, что у знака счёта.
+    /// Подложка — бледный тон того же цвета, и при правке одного из двух токенов пара тускнеет первой.
+    /// </summary>
+    /// <param name="tone">Вид без приставки и темы: <c>Closed</c>, <c>Froze</c>…</param>
+    /// <param name="theme">Суффикс темы: <c>Light</c> или <c>Dark</c>.</param>
+    [Theory]
+    [InlineData("Closed", "Light")]
+    [InlineData("Closed", "Dark")]
+    [InlineData("System", "Light")]
+    [InlineData("System", "Dark")]
+    [InlineData("Froze", "Light")]
+    [InlineData("Froze", "Dark")]
+    [InlineData("Killed", "Light")]
+    [InlineData("Killed", "Dark")]
+    [InlineData("Caught", "Light")]
+    [InlineData("Caught", "Dark")]
+    [InlineData("Warning", "Light")]
+    [InlineData("Warning", "Dark")]
+    public void Значок_вида_сбоя_различим_на_подложке(string tone, string theme)
+    {
+        double ratio = Ratio($"Crash{tone}{theme}", $"Crash{tone}Tint{theme}");
+
+        Assert.True(ratio >= 3.0, $"Crash{tone}{theme} на Crash{tone}Tint{theme}: контраст {ratio:F2}, нужен не ниже 3");
+    }
+
+    /// <summary>
     /// Все цвета очереди в обеих темах.
     /// </summary>
     public static TheoryData<AccountColor, string> AccountFills()

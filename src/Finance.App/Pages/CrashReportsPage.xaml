@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
-    Экран D-16: отчёты о сбоях. Список от новых к старым, касание раскрывает отчёт
-    целиком; «Поделиться» отдаёт файл, «Очистить» удаляет все после вопроса.
+    Экран D-16: отчёты о сбоях. Сверху последний сбой крупно — что и где случилось,
+    счётчики и «Поделиться отчётами»; ниже все отчёты от новых к старым, касание
+    открывает отчёт [D-17]; «Очистить отчёты» — тихой подписью в конце.
     Открывается строкой в «О программе» [D-09].
+
+    Стиль «Изумруд»: атмосфера под всем экраном, поверхности — стекло (GlassSurface).
+    Список — BindableLayout, а не CollectionView: он лежит в прокрутке вместе со
+    сводкой, а отчётов на телефоне единицы.
 -->
 <pages:DataPage
     x:Class="Finance.App.Pages.CrashReportsPage"
@@ -10,47 +15,103 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:texts="clr-namespace:Finance.Application.Texts;assembly=Finance.Application"
     xmlns:pages="clr-namespace:Finance.App.Pages"
+    xmlns:controls="clr-namespace:Finance.App.Controls"
     xmlns:diagnostics="clr-namespace:Finance.Application.Features.Settings.Diagnostics;assembly=Finance.Application"
     x:DataType="diagnostics:CrashReportsViewModel"
     Title="{x:Static texts:UiTexts.CrashReportsTitle}">
 
-    <Grid RowDefinitions="*,Auto">
-        <CollectionView Grid.Row="0" ItemsSource="{Binding Items}" SelectionMode="None">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="diagnostics:CrashReportItem">
-                    <Grid Padding="16,10" RowDefinitions="Auto,Auto,Auto" RowSpacing="2"
-                          MinimumHeightRequest="{StaticResource TouchTarget}">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnReportTapped" />
-                        </Grid.GestureRecognizers>
-                        <Label Grid.Row="0" Text="{Binding Kind}" />
-                        <Label Grid.Row="1" Text="{Binding Caption}" LineBreakMode="TailTruncation"
-                               Style="{StaticResource SecondaryLabel}" />
-                        <!-- Моноширинный: стек и след читаются столбцами, как в журнале устройства -->
-                        <Label Grid.Row="2" Text="{Binding Text}" IsVisible="{Binding IsExpanded}"
-                               FontFamily="monospace" FontSize="11" Margin="0,6,0,0"
-                               Style="{StaticResource SecondaryLabel}" />
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-            <!-- Пустое состояние — внутри списка: соседом в той же ячейке его перекрыл бы пустой список -->
-            <CollectionView.EmptyView>
-                <ContentView>
-                    <VerticalStackLayout Padding="16,24" Spacing="8" IsVisible="{Binding IsEmpty}">
+    <!-- Атмосфера — от края до края страницы, содержимое — в безопасной области -->
+    <Grid SafeAreaEdges="None">
+        <controls:Backdrop />
+
+        <ScrollView SafeAreaEdges="Container">
+            <VerticalStackLayout Padding="16,12,16,24" Spacing="12">
+
+                <!-- Пусто — только после чтения, иначе мигнуло бы до него -->
+                <Border Style="{StaticResource GlassSurface}" IsVisible="{Binding IsEmpty}">
+                    <VerticalStackLayout Padding="16,18" Spacing="6">
                         <Label Text="{x:Static texts:UiTexts.CrashReportsEmptyTitle}" Style="{StaticResource TitleLabel}" />
                         <Label Text="{x:Static texts:UiTexts.CrashReportsEmptyHint}" Style="{StaticResource SecondaryLabel}" />
                     </VerticalStackLayout>
-                </ContentView>
-            </CollectionView.EmptyView>
-        </CollectionView>
+                </Border>
 
-        <VerticalStackLayout Grid.Row="1" Padding="16,8,16,12" Spacing="8">
-            <Button Text="{x:Static texts:UiTexts.CrashReportsShare}" IsEnabled="{Binding HasReports}"
-                    AutomationId="ShareCrashReports" Clicked="OnShareClicked" />
-            <Button Text="{x:Static texts:UiTexts.CrashReportsClear}" IsEnabled="{Binding HasReports}"
-                    AutomationId="ClearCrashReports" Clicked="OnClearClicked"
-                    Style="{StaticResource DangerButton}" />
-        </VerticalStackLayout>
+                <!-- Последний сбой: главное, ради чего сюда приходят, — что было и как отправить -->
+                <Border Style="{StaticResource GlassSurface}" IsVisible="{Binding HasReports}">
+                    <VerticalStackLayout Padding="16,14,16,16" Spacing="2">
+                        <!-- Касание по последнему сбою открывает его отчёт, как строка в списке -->
+                        <VerticalStackLayout Spacing="2">
+                            <VerticalStackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnLatestTapped" />
+                            </VerticalStackLayout.GestureRecognizers>
+                            <Label Text="{x:Static texts:UiTexts.CrashReportsLatest}" Style="{StaticResource SectionLabel}" />
+                            <Label Text="{Binding Latest.Title, FallbackValue=''}" FontFamily="OpenSansSemibold" FontSize="18" />
+                            <Label Text="{Binding LatestCaption}" Style="{StaticResource SecondaryLabel}" />
+                        </VerticalStackLayout>
+
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8" Margin="0,12,0,14">
+                            <Border Grid.Column="0" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="6,7"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}">
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding ClosedCount}" FontFamily="OpenSansSemibold" FontSize="17" HorizontalTextAlignment="Center" />
+                                    <Label Text="{x:Static texts:UiTexts.CrashReportsClosed}" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="Center" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Border Grid.Column="1" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="6,7"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}">
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding FrozeCount}" FontFamily="OpenSansSemibold" FontSize="17" HorizontalTextAlignment="Center" />
+                                    <Label Text="{x:Static texts:UiTexts.CrashReportsFroze}" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="Center" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Border Grid.Column="2" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="6,7"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource AccentBackgroundLight}, Dark={StaticResource AccentBackgroundDark}}">
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding OtherCount}" FontFamily="OpenSansSemibold" FontSize="17" HorizontalTextAlignment="Center" />
+                                    <Label Text="{x:Static texts:UiTexts.CrashReportsOther}" Style="{StaticResource CaptionLabel}" HorizontalTextAlignment="Center" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+
+                        <Button Text="{x:Static texts:UiTexts.CrashReportsShare}" AutomationId="ShareCrashReports"
+                                Clicked="OnShareClicked" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="{Binding AllCaption}" Style="{StaticResource SectionLabel}" Margin="4,4,0,0"
+                       IsVisible="{Binding HasReports}" />
+
+                <Border Style="{StaticResource GlassSurface}" IsVisible="{Binding HasReports}">
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Items}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="diagnostics:CrashReportItem">
+                                <VerticalStackLayout>
+                                    <BoxView Style="{StaticResource Divider}" IsVisible="{Binding HasDivider}" />
+                                    <Grid Padding="12,10" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12"
+                                          MinimumHeightRequest="{StaticResource TouchTarget}">
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnReportTapped" />
+                                        </Grid.GestureRecognizers>
+                                        <controls:CrashBadge Grid.Column="0" Category="{Binding Category}" />
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="{Binding Title}" FontFamily="OpenSansSemibold" />
+                                            <Label Text="{Binding Caption}" Style="{StaticResource SecondaryLabel}" FontSize="13"
+                                                   LineBreakMode="TailTruncation" />
+                                        </VerticalStackLayout>
+                                        <controls:Icon Grid.Column="2" Key="chevron-right" VerticalOptions="Center" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button Text="{x:Static texts:UiTexts.CrashReportsClear}" AutomationId="ClearCrashReports"
+                        Clicked="OnClearClicked" IsVisible="{Binding HasReports}"
+                        Style="{StaticResource GhostButton}"
+                        TextColor="{AppThemeBinding Light={StaticResource NegativeLight}, Dark={StaticResource NegativeDark}}" />
+
+            </VerticalStackLayout>
+        </ScrollView>
     </Grid>
 
 </pages:DataPage>

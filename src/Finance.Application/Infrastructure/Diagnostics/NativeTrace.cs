@@ -19,10 +19,10 @@ internal static class NativeTrace
     /// </summary>
     private const int MaxFrames = 64;
 
-    // Tombstone
-    private const int TombstoneTid = 6;
-    private const int TombstoneSignal = 10;
-    private const int TombstoneThreads = 16;
+    // Корень трассы
+    private const int TraceTid = 6;
+    private const int TraceSignal = 10;
+    private const int TraceThreads = 16;
 
     // Signal
     private const int SignalNumber = 1;
@@ -62,7 +62,7 @@ internal static class NativeTrace
         // стоить стека, а испорченный поток — уже прочитанного сигнала
         try
         {
-            ReadTombstone(trace, text, ref tid);
+            ReadSignal(trace, text, ref tid);
         }
         catch (InvalidDataException)
         {
@@ -86,7 +86,7 @@ internal static class NativeTrace
         return text.ToString();
     }
 
-    private static void ReadTombstone(ReadOnlySpan<byte> trace, StringBuilder text, ref int tid)
+    private static void ReadSignal(ReadOnlySpan<byte> trace, StringBuilder text, ref int tid)
     {
         ProtoReader reader = new(trace);
 
@@ -94,10 +94,10 @@ internal static class NativeTrace
         {
             switch (field)
             {
-                case TombstoneTid when wireType is 0:
+                case TraceTid when wireType is 0:
                     tid = (int)reader.ReadVarint();
                     break;
-                case TombstoneSignal when wireType is 2:
+                case TraceSignal when wireType is 2:
                     AppendSignal(reader.ReadBytes(), text);
                     break;
                 default:
@@ -146,7 +146,7 @@ internal static class NativeTrace
 
         while (reader.TryReadTag(out int field, out int wireType))
         {
-            if (field is not TombstoneThreads || wireType is not 2)
+            if (field is not TraceThreads || wireType is not 2)
             {
                 reader.Skip(wireType);
                 continue;

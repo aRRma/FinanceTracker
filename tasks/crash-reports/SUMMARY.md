@@ -34,14 +34,14 @@
 - `AndroidEnvironment.UnhandledExceptionRaiser` — главный путь для MAUI на Android: исключение .NET, уходящее в Java.
 - `AppDomain.CurrentDomain.UnhandledException` — исключения в потоках.
 - `TaskScheduler.UnobservedTaskException` — забытые задачи; процесс не роняет, пишется как предупреждение.
-- Свой `Java.Lang.Thread.DefaultUncaughtExceptionHandler` — исключение внутри Java: пишет полный стек
+- Свой `Java.Lang.Thread.DefaultUncaughtExceptionHandler` — исключение внутри Java: пишет стек (в плане — без сообщений)
   и передаёт прежнему обработчику, чтобы система закрыла процесс как обычно.
 - Подключение — как можно раньше, в `MainApplication`: сбой в `MauiProgram.CreateMauiApp` иначе не попадёт.
 
 **Не пишется:** `DomainException` — это нарушенное правило, а не сбой, и в его тексте бывают имена.
 `DatabaseMigrationException` пишется вместе с вложенным исключением — именно оно и нужно.
 
-**Отчёт о сбое:** время в UTC (через `IClock`), вид (пойманный, необработанный .NET, Java, предупреждение,
+**Отчёт о сбое:** время в UTC (в плане — у `TimeProvider`: отчёты создаются раньше контейнера с `IClock`), вид (пойманный, необработанный .NET, Java, предупреждение,
 прошлое завершение), версия и сборка приложения, версия Android, модель, `exception.ToString()`
 с вложенными, след действий (пункт 3). В релизе с полным AOT имена методов в стеке есть, номеров строк нет — для поиска причины хватает.
 
@@ -66,7 +66,7 @@
 | `REASON_CRASH` | только `getDescription` — формат не гарантирован | полный стек уже записали обработчики пункта 1 |
 | `REASON_LOW_MEMORY`, `REASON_FREEZER`, `REASON_SIGNALED`, `REASON_OTHER` | одна строка | объясняет «открыл, а форма пустая»: процесс убит в фоне |
 | `REASON_EXIT_SELF` с кодом не 0 | пустое описание | сбой .NET вне главного потока (поток, таймер) — проверено на эмуляторе |
-| `REASON_EXIT_SELF` с кодом 0, `REASON_USER_REQUESTED`, `REASON_USER_STOPPED`, `REASON_PACKAGE_UPDATED` | — | обычные завершения, отчёта не дают. `EXIT_SELF` с кодом 0 — перезапуск после восстановления (`AppRestart` выходит `Exit(0)`) |
+| `REASON_EXIT_SELF` с кодом 0, `REASON_USER_REQUESTED`, `REASON_USER_STOPPED`, `REASON_PACKAGE_UPDATED`, `REASON_PACKAGE_STATE_CHANGE` | — | обычные завершения, отчёта не дают. `EXIT_SELF` с кодом 0 — перезапуск после восстановления (`AppRestart` выходит `Exit(0)`) |
 
 **Подробности:**
 - обработанные записи помнятся меткой времени последней в `Preferences`, иначе каждая давала бы отчёт на каждом запуске;
@@ -91,7 +91,7 @@
 | Переходы | `Shell.Navigated` в `AppShell` — одно место на все переходы, включая «назад» | маршрут **без параметров** (`?id=…`, `?kind=…` отрезаются) |
 | Действия | `[CallerMemberName]` и `[CallerFilePath]` у `Guarded.Run` и `Guarded.Execute` | «TransactionPage.OnSaveClicked» — без разметки каждой кнопки |
 | Жизненный цикл | `MainActivity`: `OnStop`, `OnRestart`, смена темы, `OnTrimMemory` | событие; смена темы — прямо про разовое падение |
-| Нарушенное правило | `FormViewModel` и `Guarded` | только имя члена `Invariant` |
+| Нарушенное правило | `Guarded` (из `FormViewModel` — нет, причина в плане) | только имя члена `Invariant` |
 
 Кольцо принимает только имена из кода (маршрут, файл и метод, член перечисления), а не произвольный текст —
 положить туда сумму или имя случайно нельзя. При каждом переходе обновляется и `setProcessStateSummary`.

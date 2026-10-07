@@ -87,6 +87,7 @@ public sealed partial class DataNumberTests
         Assert.NotEmpty(Screens.InMockups);
         Assert.Matches(Groups(), "13 групп");
         Assert.Matches(ScreenCount(), "30 экранов");
+        Assert.DoesNotMatch(ScreenCount(), "09:55:18 экран «Ещё»");
         Assert.False(Groups().IsMatch("ADR-13 групп"), "хвост идентификатора не число документации");
         Assert.Equal(32, FromWords(ScreenCountInWords().Match("Тридцать два экрана").Groups["count"].Value));
         Assert.Equal(13, FromWords(ScreenCountInWords().Match("тринадцать экранов").Groups["count"].Value));
@@ -111,7 +112,8 @@ public sealed partial class DataNumberTests
     [GeneratedRegex(@"(?<![-\d])(?<count>\d+)\s+ключ")]
     private static partial Regex Keys();
 
-    [GeneratedRegex(@"(?<![-\d])(?<count>\d+)\s+экран")]
+    // Двоеточие впереди — время, а не счёт: «09:55:18 экран «Ещё»» в следе действий на макете
+    [GeneratedRegex(@"(?<![-:\d])(?<count>\d+)\s+экран")]
     private static partial Regex ScreenCount();
 
     [GeneratedRegex(

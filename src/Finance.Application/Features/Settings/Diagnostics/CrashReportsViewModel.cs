@@ -8,7 +8,8 @@ using Finance.Application.Texts;
 namespace Finance.Application.Features.Settings.Diagnostics;
 
 /// <summary>
-/// Экран «Отчёты о сбоях»: список от новых к старым, отчёт целиком по касанию, отправка файлом и очистка.
+/// Экран «Отчёты о сбоях»: последний сбой крупно со счётчиками и отправкой, ниже все отчёты от новых
+/// к старым; касание открывает отчёт, «Очистить» удаляет все.
 /// </summary>
 /// <remarks>
 /// Отчёты лежат не в базе, а в файле, и изменения базы их не касаются: экран читает их при появлении,
@@ -20,22 +21,26 @@ public sealed partial class CrashReportsViewModel : ObservableObject
     /// <summary>
     /// Имя сведённого файла для «Поделиться»: под ним он придёт адресату.
     /// </summary>
-    private const string ShareFileName = "finance-crash-reports.txt";
+    internal const string ShareFileName = "finance-crash-reports.txt";
 
     private readonly CrashReports _reports;
+    private readonly CrashReportChoice _choice;
     private readonly IClock _clock;
 
     /// <summary>
     /// Модель экрана.
     /// </summary>
     /// <param name="reports">Отчёты о сбоях.</param>
+    /// <param name="choice">Выбор отчёта для экрана отчёта.</param>
     /// <param name="clock">Часы — для зоны и «сегодня» в подписи момента.</param>
-    public CrashReportsViewModel(CrashReports reports, IClock clock)
+    public CrashReportsViewModel(CrashReports reports, CrashReportChoice choice, IClock clock)
     {
         ArgumentNullException.ThrowIfNull(reports);
+        ArgumentNullException.ThrowIfNull(choice);
         ArgumentNullException.ThrowIfNull(clock);
 
         _reports = reports;
+        _choice = choice;
         _clock = clock;
     }
 
@@ -45,6 +50,42 @@ public sealed partial class CrashReportsViewModel : ObservableObject
     public ObservableCollection<CrashReportItem> Items { get; } = [];
 
     /// <summary>
+    /// Последний сбой — карточка наверху; пусто — отчётов нет.
+    /// </summary>
+    [ObservableProperty]
+    public partial CrashReportItem? Latest { get; private set; }
+
+    /// <summary>
+    /// Когда и где случился последний сбой: «Сегодня, 09:57 · экран «О программе»».
+    /// </summary>
+    [ObservableProperty]
+    public partial string LatestCaption { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Сколько раз приложение закрылось — на исключении или в системе Android.
+    /// </summary>
+    [ObservableProperty]
+    public partial string ClosedCount { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Сколько раз приложение зависло.
+    /// </summary>
+    [ObservableProperty]
+    public partial string FrozeCount { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Сколько прочих отчётов: закрыто системой, действие не удалось, предупреждения.
+    /// </summary>
+    [ObservableProperty]
+    public partial string OtherCount { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Подпись списка с числом отчётов.
+    /// </summary>
+    [ObservableProperty]
+    public partial string AllCaption { get; private set; } = string.Empty;
+
+    /// <summary>
     /// Первое чтение прошло — без этого пустое состояние мигнуло бы до него.
     /// </summary>
     [ObservableProperty]
@@ -52,7 +93,7 @@ public sealed partial class CrashReportsViewModel : ObservableObject
     public partial bool IsLoaded { get; private set; }
 
     /// <summary>
-    /// Отчёты есть — «Поделиться» и «Очистить» доступны.
+    /// Отчёты есть — сводка, список и кнопки на экране.
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsEmpty))]
@@ -71,34 +112,45 @@ public sealed partial class CrashReportsViewModel : ObservableObject
     {
         // ConfigureAwait(false) здесь недопустим: следом меняется привязанный список
         IReadOnlyList<CrashReport> reports = await _reports.ReadAsync(cancellationToken);
+        CrashReportSummary[] summaries = [.. reports.Select(CrashReportSummary.Of)];
 
         Items.Clear();
 
-        foreach (CrashReport report in reports)
+        foreach (CrashReportSummary summary in summaries)
         {
             Items.Add(new CrashReportItem
             {
-                Kind = KindOf(report.Kind),
-                Caption = string.Create(
-                    CultureInfo.InvariantCulture,
-                    $"{DateText.Moment(report.AtUtc, _clock.TimeZone, _clock.Today)} · {report.Headline}"),
-                Text = report.Text,
+                Category = summary.Category,
+                Title = summary.Title,
+                Caption = Join(Moment(summary.Report.AtUtc), summary.Detail),
+                HasDivider = Items.Count > 0,
+                Report = summary.Report,
             });
         }
+
+        Latest = Items.Count > 0 ? Items[0] : null;
+        LatestCaption = summaries.Length > 0 ? Join(Moment(summaries[0].Report.AtUtc), ScreenText(summaries[0].Screen)) : string.Empty;
+
+        int closed = summaries.Count(static summary => summary.Category is CrashCategory.AppClosed or CrashCategory.SystemFault);
+        int froze = summaries.Count(static summary => summary.Category is CrashCategory.Froze);
+        ClosedCount = closed.ToString(UiCulture.Current);
+        FrozeCount = froze.ToString(UiCulture.Current);
+        OtherCount = (summaries.Length - closed - froze).ToString(UiCulture.Current);
+        AllCaption = string.Format(UiCulture.Current, UiTexts.CrashReportsAll, summaries.Length);
 
         HasReports = Items.Count > 0;
         IsLoaded = true;
     }
 
     /// <summary>
-    /// Раскрывает отчёт или сворачивает раскрытый.
+    /// Выбирает отчёт для экрана отчёта; переход делает страница.
     /// </summary>
     /// <param name="item">Строка.</param>
-    public static void Toggle(CrashReportItem item)
+    public void Choose(CrashReportItem item)
     {
         ArgumentNullException.ThrowIfNull(item);
 
-        item.IsExpanded = !item.IsExpanded;
+        _choice.Current = item.Report;
     }
 
     /// <summary>
@@ -125,15 +177,15 @@ public sealed partial class CrashReportsViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Удаляет все отчёты и сведённую для отправки копию. Вопрос задаёт страница.
+    /// Удаляет все отчёты и копии, сведённые для отправки. Вопрос задаёт страница.
     /// </summary>
-    /// <param name="shareFolder">Папка временных файлов, куда кладётся копия для «Поделиться».</param>
+    /// <param name="shareFolder">Папка временных файлов, куда кладутся копии для «Поделиться».</param>
     /// <param name="cancellationToken">Отмена до начала удаления.</param>
     /// <remarks>
     /// Удаление — в пуле потоков: оно ждёт блокировку записи. Список перечитывается и после неудачи —
     /// удалился один файл из двух, и экран обязан показать то, что осталось, а не прежний список.
-    /// Копия удаляется тоже: «Очистить» обещает, что отчётов на телефоне нет, а сразу после отправки
-    /// её не удалить — приложение-адресат читает файл позже.
+    /// Копии удаляются тоже: «Очистить» обещает, что отчётов на телефоне нет, а сразу после отправки
+    /// их не удалить — приложение-адресат читает файл позже.
     /// </remarks>
     public async Task ClearAsync(string shareFolder, CancellationToken cancellationToken = default)
     {
@@ -146,6 +198,7 @@ public sealed partial class CrashReportsViewModel : ObservableObject
                 {
                     _reports.Clear();
                     File.Delete(Path.Combine(shareFolder, ShareFileName));
+                    File.Delete(Path.Combine(shareFolder, CrashReportViewModel.ShareFileName));
                 },
                 cancellationToken);
         }
@@ -156,13 +209,16 @@ public sealed partial class CrashReportsViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Вид сбоя словом. Падение .NET и падение Java для того, кто читает список, — одно: приложение закрылось.
+    /// «экран «О программе»»; пусто — экран не известен.
     /// </summary>
-    private static string KindOf(CrashKind kind) => kind switch
-    {
-        CrashKind.Unhandled or CrashKind.Java => UiTexts.CrashKindFatal,
-        CrashKind.Warning => UiTexts.CrashKindWarning,
-        CrashKind.ExitReason => UiTexts.CrashKindExitReason,
-        _ => UiTexts.CrashKindCaught,
-    };
+    internal static string ScreenText(string? screen) =>
+        screen is null ? string.Empty : string.Format(UiCulture.Current, UiTexts.CrashScreen, screen);
+
+    /// <summary>
+    /// Части подписи через точку, пустые пропускаются.
+    /// </summary>
+    internal static string Join(string first, string second) =>
+        second.Length is 0 ? first : string.Create(CultureInfo.InvariantCulture, $"{first} · {second}");
+
+    private string Moment(DateTimeOffset atUtc) => DateText.Moment(atUtc, _clock.TimeZone, _clock.Today);
 }

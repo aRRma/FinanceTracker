@@ -842,25 +842,121 @@
     <value>Они появятся, если приложение закроется с ошибкой.</value>
   </data>
   <data name="CrashReportsShare" xml:space="preserve">
-    <value>Поделиться</value>
+    <value>Поделиться отчётами</value>
   </data>
   <data name="CrashReportsClear" xml:space="preserve">
-    <value>Очистить</value>
+    <value>Очистить отчёты</value>
   </data>
   <data name="CrashReportsClearQuestion" xml:space="preserve">
     <value>Удалить отчёты о сбоях?</value>
   </data>
-  <data name="CrashKindCaught" xml:space="preserve">
-    <value>Ошибка</value>
+  <data name="CrashReportsLatest" xml:space="preserve">
+    <value>Последний сбой</value>
   </data>
-  <data name="CrashKindFatal" xml:space="preserve">
-    <value>Падение</value>
+  <data name="CrashReportsClosed" xml:space="preserve">
+    <value>закрылось</value>
   </data>
-  <data name="CrashKindWarning" xml:space="preserve">
+  <data name="CrashReportsFroze" xml:space="preserve">
+    <value>зависло</value>
+  </data>
+  <data name="CrashReportsOther" xml:space="preserve">
+    <value>прочее</value>
+  </data>
+  <data name="CrashReportsAll" xml:space="preserve">
+    <value>Все отчёты · {0}</value>
+  </data>
+  <data name="CrashCategoryAppClosed" xml:space="preserve">
+    <value>Приложение закрылось</value>
+  </data>
+  <data name="CrashCategorySystemFault" xml:space="preserve">
+    <value>Падение в системе Android</value>
+  </data>
+  <data name="CrashCategoryFroze" xml:space="preserve">
+    <value>Приложение зависло</value>
+  </data>
+  <data name="CrashCategoryKilled" xml:space="preserve">
+    <value>Закрыто системой</value>
+  </data>
+  <data name="CrashCategoryActionFailed" xml:space="preserve">
+    <value>Действие не удалось</value>
+  </data>
+  <data name="CrashCategoryWarning" xml:space="preserve">
     <value>Предупреждение</value>
   </data>
-  <data name="CrashKindExitReason" xml:space="preserve">
-    <value>Прошлое завершение</value>
+  <data name="CrashKilledLowMemory" xml:space="preserve">
+    <value>мало памяти</value>
+  </data>
+  <data name="CrashKilledFreezer" xml:space="preserve">
+    <value>заморожено в фоне</value>
+  </data>
+  <data name="CrashKilledResources" xml:space="preserve">
+    <value>лишний расход ресурсов</value>
+  </data>
+  <data name="CrashKilledInitialization" xml:space="preserve">
+    <value>не смогло запуститься</value>
+  </data>
+  <data name="CrashKilledSignal" xml:space="preserve">
+    <value>сигнал {0}</value>
+  </data>
+  <data name="CrashScreen" xml:space="preserve">
+    <value>экран «{0}»</value>
+  </data>
+  <data name="CrashScreenAccountFeed" xml:space="preserve">
+    <value>Лента счёта</value>
+  </data>
+  <data name="CrashReportTitle" xml:space="preserve">
+    <value>Отчёт о сбое</value>
+  </data>
+  <data name="CrashReportPhone" xml:space="preserve">
+    <value>Телефон</value>
+  </data>
+  <data name="CrashReportAndroid" xml:space="preserve">
+    <value>Android</value>
+  </data>
+  <data name="CrashReportCause" xml:space="preserve">
+    <value>Причина</value>
+  </data>
+  <data name="CrashReportStackAll" xml:space="preserve">
+    <value>Весь стек — {0}</value>
+  </data>
+  <data name="CrashReportStackLinesOne" xml:space="preserve">
+    <value>строка</value>
+  </data>
+  <data name="CrashReportStackLinesFew" xml:space="preserve">
+    <value>строки</value>
+  </data>
+  <data name="CrashReportStackLinesMany" xml:space="preserve">
+    <value>строк</value>
+  </data>
+  <data name="CrashReportStackCollapse" xml:space="preserve">
+    <value>Свернуть</value>
+  </data>
+  <data name="CrashReportBefore" xml:space="preserve">
+    <value>Перед сбоем</value>
+  </data>
+  <data name="CrashReportShare" xml:space="preserve">
+    <value>Поделиться отчётом</value>
+  </data>
+  <data name="CrashTrailCrash" xml:space="preserve">
+    <value>сбой</value>
+  </data>
+  <data name="CrashTrailStarted" xml:space="preserve">
+    <value>запуск</value>
+  </data>
+  <data name="CrashTrailStopped" xml:space="preserve">
+    <value>уход в фон</value>
+  </data>
+  <data name="CrashTrailRestarted" xml:space="preserve">
+    <value>возврат из фона</value>
+  </data>
+  <data name="CrashTrailThemeChanged" xml:space="preserve">
+    <value>смена темы</value>
+  </data>
+  <data name="CrashTrailTrimMemory" xml:space="preserve">
+    <value>система просит память</value>
+  </data>
+  <data name="CrashTrailRule" xml:space="preserve">
+    <value>нарушено правило {0}</value>
   </data>
   <!-- Выгрузка и восстановление из неё -->
   <data name="ExportTitle" xml:space="preserve">
@@ -984,7 +1080,7 @@
     <value>Не удалось выполнить действие</value>
   </data>
   <data name="ErrorUnexpected" xml:space="preserve">
-    <value>Что-то пошло не так. Попробуйте ещё раз; подробности — в журнале устройства.</value>
+    <value>Что-то пошло не так. Попробуйте ещё раз; подробности — в «О программе» → «Отчёты о сбоях».</value>
   </data>
   <data name="ErrorReloadFailedTitle" xml:space="preserve">
     <value>Данные не обновились</value>

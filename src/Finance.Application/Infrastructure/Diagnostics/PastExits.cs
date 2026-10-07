@@ -27,6 +27,11 @@ public sealed class PastExits
     /// </summary>
     private static readonly TimeSpan HandlerWindow = TimeSpan.FromSeconds(10);
 
+    /// <summary>
+    /// Запас в другую сторону: система округляет момент записи.
+    /// </summary>
+    private static readonly TimeSpan ClockSkew = TimeSpan.FromSeconds(1);
+
     private readonly CrashReports _reports;
     private readonly IExitHistory _history;
     private readonly IDevicePreferences _preferences;
@@ -67,13 +72,18 @@ public sealed class PastExits
             return 0;
         }
 
-        IReadOnlyList<CrashReport> known = await _reports.ReadAsync(cancellationToken).ConfigureAwait(false);
+        List<DateTimeOffset> handled =
+        [
+            .. (await _reports.ReadAsync(cancellationToken).ConfigureAwait(false))
+                .Where(static report => report.Kind is CrashKind.Unhandled or CrashKind.Java)
+                .Select(static report => report.AtUtc),
+        ];
         int written = 0;
         DateTimeOffset? done = null;
 
         foreach (PastExit exit in exits.OrderBy(static exit => exit.AtUtc))
         {
-            if (!IsOrdinary(exit) && !IsKnown(exit, known))
+            if (!IsOrdinary(exit) && !TakeHandled(exit, handled))
             {
                 // Не записалось — метка встаёт перед этой записью: иначе система больше её не отдаст,
                 // и о нативном падении или зависании не узнать никогда. Повтор — при следующем запуске
@@ -98,8 +108,8 @@ public sealed class PastExits
     }
 
     /// <summary>
-    /// Обычное завершение: пользователь закрыл приложение, его обновили, оно перезапустилось само после
-    /// восстановления из выгрузки.
+    /// Обычное завершение: пользователь закрыл приложение, его обновили или выключили, оно перезапустилось
+    /// само после восстановления из выгрузки.
     /// </summary>
     internal static bool IsOrdinary(PastExit exit) => exit.Reason switch
     {
@@ -113,16 +123,30 @@ public sealed class PastExits
     /// тоже: среда .NET после необработанного исключения может закрыть процесс прерыванием, и система
     /// запишет его нативным — а это та же смерть, что уже в отчёте.
     /// </summary>
+    /// <param name="exit">Запись системы.</param>
+    /// <param name="handled">Моменты отчётов обработчиков, ещё не сведённых с записью; сведённый убирается.</param>
     /// <remarks>
-    /// Окно несимметрично: обработчик пишет до смерти процесса, а система отмечает её после. Секунда
-    /// в другую сторону — запас на округление момента системой.
+    /// Окно несимметрично: обработчик пишет до смерти процесса, а система отмечает её после. Отчёт обработчика сводится с одной записью:
+    /// одна смерть — одна запись, а падение следующего запуска в том же окне — уже другая смерть.
     /// </remarks>
-    private static bool IsKnown(PastExit exit, IReadOnlyList<CrashReport> known) =>
-        exit.Reason is ExitReason.Crash or ExitReason.ExitSelf or ExitReason.CrashNative
-        && known.Any(report =>
-            report.Kind is CrashKind.Unhandled or CrashKind.Java
-            && report.AtUtc >= exit.AtUtc - HandlerWindow
-            && report.AtUtc <= exit.AtUtc + TimeSpan.FromSeconds(1));
+    private static bool TakeHandled(PastExit exit, List<DateTimeOffset> handled)
+    {
+        if (exit.Reason is not (ExitReason.Crash or ExitReason.ExitSelf or ExitReason.CrashNative))
+        {
+            return false;
+        }
+
+        int index = handled.FindIndex(atUtc => atUtc >= exit.AtUtc - HandlerWindow && atUtc <= exit.AtUtc + ClockSkew);
+
+        if (index < 0)
+        {
+            return false;
+        }
+
+        handled.RemoveAt(index);
+
+        return true;
+    }
 
     private static string Describe(PastExit exit)
     {
