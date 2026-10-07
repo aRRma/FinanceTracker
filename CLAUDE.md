@@ -79,6 +79,7 @@ C# 14 · .NET 10 · MAUI (Android 16+) · EF Core + SQLite · xUnit. Серве�
 - **Значки категорий — только из [data/icons.json](data/icons.json)**, контуры — в [data/icon-paths.json](data/icon-paths.json), и у каждого ключа набора контур обязан быть. **Цвета — только именованные токены темы**, контраст сверяет `ContrastTests`. Знак счёта — один контрол `AccountBadge`, значок — один маппинг `AccountIcon.For` ([ADR-0016](docs/adr/0016-account-color-and-icon.md), навык `maui`).
 - **Возврат настройки к системному значению — удаление строки**, а не запись слова «системный»; тема — исключение.
 - **Защита входа — вне базы:** таблица `settings` уезжает с выгрузкой, а по следу в файле четыре цифры подбираются за секунды ([ADR-0017](docs/adr/0017-entry-protection-own-pin-outside-database.md)). Время в фоне — только `IUptime`: `Stopwatch` на Android стоит во сне.
+- **Отчёт о сбое — без личных данных:** файл уходит с телефона руками, через мессенджер ([ADR-0018](docs/adr/0018-crash-reports-file-outside-database.md)). Текст исключения пишется только у белого списка `CrashDescription`, стек Java — без сообщений, след действий (`ActionTrail`) — только имена из кода: от нарушенного правила остаётся член `Invariant`.
 
 ## Стиль C#
 
